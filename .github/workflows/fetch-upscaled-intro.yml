@@ -2,18 +2,24 @@ name: Fetch and optimize upscaled intro
 
 # One-shot helper: pulls the Higgsfield 4K upscale (runner has open internet),
 # web-optimizes it with ffmpeg (H.264, faststart, tuned to stay well under
-# GitHub's 100MB file limit), and commits it to this branch. Triggered manually.
+# GitHub's 100MB file limit), and commits it to this branch.
+#
+# Triggered by pushing this workflow file. The in-workflow commit is pushed
+# with GITHUB_TOKEN, which by design does NOT trigger another run, so there is
+# no recursion.
 
 on:
-  workflow_dispatch:
-    inputs:
-      source_url:
-        description: "Direct URL of the upscaled video to fetch"
-        required: true
-        type: string
+  push:
+    branches:
+      - claude/darulamir-redesign-hyz302
+    paths:
+      - .github/workflows/fetch-upscaled-intro.yml
 
 permissions:
   contents: write
+
+env:
+  SOURCE_URL: "https://d8j0ntlcm91z4.cloudfront.net/user_3GMvo3e1s3xJXyaDvyljaVxMslN/hf_20260712_105955_2861b2b3-9dee-4a64-bfea-420d7295c5b1.mp4"
 
 jobs:
   fetch-and-optimize:
@@ -33,7 +39,7 @@ jobs:
       - name: Download source
         run: |
           set -euo pipefail
-          curl -fSL "${{ github.event.inputs.source_url }}" -o raw.mp4
+          curl -fSL "$SOURCE_URL" -o raw.mp4
           echo "Downloaded $(stat -c%s raw.mp4) bytes"
           echo "== source stream =="
           ffprobe -v error -select_streams v:0 \
