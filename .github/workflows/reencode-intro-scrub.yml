@@ -1,0 +1,98 @@
+name: Re-encode intro for scroll-scrub
+
+# One-shot helper: re-encodes the committed desktop intro to 1440p ALL-INTRA
+# (a keyframe on every frame) so scroll-scrubbing (vid.currentTime = f(scroll))
+# can seek to any position and decode a single frame instantly. Lower
+# resolution than 4K decodes far faster per seek; all-intra removes the
+# decode-from-previous-keyframe cost. Both are what make scrubbing fluid.
+#
+# Triggered by pushing this workflow file. The in-workflow commit uses
+# GITHUB_TOKEN, which does not re-trigger runs, so there is no recursion.
+
+on:
+  push:
+    branches:
+      - claude/darulamir-redesign-hyz302
+    paths:
+      - .github/workflows/reencode-intro-scrub.yml
+
+permissions:
+  contents: write
+
+jobs:
+  reencode:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -version | head -1
+
+      - name: Inspect source
+        run: |
+          set -euo pipefail
+          echo "Source size: $(stat -c%s assets/darulamir-intro.mp4) bytes"
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,r_frame_rate,codec_name,nb_frames \
+            -show_entries format=duration -of default=noprint_wrappers=1 \
+            assets/darulamir-intro.mp4
+
+      - name: Re-encode 1440p all-intra
+        run: |
+          set -euo pipefail
+          LIMIT=95000000
+          cp assets/darulamir-intro.mp4 src.mp4
+          encode() {
+            local crf="$1"
+            # keyint=1 -> every frame is an IDR keyframe (all-intra).
+            # scenecut=0 keeps it deterministic. -an: the hero is muted.
+            ffmpeg -y -loglevel error -i src.mp4 \
+              -vf "scale=2560:-2:flags=lanczos" \
+              -c:v libx264 -preset slow -crf "$crf" \
+              -x264-params "keyint=1:min-keyint=1:scenecut=0" \
+              -pix_fmt yuv420p -movflags +faststart -an out.mp4
+          }
+          for crf in 20 22 24 26; do
+            encode "$crf"
+            SIZE=$(stat -c%s out.mp4)
+            echo "CRF $crf -> $SIZE bytes"
+            if [ "$SIZE" -le "$LIMIT" ]; then
+              echo "Accepted at CRF $crf ($SIZE bytes)"
+              break
+            fi
+          done
+          SIZE=$(stat -c%s out.mp4)
+          if [ "$SIZE" -gt "$LIMIT" ]; then
+            echo "Still over limit; dropping to 1080p all-intra"
+            ffmpeg -y -loglevel error -i src.mp4 \
+              -vf "scale=1920:-2:flags=lanczos" \
+              -c:v libx264 -preset slow -crf 22 \
+              -x264-params "keyint=1:min-keyint=1:scenecut=0" \
+              -pix_fmt yuv420p -movflags +faststart -an out.mp4
+          fi
+          echo "== final =="
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,nb_frames -of default=noprint_wrappers=1 out.mp4
+          echo "Final size: $(stat -c%s out.mp4) bytes"
+          mv out.mp4 assets/darulamir-intro.mp4
+          rm -f src.mp4
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- assets/darulamir-intro.mp4; then
+            echo "No change to commit"
+            exit 0
+          fi
+          NEWSIZE=$(stat -c%s assets/darulamir-intro.mp4)
+          git add assets/darulamir-intro.mp4
+          git commit -m "Re-encode intro to 1440p all-intra for smooth scroll-scrub (${NEWSIZE} bytes)"
+          git push
