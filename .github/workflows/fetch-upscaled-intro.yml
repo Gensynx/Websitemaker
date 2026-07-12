@@ -1,0 +1,92 @@
+name: Fetch and optimize upscaled intro
+
+# One-shot helper: pulls the Higgsfield 4K upscale (runner has open internet),
+# web-optimizes it with ffmpeg (H.264, faststart, tuned to stay well under
+# GitHub's 100MB file limit), and commits it to this branch. Triggered manually.
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_url:
+        description: "Direct URL of the upscaled video to fetch"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  fetch-and-optimize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -version | head -1
+
+      - name: Download source
+        run: |
+          set -euo pipefail
+          curl -fSL "${{ github.event.inputs.source_url }}" -o raw.mp4
+          echo "Downloaded $(stat -c%s raw.mp4) bytes"
+          echo "== source stream =="
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,r_frame_rate,codec_name \
+            -show_entries format=duration -of default=noprint_wrappers=1 raw.mp4
+
+      - name: Web-optimize (keep 4K, compress under 95MB)
+        run: |
+          set -euo pipefail
+          LIMIT=95000000
+          encode() {
+            local crf="$1"
+            ffmpeg -y -loglevel error -i raw.mp4 \
+              -c:v libx264 -profile:v high -pix_fmt yuv420p \
+              -crf "$crf" -preset slow -movflags +faststart \
+              -c:a aac -b:a 128k out.mp4
+          }
+          # Start at a high-quality CRF; step up compression only if the file
+          # would exceed the 100MB git limit.
+          for crf in 22 24 26 28; do
+            encode "$crf"
+            SIZE=$(stat -c%s out.mp4)
+            echo "CRF $crf -> $SIZE bytes"
+            if [ "$SIZE" -le "$LIMIT" ]; then
+              echo "Accepted at CRF $crf ($SIZE bytes)"
+              break
+            fi
+          done
+          SIZE=$(stat -c%s out.mp4)
+          if [ "$SIZE" -gt "$LIMIT" ]; then
+            echo "Still over limit at 4K; scaling to 2560px wide as a fallback"
+            ffmpeg -y -loglevel error -i raw.mp4 \
+              -vf "scale=2560:-2" -c:v libx264 -profile:v high -pix_fmt yuv420p \
+              -crf 24 -preset slow -movflags +faststart \
+              -c:a aac -b:a 128k out.mp4
+          fi
+          echo "== final =="
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height -of default=noprint_wrappers=1 out.mp4
+          echo "Final size: $(stat -c%s out.mp4) bytes"
+          mv out.mp4 assets/darulamir-intro.mp4
+          rm -f raw.mp4
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- assets/darulamir-intro.mp4; then
+            echo "No change to commit"
+            exit 0
+          fi
+          NEWSIZE=$(stat -c%s assets/darulamir-intro.mp4)
+          git add assets/darulamir-intro.mp4
+          git commit -m "Replace desktop intro with web-optimized 4K upscale (${NEWSIZE} bytes)"
+          git push
