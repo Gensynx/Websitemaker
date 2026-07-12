@@ -561,7 +561,7 @@ footer{background:var(--plum-deep);border-top:1px solid var(--line-soft);padding
   function boot(){paintStars();paintCards();observeReveals();onScroll();}
   var startv=(location.hash||"").replace("#","");
   if(VIEWS.indexOf(startv)>0){go(startv);document.body.classList.add("entered");}
-  /* portrait phones: prefer a vertical cut if hosted (assets/darulamir-intro-vertical.mp4) */try{if(window.matchMedia("(max-width:760px),(orientation:portrait)").matches){var vs=document.createElement("source");vs.src="assets/darulamir-intro-vertical.mp4";vs.type="video/mp4";vid.insertBefore(vs,vid.firstChild);}vid.load();}catch(e){}
+  /* one intro clip on all viewports; object-fit:cover center-crops on portrait (motion converges on the central door, so the crop holds) */try{vid.load();}catch(e){}
   window.addEventListener("load",boot);setTimeout(boot,300);
   var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){paintStars();paintCards();},180);});
 })();
