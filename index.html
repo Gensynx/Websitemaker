@@ -55,6 +55,14 @@ p{margin:0}
 .gate-hint .lbl{font-size:.7rem;letter-spacing:.34em;text-transform:uppercase}
 .gate-hint .chev{width:22px;height:22px;animation:bob 1.8s var(--e-inout) infinite}
 @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(7px)}}
+/* portrait phones: stack the hero CTAs full-width and keep the tagline on-screen */
+@media (max-width:600px){
+  .hero .inner{margin-top:4vh;width:100%}
+  .hero .cta-row{flex-direction:column;gap:.75rem;width:100%;max-width:340px;margin:0 auto}
+  .hbtn{width:100%;min-width:0;padding:1em 1.2em;font-size:.95rem}
+  .hero .tagline{letter-spacing:.16em;font-size:.7rem;margin-top:1.5rem;max-width:90%;line-height:1.7}
+  .hero .moon{width:56px;top:6%}
+}
 
 /* ============ BUTTONS ============ */
 .btn{display:inline-flex;align-items:center;gap:.7em;border:1px solid var(--gold);color:var(--gold-bright);padding:.95em 2em;letter-spacing:.06em;font-size:.86rem;position:relative;overflow:hidden;transition:color .4s var(--e-out);border-radius:2px}
@@ -561,7 +569,7 @@ footer{background:var(--plum-deep);border-top:1px solid var(--line-soft);padding
   function boot(){paintStars();paintCards();observeReveals();onScroll();}
   var startv=(location.hash||"").replace("#","");
   if(VIEWS.indexOf(startv)>0){go(startv);document.body.classList.add("entered");}
-  /* one intro clip on all viewports; object-fit:cover center-crops on portrait (motion converges on the central door, so the crop holds) */try{vid.load();}catch(e){}
+  /* portrait phones load the 9:16 vertical cut for proper full-screen framing */try{if(window.matchMedia("(max-width:760px),(orientation:portrait)").matches){var vs=document.createElement("source");vs.src="assets/darulamir-intro-vertical.mp4";vs.type="video/mp4";vid.insertBefore(vs,vid.firstChild);}vid.load();}catch(e){}
   window.addEventListener("load",boot);setTimeout(boot,300);
   var rt;window.addEventListener("resize",function(){clearTimeout(rt);rt=setTimeout(function(){paintStars();paintCards();},180);});
 })();
