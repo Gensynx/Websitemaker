@@ -2,7 +2,32 @@
 
 Static websites built with Claude Code. Each site is a self-contained folder that can be hosted anywhere (Netlify, Vercel, GitHub Pages) with no build step.
 
-## Current site: Dar Ul Amir
+## Sites in this repo
+
+| Site | Where | URL when hosted on GitHub Pages |
+|---|---|---|
+| Dar Ul Amir (thobes & perfumery) | repo root (`index.html`) | `https://gensynx.github.io/Websitemaker/` |
+| Vassallo Developments | `vassallo/` | `https://gensynx.github.io/Websitemaker/vassallo/` |
+
+## Site: Vassallo Developments (`vassallo/`)
+
+Property acquisition / design / development one-pager. Opens with a
+scroll-scrubbed Higgsfield film — a derelict townhouse rebuilt floor by floor,
+ending on the new front door closing — capped by the line *"We make the
+impossible possible."*, then hands off into the brochure site (approach, work,
+track record, enquiry form).
+
+```
+vassallo/
+  index.html                          the site (fonts embedded)
+  assets/
+    vassallo-transformation.mp4       ADD THIS FILE (see assets/README.txt) —
+                                      until it exists the page streams the clip
+                                      from the Higgsfield CDN as a fallback
+    vassallo-transformation-vertical.mp4  optional 9:16 cut for phones
+```
+
+## Site: Dar Ul Amir
 
 `index.html` is the Dar Ul Amir storefront redesign (Thobe Atelier and Perfumery). It is a single-page, multi-view site: Home, Thobes, Perfumes, Contact, Refund Policy, with a scroll-scrubbed palace video intro that hands off into a matching hero.
 
