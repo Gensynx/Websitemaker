@@ -12,10 +12,12 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 ## Site: Vassallo Developments (`vassallo/`)
 
 Property acquisition / design / development one-pager. Opens with a
-scroll-scrubbed Higgsfield film — a derelict townhouse rebuilt floor by floor,
-ending on the new front door closing — capped by the line *"We make the
-impossible possible."*, then hands off into the brochure site (approach, work,
-track record, enquiry form).
+scroll-scrubbed Higgsfield film: the camera walks into a derelict townhouse,
+through the decayed hallway and living room, then glides back out as every
+room renovates itself around you, ending with the new front door closing on a
+pristine facade — capped by the line *"We make the impossible possible."* —
+then hands off into the brochure site (approach, work, track record, enquiry
+form).
 
 ```
 vassallo/
