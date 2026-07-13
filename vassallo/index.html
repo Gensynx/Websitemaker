@@ -381,7 +381,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
     <video class="intro-video" id="introVideo" muted playsinline preload="auto" disablepictureinpicture>
       <source src="assets/vassallo-transformation.mp4" type="video/mp4">
       <!-- temporary fallback while the local file is absent — replace by committing the mp4 (see assets/README.txt) -->
-      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_3GMvo3e1s3xJXyaDvyljaVxMslN/hf_20260712_233042_0db7823f-a233-4bf2-ad96-77a7ecc00ea9.mp4" type="video/mp4">
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_3GMvo3e1s3xJXyaDvyljaVxMslN/hf_20260713_000341_dcf6480a-2ead-433e-bcb2-3c775ad56ff7.mp4" type="video/mp4">
     </video>
     <div class="intro-shade" aria-hidden="true"></div>
     <div class="intro-beat"><p>Every building has a past.</p></div>
@@ -808,10 +808,10 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
   var beats = intro.querySelectorAll(".intro-beat");
   var cue = document.getElementById("introCue");
   var nav = document.getElementById("nav");
-  var vdur = 15, vready = false;
+  var vdur = 12, vready = false;
 
   vid.addEventListener("loadedmetadata", function(){
-    vdur = vid.duration || 15; vready = true;
+    vdur = vid.duration || 12; vready = true;
     try{ vid.pause(); vid.currentTime = 0; }catch(e){}
   });
 

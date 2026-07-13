@@ -2,12 +2,13 @@ Vassallo Developments — video assets
 ====================================
 
 vassallo-transformation.mp4  (ADD THIS FILE — required for reliable hosting)
-  The 15s Higgsfield (Kling 3.0) story shot: into the derelict house, through
-  the decayed hallway and living room, then gliding back out as every room
-  renovates itself around the camera, ending with the new front door closing
-  on a pristine facade. Download it from:
-  https://d8j0ntlcm91z4.cloudfront.net/user_3GMvo3e1s3xJXyaDvyljaVxMslN/hf_20260712_233042_0db7823f-a233-4bf2-ad96-77a7ecc00ea9.mp4
-  (also in your Higgsfield account under Generations, 2026-07-12)
+  The 12s Higgsfield (Cinema Studio) story shot: into the derelict house,
+  through the decayed hallway and living room, then gliding back out as every
+  room renovates itself around the camera, ending with the new front door
+  closing on a fully repaired, pristine facade (end frame pinned to a
+  generated photo so no exterior damage remains). Download it from:
+  https://d8j0ntlcm91z4.cloudfront.net/user_3GMvo3e1s3xJXyaDvyljaVxMslN/hf_20260713_000341_dcf6480a-2ead-433e-bcb2-3c775ad56ff7.mp4
+  (also in your Higgsfield account under Generations, 2026-07-13)
   Save it here as vassallo-transformation.mp4. Until the file exists the site
   streams it straight from the Higgsfield CDN — fine for previewing, but that
   URL can expire, so commit the file before real launch.
