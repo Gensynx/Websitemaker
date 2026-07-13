@@ -1,0 +1,89 @@
+name: Build blurred-fill vertical intro
+
+# One-shot helper: derives the phone intro from the SAME desktop clip so the
+# footage matches. Fits the 16:9 clip to a 9:16 (720x1280) canvas by centering
+# the full frame over a blurred, darkened, cover-scaled copy of itself — full
+# palace stays visible, screen is filled, nothing cropped. Output is all-intra
+# (a keyframe on every frame) for smooth scroll-scrubbing on all phones.
+#
+# Triggered by pushing this workflow file. The in-workflow commit uses
+# GITHUB_TOKEN, which does not re-trigger runs.
+
+on:
+  push:
+    branches:
+      - claude/darulamir-redesign-hyz302
+    paths:
+      - .github/workflows/build-vertical-blurfill.yml
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -version | head -1
+
+      - name: Inspect desktop source
+        run: |
+          set -euo pipefail
+          echo "Source size: $(stat -c%s assets/darulamir-intro.mp4) bytes"
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,r_frame_rate,nb_frames \
+            -show_entries format=duration -of default=noprint_wrappers=1 \
+            assets/darulamir-intro.mp4
+
+      - name: Build 720x1280 blurred-fill, all-intra
+        run: |
+          set -euo pipefail
+          LIMIT=95000000
+          cp assets/darulamir-intro.mp4 src.mp4
+          # bg: cover-scale the clip to fill 720x1280, crop, blur, darken.
+          # fg: the full 16:9 frame scaled to 720 wide, centered over bg.
+          FC="[0:v]split=2[bg][fg];[bg]scale=720:1280:force_original_aspect_ratio=increase,crop=720:1280,boxblur=32:1,eq=brightness=-0.12[bgb];[fg]scale=720:-2:flags=lanczos[fgs];[bgb][fgs]overlay=(W-w)/2:(H-h)/2,format=yuv420p,setsar=1[outv]"
+          build() {
+            local crf="$1"
+            ffmpeg -y -loglevel error -i src.mp4 -filter_complex "$FC" -map "[outv]" \
+              -c:v libx264 -preset slow -crf "$crf" \
+              -x264-params "keyint=1:min-keyint=1:scenecut=0" \
+              -pix_fmt yuv420p -movflags +faststart -an out.mp4
+          }
+          for crf in 20 22 24 26; do
+            build "$crf"
+            SIZE=$(stat -c%s out.mp4)
+            echo "CRF $crf -> $SIZE bytes"
+            if [ "$SIZE" -le "$LIMIT" ]; then
+              echo "Accepted at CRF $crf ($SIZE bytes)"
+              break
+            fi
+          done
+          echo "== final =="
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,nb_frames -of default=noprint_wrappers=1 out.mp4
+          echo "Final size: $(stat -c%s out.mp4) bytes"
+          mv out.mp4 assets/darulamir-intro-vertical.mp4
+          rm -f src.mp4
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- assets/darulamir-intro-vertical.mp4; then
+            echo "No change to commit"
+            exit 0
+          fi
+          NEWSIZE=$(stat -c%s assets/darulamir-intro-vertical.mp4)
+          git add assets/darulamir-intro-vertical.mp4
+          git commit -m "Rebuild vertical from desktop clip: 720x1280 blurred-fill, all-intra (${NEWSIZE} bytes)"
+          git push
