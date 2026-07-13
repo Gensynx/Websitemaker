@@ -1,0 +1,85 @@
+name: Fetch upscaled vertical and all-intra encode
+
+# One-shot helper: fetches the Higgsfield 1080x1920 upscale of the phone intro
+# (runner has open internet), re-encodes it all-intra (a keyframe on every
+# frame) for smooth scroll-scrubbing, and commits it. Kept under GitHub's
+# 100MB file limit via a CRF step-up. Triggered by pushing this workflow file.
+
+on:
+  push:
+    branches:
+      - claude/darulamir-redesign-hyz302
+    paths:
+      - .github/workflows/fetch-vertical-1080.yml
+
+permissions:
+  contents: write
+
+env:
+  SOURCE_URL: "https://d8j0ntlcm91z4.cloudfront.net/user_3GMvo3e1s3xJXyaDvyljaVxMslN/hf_20260713_005946_423e7f4f-0b9b-477c-986e-29c4e82c587a.mp4"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Install ffmpeg
+        run: |
+          if ! command -v ffmpeg >/dev/null 2>&1; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq ffmpeg
+          fi
+          ffmpeg -version | head -1
+
+      - name: Download upscaled source
+        run: |
+          set -euo pipefail
+          curl -fSL "$SOURCE_URL" -o raw.mp4
+          echo "Downloaded $(stat -c%s raw.mp4) bytes"
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,r_frame_rate,nb_frames \
+            -show_entries format=duration -of default=noprint_wrappers=1 raw.mp4
+
+      - name: Re-encode 1080x1920 all-intra
+        run: |
+          set -euo pipefail
+          LIMIT=95000000
+          encode() {
+            local crf="$1"
+            ffmpeg -y -loglevel error -i raw.mp4 \
+              -vf "scale=1080:-2:flags=lanczos" \
+              -c:v libx264 -preset slow -crf "$crf" \
+              -x264-params "keyint=1:min-keyint=1:scenecut=0" \
+              -pix_fmt yuv420p -movflags +faststart -an out.mp4
+          }
+          for crf in 21 23 25 27; do
+            encode "$crf"
+            SIZE=$(stat -c%s out.mp4)
+            echo "CRF $crf -> $SIZE bytes"
+            if [ "$SIZE" -le "$LIMIT" ]; then
+              echo "Accepted at CRF $crf ($SIZE bytes)"
+              break
+            fi
+          done
+          echo "== final =="
+          ffprobe -v error -select_streams v:0 \
+            -show_entries stream=width,height,nb_frames -of default=noprint_wrappers=1 out.mp4
+          echo "Final size: $(stat -c%s out.mp4) bytes"
+          mv out.mp4 assets/darulamir-intro-vertical.mp4
+          rm -f raw.mp4
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- assets/darulamir-intro-vertical.mp4; then
+            echo "No change to commit"
+            exit 0
+          fi
+          NEWSIZE=$(stat -c%s assets/darulamir-intro-vertical.mp4)
+          git add assets/darulamir-intro-vertical.mp4
+          git commit -m "Upscale phone intro to 1080x1920, all-intra (${NEWSIZE} bytes)"
+          git push
