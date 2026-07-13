@@ -23,9 +23,7 @@ form).
 vassallo/
   index.html                          the site (fonts embedded)
   assets/
-    vassallo-transformation.mp4       ADD THIS FILE (see assets/README.txt) —
-                                      until it exists the page streams the clip
-                                      from the Higgsfield CDN as a fallback
+    vassallo-transformation.mp4       the intro film (committed, all-intra 720p)
     vassallo-transformation-vertical.mp4  optional 9:16 cut for phones
 ```
 
