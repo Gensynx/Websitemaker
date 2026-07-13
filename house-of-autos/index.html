@@ -725,7 +725,6 @@
   </div>
 </footer>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (function(){
   "use strict";
@@ -811,132 +810,149 @@
   }
 
   /* =========================================================
-     Three.js hero background — a slow drive through the house's
+     Hero background — a slow drive through the house's
      underground garage: warm ring ceiling lights receding into
      the dark (as in the brand photography), reflections on
-     polished concrete, columns, navy haze. Classy, not sci-fi.
+     polished concrete, columns and drifting dust. Rendered on a
+     plain 2D <canvas> with a hand-rolled perspective projection,
+     so it has NO external dependency and runs everywhere.
      ========================================================= */
-  function initHero3D(){
-    if(reduce||!window.THREE)return;
+  function initHeroGarage(){
+    if(reduce)return; // motion-sensitive users keep the static gradient
     var host=document.getElementById("hero3d");
     if(!host)return;
-    var W=host.clientWidth||window.innerWidth;
-    var H=host.clientHeight||window.innerHeight;
-    var renderer;
-    try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:true})}
-    catch(err){return} // no WebGL — gradient fallback stays
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));
-    renderer.setSize(W,H);
-    host.appendChild(renderer.domElement);
+    var canvas=document.createElement("canvas");
+    var ctx=canvas.getContext("2d");
+    if(!ctx)return; // no 2D context — gradient fallback stays
+    host.appendChild(canvas);
 
-    var scene=new THREE.Scene();
-    scene.fog=new THREE.Fog(0x0C1626,6,110);
-    var camera=new THREE.PerspectiveCamera(58,W/H,0.1,200);
-    camera.position.set(0,1.5,12); // driver's eye height
+    var W=0,H=0,dpr=1,cx=0,cy=0,focal=0;
+    function resize(){
+      W=host.clientWidth||window.innerWidth;
+      H=host.clientHeight||window.innerHeight;
+      if(!W||!H)return;
+      dpr=Math.min(window.devicePixelRatio||1,2);
+      canvas.width=W*dpr; canvas.height=H*dpr;
+      canvas.style.width=W+"px"; canvas.style.height=H+"px";
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+      cx=W/2; cy=H/2;
+      focal=H*0.9;            // ~58° vertical field of view
+    }
+    resize();
 
+    // world layout (metres) — camera rolls forward along -z
     var CEIL=7.2, FLOOR=-2.2, BAY=14, ROWS=9, DEPTH=ROWS*BAY;
+    var CAMZ=12, LANE=4.6, COLX=9.5, RING=2.5;
+    var camX=0, camY=1.5;     // eased toward the cursor each frame
 
-    // floor + ceiling planes (polished concrete / soffit)
-    var floor=new THREE.Mesh(new THREE.PlaneGeometry(70,DEPTH*2.4),
-      new THREE.MeshBasicMaterial({color:0x0A1322}));
-    floor.rotation.x=-Math.PI/2; floor.position.set(0,FLOOR,-DEPTH*0.8);
-    scene.add(floor);
-    var ceil=new THREE.Mesh(new THREE.PlaneGeometry(70,DEPTH*2.4),
-      new THREE.MeshBasicMaterial({color:0x0E1A2E}));
-    ceil.rotation.x=Math.PI/2; ceil.position.set(0,CEIL+0.1,-DEPTH*0.8);
-    scene.add(ceil);
-
-    // warm ring lights on the ceiling + their reflection on the floor
-    var units=[];
-    var ringGeo=new THREE.TorusGeometry(2.5,0.09,10,64);
-    var glowGeo=new THREE.CircleGeometry(2.3,48);
-    function addLightUnit(x,z){
-      var warm=new THREE.MeshBasicMaterial({color:0xF3E8CF,transparent:true,opacity:0.95});
-      var glow=new THREE.MeshBasicMaterial({color:0xEFE0BC,transparent:true,opacity:0.14});
-      var refl=new THREE.MeshBasicMaterial({color:0xC8A45C,transparent:true,opacity:0.13});
-      var ring=new THREE.Mesh(ringGeo,warm); ring.rotation.x=Math.PI/2;
-      var disc=new THREE.Mesh(glowGeo,glow); disc.rotation.x=Math.PI/2;
-      var g=new THREE.Group(); g.add(ring); g.add(disc);
-      g.position.set(x,CEIL,z); scene.add(g);
-      var mirror=new THREE.Mesh(ringGeo,refl); mirror.rotation.x=Math.PI/2;
-      mirror.position.set(x,FLOOR+0.02,z); scene.add(mirror);
-      units.push({top:g,mirror:mirror});
-    }
-    // columns marking the parking bays
-    var cols=[];
-    var colGeo=new THREE.BoxGeometry(0.9,CEIL-FLOOR,0.9);
-    var colMat=new THREE.MeshBasicMaterial({color:0x111D33});
-    function addColumns(z){
-      [-9.5,9.5].forEach(function(x){
-        var c=new THREE.Mesh(colGeo,colMat);
-        c.position.set(x,(CEIL+FLOOR)/2,z);
-        scene.add(c); cols.push(c);
-      });
-    }
+    var lights=[], columns=[];
     for(var i=0;i<ROWS;i++){
-      addLightUnit(-4.6,-i*BAY);
-      addLightUnit(4.6,-i*BAY-BAY/2);
-      addColumns(-i*BAY-BAY/4);
+      lights.push({x:-LANE, z:-i*BAY});
+      lights.push({x: LANE, z:-i*BAY-BAY/2});
+      columns.push({x:-COLX, z:-i*BAY-BAY/4});
+      columns.push({x: COLX, z:-i*BAY-BAY/4});
     }
-
-    // faint drifting dust in the headlight haze
-    var N=220, pos=new Float32Array(N*3);
+    var N=220, dust=[];
     for(var j=0;j<N;j++){
-      pos[j*3]=(Math.random()-0.5)*24;
-      pos[j*3+1]=FLOOR+Math.random()*(CEIL-FLOOR);
-      pos[j*3+2]=-Math.random()*DEPTH;
+      dust.push({x:(Math.random()-0.5)*24,
+                 y:FLOOR+Math.random()*(CEIL-FLOOR),
+                 z:-Math.random()*DEPTH, seed:Math.random()*6.28});
     }
-    var pGeo=new THREE.BufferGeometry();
-    pGeo.setAttribute("position",new THREE.BufferAttribute(pos,3));
-    var dust=new THREE.Points(pGeo,new THREE.PointsMaterial({
-      color:0xEDE7DA,size:0.06,transparent:true,opacity:0.3}));
-    scene.add(dust);
 
-    // gentle cursor parallax — a glance around the garage
-    var mx=0,my=0;
-    window.addEventListener("mousemove",function(e){
-      mx=e.clientX/window.innerWidth-0.5;
-      my=e.clientY/window.innerHeight-0.5;
-    },{passive:true});
+    // project a world point to screen; returns null if behind camera
+    function project(x,y,z){
+      var d=CAMZ-z;                // depth in front of the camera
+      if(d<=0.25)return null;
+      var s=focal/d;
+      return {sx:cx+(x-camX)*s, sy:cy-(y-camY)*s, s:s, d:d};
+    }
+    // fog: nearer = brighter, fades into the navy haze with distance
+    function fog(d){
+      var f=1-(d-4)/95; return f<0?0:(f>1?1:f);
+    }
+
+    function drawRing(x,y,z,warm){
+      var p=project(x,y,z); if(!p)return;
+      var r=RING*p.s, a=fog(p.d);
+      if(a<=0.01||r<0.4)return;
+      // soft glow
+      var g=ctx.createRadialGradient(p.sx,p.sy,0,p.sx,p.sy,r*1.7);
+      if(warm){
+        g.addColorStop(0,"rgba(243,232,207,"+(0.16*a)+")");
+        g.addColorStop(1,"rgba(243,232,207,0)");
+      }else{
+        g.addColorStop(0,"rgba(200,164,92,"+(0.10*a)+")");
+        g.addColorStop(1,"rgba(200,164,92,0)");
+      }
+      ctx.fillStyle=g;
+      ctx.beginPath(); ctx.arc(p.sx,p.sy,r*1.7,0,6.283); ctx.fill();
+      // the ring itself
+      ctx.lineWidth=Math.max(0.6,r*0.06);
+      ctx.strokeStyle=warm?"rgba(245,235,212,"+(0.95*a)+")"
+                          :"rgba(200,164,92,"+(0.5*a)+")";
+      ctx.beginPath(); ctx.arc(p.sx,p.sy,r,0,6.283); ctx.stroke();
+    }
+
+    function drawColumn(x,z){
+      var top=project(x,CEIL,z), bot=project(x,FLOOR,z);
+      if(!top||!bot)return;
+      var w=0.9*top.s, a=fog(top.d)*0.85;
+      if(a<=0.01)return;
+      ctx.fillStyle="rgba(17,29,51,"+a+")";
+      ctx.fillRect(top.sx-w/2, top.sy, w, bot.sy-top.sy);
+    }
 
     var visible=true;
     if("IntersectionObserver" in window){
       new IntersectionObserver(function(en){visible=en[0].isIntersecting},{threshold:0})
         .observe(host);
     }
+    var mx=0,my=0;
+    window.addEventListener("mousemove",function(e){
+      mx=e.clientX/window.innerWidth-0.5;
+      my=e.clientY/window.innerHeight-0.5;
+    },{passive:true});
 
-    var speed=0.022; // a stately roll through the bays, not a fly-through
-    function wrapZ(o){
-      o.position.z+=speed;
-      if(o.position.z>camera.position.z+4)o.position.z-=DEPTH;
-    }
+    var speed=0.022, t=0;
     function tick(){
       requestAnimationFrame(tick);
-      if(!visible||document.hidden)return;
-      units.forEach(function(u){wrapZ(u.top);wrapZ(u.mirror)});
-      cols.forEach(wrapZ);
-      var arr=dust.geometry.attributes.position.array;
-      for(var k=0;k<N;k++){
-        arr[k*3+2]+=speed*0.5;
-        arr[k*3+1]+=Math.sin((Date.now()*0.0002)+k)*0.0008;
-        if(arr[k*3+2]>camera.position.z+2)arr[k*3+2]-=DEPTH;
-      }
-      dust.geometry.attributes.position.needsUpdate=true;
-      camera.position.x+=(mx*1.1-camera.position.x)*0.025;
-      camera.position.y+=(1.5-my*0.6-camera.position.y)*0.025;
-      camera.lookAt(0,1.6,camera.position.z-30);
-      renderer.render(scene,camera);
+      if(!visible||document.hidden||!W||!H)return;
+      t+=0.016;
+      camX+=(mx*1.1-camX)*0.025;
+      camY+=(1.5-my*0.6-camY)*0.025;
+
+      // advance everything toward the camera, wrapping at the back
+      function roll(o){o.z+=speed; if(o.z>CAMZ+4)o.z-=DEPTH;}
+      lights.forEach(roll); columns.forEach(roll);
+      dust.forEach(function(p){
+        p.z+=speed*0.5; p.y+=Math.sin(t+p.seed)*0.0008;
+        if(p.z>CAMZ+2)p.z-=DEPTH;
+      });
+
+      ctx.clearRect(0,0,W,H);
+
+      // far to near so nearer lights overlay the distant haze
+      columns.slice().sort(function(a,b){return a.z-b.z;}).forEach(function(c){drawColumn(c.x,c.z);});
+      var ordered=lights.slice().sort(function(a,b){return a.z-b.z;});
+      ordered.forEach(function(l){                       // floor reflections first
+        drawRing(l.x,FLOOR+0.02,l.z,false);
+      });
+      ordered.forEach(function(l){                       // then the ceiling rings
+        drawRing(l.x,CEIL,l.z,true);
+      });
+
+      dust.forEach(function(p){                           // drifting dust motes
+        var pr=project(p.x,p.y,p.z); if(!pr)return;
+        var a=fog(pr.d)*0.3; if(a<=0.01)return;
+        ctx.fillStyle="rgba(237,231,218,"+a+")";
+        ctx.beginPath(); ctx.arc(pr.sx,pr.sy,Math.max(0.4,pr.s*0.06),0,6.283); ctx.fill();
+      });
     }
     tick();
 
-    window.addEventListener("resize",function(){
-      W=host.clientWidth;H=host.clientHeight;
-      if(!W||!H)return;
-      camera.aspect=W/H;camera.updateProjectionMatrix();
-      renderer.setSize(W,H);
-    });
+    window.addEventListener("resize",resize);
   }
-  initHero3D();
+  initHeroGarage();
 
   /* =========================================================
      Booking system (front end)
