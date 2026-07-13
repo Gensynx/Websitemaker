@@ -328,6 +328,11 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
    ============================================================ */
 .intro{position:relative;height:400vh;z-index:3;background:#100D0A}
 .intro-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#100D0A}
+/* touch devices can't reliably scrub video on scroll — the film autoplays
+   through instead, so the intro is just one screen tall */
+@media (pointer:coarse), (max-width:760px){
+  .intro{height:100svh}
+}
 .intro-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .intro-shade{position:absolute;inset:0;background:
   linear-gradient(rgba(10,8,6,.38), rgba(10,8,6,0) 30%, rgba(10,8,6,0) 62%, rgba(10,8,6,.48)),
@@ -808,42 +813,32 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
   var nav = document.getElementById("nav");
   var vdur = 12, vready = false;
 
+  /* Touch devices (phones, tablets) can't reliably scrub a video frame-by-frame
+     on scroll, so there we let the film AUTOPLAY through on its own and time the
+     copy beats to the video. Pointer-based devices (desktop) get the scroll-scrub. */
+  var isTouch = window.matchMedia("(pointer:coarse)").matches
+             || window.matchMedia("(max-width:760px)").matches;
+
   vid.addEventListener("loadedmetadata", function(){
     vdur = vid.duration || 12; vready = true;
-    try{ vid.pause(); vid.currentTime = 0; }catch(e){}
+    if(!isTouch){ try{ vid.pause(); vid.currentTime = 0; }catch(e){} }
   });
 
-  /* portrait phones prefer the 9:16 vertical cut when the file exists */
-  try{
-    if(window.matchMedia("(max-width:760px),(orientation:portrait)").matches){
-      var vs = document.createElement("source");
-      vs.src = "assets/vassallo-transformation-vertical.mp4"; vs.type = "video/mp4";
-      vid.insertBefore(vs, vid.firstChild);
-    }
-    vid.load();
-  }catch(e){}
+  try{ vid.load(); }catch(e){}
 
-  /* if no source can load at all, drop the intro so the site still works */
+  /* if the video can't load at all, drop the intro so the site still works */
   function fail(){ intro.classList.add("collapsed"); nav.classList.remove("over-intro"); }
   var sources = vid.querySelectorAll("source");
-  sources[sources.length-1].addEventListener("error", fail);
+  if(sources.length){ sources[sources.length-1].addEventListener("error", fail); }
+  vid.addEventListener("error", fail);
 
   function clamp(v,a,b){ return Math.min(Math.max(v,a),b); }
-  /* fade a beat in and out inside its [a,b] scroll window */
+  /* fade a beat in and out inside its [a,b] progress window */
   function windowFade(p,a,b){ var f=.05; return clamp(Math.min((p-a)/f,(b-p)/f),0,1); }
-
   var BEATS = [[.03,.22],[.28,.46],[.52,.70]]; /* final beat handled separately — it stays */
 
-  function updateIntro(){
-    var rect = intro.getBoundingClientRect();
-    var range = intro.offsetHeight - window.innerHeight;
-    var p = clamp(-rect.top/(range>0?range:1), 0, 1);
-
-    nav.classList.toggle("over-intro", rect.bottom > 80);
-
-    var vp = clamp(p/.86, 0, 1);
-    if(vready){ try{ vid.currentTime = vp*vdur*.999; }catch(e){} }
-
+  /* set the four copy beats from a 0..1 progress value (shared by both modes) */
+  function paintBeats(p){
     for(var i=0;i<BEATS.length;i++){
       var o = windowFade(p, BEATS[i][0], BEATS[i][1]);
       beats[i].style.opacity = o.toFixed(3);
@@ -852,16 +847,62 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
     var fo = clamp((p-.80)/.08, 0, 1);
     beats[3].style.opacity = fo.toFixed(3);
     beats[3].style.transform = "translateY(" + ((1-fo)*22).toFixed(1) + "px)";
-
-    cue.style.opacity = Math.max(1-p*5, 0).toFixed(3);
   }
 
-  var iticking = false;
-  window.addEventListener("scroll", function(){
-    if(!iticking){ requestAnimationFrame(function(){ updateIntro(); iticking=false; }); iticking = true; }
-  }, {passive:true});
-  window.addEventListener("resize", updateIntro);
-  updateIntro();
+  /* ---------- DESKTOP: scroll scrubs the video ---------- */
+  function setupScrub(){
+    function updateIntro(){
+      var rect = intro.getBoundingClientRect();
+      var range = intro.offsetHeight - window.innerHeight;
+      var p = clamp(-rect.top/(range>0?range:1), 0, 1);
+      nav.classList.toggle("over-intro", rect.bottom > 80);
+      var vp = clamp(p/.86, 0, 1);
+      if(vready){ try{ vid.currentTime = vp*vdur*.999; }catch(e){} }
+      paintBeats(p);
+      cue.style.opacity = Math.max(1-p*5, 0).toFixed(3);
+    }
+    var iticking = false;
+    window.addEventListener("scroll", function(){
+      if(!iticking){ requestAnimationFrame(function(){ updateIntro(); iticking=false; }); iticking = true; }
+    }, {passive:true});
+    window.addEventListener("resize", updateIntro);
+    updateIntro();
+  }
+
+  /* ---------- TOUCH: the film plays through, beats timed to it ---------- */
+  function setupPlaythrough(){
+    function paint(){ paintBeats(vid.duration ? clamp(vid.currentTime/vid.duration,0,1) : 0); }
+    vid.addEventListener("timeupdate", paint);
+    vid.addEventListener("ended", function(){ paintBeats(1); }); /* hold the finale */
+    paint();
+
+    /* try to autoplay; if the browser blocks it, start on the first interaction */
+    function play(){ var pr; try{ pr = vid.play(); }catch(e){} return pr; }
+    var pr = play();
+    if(pr && pr.catch){
+      pr.catch(function(){
+        var kick = function(){ play(); window.removeEventListener("touchstart",kick); window.removeEventListener("scroll",kick); window.removeEventListener("click",kick); };
+        window.addEventListener("touchstart", kick, {passive:true});
+        window.addEventListener("scroll", kick, {passive:true});
+        window.addEventListener("click", kick);
+      });
+    }
+
+    /* nav stays light while the film is on screen; cue fades once you scroll */
+    var nticking = false;
+    function onScroll(){
+      var rect = intro.getBoundingClientRect();
+      nav.classList.toggle("over-intro", rect.bottom > 80);
+      var y = window.scrollY || window.pageYOffset;
+      cue.style.opacity = Math.max(1 - y/120, 0).toFixed(3);
+    }
+    window.addEventListener("scroll", function(){
+      if(!nticking){ requestAnimationFrame(function(){ onScroll(); nticking=false; }); nticking = true; }
+    }, {passive:true});
+    onScroll();
+  }
+
+  if(isTouch){ setupPlaythrough(); } else { setupScrub(); }
 })();
 </script>
 
