@@ -1,0 +1,4 @@
+# One-off standalone build (video embedded inline, ~15 MB) — generated on
+# demand for sharing/emailing, not part of the site source. The hosted site
+# uses vassallo/index.html + vassallo/assets/ instead.
+vassallo-standalone.html
