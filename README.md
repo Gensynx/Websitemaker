@@ -2,6 +2,10 @@
 
 Static websites built with Claude Code. Each site is a self-contained folder that can be hosted anywhere (Netlify, Vercel, GitHub Pages) with no build step.
 
+## Sites in this repo
+- **Dar Ul Amir** — repo root (`index.html`), deployed at https://gensynx.github.io/Websitemaker/
+- **Coverworks** — `coverworks/` folder, the studio's own animated site (see `coverworks/README.md`)
+
 ## Current site: Dar Ul Amir
 
 `index.html` is the Dar Ul Amir storefront redesign (Thobe Atelier and Perfumery). It is a single-page, multi-view site: Home, Thobes, Perfumes, Contact, Refund Policy, with a scroll-scrubbed palace video intro that hands off into a matching hero.
