@@ -1,2 +1,10 @@
+# Python bytecode from .claude skill scripts
 __pycache__/
 *.pyc
+
+# Node
+node_modules/
+
+# OS noise
+.DS_Store
+Thumbs.db
