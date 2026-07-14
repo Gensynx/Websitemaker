@@ -4,7 +4,8 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 
 ## Sites in this repo
 - **Dar Ul Amir** — repo root (`index.html`), deployed at https://gensynx.github.io/Websitemaker/
-- **Coverworks** — `coverworks/` folder, the studio's own animated site (see `coverworks/README.md`)
+- **Coveworks** — `coveworks/` folder, the studio's own animated site, editorial luxury edition (see `coveworks/README.md`)
+- **Coveworks scifi** — `coveworks-scifi/` folder, the mission control edition of the same site (see `coveworks-scifi/README.md`)
 
 ## Current site: Dar Ul Amir
 
