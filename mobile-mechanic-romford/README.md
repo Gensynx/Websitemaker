@@ -1,13 +1,22 @@
 # Mobile Mechanic Romford
 
-A premium, single-page website for **Farhan · Mobile Mechanic Romford** — the mobile
+Premium, single-page website(s) for **Farhan · Mobile Mechanic Romford** — the mobile
 mechanic who comes to your driveway across Romford and East London.
 
-Self-contained: one `index.html` with all CSS and JS inline. No build step, no image
-files, no external dependencies except Google Fonts (which fall back gracefully to system
-fonts if blocked). Host it anywhere.
+Each page is self-contained: one HTML file with all CSS and JS inline. No build step, no
+image files, no external dependencies except Google Fonts (which fall back gracefully to
+system fonts if blocked). Host either one anywhere.
 
-## Design
+## Two designs — pick one
+| File | Vibe |
+|---|---|
+| **`index.html`** | Clean "premium concierge" — molten gold on charcoal, Sora/Inter, restrained luxury. |
+| **`garage.html`** | Full car/garage theme — gunmetal + racing-red + hazard-yellow, Rajdhani, carbon fibre, a car illustration with spinning wheels, a speedometer rating gauge, an interactive **dashboard warning-light decoder**, tyre-tread dividers and a radar coverage map. |
+
+Both share the same content, real reviews and `CONFIG` block. Decide which you prefer and
+make it the site's `index.html` (rename or copy), or A/B test them.
+
+## Design (index.html)
 - **Look:** dark "molten gold on charcoal" automotive luxury — bold Sora/Inter type,
   gold gradient accents, glass cards, subtle motion.
 - **Structure:** Hero → assurance marquee → Services → Instant Quote estimator →
