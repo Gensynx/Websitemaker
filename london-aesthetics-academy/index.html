@@ -157,15 +157,14 @@ p{margin:0}
 .drawer .panel .btn{margin-top:22px}
 
 /* ============================================================ HERO */
-.hero{position:relative;overflow:hidden;background:var(--wine)}
-.hero-media{position:absolute;inset:0;z-index:0}
-.hero-media img{width:100%;height:100%;object-fit:cover;opacity:.5}
-.hero-media::after{
-  content:"";position:absolute;inset:0;
+.hero{position:relative;overflow:hidden;
   background:
-    linear-gradient(115deg,rgba(36,30,28,.86) 0%,rgba(58,37,48,.72) 42%,rgba(58,37,48,.30) 100%),
-    radial-gradient(90% 90% at 80% 10%,rgba(176,138,87,.28),transparent 60%);
+    radial-gradient(85% 85% at 82% 6%,rgba(176,138,87,.22),transparent 55%),
+    linear-gradient(120deg,#241E1C 0%,var(--wine) 55%,var(--wine-2) 100%);
 }
+.hero-media{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.hero-circle{position:absolute;top:50%;left:60%;transform:translate(-50%,-50%);width:min(640px,74vw);height:auto}
+@media(max-width:900px){.hero-circle{left:72%;top:40%;width:min(520px,92vw)}}
 .hero-inner{position:relative;z-index:2;padding:clamp(70px,11vw,140px) 0 clamp(80px,11vw,140px)}
 .hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center}
 .hero-copy{max-width:640px;color:#fff}
@@ -499,8 +498,11 @@ p{margin:0}
 
 <!-- ============ HERO ============ -->
 <section class="hero">
-  <div class="hero-media">
-    <img data-img="hero" alt="Aesthetics practitioner performing a treatment in a luxury clinic setting">
+  <div class="hero-media" aria-hidden="true">
+    <svg class="hero-circle" viewBox="0 0 600 600" fill="none">
+      <circle cx="300" cy="300" r="200" stroke="#B08A57" stroke-opacity="0.32" stroke-width="1.5"/>
+      <path d="M300 80V520M80 300H520" stroke="#B08A57" stroke-opacity="0.16" stroke-width="1.5"/>
+    </svg>
   </div>
   <div class="hero-inner wrap">
     <div class="hero-grid">

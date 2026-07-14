@@ -6,9 +6,11 @@ breaks — add photos whenever you're ready and they swap in automatically.
 
 Use JPG, roughly **2× the display size** for a crisp result.
 
+The hero now uses a styled aubergine + gold background (a decorative crosshair
+circle), so it needs no photo.
+
 | Filename | Where it appears | Ideal size | Suggested subject |
 |---|---|---|---|
-| `hero.jpg` | Full-screen hero background | 2000×1200+ | A treatment in progress / trainer at work, elegant clinic |
 | `trainers.jpg` | About section portrait | 1000×1250 (4:5) | Jodi & Levi together, warm and professional |
 | `gallery-1.jpg` | Gallery — large tile | 1200×1200 | Signature training-day shot |
 | `gallery-2.jpg` | Gallery | 800×800 | Close-up of a treatment |
