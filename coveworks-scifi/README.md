@@ -1,27 +1,31 @@
-# Coveworks · the flagship site with four themes
+# Coveworks · the flagship site with five themes
 
-The Coveworks studio site with four complete personalities in one self contained file. Visitors land on a welcome screen ("Welcome to Coveworks. Select a theme.") with three buttons, each rendered in its own theme. Picking one plays that theme's intro and lands on the hero. A floating bubble then lets them switch at any time.
+The Coveworks studio site with five complete personalities in one self contained file. Visitors land on a welcome screen ("Welcome to Coveworks. Select a theme.") with five buttons, each rendered in its own theme. Picking one plays that theme's intro and lands on the hero. A floating bubble then lets them switch at any time.
 
-## The four themes
+## The five themes
 - **Scifi**: deep space blue, signal cyan, Chakra Petch type, HUD chrome, clipped corners, scramble decode headlines, warp starfield, terminal boot intro, crosshair cursor
 - **Editorial**: warm black, brass, Fraunces serif with italic accents, rounded shapes, film grain, line rise headlines, drifting gold dust, counter curtain intro, quiet ring cursor
 - **Light**: pure white and gold, Space Grotesk, pill and rounded shapes, halo glows, light rays, golden bokeh, shimmer sweep headlines, radiant intro
-- **Terminal**: phosphor green on black, everything monospace, hard offset shadows, CRT flicker and scanlines, matrix rain, typed headlines with a block cursor, green tinted work frames
+- **Terminal**: phosphor green on black, everything monospace, hard offset shadows, CRT flicker and scanlines, matrix rain, typed headlines with a block cursor
+- **Glass**: deep water blue, 3d glass panels with blur and rim highlights, rising bubbles, underwater light shafts, character wave headlines, glass orb bubble
 
-Each theme has its own intro, headline entrance, canvas particles, shapes, fonts and chrome. Same words everywhere.
+Each theme has its own intro, headline entrance, canvas particles, shapes, fonts and chrome, and the particle effect now runs across the entire page, not just the hero. Work screenshots are never tinted by a theme; only the chrome around them changes. Same words everywhere.
 
 ## The theme bubble
 - Free roams the page with wandering physics while being pulled toward the pointer, settles beside it when you stop, and freezes when you reach for it; a small tag then reminds you that T cycles themes. Docks bottom right on phones
 - Press it to cycle themes (spam friendly), or hover it to fan out four themed dots and pick one directly; the picker stays open with a grace period so the dots are easy to hit
-- Morphs shape to match the active theme: cyan diamond, brass sphere, white halo orb, green terminal square
+- Morphs shape to match the active theme: cyan diamond, brass sphere, white halo orb, green terminal square, glass droplet orb
 - A full page wipe in the new theme's colour carries the switch, and the headline replays its entrance
 - Keyboard: press T anywhere to cycle themes
-- The choice is remembered between visits
+- The choice is remembered between visits, and `?theme=glass` (or any theme name) in the URL opens that theme directly, skipping the welcome screen
 
 ## Structure
 ```
-index.html          the whole site (all font sets and images embedded, ~660 KB)
+index.html          the whole site (all font sets and images embedded, ~685 KB)
 ```
+
+## The works page
+The work section starts with Vassallo Developments and links to an all works page (`#/works`), a themed grid of small previews. Selecting a build opens a popup with a large preview on one side and the story, tags and a live site link on the other. Back button, backdrop click and Escape all close it; the hash route means the browser back button works too.
 
 ## Also animated
 - Velocity reactive ticker, draggable work carousel with momentum, snap and parallax
