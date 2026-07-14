@@ -600,12 +600,13 @@ html:not(.js) #themeDock{display:none}
 html:not(.theme-editorial):not(.theme-light):not(.theme-terminal) #themeBubble .tb-sf{opacity:1;scale:1}
 .theme-editorial #themeBubble .tb-ed{opacity:1;scale:1}
 .theme-light #themeBubble .tb-li{opacity:1;scale:1}
-#themeDock .tb-tip{position:absolute;right:calc(100% + 14px);top:50%;translate:0 -50%;
-  font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan);
+#themeDock .tb-tip{position:absolute;left:50%;top:calc(100% + 14px);translate:-50% 0;
+  font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);
   background:var(--bg-2);border:1px solid var(--cyan-line);padding:7px 14px;white-space:nowrap;pointer-events:none;
-  opacity:0;transform:translateX(8px);transition:opacity .35s,transform .35s var(--ease)}
-.theme-editorial #themeDock .tb-tip{border-radius:99px}
-#themeDock.open .tb-tip{opacity:1;transform:translateX(0)}
+  opacity:0;transform:translateY(-6px);transition:opacity .35s,transform .35s var(--ease)}
+.theme-editorial #themeDock .tb-tip,.theme-light #themeDock .tb-tip{border-radius:99px}
+.theme-light #themeDock .tb-tip{background:#FFFFFF}
+#themeDock.open .tb-tip,#themeDock.hint .tb-tip{opacity:1;transform:translateY(0)}
 /* picker dots fan out to the upper left */
 .tb-dot{pointer-events:auto;position:absolute;left:50%;top:50%;width:44px;height:44px;margin:-22px 0 0 -22px;
   display:flex;align-items:center;justify-content:center;cursor:pointer;
@@ -1786,11 +1787,12 @@ var dots = Array.prototype.slice.call(document.querySelectorAll('.tb-dot'));
 var pickerOpen = false, pickerTimer = null;
 var bubbleFloats = finePointer && !reduce;
 if (bubbleFloats) dock.classList.add('float');
-var bx = window.innerWidth - 110, by = window.innerHeight - 110, bFrozen = false, bubbleHover = false;
+var bx = window.innerWidth - 160, by = window.innerHeight - 200, bFrozen = false, bubbleHover = false;
+var bvx = 0, bvy = 0, wanderA = Math.random() * 6.2832, hintT = null;
 function syncBubble(){
   var t = THEMES[themeIdx()];
   bubble.setAttribute('aria-label', 'Cycle theme. Current: ' + t.label);
-  tbTip.textContent = 'Theme: ' + t.label;
+  tbTip.textContent = 'Theme: ' + t.label + ' \u00b7 press T to cycle';
   dots.forEach(function(d){ d.classList.toggle('on', d.getAttribute('data-theme') === t.k); });
 }
 var closeGrace = null;
@@ -1870,12 +1872,32 @@ function loop(){
     }
     /* bubble follows the cursor with a soft trail; freezes when you get close so you can catch it */
     if (bubbleFloats){
-      var tx = Math.max(130, Math.min(window.innerWidth - 84, mx + 52));
-      var ty = Math.max(130, Math.min(window.innerHeight - 84, my + 52));
-      var bdist = Math.hypot(mx - (bx + 30), my - (by + 30));
-      if (pickerOpen || bubbleHover || bdist < 46) bFrozen = true;
-      else if (bdist > 104) bFrozen = false;
-      if (!bFrozen){ bx = lerp(bx, tx, 0.13); by = lerp(by, ty, 0.13); }
+      var bdx = mx - (bx + 30), bdy = my - (by + 30);
+      var bdist = Math.hypot(bdx, bdy) || 1;
+      if (pickerOpen || bubbleHover || bdist < 50) bFrozen = true;
+      else if (bdist > 120) bFrozen = false;
+      if (!bFrozen){
+        /* free roam: random wander plus a pull toward the pointer that grows with distance */
+        wanderA += (Math.random() - .5) * .55;
+        var pull = Math.min(.85, bdist * .0016) + .05;
+        bvx += (bdx / bdist) * pull + Math.cos(wanderA) * .22;
+        bvy += (bdy / bdist) * pull + Math.sin(wanderA) * .22;
+        bvx *= .93; bvy *= .93;
+        var bsp = Math.hypot(bvx, bvy), BMAX = 8;
+        if (bsp > BMAX){ bvx *= BMAX / bsp; bvy *= BMAX / bsp; }
+        bx += bvx; by += bvy;
+        if (bx < 140) bvx += .5; if (bx > window.innerWidth - 100) bvx -= .5;
+        if (by < 140) bvy += .5; if (by > window.innerHeight - 160) bvy -= .5;
+        bx = Math.max(110, Math.min(window.innerWidth - 80, bx));
+        by = Math.max(110, Math.min(window.innerHeight - 140, by));
+      } else { bvx = 0; bvy = 0; }
+      /* settled beside the pointer: hint that T cycles themes */
+      if (bFrozen && !pickerOpen && !bubbleHover){
+        if (!hintT) hintT = setTimeout(function(){ dock.classList.add('hint'); hintT = 0; }, 450);
+      } else if (!bFrozen){
+        if (hintT) clearTimeout(hintT);
+        hintT = null; dock.classList.remove('hint');
+      }
       dock.style.transform = 'translate(' + bx.toFixed(2) + 'px,' + by.toFixed(2) + 'px)';
     }
   } else {

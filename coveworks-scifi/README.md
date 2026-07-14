@@ -11,7 +11,7 @@ The Coveworks studio site with four complete personalities in one self contained
 Each theme has its own intro, headline entrance, canvas particles, shapes, fonts and chrome. Same words everywhere.
 
 ## The theme bubble
-- Chases the pointer around the page on desktop, settling right beside it, and freezes when you reach for it so it is easy to catch; docks bottom right on phones
+- Free roams the page with wandering physics while being pulled toward the pointer, settles beside it when you stop, and freezes when you reach for it; a small tag then reminds you that T cycles themes. Docks bottom right on phones
 - Press it to cycle themes (spam friendly), or hover it to fan out four themed dots and pick one directly; the picker stays open with a grace period so the dots are easy to hit
 - Morphs shape to match the active theme: cyan diamond, brass sphere, white halo orb, green terminal square
 - A full page wipe in the new theme's colour carries the switch, and the headline replays its entrance
