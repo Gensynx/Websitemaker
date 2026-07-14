@@ -1,13 +1,19 @@
-# Coveworks · scifi edition
+# Coveworks · scifi edition, with a theme switcher
 
-A second, heavily animated take on the Coveworks studio site. Mission control theme: deep space blue, signal cyan, HUD chrome everywhere. One self contained file: fonts (Chakra Petch, Space Grotesk, Share Tech Mono) and all images are embedded as data URIs, so it works opened straight from disk.
+A heavily animated take on the Coveworks studio site, now with two full themes in one file. A floating bubble (bottom right) follows the visitor, morphs shape to match the active theme, and swaps the entire personality of the page:
+
+- **Scifi cut** (default): deep space blue, signal cyan, Chakra Petch type, HUD chrome, clipped corners, warp starfield, crosshair cursor
+- **Editorial cut**: warm black, brass, Fraunces serif, rounded shapes, film grain, drifting gold dust, quiet ring cursor
+
+The choice is remembered between visits. One self contained file: both font sets and all images are embedded as data URIs, so it works opened straight from disk.
 
 ## Structure
 ```
-index.html          the whole site (fonts and images embedded, ~350 KB)
+index.html          the whole site (both theme font sets and images embedded, ~630 KB)
 ```
 
 ## What is animated
+- The theme bubble: bobs idly, lags with your scroll, leans toward the cursor, morphs from cyan diamond to brass sphere on switch, and replays the headline decode in the new theme
 - Terminal boot sequence with typing status lines and a counter
 - Headline decode effect (characters scramble into place)
 - Canvas starfield that goes to warp when you scroll fast, with mouse parallax
