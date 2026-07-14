@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>London's Aesthetics Academy — Accredited Aesthetics Training in West London</title>
+<meta name="description" content="Accredited, hands-on aesthetics training from practising injectors. Intimate class sizes, live models and lifetime mentorship — from your first treatment to your own clinic. West London.">
+<meta property="og:title" content="London's Aesthetics Academy — Master the Art of Aesthetics">
+<meta property="og:description" content="Accredited, insured, hands-on aesthetics courses in West London. Small classes, real models, lifetime support.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   London's Aesthetics Academy — luxury redesign
+   Palette: warm ivory · espresso ink · champagne gold · deep aubergine
+   Type: Playfair Display (display) + Inter (UI/body)
+   ============================================================ */
+:root{
+  --ivory:#FAF6F1;
+  --sand:#F2E9DF;
+  --blush:#F0E3DD;
+  --surface:#FFFFFF;
+  --ink:#241E1C;
+  --ink-2:#6B5F58;
+  --ink-3:#9A8D84;
+  --line:#E7DBCE;
+  --line-2:#EFE7DC;
+  --gold:#B08A57;
+  --gold-2:#96703E;
+  --gold-soft:#D8BF97;
+  --wine:#3A2530;
+  --wine-2:#4E3341;
+  --wine-ink:#F4E9EC;
+  --shadow-sm:0 1px 2px rgba(58,37,48,.05), 0 2px 8px rgba(58,37,48,.05);
+  --shadow:0 10px 30px -12px rgba(58,37,48,.20), 0 4px 12px -6px rgba(58,37,48,.10);
+  --shadow-lg:0 30px 60px -20px rgba(58,37,48,.30);
+  --r-sm:10px; --r:16px; --r-lg:24px; --r-xl:34px;
+  --max:1200px;
+  --ease:cubic-bezier(.2,.7,.2,1);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;
+  font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  color:var(--ink);
+  background:var(--ivory);
+  font-size:17px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+h1,h2,h3,h4{font-family:'Playfair Display',Georgia,serif;font-weight:600;line-height:1.1;letter-spacing:-.01em;margin:0}
+p{margin:0}
+::selection{background:var(--gold);color:#fff}
+
+/* --- shared utilities --- */
+.wrap{max-width:var(--max);margin:0 auto;padding:0 26px}
+.eyebrow{
+  font-size:12px;letter-spacing:.32em;text-transform:uppercase;font-weight:600;
+  color:var(--gold-2);display:inline-flex;align-items:center;gap:12px;
+}
+.eyebrow::before{content:"";width:28px;height:1px;background:var(--gold);opacity:.7}
+.eyebrow.center::before{display:none}
+.section{padding:clamp(72px,10vw,130px) 0}
+.section-head{max-width:660px}
+.section-head.center{margin:0 auto;text-align:center}
+.section-head h2{font-size:clamp(30px,4.6vw,50px);margin:20px 0 0}
+.section-head p{color:var(--ink-2);margin-top:20px;font-size:18px}
+.lead{font-size:19px;color:var(--ink-2)}
+.gold-i{font-style:italic;color:var(--gold-2)}
+
+/* --- buttons --- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-weight:600;font-size:15px;letter-spacing:.01em;
+  padding:15px 30px;border-radius:100px;cursor:pointer;border:1px solid transparent;
+  transition:transform .25s var(--ease),background .25s var(--ease),color .25s var(--ease),box-shadow .25s var(--ease),border-color .25s var(--ease);
+  white-space:nowrap;
+}
+.btn svg{width:17px;height:17px}
+.btn-primary{background:var(--wine);color:#fff;box-shadow:0 10px 24px -12px rgba(58,37,48,.6)}
+.btn-primary:hover{background:var(--gold-2);transform:translateY(-2px);box-shadow:0 16px 30px -14px rgba(150,112,62,.7)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-2);transform:translateY(-2px)}
+.btn-light{background:#fff;color:var(--wine)}
+.btn-light:hover{background:var(--gold-soft);transform:translateY(-2px)}
+.btn-outline-light{background:transparent;color:#fff;border-color:rgba(255,255,255,.4)}
+.btn-outline-light:hover{border-color:#fff;background:rgba(255,255,255,.08);transform:translateY(-2px)}
+.link-arrow{display:inline-flex;align-items:center;gap:8px;font-weight:600;color:var(--gold-2);font-size:15px}
+.link-arrow svg{width:16px;height:16px;transition:transform .25s var(--ease)}
+.link-arrow:hover svg{transform:translateX(5px)}
+
+/* ============================================================ ANNOUNCEMENT */
+.topbar{
+  background:var(--wine);color:var(--wine-ink);font-size:13px;letter-spacing:.04em;
+  text-align:center;padding:9px 16px;
+}
+.topbar strong{color:#fff;font-weight:600}
+.topbar span{color:var(--gold-soft)}
+
+/* ============================================================ HEADER */
+.header{
+  position:sticky;top:0;z-index:100;background:rgba(250,246,241,.82);
+  backdrop-filter:saturate(140%) blur(14px);-webkit-backdrop-filter:saturate(140%) blur(14px);
+  border-bottom:1px solid transparent;transition:border-color .3s,box-shadow .3s,background .3s;
+}
+.header.scrolled{border-color:var(--line);box-shadow:0 6px 24px -18px rgba(58,37,48,.5)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:74px}
+.brand{display:flex;align-items:center;gap:13px}
+.brand .mark{
+  width:42px;height:42px;border-radius:50%;flex:none;
+  background:radial-gradient(120% 120% at 30% 20%,var(--gold-soft),var(--gold) 45%,var(--gold-2));
+  display:grid;place-items:center;color:#fff;box-shadow:inset 0 1px 3px rgba(255,255,255,.5),0 4px 12px -6px rgba(150,112,62,.7)}
+.brand .mark span{font-family:'Playfair Display',serif;font-weight:700;font-size:19px;letter-spacing:.02em}
+.brand .name{line-height:1.05}
+.brand .name b{font-family:'Playfair Display',serif;font-weight:600;font-size:18px;display:block;letter-spacing:.01em}
+.brand .name small{font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold-2);font-weight:600}
+.menu{display:flex;align-items:center;gap:30px}
+.menu a{font-size:14.5px;font-weight:500;color:var(--ink-2);position:relative;transition:color .2s}
+.menu a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:1.5px;background:var(--gold);transition:width .28s var(--ease)}
+.menu a:hover{color:var(--ink)}
+.menu a:hover::after{width:100%}
+.nav-cta{display:flex;align-items:center;gap:14px}
+.nav-cta .btn{padding:11px 22px;font-size:14px}
+.burger{display:none;background:none;border:0;cursor:pointer;width:44px;height:44px;color:var(--ink)}
+.burger svg{width:26px;height:26px}
+@media(max-width:960px){
+  .menu,.nav-cta .btn-ghost{display:none}
+  .burger{display:grid;place-items:center}
+}
+@media(max-width:560px){
+  .nav-cta{display:none}
+  .brand .name b{font-size:16px}
+  .brand .mark{width:38px;height:38px}
+}
+/* mobile drawer */
+.drawer{position:fixed;inset:0;z-index:200;pointer-events:none}
+.drawer .scrim{position:absolute;inset:0;background:rgba(36,30,28,.5);opacity:0;transition:opacity .3s}
+.drawer .panel{
+  position:absolute;top:0;right:0;height:100%;width:min(84vw,340px);background:var(--ivory);
+  box-shadow:var(--shadow-lg);transform:translateX(100%);transition:transform .4s var(--ease);
+  display:flex;flex-direction:column;padding:26px;overflow-y:auto;
+}
+.drawer.open{pointer-events:auto}
+.drawer.open .scrim{opacity:1}
+.drawer.open .panel{transform:translateX(0)}
+.drawer .panel .close{align-self:flex-end;background:none;border:0;cursor:pointer;color:var(--ink);width:44px;height:44px}
+.drawer .panel .close svg{width:26px;height:26px}
+.drawer .panel a{padding:15px 6px;font-size:18px;font-weight:500;border-bottom:1px solid var(--line-2);color:var(--ink)}
+.drawer .panel .btn{margin-top:22px}
+
+/* ============================================================ HERO */
+.hero{position:relative;overflow:hidden;background:var(--wine)}
+.hero-media{position:absolute;inset:0;z-index:0}
+.hero-media img{width:100%;height:100%;object-fit:cover;opacity:.5}
+.hero-media::after{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(115deg,rgba(36,30,28,.86) 0%,rgba(58,37,48,.72) 42%,rgba(58,37,48,.30) 100%),
+    radial-gradient(90% 90% at 80% 10%,rgba(176,138,87,.28),transparent 60%);
+}
+.hero-inner{position:relative;z-index:2;padding:clamp(70px,11vw,140px) 0 clamp(80px,11vw,140px)}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:60px;align-items:center}
+.hero-copy{max-width:640px;color:#fff}
+.hero .eyebrow{color:var(--gold-soft)}
+.hero .eyebrow::before{background:var(--gold-soft)}
+.hero h1{
+  font-size:clamp(42px,6.4vw,80px);line-height:1.02;margin:26px 0 0;color:#fff;font-weight:600;
+  letter-spacing:-.02em;
+}
+.hero h1 em{font-style:italic;color:var(--gold-soft);font-weight:500}
+.hero-sub{margin-top:26px;font-size:clamp(17px,1.9vw,20px);color:rgba(244,233,236,.9);max-width:560px;line-height:1.6}
+.hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:36px}
+.hero-trust{display:flex;flex-wrap:wrap;align-items:center;gap:10px 26px;margin-top:38px;padding-top:28px;border-top:1px solid rgba(255,255,255,.16)}
+.hero-trust .stars{color:var(--gold-soft);letter-spacing:2px;font-size:15px}
+.hero-trust span{font-size:14px;color:rgba(244,233,236,.82);display:inline-flex;align-items:center;gap:9px}
+.hero-trust span svg{width:17px;height:17px;color:var(--gold-soft)}
+/* hero side card */
+.hero-card{
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:var(--r-lg);
+  padding:30px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);color:#fff;box-shadow:var(--shadow-lg)}
+.hero-card h3{color:#fff;font-size:23px}
+.hero-card .tiny{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-soft);font-weight:600}
+.hero-card ul{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:14px}
+.hero-card li{display:flex;gap:12px;font-size:14.5px;color:rgba(244,233,236,.92);align-items:flex-start}
+.hero-card li svg{width:19px;height:19px;color:var(--gold-soft);flex:none;margin-top:1px}
+.hero-card .price{margin-top:22px;padding-top:20px;border-top:1px solid rgba(255,255,255,.16);display:flex;align-items:baseline;justify-content:space-between}
+.hero-card .price b{font-family:'Playfair Display',serif;font-size:30px;color:#fff}
+.hero-card .price s{color:rgba(244,233,236,.5)}
+.hero-wave{position:relative;z-index:2;line-height:0}
+.hero-wave svg{width:100%;height:auto;display:block}
+@media(max-width:900px){
+  .hero-grid{grid-template-columns:1fr;gap:40px}
+  .hero-card{max-width:440px}
+}
+
+/* ============================================================ MARQUEE / TRUST STRIP */
+.trust-strip{background:var(--sand);border-bottom:1px solid var(--line)}
+.trust-strip .wrap{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:14px 44px;padding:26px}
+.trust-item{display:inline-flex;align-items:center;gap:11px;font-size:14px;font-weight:500;color:var(--ink-2)}
+.trust-item svg{width:22px;height:22px;color:var(--gold-2);flex:none}
+.trust-item b{color:var(--ink);font-weight:600}
+
+/* ============================================================ STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:30px;text-align:center}
+.stat b{font-family:'Playfair Display',serif;font-size:clamp(38px,5vw,56px);color:var(--gold-2);display:block;line-height:1;font-weight:600}
+.stat span{display:block;margin-top:12px;font-size:14px;color:var(--ink-2);letter-spacing:.02em}
+@media(max-width:720px){.stats{grid-template-columns:1fr 1fr;gap:34px 20px}}
+
+/* ============================================================ ABOUT / TRAINERS */
+.about{background:var(--surface)}
+.about-grid{display:grid;grid-template-columns:.95fr 1.05fr;gap:clamp(40px,6vw,80px);align-items:center}
+.about-media{position:relative}
+.about-media .photo{
+  aspect-ratio:4/5;border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow-lg);
+  background:linear-gradient(150deg,var(--blush),var(--sand));
+}
+.about-media .photo img{width:100%;height:100%;object-fit:cover}
+.about-media .badge{
+  position:absolute;bottom:-26px;left:-26px;background:var(--wine);color:#fff;border-radius:var(--r);
+  padding:22px 26px;box-shadow:var(--shadow-lg);max-width:230px}
+.about-media .badge b{font-family:'Playfair Display',serif;font-size:34px;display:block;color:var(--gold-soft);line-height:1}
+.about-media .badge span{font-size:13px;color:rgba(244,233,236,.85);display:block;margin-top:6px}
+.about-media .frame{position:absolute;inset:18px -18px -18px 18px;border:1px solid var(--gold);border-radius:var(--r-lg);z-index:-1}
+.about-copy h2{font-size:clamp(30px,4.4vw,48px);margin-top:20px}
+.about-copy p{color:var(--ink-2);margin-top:20px}
+.sign{display:flex;align-items:center;gap:16px;margin-top:30px}
+.sign .who{font-family:'Playfair Display',serif;font-style:italic;font-size:22px;color:var(--wine)}
+.sign small{display:block;font-family:'Inter';font-style:normal;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-2);margin-top:2px}
+@media(max-width:860px){
+  .about-grid{grid-template-columns:1fr;gap:60px}
+  .about-media{max-width:440px;margin:0 auto}
+  .about-media .badge{left:0}
+}
+
+/* ============================================================ PATHWAYS (packages) */
+.pathways{background:var(--ivory)}
+.path-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;margin-top:56px;align-items:stretch}
+.path-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:34px 30px;
+  display:flex;flex-direction:column;position:relative;transition:transform .35s var(--ease),box-shadow .35s var(--ease),border-color .35s var(--ease);
+}
+.path-card:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:var(--gold-soft)}
+.path-card .tier{font-size:12px;letter-spacing:.24em;text-transform:uppercase;font-weight:600;color:var(--gold-2)}
+.path-card h3{font-size:29px;margin-top:8px}
+.path-card .blurb{color:var(--ink-2);font-size:15px;margin-top:12px;min-height:44px}
+.path-card .cost{display:flex;align-items:baseline;gap:8px;margin:22px 0 4px}
+.path-card .cost b{font-family:'Playfair Display',serif;font-size:42px;color:var(--ink)}
+.path-card .cost small{color:var(--ink-3);font-size:14px}
+.path-card .finance{font-size:13px;color:var(--gold-2);font-weight:500}
+.path-card ul{list-style:none;padding:0;margin:24px 0;display:grid;gap:13px;flex:1}
+.path-card li{display:flex;gap:11px;font-size:14.5px;color:var(--ink);align-items:flex-start}
+.path-card li svg{width:18px;height:18px;color:var(--gold);flex:none;margin-top:2px}
+.path-card .btn{width:100%}
+.path-card.featured{background:linear-gradient(180deg,var(--wine),var(--wine-2));border-color:var(--wine);color:#fff;box-shadow:var(--shadow-lg)}
+.path-card.featured .tier{color:var(--gold-soft)}
+.path-card.featured h3,.path-card.featured .cost b{color:#fff}
+.path-card.featured .blurb{color:rgba(244,233,236,.8)}
+.path-card.featured .cost small{color:rgba(244,233,236,.6)}
+.path-card.featured li{color:rgba(244,233,236,.94)}
+.path-card.featured li svg{color:var(--gold-soft)}
+.path-card.featured .finance{color:var(--gold-soft)}
+.path-card.featured:hover{transform:translateY(-10px)}
+.path-card .ribbon{
+  position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;
+  font-size:11px;letter-spacing:.18em;text-transform:uppercase;font-weight:600;padding:6px 18px;border-radius:100px;white-space:nowrap;box-shadow:0 8px 18px -8px rgba(150,112,62,.8)}
+.path-note{text-align:center;margin-top:34px;font-size:14px;color:var(--ink-3)}
+@media(max-width:900px){.path-grid{grid-template-columns:1fr;max-width:440px;margin-inline:auto}}
+
+/* ============================================================ COURSES */
+.courses{background:var(--surface)}
+.course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:52px}
+.course{
+  border:1px solid var(--line);border-radius:var(--r);padding:28px 26px;background:var(--ivory);
+  transition:transform .3s var(--ease),box-shadow .3s var(--ease),border-color .3s var(--ease);position:relative;overflow:hidden;
+}
+.course::before{content:"";position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,var(--gold-soft),var(--gold));transform:scaleX(0);transform-origin:left;transition:transform .35s var(--ease)}
+.course:hover{transform:translateY(-5px);box-shadow:var(--shadow);border-color:var(--gold-soft)}
+.course:hover::before{transform:scaleX(1)}
+.course .ico{width:52px;height:52px;border-radius:14px;background:var(--blush);display:grid;place-items:center;color:var(--gold-2);margin-bottom:18px}
+.course .ico svg{width:26px;height:26px}
+.course h3{font-size:21px}
+.course p{color:var(--ink-2);font-size:14.5px;margin-top:9px;min-height:63px}
+.course .meta{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.course .meta .from{font-size:13px;color:var(--ink-3)}
+.course .meta .from b{font-family:'Playfair Display',serif;font-size:20px;color:var(--ink);display:block}
+.course .meta .dur{font-size:12.5px;color:var(--gold-2);font-weight:600;letter-spacing:.04em;background:var(--sand);padding:5px 11px;border-radius:100px}
+@media(max-width:900px){.course-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.course-grid{grid-template-columns:1fr}.course p{min-height:0}}
+
+/* ============================================================ WHY / FEATURES */
+.why{background:var(--wine);color:#fff;position:relative;overflow:hidden}
+.why::before{content:"";position:absolute;top:-30%;right:-10%;width:520px;height:520px;border-radius:50%;
+  background:radial-gradient(circle,rgba(176,138,87,.35),transparent 65%)}
+.why .section-head h2,.why .section-head .eyebrow{color:#fff}
+.why .eyebrow{color:var(--gold-soft)}
+.why .eyebrow::before{background:var(--gold-soft)}
+.why .section-head p{color:rgba(244,233,236,.8)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:56px;position:relative}
+.feat{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.14);border-radius:var(--r);padding:30px 28px;transition:background .3s,transform .3s var(--ease)}
+.feat:hover{background:rgba(255,255,255,.09);transform:translateY(-4px)}
+.feat .ico{width:50px;height:50px;border-radius:13px;background:rgba(216,191,151,.16);display:grid;place-items:center;color:var(--gold-soft);margin-bottom:18px}
+.feat .ico svg{width:25px;height:25px}
+.feat h3{color:#fff;font-size:20px}
+.feat p{color:rgba(244,233,236,.78);font-size:14.5px;margin-top:10px}
+@media(max-width:860px){.feat-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.feat-grid{grid-template-columns:1fr}}
+
+/* ============================================================ JOURNEY / STEPS */
+.journey{background:var(--sand)}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;margin-top:56px;counter-reset:step}
+.step{position:relative}
+.step .num{
+  width:56px;height:56px;border-radius:50%;border:1px solid var(--gold);color:var(--gold-2);
+  display:grid;place-items:center;font-family:'Playfair Display',serif;font-size:24px;background:var(--ivory);margin-bottom:20px}
+.step h3{font-size:20px}
+.step p{color:var(--ink-2);font-size:14.5px;margin-top:9px}
+.step:not(:last-child) .num::after{content:"";position:absolute;top:28px;left:56px;width:calc(100% - 56px);height:1px;background:repeating-linear-gradient(90deg,var(--gold-soft),var(--gold-soft) 5px,transparent 5px,transparent 11px)}
+@media(max-width:860px){.steps{grid-template-columns:1fr 1fr;gap:36px 26px}.step .num::after{display:none}}
+@media(max-width:480px){.steps{grid-template-columns:1fr}}
+
+/* ============================================================ GALLERY */
+.gallery{background:var(--surface)}
+.gal-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-auto-rows:180px;gap:16px;margin-top:52px}
+.gal{border-radius:var(--r);overflow:hidden;position:relative;background:linear-gradient(150deg,var(--blush),var(--sand));box-shadow:var(--shadow-sm)}
+.gal img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+.gal:hover img{transform:scale(1.06)}
+.gal::after{content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(58,37,48,.35),transparent 50%);opacity:0;transition:opacity .3s}
+.gal:hover::after{opacity:1}
+.gal.big{grid-column:span 2;grid-row:span 2}
+.gal.wide{grid-column:span 2}
+@media(max-width:820px){
+  .gal-grid{grid-template-columns:1fr 1fr;grid-auto-rows:150px}
+  .gal.big{grid-column:span 2;grid-row:span 2}
+  .gal.wide{grid-column:span 2}
+}
+
+/* ============================================================ TESTIMONIALS */
+.reviews{background:var(--ivory)}
+.rev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:52px}
+.rev{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:32px 30px;position:relative;transition:transform .3s var(--ease),box-shadow .3s var(--ease)}
+.rev:hover{transform:translateY(-4px);box-shadow:var(--shadow)}
+.rev .q{font-family:'Playfair Display',serif;font-size:54px;line-height:.6;color:var(--gold-soft);height:24px}
+.rev .stars{color:var(--gold);letter-spacing:2px;font-size:15px;margin:14px 0 4px}
+.rev p{color:var(--ink);font-size:15.5px;line-height:1.6}
+.rev .who{display:flex;align-items:center;gap:13px;margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.rev .who .av{width:46px;height:46px;border-radius:50%;background:linear-gradient(140deg,var(--gold-soft),var(--gold-2));display:grid;place-items:center;color:#fff;font-family:'Playfair Display',serif;font-size:18px;flex:none}
+.rev .who b{font-size:15px}
+.rev .who small{display:block;color:var(--ink-3);font-size:13px}
+@media(max-width:860px){.rev-grid{grid-template-columns:1fr}.rev-grid{max-width:520px;margin-inline:auto}}
+
+/* ============================================================ FAQ */
+.faq{background:var(--surface)}
+.faq-wrap{max-width:820px;margin:52px auto 0}
+.qa{border-bottom:1px solid var(--line)}
+.qa button{
+  width:100%;background:none;border:0;cursor:pointer;text-align:left;padding:26px 0;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;font-family:'Playfair Display',serif;
+  font-size:20px;color:var(--ink);font-weight:500;line-height:1.3}
+.qa .ico{width:34px;height:34px;border-radius:50%;border:1px solid var(--line);flex:none;display:grid;place-items:center;color:var(--gold-2);transition:transform .3s var(--ease),background .3s,border-color .3s}
+.qa .ico svg{width:18px;height:18px}
+.qa.open .ico{transform:rotate(45deg);background:var(--gold);border-color:var(--gold);color:#fff}
+.qa .ans{max-height:0;overflow:hidden;transition:max-height .4s var(--ease)}
+.qa .ans p{color:var(--ink-2);padding:0 0 26px;font-size:15.5px;max-width:680px}
+
+/* ============================================================ CTA BAND */
+.cta-band{background:linear-gradient(135deg,var(--wine),var(--wine-2));color:#fff;text-align:center;position:relative;overflow:hidden}
+.cta-band::before,.cta-band::after{content:"";position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(176,138,87,.3),transparent 60%)}
+.cta-band::before{width:400px;height:400px;top:-160px;left:-100px}
+.cta-band::after{width:460px;height:460px;bottom:-220px;right:-120px}
+.cta-band .inner{position:relative;z-index:2;max-width:680px;margin:0 auto}
+.cta-band h2{font-size:clamp(30px,4.6vw,50px);color:#fff}
+.cta-band p{color:rgba(244,233,236,.86);margin-top:18px;font-size:18px}
+.cta-band .hero-actions{justify-content:center;margin-top:34px}
+
+/* ============================================================ CONTACT */
+.contact{background:var(--ivory)}
+.contact-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:clamp(36px,5vw,64px);align-items:start}
+.contact-info h2{font-size:clamp(28px,4.2vw,44px);margin-top:18px}
+.contact-info p{color:var(--ink-2);margin-top:18px}
+.info-list{list-style:none;padding:0;margin:32px 0 0;display:grid;gap:20px}
+.info-list li{display:flex;gap:16px;align-items:flex-start}
+.info-list .ico{width:48px;height:48px;border-radius:13px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--gold-2);flex:none}
+.info-list .ico svg{width:22px;height:22px}
+.info-list b{display:block;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold-2)}
+.info-list span{color:var(--ink);font-size:16px}
+.info-list a{color:var(--ink)}
+.info-list a:hover{color:var(--gold-2)}
+.socials{display:flex;gap:12px;margin-top:30px}
+.socials a{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;color:var(--ink);transition:all .25s var(--ease)}
+.socials a:hover{background:var(--wine);color:#fff;border-color:var(--wine);transform:translateY(-3px)}
+.socials a svg{width:21px;height:21px}
+/* form */
+.form-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(28px,4vw,42px);box-shadow:var(--shadow)}
+.form-card h3{font-size:24px}
+.form-card > p{color:var(--ink-2);font-size:15px;margin-top:8px}
+.field{margin-top:20px}
+.field label{display:block;font-size:13px;font-weight:600;letter-spacing:.03em;margin-bottom:8px;color:var(--ink)}
+.field label .req{color:var(--gold-2)}
+.field input,.field select,.field textarea{
+  width:100%;padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--ivory);
+  font-family:inherit;font-size:15px;color:var(--ink);transition:border-color .2s,box-shadow .2s;min-height:50px}
+.field textarea{min-height:120px;resize:vertical}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(176,138,87,.15);background:#fff}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-card .btn{width:100%;margin-top:24px}
+.form-note{font-size:12.5px;color:var(--ink-3);text-align:center;margin-top:14px}
+.form-success{display:none;text-align:center;padding:20px 0}
+.form-success.show{display:block}
+.form-success .tick{width:64px;height:64px;border-radius:50%;background:var(--blush);color:var(--gold-2);display:grid;place-items:center;margin:0 auto 18px}
+.form-success .tick svg{width:32px;height:32px}
+.form-success h3{color:var(--wine)}
+.form-success p{color:var(--ink-2);margin-top:10px}
+@media(max-width:860px){.contact-grid{grid-template-columns:1fr;gap:44px}.field-row{grid-template-columns:1fr}}
+
+/* ============================================================ FOOTER */
+.footer{background:#1E1815;color:rgba(244,233,236,.7);padding:70px 0 30px}
+.foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:40px}
+.foot-brand .brand .name b{color:#fff}
+.foot-brand p{margin-top:18px;font-size:14.5px;max-width:280px;color:rgba(244,233,236,.6)}
+.footer h4{font-family:'Inter';font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-soft);font-weight:600;margin-bottom:18px}
+.footer ul{list-style:none;padding:0;margin:0;display:grid;gap:11px}
+.footer ul a{font-size:14.5px;color:rgba(244,233,236,.66);transition:color .2s}
+.footer ul a:hover{color:#fff}
+.foot-bottom{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-top:56px;padding-top:26px;border-top:1px solid rgba(255,255,255,.1);font-size:13px;color:rgba(244,233,236,.5)}
+.foot-bottom a{color:rgba(244,233,236,.6)}
+.foot-bottom a:hover{color:#fff}
+@media(max-width:860px){.foot-grid{grid-template-columns:1fr 1fr;gap:36px 24px}.foot-brand{grid-column:span 2}}
+@media(max-width:520px){.foot-grid{grid-template-columns:1fr}.foot-brand{grid-column:auto}}
+
+/* ============================================================ REVEAL ANIM */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  *{scroll-behavior:auto !important}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ ANNOUNCEMENT ============ -->
+<div class="topbar">
+  <strong>Next intake now booking</strong> &nbsp;·&nbsp; Accredited &amp; fully insurable certificates &nbsp;<span>·</span>&nbsp; 0% finance available on Signature Pathways
+</div>
+
+<!-- ============ HEADER ============ -->
+<header class="header" id="header">
+  <div class="wrap nav">
+    <a class="brand" href="#top" aria-label="London's Aesthetics Academy home">
+      <span class="mark"><span>LA</span></span>
+      <span class="name"><b>London's Aesthetics</b><small>Academy · West London</small></span>
+    </a>
+    <nav class="menu" aria-label="Primary">
+      <a href="#pathways">Pathways</a>
+      <a href="#courses">Courses</a>
+      <a href="#about">About</a>
+      <a href="#why">Why Us</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-ghost" href="#contact">Enquire</a>
+      <a class="btn btn-primary" href="#pathways">Book a Course</a>
+    </div>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h18" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- mobile drawer -->
+<div class="drawer" id="drawer">
+  <div class="scrim" data-close></div>
+  <div class="panel">
+    <button class="close" data-close aria-label="Close menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 6l12 12M18 6L6 18" stroke-linecap="round"/></svg>
+    </button>
+    <a href="#pathways" data-close>Signature Pathways</a>
+    <a href="#courses" data-close>Individual Courses</a>
+    <a href="#about" data-close>About &amp; Trainers</a>
+    <a href="#why" data-close>Why Train With Us</a>
+    <a href="#gallery" data-close>Gallery</a>
+    <a href="#reviews" data-close>Reviews</a>
+    <a href="#faq" data-close>FAQ</a>
+    <a class="btn btn-primary" href="#contact" data-close>Book a Course</a>
+  </div>
+</div>
+
+<span id="top"></span>
+
+<!-- ============ HERO ============ -->
+<section class="hero">
+  <div class="hero-media">
+    <img data-img="hero" alt="Aesthetics practitioner performing a treatment in a luxury clinic setting">
+  </div>
+  <div class="hero-inner wrap">
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <span class="eyebrow">CPD-Accredited · Fully Insured · West London</span>
+        <h1>Master the art of <em>aesthetics.</em></h1>
+        <p class="hero-sub">Accredited, hands-on training from practising injectors — intimate class sizes, live models and lifetime mentorship that carries you from your very first treatment to a clinic of your own.</p>
+        <div class="hero-actions">
+          <a class="btn btn-light" href="#pathways">Explore Our Courses
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-outline-light" href="#about">Meet Your Trainers</a>
+        </div>
+        <div class="hero-trust">
+          <span class="stars">★★★★★</span>
+          <span>Rated by 200+ graduates</span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9"/></svg>
+            Certificates accredited &amp; insurable
+          </span>
+        </div>
+      </div>
+
+      <aside class="hero-card reveal">
+        <p class="tiny">Most Popular · Start From Scratch</p>
+        <h3>The Silver Pathway</h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Anti-Wrinkle, Dermal &amp; Lip Fillers</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Microneedling &amp; Skin Boosters</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Fat Dissolving &amp; Vitamin Injectables</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Live models · Kit · Lifetime mentorship</li>
+        </ul>
+        <div class="price">
+          <span class="tiny" style="letter-spacing:.12em">From <b>£2,499</b></span>
+          <a class="link-arrow" href="#pathways" style="color:var(--gold-soft)">Compare pathways
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </aside>
+    </div>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 80" preserveAspectRatio="none" fill="var(--ivory)"><path d="M0 80V40c240 40 480 40 720 20S1200 20 1440 44V80z"/></svg>
+  </div>
+</section>
+
+<!-- ============ TRUST STRIP ============ -->
+<div class="trust-strip">
+  <div class="wrap">
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 19.3 7.2 21.8l.9-5.4-3.9-3.8 5.4-.8z" stroke-linejoin="round"/></svg> <span><b>CPD Accredited</b> Certification</span></div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg> <span><b>Insurable</b> Qualifications</span></div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke-linecap="round"/><path d="M16 6.5a3 3 0 010 5.6M18 20c0-2.2-1-3.8-2.5-4.7" stroke-linecap="round"/></svg> <span><b>Small Groups</b> · Max 4 Students</span></div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-4.5-9.2-9.2C1.2 8.1 3 5 6.2 5c2 0 3.2 1.2 3.8 2.3C10.6 6.2 11.8 5 13.8 5 17 5 18.8 8.1 17.2 11.8 15 16.5 12 21 12 21z" stroke-linejoin="round"/></svg> <span><b>Lifetime</b> Support &amp; Mentorship</span></div>
+    <div class="trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 19.3 7.2 21.8l.9-5.4-3.9-3.8 5.4-.8z" stroke-linejoin="round"/></svg> <span><b>Live Models</b> on Every Course</span></div>
+  </div>
+</div>
+
+<!-- ============ STATS ============ -->
+<section class="section" style="padding-top:clamp(56px,7vw,90px);padding-bottom:clamp(56px,7vw,90px)">
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat reveal"><b>10+</b><span>Years combined experience</span></div>
+      <div class="stat reveal"><b>200+</b><span>Practitioners trained</span></div>
+      <div class="stat reveal"><b>4:1</b><span>Max student-to-trainer ratio</span></div>
+      <div class="stat reveal"><b>∞</b><span>Lifetime aftercare &amp; refreshers</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT / TRAINERS ============ -->
+<section class="section about" id="about">
+  <div class="wrap about-grid">
+    <div class="about-media reveal">
+      <div class="frame"></div>
+      <div class="photo"><img data-img="trainers" alt="Jodi and Levi, founders and lead trainers of London's Aesthetics Academy"></div>
+      <div class="badge"><b>10+ yrs</b><span>Combined clinical &amp; teaching experience</span></div>
+    </div>
+    <div class="about-copy reveal">
+      <span class="eyebrow">Meet Your Trainers</span>
+      <h2>Taught by practising injectors who never stopped learning.</h2>
+      <p>London's Aesthetics Academy was founded by <strong>Jodi &amp; Levi</strong> — two practitioners with a genuine beauty and aesthetics background and over a decade of combined experience between them. We trained under some of the most respected names in the industry, and we still do: we attend refresher training constantly so that everything we know, and everything that's new, is passed directly to you.</p>
+      <p>We train both medics and non-medics, tailoring every course to your background — whether you're already established in beauty or starting completely from scratch. Alongside the academy we run private clinics, which means you learn from real, current practice, and you can even join us as a model on a training day before you enrol.</p>
+      <div class="sign">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.4"><path d="M12 21s-7-4.5-9.2-9.2C1.2 8.1 3 5 6.2 5c2 0 3.2 1.2 3.8 2.3C10.6 6.2 11.8 5 13.8 5 17 5 18.8 8.1 17.2 11.8 15 16.5 12 21 12 21z" stroke-linejoin="round"/></svg>
+        <div><span class="who">Jodi &amp; Levi<small>Founders &amp; Lead Trainers</small></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PATHWAYS ============ -->
+<section class="section pathways" id="pathways">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow center">Signature Pathways</span>
+      <h2>Everything you need to launch your aesthetics career.</h2>
+      <p>Our Bronze, Silver &amp; Gold pathways bundle the core treatments into one guided journey — designed to take a complete beginner to a fully qualified, insurable and confident practitioner ready to open their own clinic.</p>
+    </div>
+
+    <div class="path-grid">
+      <!-- Bronze -->
+      <div class="path-card reveal">
+        <span class="tier">Bronze Pathway</span>
+        <h3>The Foundation</h3>
+        <p class="blurb">The essentials to qualify and start earning.</p>
+        <div class="cost"><b>£1,499</b><small>/ from</small></div>
+        <span class="finance">or from £125 / month</span>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Anti-Wrinkle (Botulinum Toxin)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Dermal Fillers</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Microneedling</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Vitamin B12 &amp; Wellness Injections</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Accredited certificate &amp; e-portfolio</li>
+        </ul>
+        <a class="btn btn-ghost" href="#contact">Enquire About Bronze</a>
+      </div>
+
+      <!-- Silver (featured) -->
+      <div class="path-card featured reveal">
+        <span class="ribbon">Most Popular</span>
+        <span class="tier">Silver Pathway</span>
+        <h3>The Professional</h3>
+        <p class="blurb">Our best-loved route — the complete beginner-to-clinic toolkit.</p>
+        <div class="cost"><b>£2,499</b><small>/ from</small></div>
+        <span class="finance">or from £199 / month · 0% finance</span>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Everything in Bronze</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Lip Filler Masterclass</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Skin Boosters</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Fat Dissolving</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Starter kit &amp; ongoing mentorship</li>
+        </ul>
+        <a class="btn btn-light" href="#contact">Enquire About Silver</a>
+      </div>
+
+      <!-- Gold -->
+      <div class="path-card reveal">
+        <span class="tier">Gold Pathway</span>
+        <h3>The Master</h3>
+        <p class="blurb">The full portfolio, including our advanced treatments.</p>
+        <div class="cost"><b>£3,499</b><small>/ from</small></div>
+        <span class="finance">or from £279 / month · 0% finance</span>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Everything in Silver</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Advanced Dermal Filler (cheek, chin, jaw)</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> PRP / Vampire Facial</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Mesotherapy</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> Business &amp; clinic-launch mentoring</li>
+        </ul>
+        <a class="btn btn-ghost" href="#contact">Enquire About Gold</a>
+      </div>
+    </div>
+    <p class="path-note">Prices shown are indicative starting points. Every pathway can be tailored to your background — <a href="#contact" style="color:var(--gold-2);font-weight:600">request a bespoke quote</a>.</p>
+  </div>
+</section>
+
+<!-- ============ COURSES ============ -->
+<section class="section courses" id="courses">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow center">Individual Courses</span>
+      <h2>Prefer to build your own portfolio?</h2>
+      <p>Take any treatment as a standalone, fully accredited course. Every course includes theory, live hands-on practice on real models, and your certificate.</p>
+    </div>
+
+    <div class="course-grid">
+      <div class="course reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20l7-7M14 3l7 7-9 2-2-2 2-9z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="17" cy="7" r="1.4"/></svg></div>
+        <h3>Anti-Wrinkle</h3>
+        <p>Botulinum toxin for upper-face lines — forehead, frown and crow's feet — with dosing, safety and mapping.</p>
+        <div class="meta"><span class="from">from <b>£600</b></span><span class="dur">1 day</span></div>
+      </div>
+      <div class="course reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2c3 4 5 6.5 5 10a5 5 0 01-10 0c0-3.5 2-6 5-10z" stroke-linejoin="round"/></svg></div>
+        <h3>Dermal Fillers</h3>
+        <p>Restore volume and contour cheeks, chin and nasolabial folds with hyaluronic-acid filler technique.</p>
+        <div class="meta"><span class="from">from <b>£700</b></span><span class="dur">1 day</span></div>
+      </div>
+      <div class="course reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 13c1.5-2 2.5-2 4 0s2.5 2 4 0" stroke-linecap="round"/><path d="M7 9c2-1.5 8-1.5 10 0" stroke-linecap="round"/><path d="M9 16c1 1 5 1 6 0" stroke-linecap="round"/></svg></div>
+        <h3>Lip Filler Masterclass</h3>
+        <p>Natural, balanced lip enhancement — shaping, Russian technique and correcting common asymmetries.</p>
+        <div class="meta"><span class="from">from <b>£450</b></span><span class="dur">1 day</span></div>
+      </div>
+      <div class="course reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M7 7l1.4 1.4M15.6 15.6L17 17M17 7l-1.4 1.4M8.4 15.6L7 17"/></svg></div>
+        <h3>Microneedling</h3>
+        <p>Collagen-induction therapy for texture, scarring and glow — device use, depths and aftercare.</p>
+        <div class="meta"><span class="from">from <b>£300</b></span><span class="dur">½ day</span></div>
+      </div>
+      <div class="course reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3c4 5 6 7.5 6 11a6 6 0 01-12 0c0-3.5 2-6 6-11z" stroke-linejoin="round"/><path d="M12 21v-4" stroke-linecap="round"/></svg></div>
+        <h3>Skin Boosters</h3>
+        <p>Injectable hydration and quality treatments for luminous, plumped skin across face, neck and hands.</p>
+        <div class="meta"><span class="from">from <b>£350</b></span><span class="dur">½ day</span></div>
+      </div>
+      <div class="course reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v18M5 8c3 0 4 2 7 2s4-2 7-2M5 14c3 0 4 2 7 2s4-2 7-2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Fat Dissolving</h3>
+        <p>Targeted injectable fat reduction for chin, jawline and small pockets, with assessment and safety.</p>
+        <div class="meta"><span class="from">from <b>£400</b></span><span class="dur">1 day</span></div>
+      </div>
+      <div class="course reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3l7 7-4 1-4-4 1-4z" stroke-linejoin="round"/><path d="M13 8L4 17l-1 4 4-1 9-9" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Vitamin B12 &amp; Wellness</h3>
+        <p>Vitamin and wellness injectables — protocols, consultation and safe administration for clients.</p>
+        <div class="meta"><span class="from">from <b>£250</b></span><span class="dur">½ day</span></div>
+      </div>
+      <div class="course reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3c-3 0-5 2-5 5 0 4 5 13 5 13s5-9 5-13c0-3-2-5-5-5z" stroke-linejoin="round"/><circle cx="12" cy="8" r="1.6"/></svg></div>
+        <h3>PRP · Vampire Facial</h3>
+        <p>Platelet-rich plasma for rejuvenation and hair — draw, spin and application technique.</p>
+        <div class="meta"><span class="from">from <b>£500</b></span><span class="dur">1 day</span></div>
+      </div>
+      <div class="course reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="7" cy="9" r="2"/><circle cx="16" cy="7" r="2"/><circle cx="13" cy="15" r="2"/><path d="M9 9l5-1M15 9l-1 4" stroke-linecap="round"/></svg></div>
+        <h3>Mesotherapy</h3>
+        <p>Micro-injections of vitamins and actives to revitalise skin, reduce dullness and improve tone.</p>
+        <div class="meta"><span class="from">from <b>£350</b></span><span class="dur">1 day</span></div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:44px" class="reveal">
+      <a class="btn btn-primary" href="#contact">Ask about a course &amp; dates
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ WHY US ============ -->
+<section class="section why" id="why">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow center">Why Train With Us</span>
+      <h2>A boutique academy, not a conveyor belt.</h2>
+      <p>We deliberately keep numbers low and standards high. You leave with real, repeatable skill — and a mentor for life.</p>
+    </div>
+    <div class="feat-grid">
+      <div class="feat reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5" stroke-linecap="round"/><path d="M16 6.5a3 3 0 010 5.6M18 20c0-2.2-1-3.8-2.5-4.7" stroke-linecap="round"/></svg></div>
+        <h3>Truly small groups</h3>
+        <p>A maximum of four students per course means real one-to-one time, more hands-on practice and no getting lost in a crowd.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4.5 20c0-3.5 3.4-6 7.5-6s7.5 2.5 7.5 6" stroke-linecap="round"/></svg></div>
+        <h3>Live models, every time</h3>
+        <p>You practise on real clients — never a mannequin or an orange. You'll perform genuine treatments before you ever qualify.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Accredited &amp; insurable</h3>
+        <p>Your certificate is CPD-accredited and recognised by leading insurers, so you can start treating clients legitimately from day one.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21s-7-4.5-9.2-9.2C1.2 8.1 3 5 6.2 5c2 0 3.2 1.2 3.8 2.3C10.6 6.2 11.8 5 13.8 5 17 5 18.8 8.1 17.2 11.8 15 16.5 12 21 12 21z" stroke-linejoin="round"/></svg></div>
+        <h3>Lifetime mentorship</h3>
+        <p>Training day doesn't end the relationship. Message us anytime, return for refreshers, and lean on us as your career grows.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h18v13H3z" stroke-linejoin="round"/><path d="M8 7V5a4 4 0 018 0v2M3 12h18" stroke-linecap="round"/></svg></div>
+        <h3>Business &amp; clinic support</h3>
+        <p>We share how we built and run our own clinics — pricing, consent, marketing and confidence to launch your brand.</p>
+      </div>
+      <div class="feat reveal">
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v4M12 3l-2 2M12 3l2 2" stroke-linecap="round" stroke-linejoin="round"/><rect x="4" y="7" width="16" height="13" rx="2"/><path d="M9 12h6M9 16h4" stroke-linecap="round"/></svg></div>
+        <h3>Medics &amp; non-medics welcome</h3>
+        <p>Whatever your starting point — established beauty pro or complete beginner — we tailor the pace and depth to you.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ JOURNEY ============ -->
+<section class="section journey">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow center">Your Journey</span>
+      <h2>From enquiry to your own clinic.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><div class="num">1</div><h3>Enquire</h3><p>Tell us your background and goals. We'll recommend the pathway or courses that fit — no pressure, just honest advice.</p></div>
+      <div class="step reveal"><div class="num">2</div><h3>Learn</h3><p>Join an intimate group for expert theory and plenty of hands-on practice on live models with us beside you.</p></div>
+      <div class="step reveal"><div class="num">3</div><h3>Qualify</h3><p>Complete your assessment and receive your accredited, insurable certificate and e-portfolio.</p></div>
+      <div class="step reveal"><div class="num">4</div><h3>Launch</h3><p>Start treating clients with our lifetime mentorship, refreshers and business guidance behind you.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ GALLERY ============ -->
+<section class="section gallery" id="gallery">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow center">Gallery</span>
+      <h2>Inside the academy.</h2>
+      <p>Training days, results and the calm, clinical space where it all happens.</p>
+    </div>
+    <div class="gal-grid reveal">
+      <div class="gal big"><img data-img="gallery-1" alt="Training in progress at London's Aesthetics Academy"></div>
+      <div class="gal"><img data-img="gallery-2" alt="Close-up of an aesthetics treatment"></div>
+      <div class="gal"><img data-img="gallery-3" alt="Student practising on a live model"></div>
+      <div class="gal wide"><img data-img="gallery-4" alt="The academy clinic space"></div>
+      <div class="gal"><img data-img="gallery-5" alt="Before and after treatment result"></div>
+      <div class="gal"><img data-img="gallery-6" alt="Certificate presentation to a graduate"></div>
+      <div class="gal wide"><img data-img="gallery-7" alt="Trainers demonstrating a technique"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ REVIEWS ============ -->
+<section class="section reviews" id="reviews">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow center">Graduate Reviews</span>
+      <h2>Loved by the practitioners we've trained.</h2>
+      <p>A five-star reputation built one confident graduate at a time.</p>
+    </div>
+    <div class="rev-grid">
+      <div class="rev reveal">
+        <div class="q">&ldquo;</div>
+        <div class="stars">★★★★★</div>
+        <p>I came in with zero experience and left genuinely confident. The small group meant Jodi and Levi could actually watch my technique and correct it. I'm now fully booked in my own clinic.</p>
+        <div class="who"><span class="av">A</span><div><b>Amara O.</b><small>Silver Pathway graduate</small></div></div>
+      </div>
+      <div class="rev reveal">
+        <div class="q">&ldquo;</div>
+        <div class="stars">★★★★★</div>
+        <p>By far the most hands-on course I looked at. Real models, real guidance, and the lifetime support is not a gimmick — they still answer my questions months later.</p>
+        <div class="who"><span class="av">R</span><div><b>Reece M.</b><small>Lip Filler Masterclass</small></div></div>
+      </div>
+      <div class="rev reveal">
+        <div class="q">&ldquo;</div>
+        <div class="stars">★★★★★</div>
+        <p>Luxurious, professional and so welcoming. The accredited certificate meant I got insured immediately. Honestly the best money I've invested in my career.</p>
+        <div class="who"><span class="av">S</span><div><b>Sofia K.</b><small>Gold Pathway graduate</small></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="section faq" id="faq">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="eyebrow center">Questions</span>
+      <h2>Everything you need to know.</h2>
+    </div>
+    <div class="faq-wrap reveal">
+      <div class="qa">
+        <button aria-expanded="false"><span>Do I need to be a medic or have any experience?</span>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></button>
+        <div class="ans"><p>No. We train both medics and non-medics, and many of our students start with no experience at all. We tailor the pace and depth of every course to your background so you're always supported, never overwhelmed.</p></div>
+      </div>
+      <div class="qa">
+        <button aria-expanded="false"><span>Are the certificates accredited and can I get insured?</span>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></button>
+        <div class="ans"><p>Yes. Every course is CPD-accredited and your certificate is recognised by leading aesthetics insurers, so you can obtain treatment insurance and start seeing clients legitimately.</p></div>
+      </div>
+      <div class="qa">
+        <button aria-expanded="false"><span>Will I practise on real people?</span>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></button>
+        <div class="ans"><p>Always. Every course includes hands-on practice on live models under close supervision — never mannequins. You can also join us as a model on a training day before you enrol to see how we work.</p></div>
+      </div>
+      <div class="qa">
+        <button aria-expanded="false"><span>How big are the groups?</span>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></button>
+        <div class="ans"><p>Deliberately small — a maximum of four students per course. It's the single biggest reason our graduates leave so confident: you get real one-to-one time and far more practice than a large class allows.</p></div>
+      </div>
+      <div class="qa">
+        <button aria-expanded="false"><span>What happens after I qualify?</span>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></button>
+        <div class="ans"><p>You're part of the family for life. That means ongoing mentorship, discounted refresher days, product and supplier guidance, and business support to help you launch and grow your own clinic.</p></div>
+      </div>
+      <div class="qa">
+        <button aria-expanded="false"><span>Is finance available?</span>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></span></button>
+        <div class="ans"><p>Yes — our Signature Pathways can be split into manageable monthly payments, with 0% options available. Get in touch and we'll walk you through the plans.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CTA BAND ============ -->
+<section class="section cta-band">
+  <div class="wrap inner">
+    <span class="eyebrow center" style="color:var(--gold-soft);justify-content:center">Ready When You Are</span>
+    <h2 style="margin-top:18px">Your career in aesthetics starts with a single conversation.</h2>
+    <p>Tell us where you're starting from and we'll map out exactly how to get you qualified, insured and booking clients.</p>
+    <div class="hero-actions">
+      <a class="btn btn-light" href="#contact">Book Your Place</a>
+      <a class="btn btn-outline-light" href="#pathways">Compare Pathways</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="section contact" id="contact">
+  <div class="wrap contact-grid">
+    <div class="contact-info reveal">
+      <span class="eyebrow">Get In Touch</span>
+      <h2>Let's plan your training.</h2>
+      <p>Send us a message with a little about your background and the course or pathway you're interested in. We'll reply personally with dates, pricing and honest advice.</p>
+      <ul class="info-list">
+        <li>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 21s-7-5.2-7-11a7 7 0 0114 0c0 5.8-7 11-7 11z" stroke-linejoin="round"/><circle cx="12" cy="10" r="2.4"/></svg></span>
+          <div><b>Location</b><span>West London · UB7 · Elizabeth Line</span></div>
+        </li>
+        <li>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M4 7l8 6 8-6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          <div><b>Email</b><a href="mailto:hello@londonsaestheticsacademy.co.uk">hello@londonsaestheticsacademy.co.uk</a></div>
+        </li>
+        <li>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="2" width="16" height="20" rx="4"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r="1.1" fill="currentColor" stroke="none"/></svg></span>
+          <div><b>Instagram</b><a href="https://www.instagram.com/londonsaestheticsacademy_/" target="_blank" rel="noopener">@londonsaestheticsacademy_</a></div>
+        </li>
+      </ul>
+      <div class="socials">
+        <a href="https://www.instagram.com/londonsaestheticsacademy_/" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="16" height="16" rx="5"/><circle cx="12" cy="12" r="3.4"/><circle cx="17" cy="7" r="1.1" fill="currentColor" stroke="none"/></svg>
+        </a>
+        <a href="#" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 9h3V6h-3c-2 0-3.5 1.5-3.5 3.5V11H8v3h2.5v7h3v-7H16l.5-3H13.5V9.5C13.5 9.2 13.7 9 14 9z"/></svg>
+        </a>
+        <a href="mailto:hello@londonsaestheticsacademy.co.uk" aria-label="Email">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M4 7l8 6 8-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <form class="form-card" id="enquiry" novalidate>
+        <div id="formFields">
+          <h3>Course enquiry</h3>
+          <p>We usually reply within one working day.</p>
+          <div class="field-row">
+            <div class="field">
+              <label for="fname">First name <span class="req">*</span></label>
+              <input id="fname" name="fname" type="text" autocomplete="given-name" required>
+            </div>
+            <div class="field">
+              <label for="lname">Last name <span class="req">*</span></label>
+              <input id="lname" name="lname" type="text" autocomplete="family-name" required>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="email">Email <span class="req">*</span></label>
+              <input id="email" name="email" type="email" autocomplete="email" required>
+            </div>
+            <div class="field">
+              <label for="phone">Phone</label>
+              <input id="phone" name="phone" type="tel" autocomplete="tel">
+            </div>
+          </div>
+          <div class="field">
+            <label for="interest">I'm interested in <span class="req">*</span></label>
+            <select id="interest" name="interest" required>
+              <option value="" selected disabled>Choose a pathway or course…</option>
+              <option>Bronze Pathway</option>
+              <option>Silver Pathway</option>
+              <option>Gold Pathway</option>
+              <option>Anti-Wrinkle</option>
+              <option>Dermal Fillers</option>
+              <option>Lip Filler Masterclass</option>
+              <option>Microneedling</option>
+              <option>Skin Boosters</option>
+              <option>Fat Dissolving</option>
+              <option>Vitamin B12 &amp; Wellness</option>
+              <option>PRP · Vampire Facial</option>
+              <option>Mesotherapy</option>
+              <option>Not sure yet — please advise</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="bg">Your background</label>
+            <select id="bg" name="bg">
+              <option value="" selected disabled>Select one…</option>
+              <option>Complete beginner</option>
+              <option>Beauty / aesthetics background</option>
+              <option>Medic (nurse, dentist, doctor, etc.)</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="msg">Message</label>
+            <textarea id="msg" name="msg" placeholder="Tell us your goals and any dates that suit you…"></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit">Send Enquiry
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <p class="form-note">By sending you agree to be contacted about your enquiry. We never share your details.</p>
+        </div>
+        <div class="form-success" id="formSuccess" aria-live="polite">
+          <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Thank you — message sent.</h3>
+          <p>We've received your enquiry and will be in touch personally very soon.</p>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="brand" href="#top">
+          <span class="mark"><span>LA</span></span>
+          <span class="name"><b>London's Aesthetics</b><small style="color:var(--gold-soft)">Academy · West London</small></span>
+        </a>
+        <p>Accredited, hands-on aesthetics training from practising injectors. Small classes, live models and lifetime mentorship — from your first treatment to your own clinic.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="#pathways">Signature Pathways</a></li>
+          <li><a href="#courses">Individual Courses</a></li>
+          <li><a href="#about">About &amp; Trainers</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Support</h4>
+        <ul>
+          <li><a href="#why">Why Train With Us</a></li>
+          <li><a href="#reviews">Graduate Reviews</a></li>
+          <li><a href="#faq">FAQ</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Connect</h4>
+        <ul>
+          <li><a href="https://www.instagram.com/londonsaestheticsacademy_/" target="_blank" rel="noopener">Instagram</a></li>
+          <li><a href="mailto:hello@londonsaestheticsacademy.co.uk">Email us</a></li>
+          <li><a href="#contact">Book a course</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="year"></span> London's Aesthetics Academy. All rights reserved.</span>
+      <span>CPD Accredited · Fully Insurable · West London</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+/* ---------- year ---------- */
+document.getElementById('year').textContent = new Date().getFullYear();
+
+/* ---------- sticky header shadow ---------- */
+const header = document.getElementById('header');
+const onScroll = () => header.classList.toggle('scrolled', window.scrollY > 12);
+onScroll();
+window.addEventListener('scroll', onScroll, {passive:true});
+
+/* ---------- mobile drawer ---------- */
+const drawer = document.getElementById('drawer');
+const burger = document.getElementById('burger');
+const openDrawer = () => {drawer.classList.add('open'); burger.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden';};
+const closeDrawer = () => {drawer.classList.remove('open'); burger.setAttribute('aria-expanded','false'); document.body.style.overflow='';};
+burger.addEventListener('click', openDrawer);
+drawer.querySelectorAll('[data-close]').forEach(el => el.addEventListener('click', closeDrawer));
+document.addEventListener('keydown', e => {if(e.key==='Escape') closeDrawer();});
+
+/* ---------- FAQ accordion ---------- */
+document.querySelectorAll('.qa button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const qa = btn.parentElement;
+    const ans = qa.querySelector('.ans');
+    const open = qa.classList.toggle('open');
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    ans.style.maxHeight = open ? ans.scrollHeight + 'px' : '0';
+  });
+});
+
+/* ---------- form demo ---------- */
+document.getElementById('enquiry').addEventListener('submit', e => {
+  e.preventDefault();
+  const form = e.target;
+  if(!form.checkValidity()){ form.reportValidity(); return; }
+  document.getElementById('formFields').style.display = 'none';
+  document.getElementById('formSuccess').classList.add('show');
+  form.scrollIntoView({behavior:'smooth', block:'center'});
+});
+
+/* ---------- reveal on scroll ---------- */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((en, i) => {
+    if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); }
+  });
+}, {threshold:0.12, rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ---------- graceful image placeholders ----------
+   Each <img data-img="name"> tries images/name.jpg; if missing,
+   it renders a branded gradient placeholder so the site never breaks. */
+(function(){
+  const palettes = [
+    ['#F0E3DD','#E7DBCE'], ['#EFE7DC','#D8BF97'], ['#F2E9DF','#E7D3CE'],
+    ['#EDE0D6','#D9C7B4'], ['#F0E6DC','#E3D0C8']
+  ];
+  document.querySelectorAll('img[data-img]').forEach((img, i) => {
+    const name = img.getAttribute('data-img');
+    const [c1,c2] = palettes[i % palettes.length];
+    const svg = encodeURIComponent(
+      `<svg xmlns='http://www.w3.org/2000/svg' width='800' height='800'>
+        <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+          <stop offset='0' stop-color='${c1}'/><stop offset='1' stop-color='${c2}'/></linearGradient></defs>
+        <rect width='800' height='800' fill='url(#g)'/>
+        <g fill='none' stroke='#B08A57' stroke-opacity='0.5' stroke-width='2'>
+          <circle cx='400' cy='330' r='90'/><path d='M400 240v180M310 330h180' stroke-opacity='0.25'/>
+        </g>
+        <text x='400' y='470' font-family='Playfair Display, Georgia, serif' font-size='34' fill='#3A2530' text-anchor='middle' font-style='italic'>London's Aesthetics Academy</text>
+        <text x='400' y='510' font-family='Inter, sans-serif' font-size='16' letter-spacing='4' fill='#96703E' text-anchor='middle'>PHOTO · ${name.toUpperCase()}</text>
+      </svg>`);
+    const placeholder = `data:image/svg+xml,${svg}`;
+    const real = new Image();
+    real.onload = () => { img.src = real.src; };
+    real.onerror = () => { img.src = placeholder; };
+    real.src = `images/${name}.jpg`;
+  });
+})();
+</script>
+</body>
+</html>
