@@ -866,9 +866,13 @@
       var s=focal/d;
       return {sx:cx+(x-camX)*s, sy:cy-(y-camY)*s, s:s, d:d};
     }
-    // fog: nearer = brighter, fades into the navy haze with distance
+    // fog: nearer = brighter, fades into the navy haze with distance;
+    // a matching near-fade dissolves the giant closest rings so they
+    // sweep past softly instead of overpowering the headline.
     function fog(d){
-      var f=1-(d-4)/95; return f<0?0:(f>1?1:f);
+      var f=1-(d-4)/95; if(f<0)f=0; else if(f>1)f=1;
+      var near=(d-2)/6; if(near<0)near=0; else if(near>1)near=1;
+      return f*near;
     }
 
     function drawRing(x,y,z,warm){
@@ -878,18 +882,18 @@
       // soft glow
       var g=ctx.createRadialGradient(p.sx,p.sy,0,p.sx,p.sy,r*1.7);
       if(warm){
-        g.addColorStop(0,"rgba(243,232,207,"+(0.16*a)+")");
+        g.addColorStop(0,"rgba(243,232,207,"+(0.13*a)+")");
         g.addColorStop(1,"rgba(243,232,207,0)");
       }else{
-        g.addColorStop(0,"rgba(200,164,92,"+(0.10*a)+")");
+        g.addColorStop(0,"rgba(200,164,92,"+(0.08*a)+")");
         g.addColorStop(1,"rgba(200,164,92,0)");
       }
       ctx.fillStyle=g;
       ctx.beginPath(); ctx.arc(p.sx,p.sy,r*1.7,0,6.283); ctx.fill();
       // the ring itself
-      ctx.lineWidth=Math.max(0.6,r*0.06);
-      ctx.strokeStyle=warm?"rgba(245,235,212,"+(0.95*a)+")"
-                          :"rgba(200,164,92,"+(0.5*a)+")";
+      ctx.lineWidth=Math.max(0.6,r*0.055);
+      ctx.strokeStyle=warm?"rgba(245,235,212,"+(0.7*a)+")"
+                          :"rgba(200,164,92,"+(0.4*a)+")";
       ctx.beginPath(); ctx.arc(p.sx,p.sy,r,0,6.283); ctx.stroke();
     }
 
@@ -913,7 +917,7 @@
       my=e.clientY/window.innerHeight-0.5;
     },{passive:true});
 
-    var speed=0.022, t=0;
+    var speed=0.016, t=0; // a stately roll through the bays
     function tick(){
       requestAnimationFrame(tick);
       if(!visible||document.hidden||!W||!H)return;
