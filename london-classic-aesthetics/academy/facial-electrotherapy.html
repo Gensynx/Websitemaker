@@ -200,6 +200,7 @@
               <div><dt>Setting</dt><dd>Working clinic, 157 Seymour Place, W1</dd></div>
             </dl>
             <a class="btn btn-gold" href="../contact.html">Enquire about this course <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17m0 0-6-6m6 6-6 6"/></svg></a>
+            <button class="btn btn-line btn-add" type="button" style="width:100%;margin-top:.7rem" data-course-add data-slug="facial-electrotherapy" data-name="ProQual Level 3 Certificate in Facial Electrotherapy" data-tag="Regulated · ProQual Level 3" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg> <span>Add to my course list</span></button>
             <p class="rail-note">Places are confirmed after a suitability check at enrolment.</p>
           </div>
           <div class="rail-card" style="background:var(--paper)">
@@ -236,6 +237,22 @@
       </div>
     </section>
   </main>
+
+  <button class="courselist-fab" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Your course list">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5V5.5Z"/><path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20"/><path d="M9 8h6"/></svg> <span>My courses</span> <span class="count">0</span>
+  </button>
+  <div class="courselist-scrim" aria-hidden="true"></div>
+  <aside class="courselist-drawer" role="dialog" aria-modal="true" aria-label="Your course list" data-browse="../academy/index.html">
+    <div class="courselist-head">
+      <h2>Your course list</h2>
+      <button class="courselist-close" type="button" aria-label="Close course list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+    </div>
+    <div class="courselist-items"></div>
+    <div class="courselist-foot">
+      <a class="btn btn-gold" href="../contact.html">Enquire about these <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17m0 0-6-6m6 6-6 6"/></svg></a>
+      <p class="cl-note">One enquiry covers everything on your list, or <a class="cl-mailto" href="mailto:info@londonclassicaesthetics.com">email it to us directly</a>.</p>
+    </div>
+  </aside>
 
   <footer class="site-footer">
     <div class="wrap">

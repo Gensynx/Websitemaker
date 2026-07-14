@@ -1,7 +1,11 @@
 /* Bespoke pages: home, hubs, about, become-a-model, contact. Original copy. */
 import { SITE, icon, arrow, goArrow, heroInner, ctaBand, faqBlock } from './lib.mjs';
+import { courses } from './content-academy.mjs';
 
 const check = icon('check');
+/* canonical course titles by slug, so the course list stores the same
+   name no matter where a course was added from */
+const courseTitle = Object.fromEntries(courses.map((c) => [c.slug, c.title]));
 
 /* ------------------------------------------------------------- HOME */
 export function homeBody() {
@@ -320,15 +324,16 @@ ${heroInner(r, {
           ${cpd
             .map(
               ([href, name, desc], i) => `
-          <li><a class="index-row" href="${r}${href}">
+          <li class="index-li"><a class="index-row" href="${r}${href}">
             <span class="idx">${['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'][i]}</span>
             <span class="name">${name}</span>
             <span class="desc">${desc}</span>
             ${goArrow}
-          </a></li>`
+          </a><button class="row-add" type="button" data-course-add data-slug="${href.replace('academy/', '').replace('.html', '')}" data-name="${courseTitle[href.replace('academy/', '').replace('.html', '')] || name}" data-tag="CPD Course" aria-pressed="false" aria-label="Add ${name} to your course list">${icon('plus')}</button></li>`
             )
             .join('')}
         </ul>
+        <p class="small muted mt-3" data-reveal>Collecting more than one skill? Use the <strong>+</strong> buttons to build your course list as you browse; a floating <em>My courses</em> button follows you, and a single enquiry covers everything on it.</p>
       </div>
     </section>
 
@@ -570,6 +575,11 @@ ${heroInner(r, {
                   <option>Something else</option>
                 </select>
               </div>
+              <div class="field full" id="course-summary" hidden>
+                <label>Courses on your list</label>
+                <div class="course-chips" id="course-chips"></div>
+                <p class="hint">These are included with your enquiry automatically. Remove any you have changed your mind about.</p>
+              </div>
               <div class="field full">
                 <label for="f-msg">Your message <span class="req">*</span></label>
                 <textarea id="f-msg" name="message" required></textarea>
@@ -578,7 +588,7 @@ ${heroInner(r, {
             </div>
             <div class="cta-row mt-3">
               <button class="btn btn-gold" type="submit">Send enquiry ${arrow}</button>
-              <a class="btn btn-line" href="mailto:${SITE.email}">Or email us directly</a>
+              <a class="btn btn-line" href="mailto:${SITE.email}" data-mailto-courses>Or email us directly</a>
             </div>
             <p class="form-status" role="status" aria-live="polite" tabindex="-1"></p>
           </form>

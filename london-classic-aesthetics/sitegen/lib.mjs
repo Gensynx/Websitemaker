@@ -170,6 +170,22 @@ export function page({ path, title, desc, active = '', body, bodyClass = '' }) {
 ${body}
   </main>
 
+  <button class="courselist-fab" type="button" aria-haspopup="dialog" aria-expanded="false" aria-label="Your course list">
+    ${icon('book')} <span>My courses</span> <span class="count">0</span>
+  </button>
+  <div class="courselist-scrim" aria-hidden="true"></div>
+  <aside class="courselist-drawer" role="dialog" aria-modal="true" aria-label="Your course list" data-browse="${h('academy/index.html')}">
+    <div class="courselist-head">
+      <h2>Your course list</h2>
+      <button class="courselist-close" type="button" aria-label="Close course list"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg></button>
+    </div>
+    <div class="courselist-items"></div>
+    <div class="courselist-foot">
+      <a class="btn btn-gold" href="${h('contact.html')}">Enquire about these ${arrow}</a>
+      <p class="cl-note">One enquiry covers everything on your list, or <a class="cl-mailto" href="mailto:${SITE.email}">email it to us directly</a>.</p>
+    </div>
+  </aside>
+
   <footer class="site-footer">
     <div class="wrap">
       <div class="footer-main">
@@ -417,6 +433,7 @@ ${heroInner(r, {
               ${railRows}
             </dl>
             <a class="btn btn-gold" href="${r}contact.html">Enquire about this course ${arrow}</a>
+            <button class="btn btn-line btn-add" type="button" style="width:100%;margin-top:.7rem" data-course-add data-slug="${d.slug}" data-name="${d.title}" data-tag="${d.kickerTag}" aria-pressed="false">${icon('plus')} <span>Add to my course list</span></button>
             <p class="rail-note">Places are confirmed after a suitability check at enrolment.</p>
           </div>
           <div class="rail-card" style="background:var(--paper)">

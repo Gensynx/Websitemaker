@@ -174,6 +174,182 @@
     });
   });
 
+  /* ---------- Course list (shortlist) ----------
+     Users collect Academy courses as they browse; the list persists across
+     pages via localStorage and is folded into the enquiry on the contact
+     page (chips + a prefilled mailto). */
+  (function () {
+    var LS_KEY = 'lca-course-list';
+    var EMAIL = 'info@londonclassicaesthetics.com';
+
+    function read() {
+      try {
+        var v = JSON.parse(localStorage.getItem(LS_KEY));
+        return Array.isArray(v) ? v : [];
+      } catch (e) { return []; }
+    }
+    function write(list) {
+      try { localStorage.setItem(LS_KEY, JSON.stringify(list)); } catch (e) {}
+    }
+    function has(list, slug) {
+      return list.some(function (c) { return c.slug === slug; });
+    }
+
+    var fab = document.querySelector('.courselist-fab');
+    var drawer = document.querySelector('.courselist-drawer');
+    var scrim = document.querySelector('.courselist-scrim');
+    var itemsEl = drawer && drawer.querySelector('.courselist-items');
+    var footNote = drawer && drawer.querySelector('.cl-mailto');
+    var browseHref = drawer ? drawer.getAttribute('data-browse') : 'academy/index.html';
+
+    var iconPlus = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M12 4v16M4 12h16"/></svg>';
+    var iconCheck = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 12.5 5 5L20 6.5"/></svg>';
+    var iconX = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+
+    function mailtoHref(list) {
+      var subject = 'Course enquiry (' + list.length + ' course' + (list.length === 1 ? '' : 's') + ')';
+      var body = 'Hello LCA,\n\nI would like to enquire about the following courses:\n' +
+        list.map(function (c) { return '  - ' + c.name + (c.tag ? ' (' + c.tag + ')' : ''); }).join('\n') +
+        '\n\nA little about my background:\n\n\nMy preferred dates or timing:\n\n\nThank you.';
+      return 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    }
+
+    function render() {
+      var list = read();
+
+      /* floating button */
+      if (fab) {
+        fab.classList.toggle('visible', list.length > 0);
+        var count = fab.querySelector('.count');
+        if (count) count.textContent = String(list.length);
+        fab.setAttribute('aria-label', 'Your course list, ' + list.length + ' course' + (list.length === 1 ? '' : 's'));
+        if (!list.length) setOpen(false);
+      }
+
+      /* drawer contents */
+      if (itemsEl) {
+        if (!list.length) {
+          itemsEl.innerHTML = '<p class="courselist-empty">Nothing here yet. Browse the <a href="' + browseHref + '">Academy</a> and add the courses that fit your ambition; one enquiry will cover them all.</p>';
+        } else {
+          itemsEl.innerHTML = list.map(function (c) {
+            return '<div class="courselist-item">' +
+              '<div><span class="ci-name">' + c.name + '</span>' +
+              (c.tag ? '<span class="ci-tag">' + c.tag + '</span>' : '') + '</div>' +
+              '<button type="button" class="courselist-remove" data-remove="' + c.slug + '" aria-label="Remove ' + c.name + ' from your list">' + iconX + '</button>' +
+              '</div>';
+          }).join('');
+        }
+      }
+      if (footNote) footNote.href = mailtoHref(list);
+
+      /* every add button on the page */
+      document.querySelectorAll('[data-course-add]').forEach(function (btn) {
+        var added = has(list, btn.dataset.slug);
+        btn.classList.toggle('added', added);
+        btn.setAttribute('aria-pressed', String(added));
+        if (btn.classList.contains('row-add')) {
+          btn.innerHTML = added ? iconCheck : iconPlus;
+          btn.setAttribute('aria-label', (added ? 'Remove ' : 'Add ') + btn.dataset.name + (added ? ' from' : ' to') + ' your course list');
+        } else {
+          btn.innerHTML = (added ? iconCheck : iconPlus) + '<span>' + (added ? 'On your list' : 'Add to my course list') + '</span>';
+        }
+      });
+
+      renderContact(list);
+    }
+
+    /* contact page integration */
+    function renderContact(list) {
+      var summary = document.getElementById('course-summary');
+      if (!summary) return;
+      var chips = document.getElementById('course-chips');
+      summary.hidden = !list.length;
+      if (chips) {
+        chips.innerHTML = list.map(function (c) {
+          return '<span class="course-chip">' + c.name +
+            '<button type="button" data-remove="' + c.slug + '" aria-label="Remove ' + c.name + '">' + iconX + '</button></span>';
+        }).join('');
+      }
+      if (list.length) {
+        var topic = document.getElementById('f-topic');
+        if (topic && !topic.value) topic.value = 'A training course';
+      }
+      var direct = document.querySelector('[data-mailto-courses]');
+      if (direct && list.length) direct.href = mailtoHref(list);
+    }
+
+    /* drawer open/close */
+    var lastFocus = null;
+    function setOpen(open) {
+      if (!drawer) return;
+      var isOpen = document.body.classList.contains('courselist-open');
+      if (open === isOpen) return;
+      document.body.classList.toggle('courselist-open', open);
+      if (fab) fab.setAttribute('aria-expanded', String(open));
+      if (open) {
+        lastFocus = document.activeElement;
+        var close = drawer.querySelector('.courselist-close');
+        if (close) close.focus({ preventScroll: true });
+      } else if (lastFocus && lastFocus.focus) {
+        lastFocus.focus({ preventScroll: true });
+      }
+    }
+    if (fab) fab.addEventListener('click', function () {
+      setOpen(!document.body.classList.contains('courselist-open'));
+    });
+    if (scrim) scrim.addEventListener('click', function () { setOpen(false); });
+    if (drawer) {
+      var closeBtn = drawer.querySelector('.courselist-close');
+      if (closeBtn) closeBtn.addEventListener('click', function () { setOpen(false); });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+
+    /* clicks: add/toggle + remove (delegated) */
+    document.addEventListener('click', function (e) {
+      var add = e.target.closest && e.target.closest('[data-course-add]');
+      if (add) {
+        e.preventDefault();
+        var list = read();
+        if (has(list, add.dataset.slug)) {
+          list = list.filter(function (c) { return c.slug !== add.dataset.slug; });
+        } else {
+          list.push({ slug: add.dataset.slug, name: add.dataset.name, tag: add.dataset.tag || '' });
+        }
+        write(list);
+        render();
+        return;
+      }
+      var rm = e.target.closest && e.target.closest('[data-remove]');
+      if (rm) {
+        e.preventDefault();
+        write(read().filter(function (c) { return c.slug !== rm.dataset.remove; }));
+        render();
+      }
+    });
+
+    /* the demo form acknowledges the attached courses */
+    document.querySelectorAll('form[data-demo]').forEach(function (form) {
+      form.addEventListener('submit', function () {
+        var status = form.querySelector('.form-status');
+        var list = read();
+        if (status && list.length) {
+          setTimeout(function () {
+            if (status.classList.contains('ok')) {
+              status.textContent = 'Thank you — your enquiry has been noted, including the ' +
+                list.length + ' course' + (list.length === 1 ? '' : 's') + ' on your list (' +
+                list.map(function (c) { return c.name; }).join(', ') +
+                '). We reply personally, usually within one working day.';
+            }
+          }, 750);
+        }
+      });
+    });
+
+    render();
+  })();
+
   /* ---------- Footer year ---------- */
   document.querySelectorAll('[data-year]').forEach(function (el) {
     el.textContent = new Date().getFullYear();
