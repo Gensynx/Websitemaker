@@ -23,11 +23,11 @@ Each theme has its own intro, headline entrance, canvas particles, shapes, fonts
 
 ## Structure
 ```
-index.html          the whole site (all font sets, images and WebGL textures embedded, ~815 KB)
+index.html          the whole site (all font sets, work captures and WebGL textures embedded, ~1.3 MB)
 ```
 
 ## The works page
-The portfolio lists client work only: Vassallo Developments and Dar Ul Amir (one build, with a four view gallery in its popup). The site does not list its own themes or editions as work. The work section links to an all works page (`#/works`), a themed grid of previews where each build opens a popup with the preview and gallery on one side and the story, tags and live link on the other. The theme's particles, chrome and cursor carry onto the works page and popup, the page content fades away beneath, and the grid staggers in with the theme's own title reveal.
+The portfolio lists client work only, captured live from this repository and its branches: Vassallo Developments, Dar Ul Amir (four view gallery), House of Autos, Mobile Mechanic Romford (both designs in its gallery), London Classic Aesthetics (24 pages) and London's Aesthetics Academy. The site does not list its own themes or editions as work. Builds already merged to main carry live links. The work section links to an all works page (`#/works`), a themed grid of previews where each build opens a popup with the preview and gallery on one side and the story, tags and live link on the other. The theme's particles, chrome and cursor carry onto the works page and popup, the page content fades away beneath, and the grid staggers in with the theme's own title reveal.
 
 ## Also animated
 - Velocity reactive ticker, draggable work carousel with momentum, snap and parallax
@@ -40,7 +40,7 @@ The portfolio lists client work only: Vassallo Developments and Dar Ul Amir (one
 The welcome screen has ambient drifting glows, a word by word title entrance and a live hover effect on every theme card: scanline glitch (scifi), brass shimmer (editorial), golden bloom (light) and CRT flicker with a blinking cursor (terminal). Full `prefers-reduced-motion` support; renders complete with JavaScript disabled (scifi theme, no overlays).
 
 ## Content notes
-- The carousel shows live captures of the Dar Ul Amir build (repo root), embedded in the file.
+- The carousel shows live captures of every build in the repo, embedded in the file (~1.3 MB total).
 - `hello@coveworks.studio` is a placeholder and the contact form is a demo until wired to an inbox.
 - Copy is dash free by request.
 
