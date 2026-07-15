@@ -334,6 +334,10 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
   .intro{height:100svh}
 }
 .intro-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* on upright phones show the whole wide frame (no zoom-crop) so it stays sharp;
+   slim dark bars top/bottom match the intro background */
+@media (orientation:portrait) and (pointer:coarse){ .intro-video{object-fit:contain} }
+@media (orientation:portrait) and (max-width:760px){ .intro-video{object-fit:contain} }
 .intro-shade{position:absolute;inset:0;background:
   linear-gradient(rgba(10,8,6,.38), rgba(10,8,6,0) 30%, rgba(10,8,6,0) 62%, rgba(10,8,6,.48)),
   radial-gradient(ellipse at center, transparent 45%, rgba(10,8,6,.38))}
