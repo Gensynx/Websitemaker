@@ -4,10 +4,21 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 
 ## Sites in this repo
 - **Dar Ul Amir** — repo root (`index.html`), deployed at https://gensynx.github.io/Websitemaker/
+- **House of Autos** — `house-of-autos/` (self drive performance car hire, London)
+- **Mobile Mechanic Romford** — `mobile-mechanic-romford/` (two designs)
+- **London Classic Aesthetics** — `london-classic-aesthetics/` (24 page redesign)
 - **Coveworks** — `coveworks/` folder, the studio's own animated site, editorial luxury edition (see `coveworks/README.md`)
-- **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, four full themes (scifi, editorial, light, terminal) and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
+- **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, seven full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
 
-## Current site: Dar Ul Amir
+## Site: London Classic Aesthetics (`london-classic-aesthetics/`)
+
+A full multi-page redesign of londonclassicaesthetics.com: 24 pages (home, 6 treatment pages + hub, 12 training course pages + hub, about, become-a-model, contact). Ivory/ink/champagne design system, Marcellus + Jost type (fonts committed as woff2), scroll-reveal and hero animations, all self-contained.
+
+- Open `london-classic-aesthetics/index.html` directly, or serve the repo root.
+- Photo slots show branded gradient placeholders until real photos are dropped into `london-classic-aesthetics/images/` (exact filenames in that folder's README) — they swap in automatically.
+- Pages are generated for consistency by `london-classic-aesthetics/sitegen/build.mjs` (`node sitegen/build.mjs` from the site folder); the generated HTML is committed, so deployment needs no build step.
+
+## Site: Dar Ul Amir (repo root)
 
 `index.html` is the Dar Ul Amir storefront redesign (Thobe Atelier and Perfumery). It is a single-page, multi-view site: Home, Thobes, Perfumes, Contact, Refund Policy, with a scroll-scrubbed palace video intro that hands off into a matching hero.
 
