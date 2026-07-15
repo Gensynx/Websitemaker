@@ -2,3 +2,15 @@
 # demand for sharing/emailing, not part of the site source. The hosted site
 # uses vassallo/index.html + vassallo/assets/ instead.
 vassallo-standalone*.html
+
+# Node / tooling (only used locally for headless preview checks)
+node_modules/
+package-lock.json
+
+# Python bytecode from .claude skill scripts
+__pycache__/
+*.pyc
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db

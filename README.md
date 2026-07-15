@@ -8,6 +8,8 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 |---|---|---|
 | Dar Ul Amir (thobes & perfumery) | repo root (`index.html`) | `https://gensynx.github.io/Websitemaker/` |
 | Vassallo Developments | `vassallo/` | `https://gensynx.github.io/Websitemaker/vassallo/` |
+| London Classic Aesthetics | `london-classic-aesthetics/` | `https://gensynx.github.io/Websitemaker/london-classic-aesthetics/` |
+| Mobile Mechanic Romford | `mobile-mechanic-romford/` | `https://gensynx.github.io/Websitemaker/mobile-mechanic-romford/` |
 
 ## Site: Vassallo Developments (`vassallo/`)
 
@@ -17,7 +19,8 @@ through the decayed hallway and living room, then glides back out as every
 room renovates itself around you, ending with the new front door closing on a
 pristine facade — capped by the line *"We make the impossible possible."* —
 then hands off into the brochure site (approach, work, track record, enquiry
-form).
+form). On desktop the film scrubs to your scroll; on phones it autoplays
+through smoothly (phones can't reliably scrub video on scroll).
 
 ```
 vassallo/
@@ -27,7 +30,19 @@ vassallo/
     vassallo-transformation-vertical.mp4  optional 9:16 cut for phones
 ```
 
-## Site: Dar Ul Amir
+## Site: London Classic Aesthetics (`london-classic-aesthetics/`)
+
+A full multi-page redesign of londonclassicaesthetics.com: 24 pages (home, 6 treatment pages + hub, 12 training course pages + hub, about, become-a-model, contact). Ivory/ink/champagne design system, Marcellus + Jost type (fonts committed as woff2), scroll-reveal and hero animations, all self-contained.
+
+- Open `london-classic-aesthetics/index.html` directly, or serve the repo root.
+- Photo slots show branded gradient placeholders until real photos are dropped into `london-classic-aesthetics/images/` (exact filenames in that folder's README) — they swap in automatically.
+- Pages are generated for consistency by `london-classic-aesthetics/sitegen/build.mjs` (`node sitegen/build.mjs` from the site folder); the generated HTML is committed, so deployment needs no build step.
+
+## Site: Mobile Mechanic Romford (`mobile-mechanic-romford/`)
+
+Premium single-page site for a mobile mechanic (see the folder for details and any variant pages).
+
+## Site: Dar Ul Amir (repo root)
 
 `index.html` is the Dar Ul Amir storefront redesign (Thobe Atelier and Perfumery). It is a single-page, multi-view site: Home, Thobes, Perfumes, Contact, Refund Policy, with a scroll-scrubbed palace video intro that hands off into a matching hero.
 
