@@ -25,7 +25,7 @@ index.html          the whole site (all font sets and images embedded, ~685 KB)
 ```
 
 ## The works page
-The work section starts with Vassallo Developments and links to an all works page (`#/works`), a themed grid of small previews. Selecting a build opens a popup with a large preview on one side and the story, tags and a live site link on the other. Back button, backdrop click and Escape all close it; the hash route means the browser back button works too.
+The portfolio lists real projects from this repository: Vassallo Developments, Dar Ul Amir (one build, with a four view gallery in its popup), the Coveworks editorial edition and the flagship itself. The work section links to an all works page (`#/works`), a themed grid of previews where each build opens a popup with the preview and gallery on one side and the story, tags and live link on the other. The theme's particles, chrome and cursor carry onto the works page and popup, the page content fades away beneath, and the grid staggers in with the theme's own title reveal.
 
 ## Also animated
 - Velocity reactive ticker, draggable work carousel with momentum, snap and parallax
@@ -38,7 +38,7 @@ The work section starts with Vassallo Developments and links to an all works pag
 The welcome screen has ambient drifting glows, a word by word title entrance and a live hover effect on every theme card: scanline glitch (scifi), brass shimmer (editorial), golden bloom (light) and CRT flicker with a blinking cursor (terminal). Full `prefers-reduced-motion` support; renders complete with JavaScript disabled (scifi theme, no overlays).
 
 ## Content notes
-- The carousel shows live captures of the Dar Ul Amir build (repo root), embedded in the file.
+- The carousel shows live captures of the Dar Ul Amir build (repo root) and both Coveworks editions, embedded in the file.
 - `hello@coveworks.studio` is a placeholder and the contact form is a demo until wired to an inbox.
 - Copy is dash free by request.
 
