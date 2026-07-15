@@ -2,6 +2,14 @@
 
 Static websites built with Claude Code. Each site is a self-contained folder that can be hosted anywhere (Netlify, Vercel, GitHub Pages) with no build step.
 
+## Sites in this repo
+- **Dar Ul Amir** — repo root (`index.html`), deployed at https://gensynx.github.io/Websitemaker/
+- **House of Autos** — `house-of-autos/` (self drive performance car hire, London)
+- **Mobile Mechanic Romford** — `mobile-mechanic-romford/` (two designs)
+- **London Classic Aesthetics** — `london-classic-aesthetics/` (24 page redesign)
+- **Coveworks** — `coveworks/` folder, the studio's own animated site, editorial luxury edition (see `coveworks/README.md`)
+- **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, seven full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
+
 ## Site: London Classic Aesthetics (`london-classic-aesthetics/`)
 
 A full multi-page redesign of londonclassicaesthetics.com: 24 pages (home, 6 treatment pages + hub, 12 training course pages + hub, about, become-a-model, contact). Ivory/ink/champagne design system, Marcellus + Jost type (fonts committed as woff2), scroll-reveal and hero animations, all self-contained.
