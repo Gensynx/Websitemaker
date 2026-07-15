@@ -1,14 +1,15 @@
-# Coveworks · the flagship site with six themes
+# Coveworks · the flagship site with seven themes
 
-The Coveworks studio site with six complete personalities in one self contained file. Visitors land on a welcome screen ("Welcome to Coveworks. Select a theme.") with six buttons, each rendered in its own theme. Picking one plays that theme's intro and lands on the hero. A floating bubble then lets them switch at any time.
+The Coveworks studio site with seven complete personalities in one self contained file. Visitors land on a welcome screen ("Welcome to Coveworks. Select a theme.") with seven buttons, each rendered in its own theme. Picking one plays that theme's intro and lands on the hero. A floating bubble then lets them switch at any time.
 
-## The six themes
+## The seven themes
 - **Scifi**: deep space blue, signal cyan, Chakra Petch type, HUD chrome, clipped corners, scramble decode headlines, warp starfield, terminal boot intro, crosshair cursor
 - **Editorial**: warm black, brass, Fraunces serif with italic accents, rounded shapes, film grain, line rise headlines, drifting gold dust, counter curtain intro, quiet ring cursor
 - **Light**: pure white and gold, Space Grotesk, pill and rounded shapes, halo glows, light rays, golden bokeh, shimmer sweep headlines, radiant intro
 - **Terminal**: phosphor green on black, everything monospace, hard offset shadows, CRT flicker and scanlines, matrix rain, typed headlines with a block cursor
 - **Glass**: deep water blue, 3d glass panels with blur and rim highlights, rising bubbles, underwater light shafts, character wave headlines, glass orb bubble
-- **Futurist**: jet black, extrabold Archivo, red bloom accents, a red scan line sweeping the viewport, a dot matrix that heats up under the scan with pointer parallax, word by word glitch fade headlines
+- **Futurist**: jet black, extrabold Archivo, red bloom accents, a red scan line sweeping the viewport, a dot matrix that heats up under the scan, word by word glitch fade headlines, and a WebGL hero: a procedurally generated night city with a true depth map, pointer parallax and a red dot wave flowing through the depth (translated from a React Three Fiber reference)
+- **Mono**: grayscale shadcn minimalism on paper white, Archivo tracking tight, outlined accent headline, pill buttons, and a physics ballpit of chrome spheres with gravity and collisions where the lead ball chases the cursor
 
 Each theme has its own intro, headline entrance, canvas particles, shapes, fonts and chrome, and the particle effect now runs across the entire page, not just the hero. Work screenshots are never tinted by a theme; only the chrome around them changes. Same words everywhere.
 
@@ -22,7 +23,7 @@ Each theme has its own intro, headline entrance, canvas particles, shapes, fonts
 
 ## Structure
 ```
-index.html          the whole site (all font sets and images embedded, ~780 KB)
+index.html          the whole site (all font sets, images and WebGL textures embedded, ~815 KB)
 ```
 
 ## The works page
