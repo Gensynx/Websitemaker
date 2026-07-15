@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mobile Mechanic Romford · Farhan — Your Driveway Is The Garage</title>
+<meta name="description" content="Romford's trusted mobile mechanic. Diagnostics, servicing, brakes, clutches and belts done on your driveway — 7 days a week, honest prices. Rated 4.8★ on Google." />
+<meta name="theme-color" content="#0c0e11" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Barlow:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+/* =============================================================
+   MOBILE MECHANIC ROMFORD — "GARAGE" theme
+   Gunmetal · racing red · hazard yellow · carbon fibre.
+   Self-contained. No image assets.
+   ============================================================= */
+:root{
+  --bg:#0b0d10;
+  --bg-2:#0f1216;
+  --surface:#14181d;
+  --surface-2:#1a1f26;
+  --surface-3:#222932;
+  --line:rgba(255,255,255,.08);
+  --line-2:rgba(255,255,255,.15);
+  --text:#eef1f4;
+  --muted:#98a2ad;
+  --muted-2:#6b7580;
+  --red:#e01e2b;
+  --red-2:#ff3a46;
+  --red-deep:#a90f1a;
+  --yellow:#ffd21e;
+  --steel:#aeb8c2;
+  --green:#33d67e;
+  --grad-red:linear-gradient(135deg,#ff3a46,#e01e2b 55%,#a90f1a);
+  --shadow-2:0 20px 55px -14px rgba(0,0,0,.7);
+  --shadow-red:0 14px 40px -10px rgba(224,30,43,.5);
+  --r-sm:8px; --r:14px; --r-lg:20px; --r-xl:26px;
+  --maxw:1220px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --nav-h:72px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;background:var(--bg);color:var(--text);overflow-x:hidden;line-height:1.6;
+  font-family:'Barlow','Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(1200px 600px at 80% -10%,rgba(224,30,43,.10),transparent 60%),
+    radial-gradient(900px 500px at -10% 20%,rgba(255,210,30,.05),transparent 60%);
+}
+h1,h2,h3,h4{font-family:'Rajdhani','Barlow',sans-serif;font-weight:700;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:.01em}
+p{margin:0}
+a{color:inherit;text-decoration:none}
+ul{margin:0;padding:0;list-style:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+img{max-width:100%;display:block}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:3px;border-radius:4px}
+::selection{background:rgba(224,30,43,.32);color:#fff}
+
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.section{padding:clamp(64px,9vw,120px) 0;position:relative}
+
+/* carbon fibre texture util */
+.carbon{
+  background-color:#0c0f13;
+  background-image:
+    linear-gradient(27deg,#12161b 5px,transparent 5px),
+    linear-gradient(207deg,#12161b 5px,transparent 5px),
+    linear-gradient(27deg,#12161b 5px,transparent 5px),
+    linear-gradient(207deg,#12161b 5px,transparent 5px),
+    linear-gradient(90deg,#0f1318 10px,transparent 10px);
+  background-size:20px 20px;
+  background-position:0 0,10px 5px,10px 10px,20px 15px,0 0;
+}
+
+/* hazard tape */
+.hazard{height:8px;background:repeating-linear-gradient(45deg,var(--yellow) 0 18px,#111418 18px 36px)}
+.hazard.thin{height:5px}
+
+/* eyebrow / tags */
+.tag{
+  display:inline-flex;align-items:center;gap:9px;font-family:'Rajdhani';font-weight:700;
+  font-size:.82rem;letter-spacing:.28em;text-transform:uppercase;color:var(--yellow);
+}
+.tag::before{content:"";width:22px;height:3px;background:var(--red);border-radius:2px}
+.wrench-tag{color:var(--red-2)}
+.wrench-tag::before{background:var(--yellow)}
+
+.section-head{max-width:720px;margin-bottom:clamp(34px,5vw,54px)}
+.section-head.center{margin-left:auto;margin-right:auto;text-align:center}
+.section-head h2{font-size:clamp(2.1rem,5.4vw,3.9rem);margin:14px 0 0;letter-spacing:.005em}
+.section-head p{color:var(--muted);font-size:1.08rem;margin-top:16px;font-family:'Inter'}
+.red-text{color:var(--red-2)}
+.yel-text{color:var(--yellow)}
+.slash{color:var(--red);font-weight:800}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;font-family:'Rajdhani';font-weight:700;
+  font-size:1.08rem;letter-spacing:.04em;text-transform:uppercase;padding:15px 28px;border-radius:var(--r-sm);
+  transition:transform .22s var(--ease),box-shadow .22s,background .22s,border-color .22s;min-height:54px;white-space:nowrap}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-red{background:var(--grad-red);color:#fff;box-shadow:var(--shadow-red)}
+.btn-red:hover{transform:translateY(-3px);box-shadow:0 22px 48px -8px rgba(224,30,43,.62)}
+.btn-yellow{background:var(--yellow);color:#161206}
+.btn-yellow:hover{transform:translateY(-3px);box-shadow:0 18px 40px -10px rgba(255,210,30,.5)}
+.btn-ghost{background:rgba(255,255,255,.04);color:var(--text);border:1.5px solid var(--line-2)}
+.btn-ghost:hover{background:rgba(255,255,255,.09);border-color:var(--red);transform:translateY(-3px)}
+.btn-block{width:100%}
+
+/* ---------- Header ---------- */
+header.nav{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--nav-h);display:flex;align-items:center;
+  transition:background .35s,border-color .35s;border-bottom:1px solid transparent}
+header.nav.scrolled{background:rgba(11,13,16,.9);backdrop-filter:blur(14px) saturate(140%);-webkit-backdrop-filter:blur(14px) saturate(140%);border-bottom-color:var(--line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;width:100%;max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:44px;height:44px;flex:none;border-radius:10px;background:var(--grad-red);display:grid;place-items:center;color:#fff;box-shadow:var(--shadow-red);position:relative;overflow:hidden}
+.brand-mark::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(45deg,rgba(255,210,30,.28) 0 4px,transparent 4px 8px);opacity:.35}
+.brand-mark svg{width:25px;height:25px;position:relative}
+.brand-txt{font-family:'Rajdhani';font-weight:700;font-size:1.16rem;line-height:1;text-transform:uppercase;letter-spacing:.02em}
+.brand-txt small{display:block;font-family:'Barlow';font-weight:600;font-size:.62rem;letter-spacing:.24em;color:var(--yellow);margin-top:3px}
+.nav-links{display:flex;align-items:center;gap:2px}
+.nav-links a{font-family:'Rajdhani';font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:.98rem;color:var(--muted);padding:9px 13px;border-radius:6px;transition:.2s}
+.nav-links a:hover{color:var(--text);background:rgba(255,255,255,.05)}
+.nav-cta{display:flex;align-items:center;gap:12px}
+.nav-phone{display:inline-flex;align-items:center;gap:9px;font-family:'Rajdhani';font-weight:700;font-size:1.05rem;color:var(--text)}
+.nav-phone .ph{width:34px;height:34px;border-radius:8px;background:rgba(224,30,43,.16);display:grid;place-items:center;color:var(--red-2)}
+.nav-phone svg{width:16px;height:16px}
+.burger{display:none;width:48px;height:48px;border-radius:8px;background:rgba(255,255,255,.05);border:1px solid var(--line);align-items:center;justify-content:center}
+.burger span,.burger span::before,.burger span::after{content:"";display:block;width:22px;height:2.5px;background:var(--text);border-radius:2px;transition:.3s;position:relative}
+.burger span::before{position:absolute;top:-7px}.burger span::after{position:absolute;top:7px}
+body.menu-open .burger span{background:transparent}
+body.menu-open .burger span::before{top:0;transform:rotate(45deg)}
+body.menu-open .burger span::after{top:0;transform:rotate(-45deg)}
+.drawer{position:fixed;inset:0;z-index:99;background:rgba(9,11,14,.98);display:flex;flex-direction:column;justify-content:center;gap:4px;padding:90px 30px 40px;transform:translateY(-100%);transition:transform .45s var(--ease);pointer-events:none}
+body.menu-open .drawer{transform:none;pointer-events:auto}
+.drawer a{font-family:'Rajdhani';font-weight:700;text-transform:uppercase;font-size:1.7rem;padding:14px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px}
+.drawer a span{color:var(--red-2);font-size:1rem;font-family:'Barlow'}
+.drawer .btn{margin-top:24px}
+
+/* ---------- Hero ---------- */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding-top:var(--nav-h);overflow:hidden}
+.hero::before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:52px 52px;-webkit-mask-image:radial-gradient(ellipse 80% 80% at 30% 40%,#000,transparent 75%);mask-image:radial-gradient(ellipse 80% 80% at 30% 40%,#000,transparent 75%);opacity:.6}
+.hero-stripe{position:absolute;top:0;bottom:0;left:0;width:52%;background:repeating-linear-gradient(120deg,transparent 0 60px,rgba(224,30,43,.04) 60px 62px);pointer-events:none}
+.hero-inner{position:relative;z-index:2;display:grid;grid-template-columns:1.02fr .98fr;gap:40px;align-items:center;width:100%}
+.hero-badge{display:inline-flex;align-items:center;gap:12px;padding:8px 16px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid var(--line-2);border-left:4px solid var(--red);margin-bottom:26px;font-family:'Inter';font-size:.86rem;color:var(--muted)}
+.hero-badge .stars{color:var(--yellow);letter-spacing:1px}
+.hero-badge b{color:var(--text)}
+.hero h1{font-size:clamp(2.9rem,7.5vw,5.7rem);font-weight:700;letter-spacing:.004em;line-height:.94}
+.hero h1 .k{display:block}
+.hero h1 em{font-style:normal;color:var(--red-2);position:relative}
+.hero h1 .under{position:relative;display:inline-block}
+.hero h1 .under::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.14em;background:var(--yellow);z-index:-1;transform:skewX(-12deg)}
+.hero-sub{font-family:'Inter';font-size:clamp(1.04rem,1.7vw,1.26rem);color:var(--muted);margin-top:24px;max-width:540px}
+.hero-sub b{color:var(--text);font-weight:600}
+.hero-actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:34px}
+.hero-feat{display:flex;flex-wrap:wrap;gap:10px;margin-top:32px}
+.hero-feat span{display:inline-flex;align-items:center;gap:8px;font-family:'Rajdhani';font-weight:600;text-transform:uppercase;letter-spacing:.05em;font-size:.86rem;color:var(--steel);background:rgba(255,255,255,.03);border:1px solid var(--line);padding:8px 13px;border-radius:6px}
+.hero-feat svg{width:16px;height:16px;color:var(--red-2)}
+
+/* hero right: car + speedo */
+.hero-visual{position:relative;display:grid;place-items:center;min-height:400px}
+.car-wrap{width:100%;max-width:560px;position:relative}
+.car-svg{width:100%;height:auto;overflow:visible;filter:drop-shadow(0 30px 40px rgba(0,0,0,.55))}
+.wheel{transform-box:fill-box;transform-origin:center;animation:spin 2.4s linear infinite;animation-play-state:paused}
+.car-wrap.rolling .wheel{animation-play-state:running}
+@keyframes spin{to{transform:rotate(360deg)}}
+.headlight-glow{transform-origin:center;animation:flick 4s ease-in-out infinite}
+@keyframes flick{0%,100%{opacity:.9}50%{opacity:.5}}
+
+.speedo{position:absolute;right:-6px;bottom:-18px;width:186px;background:linear-gradient(160deg,var(--surface-2),var(--surface));border:1px solid var(--line-2);border-radius:16px;padding:16px 16px 14px;box-shadow:var(--shadow-2)}
+.speedo .cap{font-family:'Rajdhani';font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:.64rem;color:var(--muted-2);text-align:center}
+.speedo svg{width:100%;height:auto;display:block}
+.speedo .needle{transform-box:fill-box;transform-origin:50% 100%;transform:rotate(-90deg);transition:transform 1.9s cubic-bezier(.34,1.4,.5,1)}
+.speedo .needle.go{transform:rotate(82deg)}
+.speedo .read{text-align:center;margin-top:-6px}
+.speedo .read b{font-family:'Rajdhani';font-weight:700;font-size:1.7rem;color:var(--text);line-height:1}
+.speedo .read b small{font-size:.9rem;color:var(--muted)}
+.speedo .read span{display:block;font-family:'Rajdhani';font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:.6rem;color:var(--yellow);margin-top:2px}
+.torque-chip{position:absolute;left:-8px;top:8px;background:rgba(20,24,29,.95);border:1px solid var(--line-2);border-left:4px solid var(--yellow);border-radius:10px;padding:11px 14px;box-shadow:var(--shadow-2);display:flex;align-items:center;gap:11px}
+.torque-chip .ic{width:32px;height:32px;border-radius:7px;background:var(--grad-red);display:grid;place-items:center;color:#fff;flex:none}
+.torque-chip .ic svg{width:18px;height:18px}
+.torque-chip b{font-family:'Rajdhani';font-weight:700;text-transform:uppercase;font-size:.9rem;display:block;line-height:1.1}
+.torque-chip span{font-family:'Inter';font-size:.72rem;color:var(--muted-2)}
+
+/* ---------- rev-counter stat bar ---------- */
+.revbar{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.revbar-grid{display:grid;grid-template-columns:repeat(4,1fr)}
+.revcell{padding:30px 20px;text-align:center;border-right:1px solid var(--line);position:relative}
+.revcell:last-child{border-right:none}
+.revcell .num{font-family:'Rajdhani';font-weight:700;font-size:clamp(2.1rem,4.6vw,2.9rem);line-height:1;color:var(--text)}
+.revcell .num .u{color:var(--red-2)}
+.revcell .lbl{font-family:'Rajdhani';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:.76rem;color:var(--muted);margin-top:8px}
+
+/* tyre-tread divider */
+.tread{height:26px;background:
+  repeating-linear-gradient(90deg,#0a0c0f 0 10px,transparent 10px 22px),
+  repeating-linear-gradient(90deg,#1b2027 0 22px,#0e1216 22px 44px);
+  border-top:1px solid var(--line);border-bottom:1px solid var(--line);opacity:.9}
+
+/* ---------- Services (Under the Bonnet) ---------- */
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.svc-card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px 26px;overflow:hidden;transition:transform .35s var(--ease),border-color .35s}
+.svc-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--grad-red);transform:scaleY(0);transform-origin:top;transition:transform .35s var(--ease)}
+.svc-card:hover{transform:translateY(-6px);border-color:var(--line-2)}
+.svc-card:hover::before{transform:scaleY(1)}
+.svc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.svc-ic{width:56px;height:56px;border-radius:12px;background:rgba(224,30,43,.1);border:1px solid rgba(224,30,43,.25);display:grid;place-items:center;color:var(--red-2)}
+.svc-ic svg{width:28px;height:28px}
+.svc-no{font-family:'Rajdhani';font-weight:700;font-size:1.5rem;color:var(--surface-3)}
+.svc-card h3{font-family:'Rajdhani';font-size:1.32rem;margin-bottom:8px;letter-spacing:.01em}
+.svc-card p{color:var(--muted);font-size:.94rem;font-family:'Inter'}
+.svc-from{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line-2);display:flex;align-items:center;justify-content:space-between}
+.svc-from .f{font-family:'Rajdhani';font-weight:700;text-transform:uppercase;font-size:.92rem;color:var(--yellow)}
+.svc-from .n{font-size:.76rem;color:var(--muted-2);font-family:'Inter'}
+
+/* ---------- Warning-light decoder ---------- */
+.diag{background:var(--bg-2)}
+.diag-panel{display:grid;grid-template-columns:1.1fr 1fr;gap:0;border:1px solid var(--line-2);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);box-shadow:var(--shadow-2)}
+.cluster{padding:clamp(26px,3.5vw,40px);background:
+  radial-gradient(140% 120% at 50% -10%,rgba(224,30,43,.10),transparent 55%),var(--surface-2);position:relative}
+.cluster-title{font-family:'Rajdhani';font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.82rem;color:var(--muted);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+.cluster-title i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.lights{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.light{aspect-ratio:1;border-radius:12px;background:rgba(0,0,0,.35);border:1px solid var(--line);display:grid;place-items:center;color:var(--muted-2);transition:.25s;position:relative}
+.light svg{width:30px;height:30px}
+.light:hover{border-color:var(--line-2);color:var(--steel);transform:translateY(-2px)}
+.light.on{color:var(--yellow);border-color:rgba(255,210,30,.5);background:rgba(255,210,30,.08);box-shadow:0 0 22px -4px rgba(255,210,30,.5)}
+.light.on.crit{color:var(--red-2);border-color:rgba(224,30,43,.55);background:rgba(224,30,43,.1);box-shadow:0 0 22px -4px rgba(224,30,43,.55)}
+.decode{padding:clamp(26px,3.5vw,40px);display:flex;flex-direction:column;justify-content:center}
+.decode .dot{display:inline-flex;align-items:center;gap:9px;font-family:'Rajdhani';font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:.78rem;color:var(--red-2);margin-bottom:12px}
+.decode .dic{width:60px;height:60px;border-radius:14px;background:rgba(224,30,43,.1);border:1px solid rgba(224,30,43,.25);display:grid;place-items:center;color:var(--red-2);margin-bottom:16px}
+.decode .dic svg{width:32px;height:32px}
+.decode h3{font-family:'Rajdhani';font-size:1.7rem;margin-bottom:10px}
+.decode p{color:var(--muted);font-family:'Inter';font-size:1rem;margin-bottom:22px}
+.decode .btn{align-self:flex-start}
+
+/* ---------- Work-order quote ---------- */
+.quote-box{border:1px solid var(--line-2);border-radius:var(--r-lg);overflow:hidden;background:var(--surface);box-shadow:var(--shadow-2);display:grid;grid-template-columns:1fr 1fr}
+.qo-left{padding:clamp(28px,4vw,44px);position:relative;background:
+  repeating-linear-gradient(0deg,transparent 0 33px,rgba(255,255,255,.02) 33px 34px),var(--surface-2)}
+.qo-left .stamp{position:absolute;top:26px;right:26px;font-family:'Rajdhani';font-weight:700;text-transform:uppercase;letter-spacing:.1em;font-size:.7rem;color:var(--red);border:2px solid var(--red);border-radius:6px;padding:5px 10px;transform:rotate(6deg);opacity:.75}
+.qo-left h3{font-family:'Rajdhani';font-size:clamp(1.6rem,2.8vw,2.2rem);margin:12px 0 10px}
+.qo-left p{color:var(--muted);font-family:'Inter'}
+.ticket{margin-top:26px;padding:22px;border-radius:12px;background:rgba(0,0,0,.3);border:1px solid var(--line-2);border-top:3px solid var(--yellow)}
+.ticket .k{font-family:'Rajdhani';font-weight:600;text-transform:uppercase;letter-spacing:.12em;font-size:.72rem;color:var(--muted-2)}
+.ticket .val{font-family:'Rajdhani';font-weight:700;font-size:clamp(2.1rem,5vw,3rem);color:var(--yellow);margin:4px 0;letter-spacing:.01em}
+.ticket small{color:var(--muted-2);font-size:.82rem;font-family:'Inter'}
+.qo-right{padding:clamp(28px,4vw,44px)}
+.field{margin-bottom:18px}
+.field label{display:block;font-family:'Rajdhani';font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.8rem;color:var(--muted);margin-bottom:9px}
+.field label b{color:var(--red-2)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:10px 15px;border-radius:6px;border:1px solid var(--line);background:rgba(255,255,255,.03);font-family:'Rajdhani';font-weight:600;text-transform:uppercase;letter-spacing:.04em;font-size:.86rem;color:var(--muted);transition:.2s;min-height:44px;display:inline-flex;align-items:center}
+.chip:hover{border-color:var(--line-2);color:var(--text)}
+.chip.active{background:var(--grad-red);color:#fff;border-color:transparent}
+input,select,textarea{width:100%;padding:14px 16px;border-radius:var(--r-sm);background:rgba(255,255,255,.035);border:1px solid var(--line);color:var(--text);font-size:1rem;font-family:'Inter';transition:.2s;min-height:52px}
+input::placeholder,textarea::placeholder{color:var(--muted-2)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--red);background:rgba(224,30,43,.05)}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='none' stroke='%2398a2ad' stroke-width='2'%3E%3Cpath d='M2 4l5 5 5-5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:42px}
+.field.err input,.field.err select{border-color:var(--red)}
+.err-msg{display:none;color:var(--red-2);font-size:.8rem;margin-top:7px;font-family:'Inter'}
+.field.err .err-msg{display:block}
+
+/* ---------- Pit-stop steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.step{position:relative;padding:34px 28px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.step::after{content:"";position:absolute;right:-30px;bottom:-30px;width:120px;height:120px;border-radius:50%;border:14px solid rgba(255,255,255,.02)}
+.step .sn{font-family:'Rajdhani';font-weight:700;font-size:1rem;color:#161206;background:var(--yellow);width:40px;height:40px;display:grid;place-items:center;border-radius:8px}
+.step h3{font-family:'Rajdhani';font-size:1.34rem;margin:16px 0 10px}
+.step p{color:var(--muted);font-family:'Inter';font-size:.96rem}
+
+/* ---------- Reviews (logbook) ---------- */
+.reviews{background:var(--bg-2)}
+.rev-summary{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:28px;max-width:760px;margin:0 auto 44px;padding:24px 28px;border:1px solid var(--line-2);border-radius:var(--r-lg);background:var(--surface);border-left:5px solid var(--red)}
+.rev-score{text-align:center}
+.rev-score .big{font-family:'Rajdhani';font-weight:700;font-size:3.1rem;line-height:1}
+.rev-score .stars{color:var(--yellow);letter-spacing:2px;font-size:1.1rem}
+.rev-score .sub{color:var(--muted);font-size:.82rem;font-family:'Inter';margin-top:3px}
+.rev-div{width:1px;height:60px;background:var(--line-2)}
+.glogo{display:flex;align-items:center;gap:12px}
+.glogo .gg{width:44px;height:44px}
+.glogo b{font-family:'Rajdhani';font-weight:700;text-transform:uppercase;font-size:1.05rem;display:block}
+.glogo span{color:var(--muted);font-size:.82rem;font-family:'Inter'}
+
+.rev-slider{max-width:840px;margin:0 auto 44px;position:relative}
+.rev-track{overflow:hidden;border-radius:var(--r-lg)}
+.rev-row{display:flex;transition:transform .55s var(--ease)}
+.rev-slide{min-width:100%;padding:6px}
+.rev-quote{background:var(--surface-2);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:clamp(28px,4vw,44px);text-align:center;position:relative;box-shadow:var(--shadow-2)}
+.rev-quote::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:var(--grad-red)}
+.rev-quote .stars{color:var(--yellow);letter-spacing:2px;font-size:1.05rem;margin-bottom:16px}
+.rev-quote blockquote{font-family:'Barlow';font-weight:500;font-size:clamp(1.14rem,2.2vw,1.5rem);line-height:1.42;margin:0 0 22px}
+.rev-author{display:flex;align-items:center;justify-content:center;gap:12px}
+.rev-author .av{width:46px;height:46px;border-radius:8px;display:grid;place-items:center;font-family:'Rajdhani';font-weight:700;color:#fff;flex:none}
+.rev-author b{display:block;text-align:left;font-family:'Rajdhani';text-transform:uppercase;letter-spacing:.02em}
+.rev-author span{color:var(--muted);font-size:.8rem;font-family:'Inter'}
+.rev-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:24px}
+.rev-arrow{width:50px;height:50px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface);display:grid;place-items:center;transition:.25s}
+.rev-arrow:hover{background:var(--grad-red);color:#fff;border-color:transparent}
+.rev-arrow svg{width:20px;height:20px}
+.rev-dots{display:flex;gap:8px}
+.rev-dots button{width:9px;height:9px;border-radius:2px;background:var(--line-2);transition:.25s}
+.rev-dots button.active{background:var(--red);width:26px}
+
+.wall{display:grid;gap:16px;overflow:hidden;margin-top:8px}
+.wall-row{display:flex;gap:16px;width:max-content}
+.wall-row.r1{animation:scrollx 48s linear infinite}
+.wall-row.r2{animation:scrollx 58s linear infinite reverse}
+.wall:hover .wall-row{animation-play-state:paused}
+@keyframes scrollx{to{transform:translateX(-50%)}}
+.rev-mini{width:330px;flex:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;border-left:3px solid var(--yellow)}
+.rev-mini .top{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+.rev-mini .av{width:36px;height:36px;border-radius:7px;display:grid;place-items:center;font-family:'Rajdhani';font-weight:700;font-size:.85rem;color:#fff;flex:none}
+.rev-mini b{font-family:'Rajdhani';text-transform:uppercase;font-size:.94rem;display:block;line-height:1.1}
+.rev-mini .st{color:var(--yellow);font-size:.76rem;letter-spacing:1px}
+.rev-mini p{color:var(--muted);font-size:.88rem;font-family:'Inter';line-height:1.55}
+
+/* ---------- Coverage ---------- */
+.cover-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.radar{position:relative;aspect-ratio:1/.84;border-radius:var(--r-lg);border:1px solid var(--line-2);background:radial-gradient(circle at 50% 46%,rgba(224,30,43,.12),transparent 60%),var(--surface);overflow:hidden;display:grid;place-items:center}
+.radar .ring{position:absolute;border-radius:50%;border:1px solid rgba(224,30,43,.16)}
+.radar .ring.a{width:80%;height:80%}.radar .ring.b{width:54%;height:54%}.radar .ring.c{width:28%;height:28%}
+.radar .sweep{position:absolute;width:50%;height:50%;left:50%;top:50%;transform-origin:top left;background:conic-gradient(from 0deg,rgba(224,30,43,.28),transparent 40%);border-radius:0 0 0 100%;animation:radar 4s linear infinite}
+@keyframes radar{to{transform:rotate(360deg)}}
+.radar .pin{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--yellow);box-shadow:0 0 0 5px rgba(255,210,30,.16)}
+.radar .pin.hub{width:20px;height:20px;background:var(--red-2);box-shadow:0 0 0 7px rgba(224,30,43,.22),0 0 26px var(--red);z-index:2}
+.radar .lbl{position:absolute;bottom:14px;left:14px;font-family:'Rajdhani';font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:.74rem;color:var(--muted);background:rgba(0,0,0,.45);border:1px solid var(--line);padding:5px 11px;border-radius:6px}
+.area-chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:22px}
+.area-chips span{padding:8px 14px;border-radius:6px;background:rgba(255,255,255,.03);border:1px solid var(--line);font-family:'Rajdhani';font-weight:600;text-transform:uppercase;letter-spacing:.03em;font-size:.84rem;color:var(--muted)}
+.area-chips span.hl{background:rgba(224,30,43,.12);border-color:rgba(224,30,43,.35);color:var(--red-2)}
+
+/* ---------- FAQ ---------- */
+.faq-list{max-width:840px;margin:0 auto;display:grid;gap:12px}
+.faq-item{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden;transition:border-color .3s}
+.faq-item.open{border-color:var(--line-2);border-left:3px solid var(--red)}
+.faq-q{width:100%;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;text-align:left;font-family:'Rajdhani';font-weight:700;text-transform:uppercase;letter-spacing:.02em;font-size:1.08rem}
+.faq-q .qi{width:30px;height:30px;border-radius:6px;background:rgba(224,30,43,.12);color:var(--red-2);display:grid;place-items:center;flex:none;transition:.35s}
+.faq-item.open .qi{transform:rotate(135deg);background:var(--grad-red);color:#fff}
+.faq-q .qi svg{width:16px;height:16px}
+.faq-a{max-height:0;overflow:hidden;transition:max-height .4s var(--ease)}
+.faq-a p{padding:0 24px 22px;color:var(--muted);font-family:'Inter';font-size:.98rem}
+
+/* ---------- Contact ---------- */
+.cta{position:relative;overflow:hidden}
+.cta-card{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line-2);display:grid;grid-template-columns:1.05fr .95fr;box-shadow:var(--shadow-2);position:relative;background:linear-gradient(150deg,#171b21,#0f1216)}
+.cta-info{padding:clamp(32px,4.5vw,54px);position:relative;z-index:1}
+.cta-info h2{font-size:clamp(2rem,4vw,3.1rem);margin-bottom:14px}
+.cta-info p{color:var(--muted);font-family:'Inter';font-size:1.06rem;margin-bottom:30px;max-width:420px}
+.clines{display:grid;gap:14px;margin-bottom:32px}
+.cline{display:flex;align-items:center;gap:14px}
+.cline .ic{width:48px;height:48px;border-radius:10px;background:rgba(224,30,43,.1);border:1px solid rgba(224,30,43,.25);display:grid;place-items:center;color:var(--red-2);flex:none}
+.cline .ic svg{width:22px;height:22px}
+.cline .k{font-family:'Rajdhani';font-weight:600;text-transform:uppercase;letter-spacing:.1em;font-size:.72rem;color:var(--muted-2)}
+.cline .v{font-family:'Rajdhani';font-weight:700;font-size:1.14rem}
+.cline a.v:hover{color:var(--red-2)}
+.cta-form{padding:clamp(32px,4.5vw,54px);background:rgba(0,0,0,.25);border-left:1px solid var(--line)}
+.cta-form h3{font-family:'Rajdhani';font-size:1.5rem;margin-bottom:4px}
+.cta-form .lead{color:var(--muted);font-family:'Inter';font-size:.92rem;margin-bottom:22px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-success{display:none;text-align:center;padding:18px 8px}
+.form-success.show{display:block;animation:fadeUp .5s var(--ease)}
+.form-success .sic{width:66px;height:66px;border-radius:12px;background:rgba(51,214,126,.14);display:grid;place-items:center;margin:0 auto 16px}
+.form-success .sic svg{width:34px;height:34px;color:var(--green)}
+.form-success h3{font-family:'Rajdhani';margin-bottom:8px}
+.form-success p{color:var(--muted);font-family:'Inter'}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- Footer ---------- */
+footer{border-top:1px solid var(--line);background:var(--bg);padding:60px 0 28px}
+.foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:38px;margin-bottom:42px}
+.foot-brand p{color:var(--muted);font-family:'Inter';font-size:.94rem;margin-top:16px;max-width:290px}
+.foot-col h4{font-family:'Rajdhani';font-weight:700;text-transform:uppercase;letter-spacing:.14em;font-size:.8rem;color:var(--muted-2);margin-bottom:16px}
+.foot-col a{display:block;color:var(--muted);font-family:'Inter';font-size:.94rem;padding:5px 0;transition:.2s}
+.foot-col a:hover{color:var(--red-2)}
+.foot-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;padding-top:24px;border-top:1px solid var(--line);color:var(--muted-2);font-size:.84rem;font-family:'Inter'}
+.foot-bottom a{color:var(--muted)}
+
+/* mobile bar + to-top */
+.mobile-bar{position:fixed;bottom:0;left:0;right:0;z-index:90;display:none;gap:10px;padding:12px 14px calc(12px + env(safe-area-inset-bottom));background:rgba(11,13,16,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line)}
+.mobile-bar .btn{flex:1;padding:14px}
+.to-top{position:fixed;bottom:26px;right:26px;z-index:80;width:50px;height:50px;border-radius:10px;background:var(--grad-red);color:#fff;display:grid;place-items:center;box-shadow:var(--shadow-red);opacity:0;transform:translateY(20px);pointer-events:none;transition:.35s var(--ease)}
+.to-top.show{opacity:1;transform:none;pointer-events:auto}
+.to-top svg{width:22px;height:22px}
+
+/* reveal */
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+.reveal.d1{transition-delay:.07s}.reveal.d2{transition-delay:.14s}.reveal.d3{transition-delay:.21s}.reveal.d4{transition-delay:.28s}
+
+/* Responsive */
+@media (max-width:1024px){
+  .hero-inner{grid-template-columns:1fr;gap:36px}
+  .hero-visual{order:-1;max-width:520px;margin:0 auto;min-height:320px}
+  .svc-grid{grid-template-columns:repeat(2,1fr)}
+  .foot-grid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:860px){
+  .nav-links,.nav-phone{display:none}
+  .burger{display:flex}
+  .diag-panel,.quote-box,.cover-grid,.cta-card{grid-template-columns:1fr}
+  .cta-form{border-left:none;border-top:1px solid var(--line)}
+  .cover-grid{gap:34px}
+  .radar{max-width:440px;margin:0 auto;width:100%}
+  .mobile-bar{display:flex}
+  .to-top{bottom:88px}
+  .revbar-grid{grid-template-columns:1fr 1fr}
+  .revcell:nth-child(2){border-right:none}
+  .revcell:nth-child(1),.revcell:nth-child(2){border-bottom:1px solid var(--line)}
+}
+@media (max-width:560px){
+  .wrap{padding:0 18px}
+  .steps,.svc-grid{grid-template-columns:1fr}
+  .form-row{grid-template-columns:1fr}
+  .lights{grid-template-columns:repeat(4,1fr);gap:9px}
+  .torque-chip,.rev-div{display:none}
+  .rev-summary{flex-direction:column}
+  .speedo{width:150px;right:0;bottom:-10px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+<div class="hazard" aria-hidden="true"></div>
+
+<!-- HEADER -->
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#home" class="brand" aria-label="Mobile Mechanic Romford — home">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.1 2.1a2 2 0 0 1-2.8-2.8Z"/></svg></span>
+      <span class="brand-txt">Mobile Mechanic<small>ROMFORD · FARHAN</small></span>
+    </a>
+    <nav class="nav-links" aria-label="Primary">
+      <a href="#services">Services</a>
+      <a href="#diagnostics">Warning Lights</a>
+      <a href="#quote">Get Quote</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#areas">Areas</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="nav-phone js-call" href="tel:+447000000000">
+        <span class="ph" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+        <span class="js-phone">07000 000000</span>
+      </a>
+      <a class="btn btn-red" href="#quote">Get Quote</a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false"><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div class="drawer" id="drawer">
+  <a href="#services"><span>01</span>Services</a>
+  <a href="#diagnostics"><span>02</span>Warning Lights</a>
+  <a href="#quote"><span>03</span>Get Quote</a>
+  <a href="#reviews"><span>04</span>Reviews</a>
+  <a href="#areas"><span>05</span>Areas</a>
+  <a href="#faq"><span>06</span>FAQ</a>
+  <a class="btn btn-red js-call" href="tel:+447000000000">Call Farhan Now</a>
+</div>
+
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-stripe" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <div class="hero-badge reveal"><span class="stars">★★★★★</span> <b>4.8</b> · 90+ Google reviews</div>
+      <h1 class="reveal d1">
+        <span class="k">Your driveway</span>
+        <span class="k">is the <em class="under">garage</em></span>
+      </h1>
+      <p class="hero-sub reveal d2">
+        Romford's go-to <b>mobile mechanic</b>. Farhan rolls up with the diagnostics gear,
+        the tools and the parts — <b>brakes, clutches, belts, servicing and fault-finding</b>
+        done right where your car sits. Same-day. Straight prices. No garage games.
+      </p>
+      <div class="hero-actions reveal d3">
+        <a class="btn btn-red js-call" href="tel:+447000000000">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+          Call Farhan Now
+        </a>
+        <a class="btn btn-ghost" href="#quote">Get a fast quote</a>
+      </div>
+      <div class="hero-feat reveal d4">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>Same-day callouts</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>10+ years on the tools</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>All makes &amp; models</span>
+      </div>
+    </div>
+
+    <div class="hero-visual reveal d2">
+      <div class="car-wrap" id="carWrap">
+        <svg class="car-svg" viewBox="0 0 620 250" role="img" aria-label="Illustration of a car">
+          <defs>
+            <linearGradient id="body" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#2a313a"/><stop offset="1" stop-color="#161b21"/>
+            </linearGradient>
+            <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#3a444f"/><stop offset="1" stop-color="#20262d"/>
+            </linearGradient>
+            <radialGradient id="hl" cx="50%" cy="50%" r="50%">
+              <stop offset="0" stop-color="#fff6cf"/><stop offset="55%" stop-color="#ffd21e"/><stop offset="100%" stop-color="#ffd21e00"/>
+            </radialGradient>
+          </defs>
+          <!-- ground shadow -->
+          <ellipse cx="315" cy="228" rx="250" ry="14" fill="#000" opacity="0.4"/>
+          <!-- body -->
+          <path d="M58 192 L58 168 Q60 149 92 147 L152 147 L212 102 Q222 94 240 93 L360 93 Q394 94 414 111 L456 148 L558 154 Q582 158 582 180 L582 192 Q582 198 574 198 L66 198 Q58 198 58 192 Z" fill="url(#body)" stroke="#3a434d" stroke-width="1.5"/>
+          <!-- red accent line -->
+          <path d="M64 182 L556 187" stroke="#e01e2b" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+          <!-- greenhouse / glass -->
+          <path d="M220 106 Q228 99 242 98 L356 98 Q384 99 400 112 L416 128 L214 128 Z" fill="url(#glass)"/>
+          <!-- b-pillar -->
+          <rect x="303" y="100" width="7" height="30" fill="#161b21"/>
+          <!-- door line + handle -->
+          <path d="M300 134 L300 190" stroke="#0e1216" stroke-width="2"/>
+          <rect x="270" y="150" width="22" height="6" rx="3" fill="#0e1216"/>
+          <!-- headlight -->
+          <circle cx="560" cy="168" r="26" fill="url(#hl)" class="headlight-glow"/>
+          <rect x="556" y="160" width="24" height="12" rx="4" fill="#ffe98a"/>
+          <!-- tail light -->
+          <rect x="60" y="160" width="10" height="14" rx="3" fill="#e01e2b"/>
+          <!-- wheels -->
+          <g class="wheel">
+            <circle cx="170" cy="198" r="46" fill="#0b0d10" stroke="#20262d" stroke-width="4"/>
+            <circle cx="170" cy="198" r="30" fill="#161b21" stroke="#2a313a" stroke-width="2"/>
+            <circle cx="170" cy="198" r="9" fill="#3a444f"/>
+            <g stroke="#4a5561" stroke-width="4" stroke-linecap="round">
+              <path d="M170 172 L170 186"/><path d="M170 210 L170 224"/>
+              <path d="M144 198 L158 198"/><path d="M182 198 L196 198"/>
+              <path d="M151 179 L161 189"/><path d="M179 207 L189 217"/>
+              <path d="M189 179 L179 189"/><path d="M161 207 L151 217"/>
+            </g>
+          </g>
+          <g class="wheel">
+            <circle cx="456" cy="198" r="46" fill="#0b0d10" stroke="#20262d" stroke-width="4"/>
+            <circle cx="456" cy="198" r="30" fill="#161b21" stroke="#2a313a" stroke-width="2"/>
+            <circle cx="456" cy="198" r="9" fill="#3a444f"/>
+            <g stroke="#4a5561" stroke-width="4" stroke-linecap="round">
+              <path d="M456 172 L456 186"/><path d="M456 210 L456 224"/>
+              <path d="M430 198 L444 198"/><path d="M468 198 L482 198"/>
+              <path d="M437 179 L447 189"/><path d="M465 207 L475 217"/>
+              <path d="M475 179 L465 189"/><path d="M447 207 L437 217"/>
+            </g>
+          </g>
+        </svg>
+
+        <div class="torque-chip" aria-hidden="true">
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.1 2.1a2 2 0 0 1-2.8-2.8Z"/></svg></span>
+          <div><b>We come to you</b><span>Home · work · roadside</span></div>
+        </div>
+
+        <div class="speedo" aria-hidden="true">
+          <div class="cap">Customer Rating</div>
+          <svg viewBox="0 0 200 120">
+            <path d="M18 110 A82 82 0 0 1 182 110" fill="none" stroke="#20262d" stroke-width="12" stroke-linecap="round"/>
+            <path d="M18 110 A82 82 0 0 1 182 110" fill="none" stroke="url(#arcg)" stroke-width="12" stroke-linecap="round" stroke-dasharray="257" stroke-dashoffset="10"/>
+            <defs><linearGradient id="arcg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#e01e2b"/><stop offset="0.5" stop-color="#ffd21e"/><stop offset="1" stop-color="#33d67e"/></linearGradient></defs>
+            <g stroke="#6b7580" stroke-width="2">
+              <path d="M18 110 L28 108"/><path d="M32 66 L40 72"/><path d="M100 28 L100 38"/><path d="M168 66 L160 72"/><path d="M182 110 L172 108"/>
+            </g>
+            <polygon class="needle" id="needle" points="96,110 104,110 100,44" fill="#e01e2b"/>
+            <circle cx="100" cy="110" r="8" fill="#2a313a" stroke="#e01e2b" stroke-width="2"/>
+          </svg>
+          <div class="read"><b>4.8<small>/5</small></b><span>Google Rated</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REV BAR -->
+<div class="revbar">
+  <div class="wrap"><div class="revbar-grid">
+    <div class="revcell"><div class="num" data-count="90" data-suffix="+">0</div><div class="lbl">5-Star Jobs</div></div>
+    <div class="revcell"><div class="num" data-count="4.8" data-decimals="1">0</div><div class="lbl">Google Rating</div></div>
+    <div class="revcell"><div class="num" data-count="10" data-suffix="+">0</div><div class="lbl">Years Experience</div></div>
+    <div class="revcell"><div class="num" data-count="30" data-suffix="<span class='u'>min</span>">0</div><div class="lbl">Avg Response</div></div>
+  </div></div>
+</div>
+<div class="tread" aria-hidden="true"></div>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <span class="tag">Under the bonnet</span>
+      <h2>Every job, <span class="red-text">bay-quality</span><br>right on your drive.</h2>
+      <p>From a snapped auxiliary belt to a full clutch and flywheel, Farhan carries the kit and the know-how to do dealer-standard work wherever your car is parked.</p>
+    </div>
+    <div class="svc-grid" id="svcGrid"></div>
+  </div>
+</section>
+
+<div class="hazard thin" aria-hidden="true"></div>
+
+<!-- WARNING LIGHT DECODER -->
+<section class="section diag" id="diagnostics">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="tag wrench-tag" style="justify-content:center">Dashboard decoder</span>
+      <h2>Got a <span class="yel-text">warning light?</span></h2>
+      <p style="margin-left:auto;margin-right:auto">Tap a light to see what it means — and how Farhan sorts it. No panic, no dealer mark-up, no jargon.</p>
+    </div>
+    <div class="diag-panel reveal d1">
+      <div class="cluster">
+        <div class="cluster-title"><i></i>Instrument cluster · tap to read</div>
+        <div class="lights" id="lights"></div>
+      </div>
+      <div class="decode" id="decode"><!-- injected --></div>
+    </div>
+  </div>
+</section>
+
+<div class="tread" aria-hidden="true"></div>
+
+<!-- QUOTE -->
+<section class="section" id="quote">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="tag" style="justify-content:center">Job sheet</span>
+      <h2>Ballpark price in <span class="red-text">10 seconds</span></h2>
+      <p style="margin-left:auto;margin-right:auto">Pick the job and your vehicle for a guide price. You always get a firm, itemised quote before a single bolt is touched.</p>
+    </div>
+    <div class="quote-box reveal d1">
+      <div class="qo-left">
+        <span class="stamp">Est.</span>
+        <span class="tag wrench-tag">Estimated total</span>
+        <h3>Straight, honest numbers.</h3>
+        <p>Every review says it — fair rates, no upselling, no surprises. Here's your ballpark, labour included.</p>
+        <div class="ticket">
+          <div class="k">Guide price · parts + labour</div>
+          <div class="val" id="estVal">£—</div>
+          <small id="estNote">Select a job and vehicle to see your estimate.</small>
+        </div>
+      </div>
+      <div class="qo-right">
+        <div class="field">
+          <label>01 · The job <b>*</b></label>
+          <div class="chips" id="jobChips"></div>
+        </div>
+        <div class="field">
+          <label>02 · Vehicle type</label>
+          <div class="chips" id="vehChips">
+            <button type="button" class="chip active" data-mult="1">Small</button>
+            <button type="button" class="chip" data-mult="1.18">Saloon</button>
+            <button type="button" class="chip" data-mult="1.34">SUV / 4x4</button>
+            <button type="button" class="chip" data-mult="1.28">Van</button>
+            <button type="button" class="chip" data-mult="1.5">Prestige</button>
+          </div>
+        </div>
+        <a class="btn btn-red btn-block" href="#contact">Book it &amp; confirm price</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PIT STOP STEPS -->
+<section class="section" id="how" style="padding-top:0">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="tag" style="justify-content:center">The pit stop</span>
+      <h2>Three steps. <span class="red-text">Zero hassle.</span></h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal d1"><div class="sn">01</div><h3>Tell us the fault</h3><p>Call or WhatsApp with what's happening. Honest advice and a clear price up front — no fee just to talk it through.</p></div>
+      <div class="step reveal d2"><div class="sn">02</div><h3>We roll to you</h3><p>Same-day or a slot that suits — evenings and weekends too. Parts sourced fast, even the ones dealers say they can't get.</p></div>
+      <div class="step reveal d3"><div class="sn">03</div><h3>Fixed on the drive</h3><p>Job done where your car sits, everything explained in plain English, plus free advice on what to watch next.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="hazard thin" aria-hidden="true"></div>
+
+<!-- REVIEWS -->
+<section class="section reviews" id="reviews">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="tag wrench-tag" style="justify-content:center">The logbook</span>
+      <h2>Stamped by <span class="yel-text">real customers</span></h2>
+    </div>
+    <div class="rev-summary reveal d1">
+      <div class="rev-score"><div class="big">4.8</div><div class="stars">★★★★★</div><div class="sub">From 90+ reviews</div></div>
+      <div class="rev-div"></div>
+      <div class="glogo">
+        <svg class="gg" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45.1 24.5c0-1.6-.1-2.8-.4-4H24v7.3h12.1c-.2 1.9-1.6 4.8-4.6 6.7l6.7 5.2c4.2-3.9 6.9-9.7 6.9-15.2Z"/><path fill="#34A853" d="M24 46c6.1 0 11.2-2 14.9-5.5l-7.1-5.5c-1.9 1.3-4.5 2.3-7.8 2.3-6 0-11-4-12.8-9.5l-7.3 5.6C7.5 40.9 15.1 46 24 46Z"/><path fill="#FBBC05" d="M11.2 27.8c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4l-7.3-5.7A22 22 0 0 0 2 23.4c0 3.6.9 6.9 2.4 9.9l6.8-5.5Z"/><path fill="#EA4335" d="M24 9.5c4.2 0 7.1 1.8 8.7 3.3l6.3-6.2C35.2 3 30.1 1 24 1 15.1 1 7.5 6.1 4.4 13.5l6.8 5.5C13 13.5 18 9.5 24 9.5Z"/></svg>
+        <div><b>Google Reviews</b><span>Verified · Romford</span></div>
+      </div>
+    </div>
+    <div class="rev-slider reveal d2">
+      <div class="rev-track"><div class="rev-row" id="slideRow"></div></div>
+      <div class="rev-nav">
+        <button class="rev-arrow" id="revPrev" aria-label="Previous review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
+        <div class="rev-dots" id="revDots"></div>
+        <button class="rev-arrow" id="revNext" aria-label="Next review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
+      </div>
+    </div>
+  </div>
+  <div class="wall" id="wall" aria-hidden="true">
+    <div class="wall-row r1" id="wallRow1"></div>
+    <div class="wall-row r2" id="wallRow2"></div>
+  </div>
+</section>
+
+<div class="tread" aria-hidden="true"></div>
+
+<!-- COVERAGE -->
+<section class="section" id="areas">
+  <div class="wrap cover-grid">
+    <div class="reveal">
+      <span class="tag">On the map</span>
+      <h2 style="font-size:clamp(2rem,4vw,3.1rem);margin:14px 0 16px">Based in Romford,<br><span class="red-text">mobile across East London.</span></h2>
+      <p style="color:var(--muted);font-family:'Inter';font-size:1.06rem">Within roughly 15 miles of Romford, Farhan comes to you — driveway, workplace or stuck at the roadside. Not sure you're in range? Just ask.</p>
+      <div class="area-chips">
+        <span class="hl">Romford</span><span>Hornchurch</span><span>Ilford</span><span>Dagenham</span>
+        <span>Barking</span><span>Upminster</span><span>Chadwell Heath</span><span>Gidea Park</span>
+        <span>Rainham</span><span>Collier Row</span><span>Harold Wood</span><span>Chigwell</span>
+        <span>Brentwood</span><span>Woodford</span>
+      </div>
+      <a class="btn btn-red js-call" href="tel:+447000000000" style="margin-top:28px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+        Check my area
+      </a>
+    </div>
+    <div class="radar reveal d2" aria-hidden="true">
+      <div class="ring a"></div><div class="ring b"></div><div class="ring c"></div>
+      <div class="sweep"></div>
+      <div class="pin hub"></div>
+      <div class="pin" style="top:26%;left:34%"></div>
+      <div class="pin" style="top:36%;left:66%"></div>
+      <div class="pin" style="top:64%;left:32%"></div>
+      <div class="pin" style="top:68%;left:62%"></div>
+      <div class="pin" style="top:50%;left:22%"></div>
+      <div class="lbl">◉ Romford HQ · ~15 mi radius</div>
+    </div>
+  </div>
+</section>
+
+<div class="hazard thin" aria-hidden="true"></div>
+
+<!-- FAQ -->
+<section class="section" id="faq">
+  <div class="wrap">
+    <div class="section-head center reveal">
+      <span class="tag" style="justify-content:center">Good to know</span>
+      <h2>Questions, <span class="red-text">answered</span></h2>
+    </div>
+    <div class="faq-list" id="faqList"></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="section cta" id="contact">
+  <div class="wrap">
+    <div class="cta-card reveal">
+      <div class="cta-info">
+        <span class="tag wrench-tag">Book the job</span>
+        <h2 style="margin-top:14px">Car playing up? <span class="red-text">Farhan's on it.</span></h2>
+        <p>Call now for the fastest response, or drop your details and get a firm price plus a time that works for you.</p>
+        <div class="clines">
+          <a class="cline js-call" href="tel:+447000000000">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg></span>
+            <div><div class="k">Call or text</div><div class="v js-phone">07000 000000</div></div>
+          </a>
+          <a class="cline js-wa" href="#" target="_blank" rel="noopener">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3 21l2.2-5.6A8.4 8.4 0 1 1 21 11.5Z"/></svg></span>
+            <div><div class="k">WhatsApp</div><div class="v">Message anytime</div></div>
+          </a>
+          <div class="cline">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg></span>
+            <div><div class="k">Based in</div><div class="v">Romford, London</div></div>
+          </div>
+          <div class="cline">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span>
+            <div><div class="k">Open</div><div class="v">7 days · early til late</div></div>
+          </div>
+        </div>
+        <a class="btn btn-red js-call" href="tel:+447000000000">Call Farhan Now</a>
+      </div>
+      <div class="cta-form">
+        <form id="bookForm" novalidate>
+          <h3>Request a callback</h3>
+          <p class="lead">30 seconds. No obligation, no spam.</p>
+          <div class="form-row">
+            <div class="field"><label for="fName">Name <b>*</b></label><input id="fName" name="name" type="text" placeholder="Your name" autocomplete="name" required /><span class="err-msg">Please enter your name.</span></div>
+            <div class="field"><label for="fPhone">Phone <b>*</b></label><input id="fPhone" name="phone" type="tel" inputmode="tel" placeholder="07…" autocomplete="tel" required /><span class="err-msg">Enter a valid number.</span></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="fVeh">Vehicle</label><input id="fVeh" name="vehicle" type="text" placeholder="e.g. BMW 320d" /></div>
+            <div class="field"><label for="fJob">Job needed</label><select id="fJob" name="job"></select></div>
+          </div>
+          <div class="field"><label for="fMsg">The problem</label><textarea id="fMsg" name="message" rows="3" placeholder="Warning lights? Noises? What's it doing?"></textarea></div>
+          <button class="btn btn-red btn-block" type="submit" id="submitBtn"><span class="btn-label">Send my request</span></button>
+          <p style="font-size:.76rem;color:var(--muted-2);text-align:center;margin-top:12px;font-family:'Inter'">We'll only use your details to reply about your car.</p>
+        </form>
+        <div class="form-success" id="formSuccess">
+          <div class="sic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+          <h3>Request received</h3>
+          <p>Farhan will call you back shortly. Need it now? Tap below.</p>
+          <a class="btn btn-red js-call" href="tel:+447000000000" style="margin-top:18px">Call now instead</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a href="#home" class="brand">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.1 2.1a2 2 0 0 1-2.8-2.8Z"/></svg></span>
+          <span class="brand-txt">Mobile Mechanic<small>ROMFORD · FARHAN</small></span>
+        </a>
+        <p>Dealer-quality car repairs brought to driveways across Romford and East London — 7 days a week, at honest prices.</p>
+      </div>
+      <div class="foot-col"><h4>Services</h4><a href="#services">Diagnostics</a><a href="#services">Servicing</a><a href="#services">Brakes &amp; Clutches</a><a href="#services">Belts &amp; Batteries</a><a href="#diagnostics">Warning Lights</a></div>
+      <div class="foot-col"><h4>Workshop</h4><a href="#how">How It Works</a><a href="#reviews">Reviews</a><a href="#areas">Areas Covered</a><a href="#faq">FAQ</a><a href="#quote">Get a Quote</a></div>
+      <div class="foot-col"><h4>Contact</h4><a class="js-call" href="tel:+447000000000"><span class="js-phone">07000 000000</span></a><a class="js-wa" href="#" target="_blank" rel="noopener">WhatsApp</a><a href="#contact">Request callback</a><a href="#home">Romford, London</a></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="yr"></span> Mobile Mechanic Romford. All rights reserved.</span>
+      <span>Honest, no-nonsense car care · <a href="#home">Back to top</a></span>
+    </div>
+  </div>
+</footer>
+
+<div class="mobile-bar">
+  <a class="btn btn-ghost" href="#quote">Quote</a>
+  <a class="btn btn-red js-call" href="tel:+447000000000"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.1-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>Call Now</a>
+</div>
+<button class="to-top" id="toTop" aria-label="Back to top"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></button>
+
+<script>
+/* ===== CONFIG — set the real details; whole page updates ===== */
+const CONFIG = {
+  phoneDisplay: "07000 000000",
+  phoneHref:    "tel:+447000000000",
+  whatsapp:     "https://wa.me/447000000000?text=Hi%20Farhan%2C%20I%20need%20a%20mobile%20mechanic%20in%20Romford"
+};
+(function(){
+  document.querySelectorAll('.js-phone').forEach(e=>e.textContent=CONFIG.phoneDisplay);
+  document.querySelectorAll('.js-call').forEach(e=>e.setAttribute('href',CONFIG.phoneHref));
+  document.querySelectorAll('.js-wa').forEach(e=>e.setAttribute('href',CONFIG.whatsapp));
+  document.getElementById('yr').textContent=new Date().getFullYear();
+})();
+
+const SERVICES=[
+ {t:"Diagnostics & Fault Finding",d:"Warning light on? Farhan plugs in, reads the fault codes and tells you exactly what's wrong — no guesswork, no scare tactics.",from:"£40",icon:'<path d="M12 2 4 5v6c0 5 3.4 8.5 8 10 4.6-1.5 8-5 8-10V5l-8-3Z"/><path d="M12 8v4M12 15h.01"/>'},
+ {t:"Full & Interim Servicing",d:"Oil, filters and a full multi-point check on your driveway. “Finished in under 45 minutes, great price.”",from:"£70",icon:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>'},
+ {t:"Clutch & Flywheel",d:"Clutch slipping or gone? Supplied and fitted at home — a big job done properly for far less than the dealer.",from:"£280",icon:'<circle cx="12" cy="12" r="4"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/>'},
+ {t:"Brakes · Pads & Discs",d:"Grinding or spongy brakes replaced same-day. “Range Rover pads and discs all replaced in very good time.”",from:"£90",icon:'<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/>'},
+ {t:"Cam & Auxiliary Belts",d:"Snapped aux belt? “Replaced the belt right in my driveway and charged a very fair price.” Cam belts too.",from:"£120",icon:'<path d="M5 12h14M13 5l7 7-7 7"/>'},
+ {t:"Batteries & Jump Starts",d:"Flat battery or won't turn over? Tested, jump-started or replaced on the spot so you're moving again fast.",from:"£60",icon:'<rect x="3" y="9" width="18" height="11" rx="2"/><path d="M6 9V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v4M9 14h2M15 12v4"/>'},
+ {t:"Alternators & Electrics",d:"Charging faults, glow plugs, wiring and starter issues diagnosed and fixed — even fitting speakers and extras.",from:"£90",icon:'<path d="M13 2 3 14h9l-1 8 10-12h-9l1-8Z"/>'},
+ {t:"Cooling & Overheating",d:"Coolant leaks, pumps and thermostats. “Sorted my coolant system on time, good prices, will use again.”",from:"£80",icon:'<path d="M14 4v10.5a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z"/>'},
+ {t:"Pre-MOT & Van Checks",d:"Last-minute pre-MOT service or a full van inspection before you buy — honest advice on what really needs doing.",from:"£45",icon:'<path d="M9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>'}
+];
+const PRICE_BASE=[55,95,360,120,150,80,120,110,60];
+const SHORT=["Diagnostics","Service","Clutch","Brakes","Belts","Battery","Electrics","Cooling","Pre-MOT"];
+
+/* Warning lights */
+const LIGHTS=[
+ {name:"Check Engine",crit:true,icon:'<path d="M5 15v-3a2 2 0 0 1 2-2h1l1-3h4l1 2h3a2 2 0 0 1 2 2v1h1v3h-1v1a2 2 0 0 1-2 2H8a3 3 0 0 1-3-3Z"/>',h:"Engine management",d:"The catch-all fault light. Farhan runs a full diagnostic scan, reads the code and tells you in plain English what's actually wrong — before you spend a penny on parts."},
+ {name:"Battery",crit:false,icon:'<rect x="3" y="7" width="18" height="12" rx="2"/><path d="M7 7V4h4v3M7 12h4M15 10v4"/>',h:"Charging system",d:"Could be the battery, the alternator or a slipping belt. We test the whole charging circuit and replace whatever's failing — usually on the spot."},
+ {name:"Oil Pressure",crit:true,icon:'<path d="M4 14c0-3 4-8 4-8s4 5 4 8a4 4 0 0 1-8 0Z"/><path d="M13 16h6M16 13v6"/>',h:"Oil pressure",d:"Take this one seriously — stop driving. We check oil level, look for leaks and test the pressure sender. Often a quick, same-day fix once diagnosed."},
+ {name:"Brakes",crit:true,icon:'<circle cx="12" cy="12" r="7"/><path d="M12 5v14M5 12h14" opacity=".5"/><text x="12" y="15" font-size="7" text-anchor="middle" fill="currentColor" stroke="none">!</text>',h:"Brake warning",d:"Low fluid, worn pads or a handbrake sensor. Brakes aren't something to leave — we inspect and replace pads and discs right on your driveway."},
+ {name:"Temperature",crit:false,icon:'<path d="M10 4a2 2 0 0 1 4 0v9a4 4 0 1 1-4 0Z"/><path d="M4 8h3M4 12h3"/>',h:"Engine temperature",d:"Overheating risk. We check coolant level, the water pump, thermostat and hoses to catch it before it turns into a cracked head or blown gasket."},
+ {name:"ABS",crit:false,icon:'<circle cx="12" cy="12" r="8"/><text x="12" y="15" font-size="7" text-anchor="middle" fill="currentColor" stroke="none">ABS</text>',h:"ABS system",d:"Usually a wheel-speed sensor or the ABS module. Diagnosed with our scanner and fixed without a trip to the main dealer."},
+ {name:"Tyre Pressure",crit:false,icon:'<path d="M5 15a7 7 0 0 1 14 0Z"/><path d="M4 19h16"/><text x="12" y="14" font-size="6" text-anchor="middle" fill="currentColor" stroke="none">!</text>',h:"Tyre pressure (TPMS)",d:"We check pressures and tread, reset or replace the sensor, and sort punctures — “fixed my tyre in under 30 mins.”"},
+ {name:"Glow Plug",crit:false,icon:'<path d="M9 3h6M10 3v4a4 4 0 0 0 4 0V3M12 11v4M9 18h6"/><path d="M8 8c0 3 8 3 8 0"/>',h:"Glow plug / preheat",d:"A diesel classic, especially in the cold. We test and replace glow plugs to cure hard starting and rough running."}
+];
+
+const REVIEWS=[
+ {n:"Igor Sequeira",meta:"3 months ago",t:"Farhan is, without a doubt, an amazing mechanic. I've had many mechanics work on my car over the years, but none have been as good as him. I will not be going to any other mechanic."},
+ {n:"Ionut Tipordei",meta:"2 months ago",t:"Excellent service. Came out quickly and replaced the clutch on my Peugeot Partner. Very professional, worked efficiently and the car is running perfectly now. Friendly, reliable and easy to deal with. Highly recommend."},
+ {n:"cristian birca",meta:"1 month ago",t:"5/5 Stars – Lifesaver! My auxiliary belt snapped and Farhan saved the day. They arrived quickly, replaced the belt right in my driveway, and charged a very fair price. Professional, convenient, and highly recommended if you're stranded!"},
+ {n:"Fay Ch",meta:"2 months ago",t:"Called them out to fix my Audi A5 at home and honestly couldn't ask for better service. Turned up on time, diagnosed the issue quickly and had everything sorted without any hassle. No unnecessary upselling, just straight honest work."},
+ {n:"Ankur Agg",meta:"5 months ago",t:"Very professional, high quality and affordable. Farhan is a very kind and skilled mechanic and knows exactly what needs to be done. He arrived on time and fixed my tyre in under 30 mins. Highly recommended."},
+ {n:"Just D",meta:"5 months ago",t:"Farhan is an amazing mechanic. I needed a last minute service before my MOT. Efficient and effective diagnostic process and explains everything he is doing. Reasonably priced."},
+ {n:"karl foreman",meta:"1 month ago",t:"A very rare thing to find a helpful and honest mechanic. Arrived to do an estimate, checked prices for parts, returned in 2 hours and completed the job quickly. Good price, very happy — would highly recommend."},
+ {n:"Crypto Raider",meta:"2 months ago",t:"Excellent service, fitted me in next day. Farhan clearly explained the job, carried it out smoothly at a very reasonable rate. Will be using for future mechanical needs."},
+ {n:"fiercestdiamond",meta:"7 months ago",t:"A very great service! Highly appreciated the quick response. My Range Rover brake pads and discs gave up and all replaced in very good time. Very friendly and helpful. Highly recommended!"},
+ {n:"Zaheed Patel",meta:"7 months ago",t:"Very easy process. I messaged Farhan with an issue regarding my car battery after dangerously failing to jump start it myself, and he sorted it with no fuss."},
+ {n:"Adebiyi Paul",meta:"8 months ago",t:"I was stuck and needed an urgent, quick fix as I headed to Manchester at 8pm. Farhan came to my rescue. Very professional, friendly and quick."},
+ {n:"Todd Nobbs",meta:"10 months ago",t:"Booked late Friday and he was here Saturday morning to complete the job. Super helpful and went above and beyond. Will 100% recommend and use again."},
+ {n:"Rafal Wasilewski",meta:"2 years ago",t:"When I called Farhan he said he'd be with me in the next 30 mins, and he managed to arrange parts that weren't available online or at the dealer, and fixed it very quickly."},
+ {n:"Lucy sims",meta:"2 years ago",t:"Farhan was amazing. He came out at late notice on a cold rainy Friday evening and fixed my car within 30 minutes. It's now driving better than it has in a long time. Highly recommended."},
+ {n:"Henry Klosok",meta:"1 year ago",t:"Found him on Google, rang him up and he came to do a van inspection to help me decide on a van I was buying. Very professional and polite. Thanks so much."},
+ {n:"John local guide",meta:"8 months ago",t:"Needed to change my oil and filters. Quoted me a good price and finished the job in less than 45 minutes. Recommend."},
+ {n:"Charlotte",meta:"4 months ago",t:"Highly recommend. He came out to me at short notice on the weekend to change my oil and check my engine. Efficient, friendly and not badly priced."},
+ {n:"John Collins",meta:"10 months ago",t:"Very good, sorted my coolant system on my E46 on time, good prices. Will definitely be using again, thank you very much."},
+ {n:"Rakz",meta:"11 months ago",t:"He did my clutch and flywheel replacement — did a great job, would definitely recommend."},
+ {n:"Anthony Brackley",meta:"3 years ago",t:"Came out and changed the alternator on my BMW — very fast service and a really nice guy. Will definitely use again."}
+];
+const FEATURED=[0,2,3,8,12,13];
+
+const FAQS=[
+ {q:"Are you really fully mobile?",a:"Yes. Farhan comes to your home, workplace or the roadside anywhere within roughly 15 miles of Romford. You never drop the car off or wait in a garage — the workshop comes to your driveway."},
+ {q:"How quickly can you get to me?",a:"For urgent jobs Farhan often responds within about 30 minutes, and same-day callouts are normal. Bigger jobs get the earliest slot that suits you, evenings and weekends included."},
+ {q:"Is there a callout or diagnostic fee just to talk?",a:"No. Describe the problem by phone or WhatsApp and you'll get honest advice and a clear price up front. You only pay once you're happy to go ahead."},
+ {q:"What can you do on a driveway?",a:"Far more than most expect: diagnostics, full and interim servicing, brakes, clutches and flywheels, cam and auxiliary belts, batteries, alternators, glow plugs, cooling systems, pre-MOT checks and van inspections."},
+ {q:"How much will it cost?",a:"Fair, reasonable and no upselling — every review says so. Use the estimate above for a guide, then you always get a firm, itemised quote before any work starts."},
+ {q:"Do you supply the parts?",a:"Yes — quality parts sourced fast, including ones dealers claim aren't available. You're welcome to supply your own if you prefer."},
+ {q:"Which cars do you work on?",a:"All makes and models — Peugeot, Kia, Ford, BMW, Audi, Mercedes, Lexus, Range Rover and vans included. Our diagnostics cover modern and older vehicles alike."},
+ {q:"How do I book?",a:"Tap Call Farhan Now for the fastest response, send a WhatsApp, or fill in the callback form and he'll come straight back with a price and a time."}
+];
+
+const AVC=['#e01e2b','#c81824','#ff3a46','#a90f1a','#d62630','#e83c48'];
+const avc=i=>AVC[i%AVC.length];
+const initials=n=>n.trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+/* services */
+(function(){
+  document.getElementById('svcGrid').innerHTML=SERVICES.map((s,i)=>`
+   <article class="svc-card reveal d${(i%3)+1}" tabindex="0">
+     <div class="svc-top"><div class="svc-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${s.icon}</svg></div><div class="svc-no">0${i+1}</div></div>
+     <h3>${s.t}</h3><p>${s.d}</p>
+     <div class="svc-from"><span class="f">From ${s.from}</span><span class="n">itemised quote first</span></div>
+   </article>`).join('');
+})();
+
+/* warning lights */
+(function(){
+  const lightsEl=document.getElementById('lights'), decode=document.getElementById('decode');
+  lightsEl.innerHTML=LIGHTS.map((l,i)=>`<button class="light${i===0?(' on'+(l.crit?' crit':'')):''}" data-i="${i}" aria-label="${l.name}" title="${l.name}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${l.icon}</svg></button>`).join('');
+  function render(i){
+    const l=LIGHTS[i];
+    decode.innerHTML=`
+     <span class="dot"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>${l.crit?'Get it checked now':'Worth checking'}</span>
+     <div class="dic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${l.icon}</svg></div>
+     <h3>${l.h}</h3><p>${l.d}</p>
+     <a class="btn btn-red js-call" href="${CONFIG.phoneHref}">Get this diagnosed</a>`;
+  }
+  lightsEl.querySelectorAll('.light').forEach(b=>b.addEventListener('click',()=>{
+    lightsEl.querySelectorAll('.light').forEach(x=>x.classList.remove('on','crit'));
+    const i=+b.dataset.i; b.classList.add('on'); if(LIGHTS[i].crit)b.classList.add('crit');
+    render(i);
+  }));
+  render(0);
+})();
+
+/* quote */
+(function(){
+  const jobChips=document.getElementById('jobChips'), vehChips=document.getElementById('vehChips'), jobSel=document.getElementById('fJob');
+  jobChips.innerHTML=SERVICES.map((s,i)=>`<button type="button" class="chip${i===0?' active':''}" data-i="${i}">${SHORT[i]}</button>`).join('');
+  jobSel.innerHTML='<option value="">Select a job…</option>'+SERVICES.map(s=>`<option>${s.t}</option>`).join('');
+  let jobI=0,mult=1;
+  const estVal=document.getElementById('estVal'), estNote=document.getElementById('estNote');
+  const fmt=n=>'£'+Math.round(n/5)*5;
+  function upd(){const b=PRICE_BASE[jobI]*mult;estVal.textContent=fmt(b*0.85)+' – '+fmt(b*1.25);estNote.textContent=SERVICES[jobI].t+' · guide price, labour included. Firm quote before work.';}
+  jobChips.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{jobChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');jobI=+c.dataset.i;jobSel.selectedIndex=jobI+1;upd();}));
+  vehChips.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{vehChips.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');mult=+c.dataset.mult;upd();}));
+  upd();
+})();
+
+/* slider */
+(function(){
+  const row=document.getElementById('slideRow'), dots=document.getElementById('revDots');
+  row.innerHTML=FEATURED.map(idx=>{const r=REVIEWS[idx];return `<div class="rev-slide"><div class="rev-quote"><div class="stars">★★★★★</div><blockquote>${esc(r.t)}</blockquote><div class="rev-author"><span class="av" style="background:${avc(idx)}">${initials(r.n)}</span><div><b>${esc(r.n)}</b><span>Google review · ${r.meta}</span></div></div></div></div>`;}).join('');
+  dots.innerHTML=FEATURED.map((_,i)=>`<button aria-label="Review ${i+1}" class="${i===0?'active':''}"></button>`).join('');
+  const n=FEATURED.length; let cur=0,timer; const de=[...dots.children];
+  function go(i){cur=(i+n)%n;row.style.transform=`translateX(-${cur*100}%)`;de.forEach((d,x)=>d.classList.toggle('active',x===cur));}
+  const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  function start(){if(!reduce)timer=setInterval(()=>go(cur+1),5500);}
+  function restart(){clearInterval(timer);start();}
+  document.getElementById('revNext').addEventListener('click',()=>{go(cur+1);restart();});
+  document.getElementById('revPrev').addEventListener('click',()=>{go(cur-1);restart();});
+  de.forEach((d,i)=>d.addEventListener('click',()=>{go(i);restart();}));
+  const s=document.querySelector('.rev-slider'); s.addEventListener('mouseenter',()=>clearInterval(timer)); s.addEventListener('mouseleave',start); start();
+})();
+
+/* wall */
+(function(){
+  const mk=r=>`<div class="rev-mini"><div class="top"><span class="av" style="background:${avc(r._i)}">${initials(r.n)}</span><div><b>${esc(r.n)}</b><span class="st">★★★★★</span></div></div><p>${esc(r.t.length>148?r.t.slice(0,146)+'…':r.t)}</p></div>`;
+  const list=REVIEWS.map((r,i)=>({...r,_i:i})); const h=Math.ceil(list.length/2);
+  const dbl=a=>a.concat(a).map(mk).join('');
+  document.getElementById('wallRow1').innerHTML=dbl(list.slice(0,h));
+  document.getElementById('wallRow2').innerHTML=dbl(list.slice(h));
+})();
+
+/* faq */
+(function(){
+  const list=document.getElementById('faqList');
+  list.innerHTML=FAQS.map((f,i)=>`<div class="faq-item reveal"><button class="faq-q" aria-expanded="false" aria-controls="fa${i}"><span>${esc(f.q)}</span><span class="qi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span></button><div class="faq-a" id="fa${i}"><p>${esc(f.a)}</p></div></div>`).join('');
+  list.querySelectorAll('.faq-item').forEach(item=>{const q=item.querySelector('.faq-q'),a=item.querySelector('.faq-a');
+    q.addEventListener('click',()=>{const open=item.classList.contains('open');
+      list.querySelectorAll('.faq-item').forEach(o=>{o.classList.remove('open');o.querySelector('.faq-a').style.maxHeight=null;o.querySelector('.faq-q').setAttribute('aria-expanded','false');});
+      if(!open){item.classList.add('open');a.style.maxHeight=a.scrollHeight+'px';q.setAttribute('aria-expanded','true');}});
+  });
+})();
+
+/* nav / scroll / reveal */
+const nav=document.getElementById('nav'), burger=document.getElementById('burger');
+addEventListener('scroll',()=>{nav.classList.toggle('scrolled',scrollY>20);document.getElementById('toTop').classList.toggle('show',scrollY>600);},{passive:true});
+function closeMenu(){document.body.classList.remove('menu-open');burger.setAttribute('aria-expanded','false');}
+burger.addEventListener('click',()=>{const o=document.body.classList.toggle('menu-open');burger.setAttribute('aria-expanded',o);});
+document.querySelectorAll('#drawer a').forEach(a=>a.addEventListener('click',closeMenu));
+document.getElementById('toTop').addEventListener('click',()=>scrollTo({top:0,behavior:'smooth'}));
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',()=>{if(document.body.classList.contains('menu-open'))closeMenu();}));
+
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.12,rootMargin:'0px 0px -8% 0px'});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* count-up + speedo + wheels */
+function countUp(el){
+  const target=+el.dataset.count, dec=+(el.dataset.decimals||0), suf=el.dataset.suffix||'';
+  let start=null;
+  function step(ts){if(!start)start=ts;const p=Math.min((ts-start)/1500,1);const e=1-Math.pow(1-p,3);
+    el.innerHTML=(target*e).toFixed(dec)+suf; if(p<1)requestAnimationFrame(step); else el.innerHTML=target.toFixed(dec)+suf;}
+  requestAnimationFrame(step);
+}
+const cio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){countUp(e.target);cio.unobserve(e.target);}}),{threshold:.6});
+document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
+
+const carWrap=document.getElementById('carWrap');
+const needle=document.getElementById('needle');
+const hio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){carWrap.classList.add('rolling');if(needle)needle.classList.add('go');hio.unobserve(e.target);}}),{threshold:.3});
+if(carWrap)hio.observe(carWrap);
+
+/* form */
+const form=document.getElementById('bookForm');
+form.addEventListener('submit',e=>{e.preventDefault();let ok=true;
+  const name=document.getElementById('fName'),phone=document.getElementById('fPhone');
+  const nf=name.closest('.field'),pf=phone.closest('.field');
+  nf.classList.toggle('err',!name.value.trim());if(!name.value.trim())ok=false;
+  const pv=/^[\d\s+()-]{7,}$/.test(phone.value.trim());pf.classList.toggle('err',!pv);if(!pv)ok=false;
+  if(!ok){(nf.classList.contains('err')?name:phone).focus();return;}
+  const btn=document.getElementById('submitBtn');btn.querySelector('.btn-label').textContent='Sending…';btn.disabled=true;
+  setTimeout(()=>{form.style.display='none';document.getElementById('formSuccess').classList.add('show');},900);
+});
+[...form.querySelectorAll('input')].forEach(i=>i.addEventListener('input',()=>i.closest('.field').classList.remove('err')));
+</script>
+</body>
+</html>
