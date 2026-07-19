@@ -22,5 +22,8 @@ index.html          the whole site (fonts and images embedded, ~490 KB)
 - `hello@coveworks.studio` is a placeholder address and the contact form is a demo until wired to an inbox.
 - Copy is dash free by request; separators use middots.
 
+## Book a call (Google Calendar)
+The contact section carries a hidden **Book a call** button wired to Google Calendar appointment scheduling. To switch it on: create an appointment schedule in Google Calendar, copy its share link, and paste it into the `CW_BOOKING_URL` constant near the top of the script in `index.html`. Full schedule links open in an in-page overlay; `calendar.app.google` short links open in a new tab. Until a link is set the button does not render at all. Setup guide and reusable widgets: [`../google-calendar/`](../google-calendar/).
+
 ## Deploy
 Any static host. For GitHub Pages on this repo it lives at `/Websitemaker/coveworks/` once merged to `main`.

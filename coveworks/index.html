@@ -605,6 +605,9 @@ footer{position:relative;border-top:1px solid var(--line);background:var(--bg-2)
         <a class="contact-mail" href="mailto:hello@coveworks.studio">hello@coveworks.studio
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
         </a>
+        <div style="margin-top:32px">
+          <a class="btn primary" id="bookCall" href="#" style="display:none"><i class="fill"></i><span>Book a call</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></a>
+        </div>
       </div>
       <form id="contactForm" novalidate>
         <div class="field">
@@ -669,6 +672,12 @@ footer{position:relative;border-top:1px solid var(--line);background:var(--bg-2)
 var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 var lerp = function(a,b,t){ return a + (b - a) * t; };
+
+/* ---------- book-a-call config ----------
+   Paste the studio's Google Calendar appointment-schedule link here and the
+   "Book a call" button appears in the contact section (hidden until set).
+   Getting the link + more integrations: google-calendar/README.md in this repo. */
+var CW_BOOKING_URL = '';
 
 /* ---------- preloader ---------- */
 var loader = document.getElementById('loader');
@@ -1017,6 +1026,56 @@ form.addEventListener('submit', function(e){
     form.querySelectorAll('input,textarea').forEach(function(el){ el.value = ''; });
   }
 });
+
+/* ---------- book a call (Google Calendar appointment schedule) ---------- */
+(function(){
+  if (!/^https:\/\//.test(CW_BOOKING_URL)) return; /* unset: button stays hidden */
+  var btn = document.getElementById('bookCall');
+  btn.style.display = '';
+  /* Full schedule links embed in an overlay; calendar.app.google short links
+     refuse iframes, so those open in a new tab instead. */
+  var embed = /^https:\/\/calendar\.google\.com\/calendar\/.*appointments\//.test(CW_BOOKING_URL)
+    ? CW_BOOKING_URL + (CW_BOOKING_URL.indexOf('?') > -1 ? '&' : '?') + 'gv=true'
+    : null;
+  var overlay = null;
+  function closeBooking(){
+    overlay.style.display = 'none';
+    document.documentElement.style.overflow = '';
+    btn.focus();
+  }
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    if (!embed){ window.open(CW_BOOKING_URL, '_blank', 'noopener'); return; }
+    if (!overlay){
+      overlay = document.createElement('div');
+      overlay.setAttribute('role', 'dialog');
+      overlay.setAttribute('aria-modal', 'true');
+      overlay.setAttribute('aria-label', 'Book a call');
+      overlay.style.cssText = 'position:fixed;inset:0;z-index:2600;display:none;align-items:center;justify-content:center;background:rgba(13,11,8,.82);padding:clamp(8px,3vw,40px)';
+      var panel = document.createElement('div');
+      panel.style.cssText = 'position:relative;width:min(1060px,100%);height:min(760px,100%);background:#fff;border-radius:12px;overflow:hidden';
+      var x = document.createElement('button');
+      x.type = 'button';
+      x.setAttribute('aria-label', 'Close booking');
+      x.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 5l14 14M19 5L5 19"/></svg>';
+      x.style.cssText = 'position:absolute;top:10px;right:10px;z-index:1;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:rgba(13,11,8,.72);color:#F2EDE2;cursor:pointer';
+      x.addEventListener('click', closeBooking);
+      overlay.addEventListener('click', function(ev){ if (ev.target === overlay) closeBooking(); });
+      document.addEventListener('keydown', function(ev){ if (ev.key === 'Escape' && overlay.style.display === 'flex') closeBooking(); });
+      var frame = document.createElement('iframe');
+      frame.src = embed;
+      frame.title = 'Book a call with Coveworks';
+      frame.style.cssText = 'width:100%;height:100%;border:0;display:block';
+      panel.appendChild(x);
+      panel.appendChild(frame);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
+    }
+    overlay.style.display = 'flex';
+    document.documentElement.style.overflow = 'hidden';
+    overlay.querySelector('button').focus();
+  });
+})();
 
 /* ---------- smooth anchor offset for fixed header ---------- */
 document.querySelectorAll('a[href^="#"]').forEach(function(a){

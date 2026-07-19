@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Google Calendar Kit · Coveworks</title>
+<meta name="description" content="Drop-in Google Calendar integration for static sites: appointment booking embeds, add-to-calendar buttons and public calendar views. No build step, no dependencies.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230D0B08'/%3E%3Crect x='14' y='18' width='36' height='32' rx='5' fill='none' stroke='%23C8A566' stroke-width='3'/%3E%3Cpath d='M14 28h36' stroke='%23C8A566' stroke-width='3'/%3E%3Cpath d='M23 14v8M41 14v8' stroke='%23C8A566' stroke-width='3' stroke-linecap='round'/%3E%3Ccircle cx='32' cy='39' r='4' fill='%23C8A566'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0D0B08;
+  --bg-2:#131009;
+  --bg-3:#1A1610;
+  --ink:#F2EDE2;
+  --ink-dim:rgba(242,237,226,.62);
+  --ink-faint:rgba(242,237,226,.36);
+  --line:rgba(242,237,226,.13);
+  --line-strong:rgba(242,237,226,.24);
+  --brass:#C8A566;
+  --brass-soft:rgba(200,165,102,.14);
+  --brass-line:rgba(200,165,102,.38);
+  --ok:#8FBF8F;
+  --err:#D98E8E;
+  --serif:'Fraunces',Georgia,'Times New Roman',serif;
+  --sans:'Archivo',-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --mono:'Space Mono','SF Mono',ui-monospace,Consolas,monospace;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --gutter:clamp(20px,4.5vw,72px);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:16px;line-height:1.65;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  touch-action:manipulation;
+}
+::selection{background:var(--brass);color:var(--bg)}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--brass);outline-offset:3px;border-radius:2px}
+img,iframe{max-width:100%}
+.wrap{max-width:1120px;margin:0 auto;padding:0 var(--gutter)}
+
+/* ---------- header ---------- */
+header{
+  position:sticky;top:0;z-index:50;
+  background:rgba(13,11,8,.86);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.hd{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px}
+.mark{display:flex;align-items:center;gap:12px;text-decoration:none}
+.mark svg{flex:none}
+.mark b{font-family:var(--serif);font-weight:500;font-size:17px;letter-spacing:.02em}
+.mark span{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-dim)}
+.hd nav{display:flex;gap:4px}
+.hd nav a{
+  display:inline-flex;align-items:center;min-height:44px;padding:0 14px;
+  font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-decoration:none;color:var(--ink-dim);
+  transition:color .25s;
+}
+.hd nav a:hover{color:var(--brass)}
+@media(max-width:720px){.hd nav{display:none}}
+
+/* ---------- hero ---------- */
+.hero{padding:clamp(64px,10vw,140px) 0 clamp(44px,6vw,80px);border-bottom:1px solid var(--line)}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--brass)}
+.hero h1{
+  font-family:var(--serif);font-weight:340;
+  font-size:clamp(40px,7.4vw,92px);line-height:1.04;letter-spacing:-.01em;
+  margin-top:22px;max-width:14ch;
+}
+.hero h1 em{font-style:italic;color:var(--brass)}
+.hero p{margin-top:26px;max-width:56ch;color:var(--ink-dim);font-size:clamp(16px,1.6vw,18px)}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:36px}
+.chip{
+  display:inline-flex;align-items:center;gap:10px;min-height:46px;padding:0 18px;
+  border:1px solid var(--line-strong);border-radius:100px;text-decoration:none;
+  font-family:var(--mono);font-size:12.5px;letter-spacing:.06em;color:var(--ink);
+  transition:border-color .25s,background .25s;
+}
+.chip:hover{border-color:var(--brass);background:var(--brass-soft)}
+.chip i{font-style:normal;color:var(--brass)}
+
+/* ---------- steps ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border-bottom:1px solid var(--line)}
+.step{background:var(--bg);padding:clamp(24px,3vw,40px) var(--gutter)}
+.steps .step:nth-child(2){background:var(--bg-2)}
+.step .no{font-family:var(--mono);font-size:12px;color:var(--brass);letter-spacing:.14em}
+.step h3{font-family:var(--serif);font-weight:420;font-size:20px;margin-top:12px}
+.step p{margin-top:8px;font-size:14.5px;color:var(--ink-dim)}
+@media(max-width:840px){.steps{grid-template-columns:1fr}}
+
+/* ---------- sections ---------- */
+section.block{padding:clamp(56px,8vw,110px) 0;border-bottom:1px solid var(--line)}
+.sec-head{display:flex;align-items:baseline;gap:20px;flex-wrap:wrap}
+.sec-no{font-family:var(--mono);font-size:13px;color:var(--brass);letter-spacing:.16em}
+.sec-head h2{font-family:var(--serif);font-weight:360;font-size:clamp(30px,4.4vw,52px);line-height:1.1}
+.sec-head h2 em{font-style:italic;color:var(--brass)}
+.sec-sub{margin-top:16px;max-width:62ch;color:var(--ink-dim)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(24px,3.5vw,48px);margin-top:40px;align-items:start}
+.cols>*{min-width:0}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+
+/* ---------- fields ---------- */
+.field{margin-top:18px}
+.field label{display:block;font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-dim);margin-bottom:8px}
+.field input[type=text],.field input[type=date],.field input[type=time],.field input[type=number],.field textarea,.field select{
+  width:100%;min-height:48px;padding:12px 14px;
+  background:var(--bg-2);border:1px solid var(--line-strong);border-radius:6px;
+  color:var(--ink);font-family:var(--mono);font-size:14px;line-height:1.5;
+  transition:border-color .25s;
+}
+.field textarea{resize:vertical;min-height:76px}
+.field input:focus,.field textarea:focus,.field select:focus{outline:none;border-color:var(--brass)}
+.field .hint{margin-top:7px;font-size:13px;color:var(--ink-faint)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.field-row>*{min-width:0}
+.check{display:flex;align-items:center;gap:10px;margin-top:18px;min-height:44px;cursor:pointer;font-size:14.5px;color:var(--ink-dim)}
+.check input{width:18px;height:18px;accent-color:var(--brass);cursor:pointer}
+.status{margin-top:10px;font-family:var(--mono);font-size:13px;display:flex;gap:8px;align-items:flex-start}
+.status.ok{color:var(--ok)}
+.status.err{color:var(--err)}
+.status.idle{color:var(--ink-faint)}
+
+/* ---------- demo panes ---------- */
+.demo{
+  border:1px solid var(--line-strong);border-radius:10px;background:var(--bg-2);
+  padding:clamp(18px,2.4vw,28px);
+}
+.demo .demo-label{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:16px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.demo .demo-label i{font-style:normal;color:var(--brass)}
+.demo-frame{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff}
+.placeholder{
+  border:1px dashed var(--line-strong);border-radius:8px;padding:clamp(24px,3vw,40px);
+  text-align:center;color:var(--ink-dim);font-size:14.5px;
+}
+.placeholder svg{display:block;margin:0 auto 14px;color:var(--brass)}
+.placeholder b{display:block;font-family:var(--serif);font-weight:460;font-size:18px;color:var(--ink);margin-bottom:6px}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  min-height:48px;padding:0 24px;border-radius:100px;
+  border:1px solid var(--brass-line);background:transparent;color:var(--ink);
+  font-family:var(--mono);font-size:13px;letter-spacing:.06em;text-decoration:none;
+  transition:background .25s,border-color .25s,color .25s;cursor:pointer;
+}
+.btn:hover{background:var(--brass);border-color:var(--brass);color:var(--bg)}
+.btn.solid{background:var(--brass);border-color:var(--brass);color:var(--bg)}
+.btn.solid:hover{background:transparent;color:var(--ink)}
+.btn svg{flex:none}
+.btn-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+
+/* ---------- snippets ---------- */
+.snippet{position:relative;margin-top:16px;border:1px solid var(--line);border-radius:8px;background:var(--bg-3);overflow:hidden}
+.snippet .snip-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px 9px 16px;border-bottom:1px solid var(--line)}
+.snippet .snip-title{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+.copy{
+  display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 12px;
+  border:1px solid var(--line-strong);border-radius:6px;background:transparent;
+  font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--ink-dim);
+  transition:color .2s,border-color .2s;
+}
+.copy:hover{color:var(--brass);border-color:var(--brass-line)}
+.copy.done{color:var(--ok);border-color:var(--ok)}
+.snippet pre{padding:16px;overflow-x:auto}
+.snippet code{font-family:var(--mono);font-size:12.5px;line-height:1.7;color:var(--ink-dim);white-space:pre}
+.snippet code .tag{color:var(--brass)}
+.snippet code .attr{color:var(--ink)}
+.snippet code .val{color:var(--ok)}
+
+/* ---------- reference table ---------- */
+.ref{margin-top:40px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.ref-row{display:grid;grid-template-columns:300px 1fr;border-top:1px solid var(--line)}
+.ref-row:first-child{border-top:0}
+.ref-row.head{background:var(--bg-2);font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint)}
+.ref-row>div{padding:13px 18px;font-size:14px}
+.ref-row code{font-family:var(--mono);font-size:12.5px;color:var(--brass);word-break:break-all}
+.ref-row .d{color:var(--ink-dim)}
+@media(max-width:760px){.ref-row{grid-template-columns:1fr}.ref-row>div{padding:10px 16px}.ref-row.head>div:last-child{display:none}.ref-row>div:first-child{padding-bottom:2px}}
+
+/* ---------- guide ---------- */
+.guide{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-top:40px}
+.guide>div{background:var(--bg-2);padding:clamp(22px,3vw,36px)}
+.guide h3{font-family:var(--serif);font-weight:440;font-size:21px}
+.guide h3 span{color:var(--brass)}
+.guide ol{margin:16px 0 0 18px;display:grid;gap:10px;color:var(--ink-dim);font-size:14.5px}
+.guide ol b{color:var(--ink);font-weight:600}
+.guide .note{margin-top:16px;padding:12px 14px;border-left:2px solid var(--brass-line);background:var(--brass-soft);font-size:13.5px;color:var(--ink-dim);border-radius:0 6px 6px 0}
+@media(max-width:860px){.guide{grid-template-columns:1fr}}
+
+/* ---------- footer ---------- */
+footer{padding:44px 0 60px;color:var(--ink-faint);font-size:13.5px}
+footer .f{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{color:var(--ink-dim);text-decoration:none;border-bottom:1px solid var(--line-strong)}
+footer a:hover{color:var(--brass);border-color:var(--brass)}
+
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap hd">
+    <a class="mark" href="#top" aria-label="Google Calendar Kit — top">
+      <svg width="26" height="26" viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="8" y="12" width="48" height="44" rx="7" stroke="#C8A566" stroke-width="4"/><path d="M8 26h48" stroke="#C8A566" stroke-width="4"/><path d="M20 6v12M44 6v12" stroke="#C8A566" stroke-width="4" stroke-linecap="round"/><circle cx="32" cy="41" r="5" fill="#C8A566"/></svg>
+      <span style="display:flex;flex-direction:column;line-height:1.25"><b>Google Calendar Kit</b><span>Coveworks · Websitemaker</span></span>
+    </a>
+    <nav aria-label="Sections">
+      <a href="#booking">01 · Booking</a>
+      <a href="#add">02 · Add to calendar</a>
+      <a href="#view">03 · Calendar view</a>
+      <a href="#reference">Reference</a>
+      <a href="#setup">Setup</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ======================= HERO ======================= -->
+  <section class="hero">
+    <div class="wrap">
+      <p class="kicker">Integration kit · No build step</p>
+      <h1>Bookings, straight onto <em>your calendar.</em></h1>
+      <p>One small script wires any site in this repo to Google Calendar: an appointment-booking embed, add-to-calendar buttons, and live public-calendar views. Copy <code style="font-family:var(--mono);font-size:.9em;color:var(--brass)">gcal.js</code> into a site folder, paste a snippet, done — widgets stay invisible until a real link is configured, so nothing breaks on a live site.</p>
+      <div class="chips" role="list">
+        <a class="chip" role="listitem" href="#booking"><i>01</i> Booking embed</a>
+        <a class="chip" role="listitem" href="#add"><i>02</i> Add-to-calendar button</a>
+        <a class="chip" role="listitem" href="#view"><i>03</i> Calendar view</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= STEPS ======================= -->
+  <div class="steps" aria-label="How it works">
+    <div class="step">
+      <span class="no">STEP 1</span>
+      <h3>Create the schedule</h3>
+      <p>In Google Calendar, hit <b>Create → Appointment schedule</b>, set your availability, save. Google handles time zones, clashes and confirmation emails.</p>
+    </div>
+    <div class="step">
+      <span class="no">STEP 2</span>
+      <h3>Copy your booking link</h3>
+      <p>Open the schedule → <b>Share</b> → copy the link (or the website-embed code — either works). Paste it into the wizard below.</p>
+    </div>
+    <div class="step">
+      <span class="no">STEP 3</span>
+      <h3>Paste the snippet</h3>
+      <p>The wizard writes the exact HTML for your site. Drop <b>gcal.js</b> next to your <b>index.html</b>, paste, push. Clients book without leaving the page.</p>
+    </div>
+  </div>
+
+  <!-- ======================= 01 BOOKING ======================= -->
+  <section class="block" id="booking">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-no">01</span><h2>Appointment <em>booking</em></h2></div>
+      <p class="sec-sub">Paste your Google appointment-schedule link and preview the real thing: an inline booking page, and a button that opens it in an elegant overlay. Both snippets update live as you type.</p>
+
+      <div class="cols">
+        <div>
+          <div class="field">
+            <label for="bookingUrl">Your booking link or embed code</label>
+            <input type="text" id="bookingUrl" autocomplete="off" spellcheck="false"
+                   placeholder="https://calendar.google.com/calendar/appointments/schedules/…">
+            <p class="status idle" id="bookingStatus" aria-live="polite">Waiting for a link — the preview lights up the moment one is pasted.</p>
+            <p class="hint">Accepts the full schedule URL, the &lt;iframe&gt; embed code, or a calendar.app.google short link (short links open in a new tab instead of embedding).</p>
+          </div>
+
+          <div class="snippet">
+            <div class="snip-head"><span class="snip-title">Button + overlay — paste before &lt;/body&gt;</span>
+              <button class="copy" type="button" data-copy="bookingBtnSnip">Copy</button></div>
+            <pre><code id="bookingBtnSnip"></code></pre>
+          </div>
+
+          <div class="snippet">
+            <div class="snip-head"><span class="snip-title">Inline embed — paste where it should appear</span>
+              <button class="copy" type="button" data-copy="bookingInlineSnip">Copy</button></div>
+            <pre><code id="bookingInlineSnip"></code></pre>
+          </div>
+        </div>
+
+        <div>
+          <div class="demo">
+            <div class="demo-label"><span>Live preview</span><i id="bookingDemoState">unconfigured</i></div>
+            <div id="bookingDemoOff" class="placeholder">
+              <svg width="34" height="34" viewBox="0 0 64 64" fill="none" aria-hidden="true"><rect x="8" y="12" width="48" height="44" rx="7" stroke="currentColor" stroke-width="3"/><path d="M8 26h48" stroke="currentColor" stroke-width="3"/><path d="M20 6v12M44 6v12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+              <b>No booking link yet</b>
+              Create an appointment schedule in Google Calendar, copy its share link, and paste it on the left. The full booking flow renders right here.
+            </div>
+            <div id="bookingDemoOn" hidden>
+              <div class="btn-row" style="margin-bottom:16px">
+                <button class="btn solid" type="button" id="tryOverlay">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+                  Book a call — overlay
+                </button>
+                <span style="font-family:var(--mono);font-size:12px;color:var(--ink-faint)">← how the button feels</span>
+              </div>
+              <div class="demo-frame"><div id="bookingInlineDemo" data-height="520"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 02 ADD TO CALENDAR ======================= -->
+  <section class="block" id="add">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-no">02</span><h2>Add to <em>calendar</em></h2></div>
+      <p class="sec-sub">A pure link — no account, no API key, nothing to configure. Describe the event and the kit builds the official Google Calendar template URL. Perfect for course dates, fittings, MOT reminders, open days.</p>
+
+      <div class="cols">
+        <div>
+          <div class="field">
+            <label for="evTitle">Event title</label>
+            <input type="text" id="evTitle" value="Design consultation · Coveworks" autocomplete="off">
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="evDate">Date</label>
+              <input type="date" id="evDate">
+            </div>
+            <div class="field">
+              <label for="evTime">Start time</label>
+              <input type="time" id="evTime" value="10:00">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="evDuration">Duration (minutes)</label>
+              <input type="number" id="evDuration" value="45" min="5" step="5">
+            </div>
+            <div class="field">
+              <label for="evTz">Time zone</label>
+              <input type="text" id="evTz" value="Europe/London" list="tzlist" autocomplete="off" spellcheck="false">
+              <datalist id="tzlist">
+                <option value="Europe/London"></option><option value="Europe/Paris"></option>
+                <option value="Europe/Istanbul"></option><option value="Asia/Dubai"></option>
+                <option value="Asia/Karachi"></option><option value="America/New_York"></option>
+                <option value="America/Los_Angeles"></option>
+              </datalist>
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" id="evAllDay"> All-day event</label>
+          <div class="field">
+            <label for="evLocation">Location</label>
+            <input type="text" id="evLocation" value="The Cove, 12 Marsh Wall, London" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="evDetails">Details</label>
+            <textarea id="evDetails" rows="2">45 minutes with the studio. Bring references, leave with a plan.</textarea>
+          </div>
+        </div>
+
+        <div>
+          <div class="demo">
+            <div class="demo-label"><span>Live preview</span><i>works right now</i></div>
+            <div class="btn-row">
+              <a class="btn solid" id="addDemoBtn" data-gcal-add href="#" >
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4M12 13v6M9 16h6"/></svg>
+                Add to Google Calendar
+              </a>
+              <span style="font-family:var(--mono);font-size:12px;color:var(--ink-faint)">← opens prefilled in Google</span>
+            </div>
+            <p class="hint" style="margin-top:14px;font-family:var(--mono);font-size:11.5px;word-break:break-all;color:var(--ink-faint)" id="addUrlPreview"></p>
+          </div>
+
+          <div class="snippet">
+            <div class="snip-head"><span class="snip-title">Your snippet</span>
+              <button class="copy" type="button" data-copy="addSnip">Copy</button></div>
+            <pre><code id="addSnip"></code></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= 03 CALENDAR VIEW ======================= -->
+  <section class="block" id="view">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-no">03</span><h2>Public calendar <em>view</em></h2></div>
+      <p class="sec-sub">Show a live calendar on the page — class timetables, availability, events. The calendar must be public; the preview below uses Google's UK-holidays calendar so it works out of the box.</p>
+
+      <div class="cols">
+        <div>
+          <div class="field">
+            <label for="calId">Calendar ID</label>
+            <input type="text" id="calId" value="en.uk#holiday@group.v.calendar.google.com" autocomplete="off" spellcheck="false">
+            <p class="hint">Google Calendar → Settings → your calendar → “Integrate calendar”. Several calendars: separate IDs with commas.</p>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label for="calMode">Layout</label>
+              <select id="calMode">
+                <option value="MONTH">Month grid</option>
+                <option value="WEEK">Week</option>
+                <option value="AGENDA" selected>Agenda list</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="calTz">Time zone</label>
+              <input type="text" id="calTz" value="Europe/London" list="tzlist" autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+
+          <div class="snippet">
+            <div class="snip-head"><span class="snip-title">Your snippet</span>
+              <button class="copy" type="button" data-copy="viewSnip">Copy</button></div>
+            <pre><code id="viewSnip"></code></pre>
+          </div>
+        </div>
+
+        <div>
+          <div class="demo">
+            <div class="demo-label"><span>Live preview</span><i>UK bank holidays</i></div>
+            <div class="demo-frame"><div id="viewDemo"></div></div>
+            <p class="hint" style="margin-top:12px">Blank preview? The calendar isn't public yet, or this network blocks Google — it renders on the hosted site.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= REFERENCE ======================= -->
+  <section class="block" id="reference">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-no">04</span><h2>Attribute <em>reference</em></h2></div>
+      <p class="sec-sub">Everything is declarative. Add attributes to plain HTML; <span style="font-family:var(--mono);font-size:.92em;color:var(--brass)">gcal.js</span> does the rest on load. Site-wide defaults live in <span style="font-family:var(--mono);font-size:.92em;color:var(--brass)">window.GCAL_CONFIG</span> (<span style="font-family:var(--mono);font-size:.92em">bookingUrl · timezone · calendarId</span>).</p>
+
+      <div class="ref" role="table" aria-label="Attribute reference">
+        <div class="ref-row head" role="row"><div role="columnheader">Attribute</div><div role="columnheader">Meaning</div></div>
+        <div class="ref-row" role="row"><div role="cell"><code>data-gcal-booking-button</code></div><div class="d" role="cell">Turns the element into a booking button that opens the schedule in an overlay (short links open a new tab). Value = schedule URL, or empty to use the site config. Hidden until a URL exists.</div></div>
+        <div class="ref-row" role="row"><div role="cell"><code>data-gcal-booking</code> <code>data-height</code></div><div class="d" role="cell">Inline booking embed rendered inside the element. Hidden until configured.</div></div>
+        <div class="ref-row" role="row"><div role="cell"><code>data-gcal-add</code></div><div class="d" role="cell">Add-to-calendar element. On an <code>&lt;a&gt;</code> the href is set; on anything else a click handler opens the link.</div></div>
+        <div class="ref-row" role="row"><div role="cell"><code>data-title</code> <code>data-start</code> <code>data-end</code> <code>data-duration</code></div><div class="d" role="cell">Event basics. <code>data-start="2026-08-01T10:00"</code> for timed, <code>"2026-08-01"</code> for all-day (then <code>data-end</code> is the last day, inclusive). No end/duration → 60 minutes.</div></div>
+        <div class="ref-row" role="row"><div role="cell"><code>data-location</code> <code>data-details</code> <code>data-timezone</code> <code>data-recur</code></div><div class="d" role="cell">Optional extras. <code>data-recur="RRULE:FREQ=WEEKLY;BYDAY=MO"</code> repeats the event.</div></div>
+        <div class="ref-row" role="row"><div role="cell"><code>data-gcal-view</code> <code>data-mode</code> <code>data-weekstart</code></div><div class="d" role="cell">Live view of public calendar ID(s). <code>data-mode</code>: MONTH · WEEK · AGENDA. <code>data-weekstart="1"</code> starts weeks on Monday.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================= SETUP ======================= -->
+  <section class="block" id="setup" style="border-bottom:0">
+    <div class="wrap">
+      <div class="sec-head"><span class="sec-no">05</span><h2>One-time <em>Google setup</em></h2></div>
+
+      <div class="guide">
+        <div>
+          <h3><span>A.</span> Booking — appointment schedule</h3>
+          <ol>
+            <li>Open <b>calendar.google.com</b> on a computer, signed into the business account.</li>
+            <li>Press <b>Create → Appointment schedule</b>. Name it, set slot length and weekly availability, save.</li>
+            <li>Click the schedule on the calendar → <b>Share</b>. Copy the <b>link</b> — or the website-embed code; the wizard reads both.</li>
+            <li>Paste it into <a href="#booking" style="color:var(--brass)">section 01</a> and ship the generated snippet.</li>
+          </ol>
+          <div class="note">Free Gmail accounts get one appointment schedule; Google Workspace unlocks several plus reminder emails. Bookers never need a Google account.</div>
+        </div>
+        <div>
+          <h3><span>B.</span> Calendar view — make it public</h3>
+          <ol>
+            <li>In Google Calendar, hover your calendar → <b>⋮ → Settings and sharing</b>.</li>
+            <li>Under <b>Access permissions for events</b>, tick <b>Make available to public</b> (choose “See only free/busy” to hide event names).</li>
+            <li>Scroll to <b>Integrate calendar</b> and copy the <b>Calendar ID</b>.</li>
+            <li>Paste it into <a href="#view" style="color:var(--brass)">section 03</a>.</li>
+          </ol>
+          <div class="note">Add-to-calendar buttons (section 02) need none of this — they're plain links and work for any visitor with a Google account.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap f">
+    <span>Google Calendar Kit — part of the <a href="https://github.com/Gensynx/Websitemaker" rel="noopener">Websitemaker</a> repo. Copy <span style="font-family:var(--mono)">gcal.js</span> into any site folder to use it.</span>
+    <span>Built by Coveworks · London</span>
+  </div>
+</footer>
+
+<script src="gcal.js" defer></script>
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+
+  function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  /* Minimal colouring for generated snippets: tags brass, quoted values green.
+     Single pass over the escaped source so replacements are never re-scanned
+     (a second pass would match the quotes inside the inserted spans). */
+  function paint(src){
+    return esc(src).replace(/(&lt;\/?)([a-z][a-z0-9-]*)|("[^"\n]*")/g, function(m, lt, tag, quoted){
+      if (lt) return lt + '<span class="tag">' + tag + '</span>';
+      return '<span class="val">' + quoted + '</span>';
+    });
+  }
+  function setSnip(id, code){ $(id).innerHTML = paint(code); }
+
+  /* ---------- copy buttons ---------- */
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('.copy');
+    if(!btn) return;
+    var text = $(btn.getAttribute('data-copy')).textContent;
+    function done(){
+      btn.classList.add('done'); btn.textContent = 'Copied';
+      setTimeout(function(){ btn.classList.remove('done'); btn.textContent = 'Copy'; }, 1800);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(done, function(){ fallback(); });
+    } else { fallback(); }
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(err){}
+      document.body.removeChild(ta);
+    }
+  });
+
+  var CONFIG_LINES = function(url){
+    return '<script>window.GCAL_CONFIG = { bookingUrl: "' + url + '" };<\/script>\n' +
+           '<script src="gcal.js" defer><\/script>';
+  };
+
+  /* ---------- 01 booking wizard ---------- */
+  var bookingInput = $('bookingUrl'), bookingTimer = null;
+  var stored = null;
+  try { stored = localStorage.getItem('gcalkit.bookingUrl'); } catch(e){}
+  if(stored) bookingInput.value = stored;
+
+  function refreshBooking(){
+    var raw = bookingInput.value.trim();
+    var status = $('bookingStatus');
+    var link = raw && window.GCal ? GCal.normalizeBookingUrl(raw) : null;
+    var url = link ? (raw.indexOf('<') > -1 ? GCal.bookingEmbedUrl(raw) : raw) : 'PASTE-YOUR-BOOKING-LINK-HERE';
+    if (link && raw.indexOf('<') > -1) url = url.replace(/([?&])gv=true&?/, '$1').replace(/[?&]$/,'');
+
+    setSnip('bookingBtnSnip',
+      CONFIG_LINES(url) + '\n\n<a class="btn" data-gcal-booking-button href="#">Book a call<\/a>');
+    setSnip('bookingInlineSnip',
+      CONFIG_LINES(url) + '\n\n<div data-gcal-booking data-height="700"><\/div>');
+
+    if(!raw){
+      status.className = 'status idle';
+      status.textContent = 'Waiting for a link — the preview lights up the moment one is pasted.';
+    } else if(!link){
+      status.className = 'status err';
+      status.textContent = 'That does not look like a booking link. Paste the https:// share link or the embed code from Google Calendar.';
+    } else if(link.embed){
+      status.className = 'status ok';
+      status.textContent = 'Link recognised — full schedule URL, embeds inline and in the overlay.';
+    } else {
+      status.className = 'status ok';
+      status.textContent = 'Short link recognised — it opens in a new tab (paste the full schedule link to embed inline).';
+    }
+
+    $('bookingDemoOff').hidden = !!link;
+    $('bookingDemoOn').hidden = !link;
+    $('bookingDemoState').textContent = link ? 'live' : 'unconfigured';
+    if(link){
+      var demo = $('bookingInlineDemo');
+      demo.setAttribute('data-gcal-booking', raw);
+      if(window.GCal) GCal.init(demo.parentNode);
+      try { localStorage.setItem('gcalkit.bookingUrl', raw); } catch(e){}
+    } else {
+      try { localStorage.removeItem('gcalkit.bookingUrl'); } catch(e){}
+    }
+  }
+  bookingInput.addEventListener('input', function(){
+    clearTimeout(bookingTimer); bookingTimer = setTimeout(refreshBooking, 300);
+  });
+  $('tryOverlay').addEventListener('click', function(){
+    if(window.GCal) GCal.openBooking(bookingInput.value.trim());
+  });
+
+  /* ---------- 02 add-to-calendar builder ---------- */
+  var week = new Date(Date.now() + 7 * 86400000);
+  $('evDate').value = week.getFullYear() + '-' +
+    ('0' + (week.getMonth() + 1)).slice(-2) + '-' + ('0' + week.getDate()).slice(-2);
+
+  function refreshAdd(){
+    var allDay = $('evAllDay').checked;
+    $('evTime').disabled = allDay;
+    $('evDuration').disabled = allDay;
+    var start = $('evDate').value ? ($('evDate').value + (allDay ? '' : 'T' + ($('evTime').value || '09:00'))) : '';
+    var attrs = [
+      ['data-title', $('evTitle').value],
+      ['data-start', start],
+      allDay ? null : ['data-duration', $('evDuration').value],
+      ['data-location', $('evLocation').value],
+      ['data-details', $('evDetails').value.replace(/\n/g, ' ')],
+      allDay ? null : ['data-timezone', $('evTz').value]
+    ];
+    var el = $('addDemoBtn');
+    el.removeAttribute('data-duration'); el.removeAttribute('data-timezone'); el.removeAttribute('data-end');
+    var snippetAttrs = '';
+    for(var i = 0; i < attrs.length; i++){
+      if(!attrs[i]) continue;
+      var k = attrs[i][0], v = (attrs[i][1] || '').trim();
+      if(!v){ el.removeAttribute(k); continue; }
+      el.setAttribute(k, v);
+      snippetAttrs += '\n   ' + k + '="' + v.replace(/"/g, '&quot;') + '"';
+    }
+    if(window.GCal) GCal.init(el.parentNode);
+    $('addUrlPreview').textContent = el.getAttribute('data-gcal-url') || '';
+    setSnip('addSnip',
+      '<script src="gcal.js" defer><\/script>\n\n<a data-gcal-add' + snippetAttrs + '>Add to Google Calendar<\/a>');
+  }
+  ['evTitle','evDate','evTime','evDuration','evTz','evLocation','evDetails','evAllDay'].forEach(function(id){
+    $(id).addEventListener('input', refreshAdd);
+    $(id).addEventListener('change', refreshAdd);
+  });
+
+  /* ---------- 03 view builder ---------- */
+  function refreshView(){
+    var id = $('calId').value.trim(), mode = $('calMode').value, tz = $('calTz').value.trim();
+    var demo = $('viewDemo');
+    demo.textContent = '';
+    demo.setAttribute('data-gcal-view', id);
+    demo.setAttribute('data-mode', mode);
+    demo.setAttribute('data-timezone', tz);
+    demo.setAttribute('data-weekstart', '1');
+    demo.setAttribute('data-height', '520');
+    if(window.GCal) GCal.init(demo.parentNode);
+    setSnip('viewSnip',
+      '<script src="gcal.js" defer><\/script>\n\n<div data-gcal-view="' + id + '"\n     data-mode="' + mode +
+      '" data-timezone="' + tz + '"\n     data-weekstart="1" data-height="620"><\/div>');
+  }
+  ['calId','calMode','calTz'].forEach(function(id){
+    $(id).addEventListener('input', refreshView);
+    $(id).addEventListener('change', refreshView);
+  });
+
+  /* ---------- boot after gcal.js is ready ---------- */
+  function boot(){
+    if(!window.GCal){ setTimeout(boot, 40); return; }
+    refreshBooking(); refreshAdd(); refreshView();
+  }
+  boot();
+})();
+</script>
+</body>
+</html>

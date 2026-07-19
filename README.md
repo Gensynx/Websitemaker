@@ -10,6 +10,10 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 - **Coveworks** — `coveworks/` folder, the studio's own animated site, editorial luxury edition (see `coveworks/README.md`)
 - **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, nine full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
 
+## Google Calendar Kit (`google-calendar/`)
+
+A drop-in Google Calendar integration any site in this repo can use: appointment-booking embeds and overlay buttons, add-to-calendar links, and live public-calendar views. One dependency-free script (`gcal.js`) plus HTML data attributes; widgets stay hidden until a real booking link or calendar ID is configured, so markup can ship ahead of setup. Open `google-calendar/index.html` for live demos and a wizard that generates the exact snippets; `google-calendar/README.md` has the written guide. The Coveworks site already carries a wired "Book a call" button (see its README).
+
 ## Site: London Classic Aesthetics (`london-classic-aesthetics/`)
 
 A full multi-page redesign of londonclassicaesthetics.com: 24 pages (home, 6 treatment pages + hub, 12 training course pages + hub, about, become-a-model, contact). Ivory/ink/champagne design system, Marcellus + Jost type (fonts committed as woff2), scroll-reveal and hero animations, all self-contained.
