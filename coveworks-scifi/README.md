@@ -17,7 +17,7 @@ Each theme has its own intro, headline entrance, canvas particles, shapes, fonts
 
 ## The theme bubble
 - Free roams the page with wandering physics while being pulled toward the pointer, settles beside it when you stop, and freezes when you reach for it; a small tag then reminds you that T cycles themes. Docks bottom right on phones
-- Press it to cycle themes (spam friendly), or hover it to fan out nine themed dots in an arc and pick one directly; the picker stays open with a grace period so the dots are easy to hit
+- Press it to cycle themes (spam friendly), or hover it to fan out ten dots in an arc: nine themes plus a welcome dot that takes you back to the theme select screen; the picker stays open with a grace period so the dots are easy to hit
 - Morphs shape to match the active theme: cyan diamond, brass sphere, white halo orb, green terminal square, glass droplet orb, red ring, chrome sphere, deep blue liquid orb and a spinning rainbow prism
 - A full page wipe in the new theme's colour carries the switch, and the headline replays its entrance
 - Keyboard: press T anywhere to cycle themes
