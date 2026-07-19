@@ -8,7 +8,7 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 - **Mobile Mechanic Romford** — `mobile-mechanic-romford/` (two designs)
 - **London Classic Aesthetics** — `london-classic-aesthetics/` (24 page redesign)
 - **Coveworks** — `coveworks/` folder, the studio's own animated site, editorial luxury edition (see `coveworks/README.md`)
-- **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, seven full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
+- **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, nine full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
 
 ## Site: London Classic Aesthetics (`london-classic-aesthetics/`)
 
