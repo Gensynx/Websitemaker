@@ -1,8 +1,8 @@
-# Coveworks · the flagship site with seven themes
+# Coveworks · the flagship site with nine themes
 
-The Coveworks studio site with seven complete personalities in one self contained file. Visitors land on a welcome screen ("Welcome to Coveworks. Select a theme.") with seven buttons, each rendered in its own theme. Picking one plays that theme's intro and lands on the hero. A floating bubble then lets them switch at any time.
+The Coveworks studio site with nine complete personalities in one self contained file. Visitors land on a welcome screen ("Welcome to Coveworks. Select a theme.") with nine buttons, each rendered in its own theme. Picking one plays that theme's intro and lands on the hero. A floating bubble then lets them switch at any time.
 
-## The seven themes
+## The nine themes
 - **Scifi**: deep space blue, signal cyan, Chakra Petch type, HUD chrome, clipped corners, scramble decode headlines, warp starfield, terminal boot intro, crosshair cursor
 - **Editorial**: warm black, brass, Fraunces serif with italic accents, rounded shapes, film grain, line rise headlines, drifting gold dust, counter curtain intro, quiet ring cursor
 - **Light**: pure white and gold, Space Grotesk, pill and rounded shapes, halo glows, light rays, golden bokeh, shimmer sweep headlines, radiant intro
@@ -10,20 +10,22 @@ The Coveworks studio site with seven complete personalities in one self containe
 - **Glass**: deep water blue, 3d glass panels with blur and rim highlights, rising bubbles, underwater light shafts, character wave headlines, glass orb bubble
 - **Futurist**: jet black, extrabold Archivo, red bloom accents, a red scan line sweeping the viewport, a dot matrix that heats up under the scan, word by word glitch fade headlines, and a WebGL hero: an organic contour ring blob generated procedurally with a true depth map, floating beside the headline with pointer parallax and a red dot wave flowing through its depth (matching the hero futuristic reference)
 - **Mono**: grayscale shadcn minimalism on paper white, Archivo tracking tight, outlined accent headline, pill buttons, and a physics ballpit of chrome spheres with gravity and collisions where the lead ball chases the cursor
+- **Liquid**: near black deep blue, Space Grotesk cut tight, and a cinematic WebGL liquid field flowing across the whole page in deep blue and ice, with grain, a sweep reveal on entry and pointer parallax (ported to vanilla WebGL from the 21st.dev WebGL Liquid hero); headlines rise out of the water line by line
+- **Prism**: deep indigo with holographic gradient headlines, and a full page WebGL shader layering ordered Bayer dithering, blue noise, prismatic refraction, iridescence, morphing crystal patterns and a cursor ripple with a glowing aura and lens distortion (ported to vanilla WebGL from the 21st.dev Dither Prism Hero), plus floating additive particles and hard edged retro chrome
 
 Each theme has its own intro, headline entrance, canvas particles, shapes, fonts and chrome, and the particle effect now runs across the entire page, not just the hero. Work screenshots are never tinted by a theme; only the chrome around them changes. Same words everywhere.
 
 ## The theme bubble
 - Free roams the page with wandering physics while being pulled toward the pointer, settles beside it when you stop, and freezes when you reach for it; a small tag then reminds you that T cycles themes. Docks bottom right on phones
-- Press it to cycle themes (spam friendly), or hover it to fan out four themed dots and pick one directly; the picker stays open with a grace period so the dots are easy to hit
-- Morphs shape to match the active theme: cyan diamond, brass sphere, white halo orb, green terminal square, glass droplet orb
+- Press it to cycle themes (spam friendly), or hover it to fan out nine themed dots in an arc and pick one directly; the picker stays open with a grace period so the dots are easy to hit
+- Morphs shape to match the active theme: cyan diamond, brass sphere, white halo orb, green terminal square, glass droplet orb, red ring, chrome sphere, deep blue liquid orb and a spinning rainbow prism
 - A full page wipe in the new theme's colour carries the switch, and the headline replays its entrance
 - Keyboard: press T anywhere to cycle themes
 - The choice is remembered between visits, and `?theme=glass` (or any theme name) in the URL opens that theme directly, skipping the welcome screen
 
 ## Structure
 ```
-index.html          the whole site (all font sets, work captures and WebGL textures embedded, ~1.3 MB)
+index.html          the whole site (all font sets, work captures, WebGL textures and shaders embedded, ~1.4 MB)
 ```
 
 ## The works page
@@ -37,7 +39,7 @@ The portfolio lists client work only, captured live from this repository and its
 - Viewport HUD with scroll coordinates and progress rail (scifi)
 - Spinning radar and live clock in the footer, magnetic buttons
 
-The welcome screen has ambient drifting glows, a word by word title entrance and a live hover effect on every theme card: scanline glitch (scifi), brass shimmer (editorial), golden bloom (light) and CRT flicker with a blinking cursor (terminal). Full `prefers-reduced-motion` support; renders complete with JavaScript disabled (scifi theme, no overlays).
+The welcome screen has ambient drifting glows, a word by word title entrance and a live hover effect on every theme card: scanline glitch (scifi), brass shimmer (editorial), golden bloom (light), CRT flicker with a blinking cursor (terminal), a rising tide (liquid) and an iridescent sweep (prism). Full `prefers-reduced-motion` support; renders complete with JavaScript disabled (scifi theme, no overlays).
 
 ## Content notes
 - The carousel shows live captures of every build in the repo, embedded in the file (~1.3 MB total).
