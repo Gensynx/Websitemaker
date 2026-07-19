@@ -1211,16 +1211,33 @@ body.works-open main,body.works-open footer,body.works-open header{opacity:0;poi
 .w-card.w-prism:hover .fx{animation:edshimmer 1.4s ease infinite}
 .w-card.w-prism:hover{box-shadow:0 0 30px rgba(99,102,241,.4),0 0 60px rgba(236,72,153,.25)}
 
-/* nine picker dots · full arc (overrides the earlier seven dot layout) */
-#themeDock.open .tb-dot.d1{translate:-106px 28px}
-#themeDock.open .tb-dot.d2{translate:-108px -21px}
-#themeDock.open .tb-dot.d3{translate:-87px -67px}
-#themeDock.open .tb-dot.d4{translate:-49px -99px}
-#themeDock.open .tb-dot.d5{translate:0px -112px}
-#themeDock.open .tb-dot.d6{translate:49px -99px}
-#themeDock.open .tb-dot.d7{translate:87px -67px}
-#themeDock.open .tb-dot.d8{translate:108px -21px}
-#themeDock.open .tb-dot.d9{translate:106px 28px}
+/* ten picker dots · nine themes plus a welcome dot, in one arc */
+#themeDock.open .tb-dot.d1{translate:-108px 29px}
+#themeDock.open .tb-dot.d2{translate:-111px -16px}
+#themeDock.open .tb-dot.d3{translate:-95px -59px}
+#themeDock.open .tb-dot.d4{translate:-64px -92px}
+#themeDock.open .tb-dot.d5{translate:-23px -110px}
+#themeDock.open .tb-dot.d6{translate:23px -110px}
+#themeDock.open .tb-dot.d7{translate:64px -92px}
+#themeDock.open .tb-dot.d8{translate:95px -59px}
+#themeDock.open .tb-dot.d9{translate:111px -16px}
+#themeDock.open .tb-dot.d0{translate:108px 29px}
+.tb-dot.dot-home{background:var(--bg-2);border:1px solid var(--cyan-line);border-radius:50%}
+.tb-dot.dot-home svg{color:var(--cyan)}
+.tb-dot.dot-home:hover{box-shadow:0 0 18px rgba(var(--acc),.45)}
+/* phones: the dock sits in the corner, so fan into a grid up and to the left instead */
+@media (max-width:767px){
+  #themeDock.open .tb-dot.d1{translate:-52px 0}
+  #themeDock.open .tb-dot.d2{translate:-104px 0}
+  #themeDock.open .tb-dot.d3{translate:0 -52px}
+  #themeDock.open .tb-dot.d4{translate:-52px -52px}
+  #themeDock.open .tb-dot.d5{translate:-104px -52px}
+  #themeDock.open .tb-dot.d6{translate:0 -104px}
+  #themeDock.open .tb-dot.d7{translate:-52px -104px}
+  #themeDock.open .tb-dot.d8{translate:-104px -104px}
+  #themeDock.open .tb-dot.d9{translate:0 -156px}
+  #themeDock.open .tb-dot.d0{translate:-52px -156px}
+}
 
 /* ============================================================
    Responsive
@@ -1286,6 +1303,7 @@ body.works-open main,body.works-open footer,body.works-open header{opacity:0;poi
   <button class="tb-dot dot-glass d5" data-theme="glass" aria-label="Glass theme"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="color:#7FDFFF"><path d="M12 3c3.5 4.5 6 7.6 6 10.4A6 6 0 0 1 6 13.4C6 10.6 8.5 7.5 12 3z"/></svg></button>
   <button class="tb-dot dot-liquid d8" data-theme="liquid" aria-label="Liquid theme"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9c3-4 6 4 9 0s6 4 9 0"/><path d="M3 15c3-4 6 4 9 0s6 4 9 0"/></svg></button>
   <button class="tb-dot dot-prism d9" data-theme="prism" aria-label="Prism theme"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4l8 14H4z"/><path d="M12 4v14"/></svg></button>
+  <button class="tb-dot dot-home d0" aria-label="Back to the theme select screen"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button>
   <button id="themeBubble" aria-label="Cycle theme">
     <span class="tb-face tb-sf" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l10 10-10 10L2 12z"/><circle cx="12" cy="12" r="3"/></svg></span>
     <span class="tb-face tb-ed" aria-hidden="true">Aa</span>
@@ -2042,11 +2060,11 @@ document.body.style.overflow = 'hidden';
 var urlTheme = (location.search.match(/[?&]theme=(scifi|editorial|light|terminal|glass|futurist|mono|liquid|prism)/) || [])[1];
 if (urlTheme){
   applyTheme(urlTheme);
-  welcome.remove(); welcome = null;
+  welcome.classList.add('gone');
   document.body.style.overflow = '';
   playIntro(function(){ revealHero(); });
 }
-if (welcome) requestAnimationFrame(function(){ requestAnimationFrame(function(){ welcome.classList.add('in'); }); });
+if (welcome && !urlTheme) requestAnimationFrame(function(){ requestAnimationFrame(function(){ welcome.classList.add('in'); }); });
 function playIntro(cb){
   if (reduce){ cb(); return; }
   intro.classList.add('show');
@@ -2075,7 +2093,6 @@ if (welcome) welcome.querySelectorAll('.w-card').forEach(function(card){
     applyTheme(card.getAttribute('data-theme'));
     welcome.classList.add('gone');
     document.body.style.overflow = '';
-    setTimeout(function(){ welcome.remove(); }, 700);
     playIntro(function(){ revealHero(); });
   });
 });
@@ -2843,9 +2860,19 @@ bubble.addEventListener('click', function(){
   openPicker();
   wipeTo(next);
 });
+function showWelcome(){
+  if (!welcome){ location.href = location.pathname; return; }
+  closePicker();
+  if (location.hash) location.hash = '';
+  window.scrollTo(0, 0);
+  document.body.style.overflow = 'hidden';
+  welcome.classList.remove('gone', 'in');
+  requestAnimationFrame(function(){ requestAnimationFrame(function(){ welcome.classList.add('in'); }); });
+}
 dots.forEach(function(d){
   d.addEventListener('click', function(){
     var k = d.getAttribute('data-theme');
+    if (!k){ showWelcome(); return; }
     if (k !== themeKey()) wipeTo(k);
     if (!finePointer) closePicker();
   });
