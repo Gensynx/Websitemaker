@@ -62,14 +62,14 @@ const pages = [
   },
   {
     path: 'about.html',
-    title: 'About Us · 381 Accountants — Independent Certified Accountants Since 2010',
+    title: 'About Us · 381 Accountants · Independent Certified Accountants Since 2010',
     desc: 'The story of 381 Accountancy & Bookkeeping Services Ltd: an independent firm of certified accountants in Barking with 16+ years serving London, cloud accounting on Sage & QuickBooks, and a five-star Google rating.',
     active: 'about',
     body: aboutBody,
   },
   {
     path: 'reviews.html',
-    title: 'Client Reviews · 381 Accountants — Rated 5.0 on Google',
+    title: 'Client Reviews · 381 Accountants · Rated 5.0 on Google',
     desc: 'Real Google reviews of 381 Accountants: five stars across the board, with clients praising professionalism, trustworthiness, responsiveness, accuracy and value for money.',
     active: 'reviews',
     body: reviewsBody,

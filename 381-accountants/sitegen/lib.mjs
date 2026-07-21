@@ -120,7 +120,7 @@ function header_({ path, active }) {
   ).join('\n      ');
   return `<header class="site-header">
   <div class="wrap nav-bar">
-    <a class="brand" href="${r}index.html" aria-label="${SITE.name} — home">
+    <a class="brand" href="${r}index.html" aria-label="${SITE.name} home">
       <span class="brand-mark"><span>381</span></span>
       <span class="brand-text"><b>381 Accountants</b><small>Accountancy &amp; Bookkeeping</small></span>
     </a>
@@ -154,7 +154,7 @@ function footer_(path, servicesNav) {
           <span class="brand-mark"><span>381</span></span>
           <span class="brand-text"><b>381 Accountants</b><small>Accountancy &amp; Bookkeeping</small></span>
         </a>
-        <p class="footer-about">${SITE.legal} — an independent firm of certified accountants in ${SITE.town}, serving businesses and individuals across London since ${SITE.established}. Efficient, proactive and personal.</p>
+        <p class="footer-about">${SITE.legal} is an independent firm of certified accountants in ${SITE.town}, serving businesses and individuals across London since ${SITE.established}. Efficient, proactive and personal.</p>
       </div>
       <div class="footer-col">
         <h4>Services</h4>
@@ -218,7 +218,7 @@ export function breadcrumbs(path, trail) {
   return `<nav class="crumbs" aria-label="Breadcrumb">${items}</nav>`;
 }
 
-export function bookingForm({ heading = 'Book a free consultation', note = 'Tell us what you need — we reply within one working day.', services, selected = '' }) {
+export function bookingForm({ heading = 'Book a free consultation', note = 'Tell us what you need and we will reply within one working day.', services, selected = '' }) {
   const opts = ['<option value="">Choose a service…</option>']
     .concat(services.map((s) => `<option value="${s.name}"${s.name === selected ? ' selected' : ''}>${s.name}</option>`))
     .concat(['<option value="Something else">Something else / not sure yet</option>'])
@@ -250,7 +250,7 @@ export function bookingForm({ heading = 'Book a free consultation', note = 'Tell
   </div>
   <button class="btn btn-gold btn-block" type="submit">${icon('send')} Request my consultation</button>
   <p class="form-status" role="status" aria-live="polite"></p>
-  <p class="form-foot">Prefer to talk? Call <a href="tel:${SITE.phone1tel}"><strong>${SITE.phone1}</strong></a> — ${SITE.hours}.</p>
+  <p class="form-foot">Prefer to talk? Call <a href="tel:${SITE.phone1tel}"><strong>${SITE.phone1}</strong></a> (${SITE.hours}).</p>
 </form>`;
 }
 
@@ -261,7 +261,7 @@ export function ctaBanner(path, { title = 'Ready to hand your numbers to safe ha
     <div class="cta-banner rv">
       <div>
         <h2>${title}</h2>
-        <p>${text || `Book a free, no-obligation consultation and find out exactly what ${SITE.name} can take off your plate — usually within one working day.`}</p>
+        <p>${text || `Book a free, no-obligation consultation and find out exactly what ${SITE.name} can take off your plate. We usually reply within one working day.`}</p>
       </div>
       <div class="cta-actions">
         <a class="btn btn-gold" href="${r}contact.html">Book a free consultation ${icon('arrow')}</a>
