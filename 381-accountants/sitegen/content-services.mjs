@@ -1,0 +1,182 @@
+/* Service definitions for 381 Accountants. Each entry drives a card on the
+   services hub, a footer link and a full detail page. */
+
+export const services = [
+  {
+    slug: 'bookkeeping',
+    name: 'Bookkeeping',
+    icon: 'ledger',
+    short: 'Daily transactions, bank reconciliation and clean, up-to-date books on Sage or QuickBooks — so you always know where you stand.',
+    heroLede: 'Accurate, up-to-date books are the foundation of every good business decision. We keep yours immaculate — <strong>daily transactions, reconciliations and clear monthly reports</strong> — on cloud software you can check any time.',
+    intro: [
+      'Bookkeeping is the discipline that keeps everything else honest: your VAT returns, your year-end accounts and your view of how the business is really doing. Fall behind and every deadline becomes a scramble; keep it current and the rest of your accounting takes care of itself.',
+      'Our bookkeepers record and categorise every transaction, chase down the missing receipts and reconcile your accounts so the numbers you look at are numbers you can trust. You get timely, readable reports — not a shoebox of paperwork returned once a year.',
+    ],
+    included: [
+      ['Daily transaction recording', 'every sale, purchase and expense captured and correctly categorised'],
+      ['Accounts payable & receivable', 'know exactly who you owe, who owes you, and when'],
+      ['Bank & credit card reconciliation', 'your books matched to your statements, line by line'],
+      ['Financial statements & reports', 'timely monthly reports that tell you how the business is performing'],
+      ['Cloud bookkeeping', 'Sage One, Sage 50 and QuickBooks — access your numbers anywhere'],
+      ['Year-end ready records', 'books that flow straight into accounts and tax returns without the panic'],
+    ],
+    callout: 'Behind on your books? We regularly take on backlogs — months or even years behind — and bring them fully up to date before switching you to a simple monthly routine.',
+    faqs: [
+      ['Which software do you work with?', 'We work with cloud-based accounting software including Sage One, Sage 50 and QuickBooks. If you are not on software yet, we will recommend the best fit for your business and set everything up for you.'],
+      ['Can you take over from our previous bookkeeper?', 'Yes. We handle the switch-over, review the state of your existing records, tidy anything that needs it and carry on without disruption to your business.'],
+      ['How often will my books be updated?', 'That depends on the volume of your transactions — weekly or monthly suits most small businesses. We agree a routine with you and stick to it, so your reports are always current.'],
+    ],
+  },
+  {
+    slug: 'payroll',
+    name: 'Payroll',
+    icon: 'payroll',
+    short: 'PAYE registration, payslips, RTI submissions and pension auto-enrolment — your team paid correctly and on time, every time.',
+    heroLede: 'Your people expect to be paid correctly and on time, and HMRC expects to hear about it the same day. We run payroll end to end — <strong>payslips, RTI submissions and pensions</strong> — so both stay happy.',
+    intro: [
+      'Payroll looks simple until you are the one running it: tax codes change, people start and leave mid-month, statutory pay rules shift, and every pay run has to be reported to HMRC in real time. Getting it wrong costs money and goodwill.',
+      'We run payroll for businesses of every size, from a single director to a growing team. You tell us the hours and any changes; we do everything else and send payslips ready to go out.',
+    ],
+    included: [
+      ['PAYE scheme registration', 'we set you up as an employer with HMRC and keep the scheme compliant'],
+      ['Weekly or monthly pay runs', 'wages, overtime, bonuses, deductions and holiday pay calculated correctly'],
+      ['Payslips for every employee', 'clear, compliant payslips delivered each pay period'],
+      ['RTI submissions to HMRC', 'Full Payment Submissions filed on or before every payday'],
+      ['Pension auto-enrolment', 'assessment, enrolment and ongoing contributions handled for you'],
+      ['Starters, leavers & year end', 'P45s, P60s and end-of-year reporting all taken care of'],
+    ],
+    callout: 'Directors’ payroll: running a limited company? We will set the most tax-efficient mix of salary and dividends alongside your payroll, so you keep more of what you earn.',
+    faqs: [
+      ['How much notice do you need for each pay run?', 'Send us hours and any changes a couple of working days before payday and everything will be ready on time. For fixed salaries with no changes, it runs automatically.'],
+      ['Can you handle pension auto-enrolment?', 'Yes — assessment of your workforce, letters to staff, enrolment with your pension provider and the ongoing contribution submissions each pay period.'],
+      ['We already run payroll — is switching painful?', 'No. We take over mid-year regularly: we collect the year-to-date figures from your current provider or software and carry straight on.'],
+    ],
+  },
+  {
+    slug: 'self-assessment',
+    name: 'Self Assessment & Tax Returns',
+    icon: 'selfassess',
+    short: 'Personal tax returns for the self-employed, landlords, investors and directors — filed accurately, on time, and never paying more than you owe.',
+    heroLede: 'Whether your income comes from self-employment, property, investments or several places at once, we prepare and file your return <strong>accurately and on time</strong> — and make sure you claim everything you are entitled to.',
+    intro: [
+      'Every January, millions of people rush a tax return they have dreaded all year — and miss reliefs and expenses they could legitimately claim. A good accountant usually saves more than they cost, and removes the deadline stress entirely.',
+      'We handle self assessment for clients whose income comes from salaries, pensions and wages, investments and savings, self-employment, property, capital gains and professional fees. Wherever your income comes from, we work out exactly what you owe — and what you can claim back.',
+    ],
+    included: [
+      ['HMRC registration', 'new to self assessment? We register you and obtain your UTR'],
+      ['Income from every source', 'employment, self-employment, pensions, savings, investments, property and capital gains'],
+      ['Allowances & reliefs', 'every legitimate expense and relief claimed, nothing left on the table'],
+      ['Accurate tax computation', 'know exactly what you owe — or what HMRC owes you — before the deadline'],
+      ['Online filing with HMRC', 'your return filed electronically, with confirmation the moment it lands'],
+      ['Deadline reminders', 'we track the dates so 31 January never sneaks up on you again'],
+    ],
+    callout: 'Left it late? We regularly turn returns around close to the deadline — get in touch even if January is already upon you.',
+    faqs: [
+      ['Do I need to file a self assessment return?', 'Usually yes if you are self-employed, a company director with untaxed income, a landlord, a higher earner with investment income, or you have capital gains. If you are not sure, ask us — it takes five minutes to check.'],
+      ['What do you need from me?', 'A record of your income for the year — invoices, statements, P60/P45, rental income and expenses. Send what you have; we will tell you if anything is missing.'],
+      ['Can you deal with HMRC on my behalf?', 'Yes. As your registered agent we correspond with HMRC directly, so letters and queries come to us first.'],
+    ],
+  },
+  {
+    slug: 'vat-returns',
+    name: 'VAT Returns',
+    icon: 'vat',
+    short: 'VAT registration, the right scheme for your business and accurate quarterly returns — fully Making Tax Digital compliant.',
+    heroLede: 'VAT is one of the easiest taxes to get wrong and one of the costliest to get wrong repeatedly. We keep you <strong>registered, compliant and on the right scheme</strong> — with every return filed on time under Making Tax Digital.',
+    intro: [
+      'From the moment your turnover approaches the registration threshold, VAT becomes a quarterly obligation with real penalties attached. The rules change often, and the scheme you choose — standard, flat rate or cash accounting — can make a genuine difference to your cash flow.',
+      'Our team stays current with the latest VAT regulations so you don’t have to. We prepare and file your returns from clean bookkeeping data, and we deal with HMRC if they ever have questions.',
+    ],
+    included: [
+      ['VAT registration & deregistration', 'registered at the right time, deregistered when it no longer serves you'],
+      ['Scheme advice', 'standard, flat rate, cash accounting or annual — we pick what suits your business'],
+      ['Quarterly VAT returns', 'prepared from reconciled books and filed before the deadline, every quarter'],
+      ['Making Tax Digital', 'fully MTD-compliant filing through recognised software'],
+      ['EC sales & special cases', 'imports, exports, reverse charge and margin schemes handled correctly'],
+      ['HMRC correspondence', 'queries, inspections and repayments dealt with on your behalf'],
+    ],
+    callout: 'On the wrong scheme, many businesses quietly overpay VAT for years. We review your position when we take you on — switching schemes has saved clients thousands.',
+    faqs: [
+      ['When do I have to register for VAT?', 'When your taxable turnover for the last 12 months passes the registration threshold, or you expect it to in the next 30 days. Register late and HMRC can backdate what you owe — talk to us before you reach the line.'],
+      ['What is Making Tax Digital?', 'HMRC’s requirement that VAT records are kept digitally and returns filed through compatible software. Our bookkeeping and filing are fully MTD-compliant, so you are covered automatically.'],
+      ['Can you take over a VAT dispute or inspection?', 'Yes. We act as your agent, prepare the paperwork HMRC asks for and manage the correspondence from start to finish.'],
+    ],
+  },
+  {
+    slug: 'annual-accounts',
+    name: 'Annual Accounts',
+    icon: 'accounts',
+    short: 'Year-end statutory accounts and corporation tax returns — filed with Companies House and HMRC, with the numbers explained in plain English.',
+    heroLede: 'Every company must file accounts — good companies use them. We prepare your <strong>year-end accounts and corporation tax return</strong>, file them with Companies House and HMRC, and sit down with you to explain what the numbers actually say.',
+    intro: [
+      'Statutory accounts are a legal obligation, but they are also the clearest annual picture of your business you will ever get. Prepared properly, they support your tax position, your borrowing power and your decisions for the year ahead.',
+      'We prepare accounts for limited companies, sole traders and partnerships — accurate, compliant and on time. And because we would rather you understand them than file-and-forget, we go through the headlines with you in plain English.',
+    ],
+    included: [
+      ['Statutory year-end accounts', 'prepared to the standards Companies House and HMRC require'],
+      ['Corporation tax return (CT600)', 'computed, checked for every allowance, and filed with HMRC'],
+      ['Companies House filing', 'accounts and confirmation statements submitted before the deadline'],
+      ['Sole trader & partnership accounts', 'year-end accounts that feed straight into your self assessment'],
+      ['Management accounts', 'optional monthly or quarterly reporting for a live view of performance'],
+      ['Cash flow forecasts', 'see what is coming before it arrives — essential for growth and borrowing'],
+    ],
+    callout: 'Deadline pressure? Late filing penalties start the day after your accounts are due and escalate from there. If your year end has been and gone, contact us today — rescue jobs are our specialty.',
+    faqs: [
+      ['When are my company accounts due?', 'Normally nine months after your accounting year end for Companies House, with corporation tax payable at the same nine-month mark. We diarise every deadline the day you join us.'],
+      ['My records are a mess — can you still help?', 'Yes. We rebuild records from bank statements, invoices and whatever else exists. It happens more often than you would think, and it is always fixable.'],
+      ['Do I need an audit?', 'Most small companies are exempt. If you are near the thresholds we will tell you, and we can prepare fully audit-ready files when one is required.'],
+    ],
+  },
+  {
+    slug: 'company-formation',
+    name: 'Company Formation & Secretarial',
+    icon: 'formation',
+    short: 'Start your limited company properly — incorporation, share structure, registered office and every Companies House form thereafter.',
+    heroLede: 'Starting a company is easy. Starting it <strong>properly</strong> — the right structure, the right shareholdings, the right registrations — saves you tax and trouble for years. We set it all up and keep it compliant.',
+    intro: [
+      'Forming a company is a ten-minute job online — and a surprising number of businesses spend years untangling the consequences of those ten minutes. Share structure, director duties, PAYE and VAT registrations, confirmation statements: the details matter.',
+      'We incorporate your company correctly from day one, register you for every tax you need, and then act as your company secretarial team so the ongoing paperwork never lands on your desk.',
+    ],
+    included: [
+      ['Company incorporation', 'name checks, formation documents and registration with Companies House'],
+      ['Share structure advice', 'the right classes and shareholdings for tax efficiency and future growth'],
+      ['Tax registrations', 'corporation tax, PAYE and VAT set up as part of the package'],
+      ['Registered office & forms', 'all Companies House forms prepared and filed as your business changes'],
+      ['Confirmation statements', 'your annual statement filed accurately and on time, every year'],
+      ['Company secretarial service', 'directors’ changes, share transfers and statutory registers maintained'],
+    ],
+    callout: 'Not sure whether to go limited? We will run the numbers for your situation — sole trader versus limited company — before you commit either way. The consultation is free.',
+    faqs: [
+      ['How long does incorporation take?', 'Usually one working day once we have your details. We prepare everything, you approve it, and your company number arrives from Companies House shortly after.'],
+      ['What is a confirmation statement?', 'An annual filing confirming Companies House holds the correct details about your company — directors, shareholders, registered office. Miss it and the company can be struck off. We file it for you every year.'],
+      ['Can you fix a company that was set up wrong?', 'Almost always. Share reallocations, changes of registered office and correcting filed information are routine secretarial work for us.'],
+    ],
+  },
+  {
+    slug: 'tax-planning',
+    name: 'Tax Planning & Investigations',
+    icon: 'planning',
+    short: 'Proactive year-round tax planning, cash flow forecasts and calm, expert support if HMRC ever comes calling.',
+    heroLede: 'The best tax outcomes are planned, not discovered in January. We work with you <strong>through the year</strong> — structuring income, timing decisions and forecasting cash — and we stand beside you if HMRC opens an enquiry.',
+    intro: [
+      'Most tax is decided long before a return is filed: how you pay yourself, when you invest, how the business is structured. Proactive planning is where an accountant genuinely earns their fee — and it is the part reactive, once-a-year accounting always misses.',
+      'And if HMRC ever selects you for an enquiry, the difference between a stressful year and a managed process is having someone who deals with tax investigations calmly and often. We do.',
+    ],
+    included: [
+      ['Year-round tax planning', 'salary and dividend mix, timing of purchases, reliefs and allowances used in full'],
+      ['Business structure reviews', 'sole trader, partnership or limited — the right vehicle as you grow'],
+      ['Cash flow forecasts', 'forward-looking projections for confidence, growth plans and lenders'],
+      ['Year-end tax reports', 'clear statements of position before the year closes, while there is still time to act'],
+      ['Tax investigation support', 'full representation through HMRC enquiries, from first letter to resolution'],
+      ['HMRC correspondence', 'we are your registered agent — letters and calls come to us first'],
+    ],
+    callout: 'HMRC letter arrived? Don’t reply on your own. Send it to us the day it lands — early, well-handled responses shorten enquiries dramatically.',
+    faqs: [
+      ['When should tax planning happen?', 'Before your year end — that is when options are still open. We review each client’s position in good time so decisions can actually be made, not just regretted.'],
+      ['What triggers an HMRC investigation?', 'Some enquiries are random; others follow late filings, unusual figures or industry campaigns. Clean, consistent, well-filed records — our default — are the best protection there is.'],
+      ['Is this only for companies?', 'No. Landlords, sole traders, contractors and directors all benefit — often more, because personal and business tax interact.'],
+    ],
+  },
+];
+
+export const servicesNav = services.map(({ slug, name }) => ({ slug, name }));

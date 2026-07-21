@@ -9,6 +9,15 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 - **London Classic Aesthetics** — `london-classic-aesthetics/` (24 page redesign)
 - **Coveworks** — `coveworks/` folder, the studio's own animated site, editorial luxury edition (see `coveworks/README.md`)
 - **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, nine full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
+- **381 Accountants** — `381-accountants/` (12-page site for the Barking accountancy firm, see `381-accountants/README.md`)
+
+## Site: 381 Accountants (`381-accountants/`)
+
+A conversion-focused, multi-page site for 381 Accountancy & Bookkeeping Services Ltd (381accountants.com): home, services hub + 7 service pages, about, reviews (real Google quotes), contact with booking form. Navy + gold Trust & Authority design system, EB Garamond + IBM Plex Sans, scroll reveals, JSON-LD local-business schema.
+
+- Open `381-accountants/index.html` directly, or serve the repo root.
+- Pages are generated for consistency by `381-accountants/sitegen/build.mjs` (`node sitegen/build.mjs` from the site folder); the generated HTML is committed, so deployment needs no build step.
+- Booking forms open a pre-filled email to info@381abs.com — no backend needed; swap for a form service before launch if preferred.
 
 ## Site: London Classic Aesthetics (`london-classic-aesthetics/`)
 
