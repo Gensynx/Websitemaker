@@ -1,7 +1,7 @@
 /* Page bodies for the 381 Accountants site. */
 import {
   SITE, icon, stars5, breadcrumbs, bookingForm, ctaBanner,
-  quoteCards, ratingBanner, REVIEWS,
+  quoteCards, ratingBanner, REVIEWS, REVIEWS_ALL,
 } from './lib.mjs';
 import { services } from './content-services.mjs';
 
@@ -43,7 +43,7 @@ function statsBar() {
   <div class="wrap">
     <div class="trust-grid">
       <div class="trust-cell"><b data-count="${yearsExp}" data-suffix="+">${yearsExp}+</b><span>Years serving London</span></div>
-      <div class="trust-cell"><b data-count="5.0">5.0</b><span>Google rating, all five stars</span></div>
+      <div class="trust-cell"><b data-count="5.0">5.0</b><span>Google rating · ${SITE.reviewCount} reviews</span></div>
       <div class="trust-cell"><b data-count="7">7</b><span>Core services under one roof</span></div>
       <div class="trust-cell"><b>${SITE.established}</b><span>Independent firm, est. ${SITE.established}</span></div>
     </div>
@@ -60,7 +60,7 @@ export function homeBody(path = 'index.html') {
   <div class="wrap">
     <div class="hero-grid">
       <div>
-        <span class="eyebrow">Certified accountants · Barking &amp; Canary Wharf, London</span>
+        <span class="eyebrow">Certified accountants · Canary Wharf, London</span>
         <h1>Accounting &amp; bookkeeping in <em>safe hands</em> for ${yearsExp}+ years.</h1>
         <p class="hero-sub">${SITE.name} is an independent firm of certified accountants trusted by London businesses since <strong>${SITE.established}</strong>. From daily bookkeeping to year-end accounts and tax, we keep you compliant, informed and ahead, <strong>whatever your size</strong>.</p>
         <div class="hero-ctas">
@@ -173,7 +173,7 @@ ${statsBar()}
     <div class="section-head center rv">
       <span class="eyebrow">Client reviews</span>
       <h2>Rated five stars by the people who pay us</h2>
-      <p>Real reviews from our Google listing. Every one of them is five stars.</p>
+      <p>Real reviews from our Google listing: ${SITE.reviewCount} of them, every one five stars, many from clients of ten years and longer.</p>
     </div>
     ${ratingBanner()}
     <div class="quote-grid">
@@ -223,7 +223,7 @@ export function servicesHubBody(path = 'services/index.html') {
     <div class="faq" style="margin-inline:auto">
       <details class="rv"><summary>How do your fees work?${icon('plus')}</summary><p>We agree a fixed fee before any work starts, based on the services you need and the state of your records. No surprise invoices, no hourly meters running.</p></details>
       <details class="rv"><summary>Can you take over from my current accountant?${icon('plus')}</summary><p>Yes. Switching is easier than most people expect. With your permission we write to your current accountant for professional clearance and your records, and we handle the whole handover.</p></details>
-      <details class="rv"><summary>Do you only work with businesses near Barking?${icon('plus')}</summary><p>No. We are based in ${SITE.town} and work with clients across ${SITE.areas.slice(0, 7).join(', ')} and beyond. Cloud accounting means we can serve you wherever you are.</p></details>
+      <details class="rv"><summary>Do you only work with businesses near Canary Wharf?${icon('plus')}</summary><p>No. We are based at 30 Churchill Place in ${SITE.town} and work with clients across ${SITE.areas.slice(1, 8).join(', ')} and beyond. Cloud accounting means we can serve you wherever you are.</p></details>
       <details class="rv"><summary>My books are months behind. Is that a problem?${icon('plus')}</summary><p>It is a Tuesday. Backlogs, missed returns and HMRC letters are routine rescue work for us. The sooner you get in touch, the cheaper they are to fix.</p></details>
     </div>
   </div>
@@ -320,10 +320,10 @@ ${statsBar()}
     <div class="split">
       <div class="rv">
         <span class="eyebrow">Our story</span>
-        <h2 style="font-size:clamp(1.9rem,4vw,2.6rem);margin-top:14px">Built in Barking. Trusted across London.</h2>
+        <h2 style="font-size:clamp(1.9rem,4vw,2.6rem);margin-top:14px">East London roots. At home in Canary Wharf.</h2>
         <div style="display:grid;gap:16px;margin-top:22px;color:var(--text-muted)">
           <p>381 Accountants was established in ${SITE.established} as an independent firm of certified accountants with a simple mission: <strong style="color:var(--ink)">to provide an efficient and proactive service to every client, and to assure them they are investing in the right accountants, regardless of size.</strong></p>
-          <p>From our office at Fortis House in Barking we serve sole traders, landlords, contractors and limited companies across ${SITE.areas.slice(0, 6).join(', ')} and the wider London area. Our senior team’s experience in the industry stretches back more than 25 years, through every change in tax law, filing regime and software along the way.</p>
+          <p>From our office at 30 Churchill Place in Canary Wharf we serve sole traders, landlords, contractors and limited companies across ${SITE.areas.slice(0, 6).join(', ')} and the wider London area. Our senior team’s experience in the industry stretches back more than 25 years, through every change in tax law, filing regime and software along the way.</p>
           <p>Clients come to us for a tax return or a tidy-up, and stay for years. Our Google reviews tell that story better than we can: five stars across the board, with reviewers citing professionalism, trustworthiness, responsiveness, accuracy and value for money.</p>
         </div>
         <div class="hero-ctas" style="margin-top:28px">
@@ -335,7 +335,7 @@ ${statsBar()}
         <div class="cred-card"><span class="svc-icon">${icon('shield')}</span><div><b>Certified accountants</b><span>An independent, certified firm registered in England &amp; Wales, no. ${SITE.companyNo}</span></div></div>
         <div class="cred-card"><span class="svc-icon">${icon('cloud')}</span><div><b>Sage &amp; QuickBooks</b><span>Cloud accounting on Sage One, Sage 50 and QuickBooks as standard</span></div></div>
         <div class="cred-card"><span class="svc-icon">${icon('star')}</span><div><b>5.0 on Google</b><span>Unanimous five-star rating from verified client reviews</span></div></div>
-        <div class="cred-card"><span class="svc-icon">${icon('pin')}</span><div><b>London roots</b><span>${SITE.address}, ${SITE.town} ${SITE.postcode}, serving all of Greater London</span></div></div>
+        <div class="cred-card"><span class="svc-icon">${icon('pin')}</span><div><b>Canary Wharf address</b><span>30 Churchill Place, London ${SITE.postcode}, serving all of Greater London</span></div></div>
       </div>
     </div>
   </div>
@@ -381,8 +381,8 @@ export function reviewsBody(path = 'reviews.html') {
 <section class="page-hero">
   <div class="wrap">
     ${breadcrumbs(path, [['Home', 'index.html'], ['Reviews', '']])}
-    <h1>Five stars, every time</h1>
-    <p class="lede">We could tell you we are professional, responsive and worth the money, but our clients already did, in public, on Google. <strong>Every review we have is five stars.</strong></p>
+    <h1>Five stars, ${SITE.reviewCount} times over</h1>
+    <p class="lede">We could tell you we are professional, responsive and worth the money, but our clients already did, in public, on Google. <strong>${SITE.reviewCount} reviews, a 5.0 rating, and every single one five stars.</strong></p>
     <div class="hero-ctas">
       <a class="btn btn-gold" href="${SITE.google}" target="_blank" rel="noopener">See our reviews on Google ${icon('arrow')}</a>
     </div>
@@ -396,9 +396,22 @@ export function reviewsBody(path = 'reviews.html') {
       ${quoteCards()}
     </div>
     <div class="praise-row rv">
-      ${['Professionalism', 'Trustworthiness', 'Responsiveness', 'Accuracy', 'Value for money'].map((p) => `<span class="praise-chip">${icon('check')} ${p}</span>`).join('\n      ')}
+      ${['Fast response', 'Professional team', 'Cooperative staff', 'Value for money', 'Trustworthy advice'].map((p) => `<span class="praise-chip">${icon('check')} ${p}</span>`).join('\n      ')}
     </div>
-    <p class="divider-note rv">${icon('google')} The themes above appear again and again in our Google reviews, quoted verbatim and lightly tidied for spelling only.</p>
+    <p class="divider-note rv">${icon('google')} The topics above are the ones Google highlights across our ${SITE.reviewCount} reviews. Quotes are shown with the reviewers’ published names, lightly tidied for spelling only.</p>
+  </div>
+</section>
+
+<section class="section muted-section">
+  <div class="wrap">
+    <div class="section-head center rv">
+      <span class="eyebrow">Straight from Google</span>
+      <h2>In their own words</h2>
+      <p>A selection from the ${SITE.reviewCount} five-star reviews on our Google listing. Clients of a year, of a decade, and of twenty-five.</p>
+    </div>
+    <div class="review-wall">
+      ${quoteCards(REVIEWS_ALL, false)}
+    </div>
   </div>
 </section>
 
@@ -409,14 +422,14 @@ export function reviewsBody(path = 'reviews.html') {
         <span class="eyebrow">The long version</span>
         <h2 style="font-size:clamp(1.8rem,3.6vw,2.4rem);margin-top:14px">Clients don’t just rate us. They stay.</h2>
         <div style="display:grid;gap:14px;margin-top:18px;color:var(--text-muted)">
-          <p>The review we are proudest of is not a sentence. It is a duration. Reviewers describe working with us for <strong style="color:var(--ink)">five, ten and more years</strong>, and relationships with our senior team stretch back over two decades.</p>
+          <p>The review we are proudest of is not a sentence. It is a duration. Reviewers describe working with us for <strong style="color:var(--ink)">five, ten, even twenty-five years</strong>: Priscila since 2011, Sofia since 2012, Srinivas since 2013, and Gulsara for over two decades.</p>
           <p>Accountancy is a trust business. You are handing over the numbers your livelihood depends on, and the only honest evidence anyone can offer is a track record. Ours is public, unanimous and growing.</p>
         </div>
       </div>
       <div class="cred-stack rv rv-d1">
-        <div class="cred-card"><span class="svc-icon">${icon('star')}</span><div><b>5.0 average rating</b><span>Every Google review left for us is five stars</span></div></div>
-        <div class="cred-card"><span class="svc-icon">${icon('users')}</span><div><b>Clients for the long run</b><span>“Used them for over 5 years now and never had a problem.”</span></div></div>
-        <div class="cred-card"><span class="svc-icon">${icon('handshake')}</span><div><b>Recommended onward</b><span>“Would gladly recommend”: the phrase that keeps appearing</span></div></div>
+        <div class="cred-card"><span class="svc-icon">${icon('star')}</span><div><b>5.0 from ${SITE.reviewCount} reviews</b><span>Every Google review left for us is five stars</span></div></div>
+        <div class="cred-card"><span class="svc-icon">${icon('users')}</span><div><b>Clients for the long run</b><span>“I have been with this firm over 25 years.” Gulsara Sarah Wennell</span></div></div>
+        <div class="cred-card"><span class="svc-icon">${icon('handshake')}</span><div><b>Recommended onward</b><span>“I would highly recommend them to anyone needing accounting services.” Dustin Clark</span></div></div>
       </div>
     </div>
   </div>

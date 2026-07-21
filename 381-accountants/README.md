@@ -1,8 +1,8 @@
 # 381 Accountants — website
 
 A 12-page, conversion-focused site for **381 Accountancy & Bookkeeping Services Ltd**
-(trading as 381 Accountants), the certified accountancy firm at Fortis House,
-160 London Road, Barking IG11 8BB — serving clients across London since 2010.
+(trading as 381 Accountants), the certified accountancy firm at 30 Churchill
+Place, Canary Wharf, London E14 5RE, serving clients across London since 2010.
 
 Everything a visitor needs to become a client: hero with the main service and
 16+ years of experience, a booking section listing every service, testimonials
@@ -29,12 +29,12 @@ services/tax-planning.html          ┘
 ## Business facts used (sourced July 2026)
 
 - Legal name: 381 Accountancy & Bookkeeping Services Ltd, company no. 07327043, incorporated 27 July 2010
-- Address: 329 Fortis House, 160 London Road, Barking IG11 8BB · Mon–Fri 9:00–17:30
+- Address: 10th Floor, Office 104, Suite 10, 30 Churchill Place, Canary Wharf, London E14 5RE · Mon–Fri 9:00–17:30
 - Phones: 020 8214 1259 · 020 3129 8066 · Email: info@381abs.com
 - Software: Sage One, Sage 50, QuickBooks
-- Testimonials are real Google reviews (lightly tidied for spelling only);
-  attributions are anonymised ("Verified client · Google review") because
-  reviewer names weren't confirmed — swap in names/photos if the firm approves.
+- Testimonials are real Google reviews (5.0 from 42 reviews), quoted with the
+  reviewers' published names and lightly tidied for spelling only. Three are
+  featured on the home page; reviews.html carries a wall of eighteen more.
 
 ## Design system
 

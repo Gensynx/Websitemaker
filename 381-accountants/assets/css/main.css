@@ -487,6 +487,10 @@ a,button,summary,input[type=submit]{touch-action:manipulation}
 .quote-card figcaption svg{width:17px;height:17px;color:var(--green);flex:none}
 .quote-card figcaption b{color:inherit;font-weight:600}
 
+.review-wall{columns:3 300px;column-gap:22px}
+.review-wall .quote-card{break-inside:avoid;-webkit-column-break-inside:avoid;margin:0 0 22px}
+.review-wall blockquote{font-size:1.07rem}
+
 .praise-row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:clamp(28px,4vw,40px)}
 .praise-chip{
   display:inline-flex;align-items:center;gap:8px;padding:9px 17px;border-radius:999px;

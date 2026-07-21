@@ -12,14 +12,15 @@ export const SITE = {
   phone2: '020 3129 8066',
   phone2tel: '+442031298066',
   email: 'info@381abs.com',
-  address: '329 Fortis House, 160 London Road',
-  town: 'Barking',
-  postcode: 'IG11 8BB',
+  address: '10th Floor, Office 104, Suite 10, 30 Churchill Place',
+  town: 'Canary Wharf',
+  postcode: 'E14 5RE',
   hours: 'Mon–Fri 9:00–17:30',
-  google: 'https://www.google.com/search?q=381+Accountancy+%26+Bookkeeping+Services+Ltd+Barking+reviews',
+  reviewCount: 42,
+  google: 'https://www.google.com/search?q=381+Accountancy+%26+Bookkeeping+Services+Ltd+Canary+Wharf+reviews',
   maps: 'https://www.google.com/maps/search/?api=1&query=' +
-    encodeURIComponent('381 Accountancy & Bookkeeping Services Ltd, Fortis House, 160 London Road, Barking IG11 8BB'),
-  areas: ['Barking', 'Dagenham', 'Ilford', 'Canary Wharf', 'Woodford', 'Bexley', 'Romford', 'East London', 'Greater London', 'Essex'],
+    encodeURIComponent('381 Accountancy & Bookkeeping Services Ltd, 30 Churchill Pl, Canary Wharf, London E14 5RE'),
+  areas: ['Canary Wharf', 'Barking', 'Ilford', 'Dagenham', 'Woodford', 'Bexley', 'Romford', 'East London', 'Greater London', 'Essex'],
 };
 
 /* ---------------- Icons (1.5px stroke, 24 grid) ---------------- */
@@ -175,7 +176,7 @@ function footer_(path, servicesNav) {
       <div class="footer-col">
         <h4>Get in touch</h4>
         <ul class="footer-contact">
-          <li>${icon('pin')} <span>${SITE.address},<br>${SITE.town}, ${SITE.postcode}</span></li>
+          <li>${icon('pin')} <span>${SITE.address},<br>${SITE.town}, London ${SITE.postcode}</span></li>
           <li>${icon('phone')} <span><a href="tel:${SITE.phone1tel}">${SITE.phone1}</a> · <a href="tel:${SITE.phone2tel}">${SITE.phone2}</a></span></li>
           <li>${icon('mail')} <a href="mailto:${SITE.email}">${SITE.email}</a></li>
           <li>${icon('clock')} <span>${SITE.hours}</span></li>
@@ -272,27 +273,125 @@ export function ctaBanner(path, { title = 'Ready to hand your numbers to safe ha
 </section>`;
 }
 
-/* Real Google reviews (lightly tidied for spelling only). */
+/* Real Google reviews, quoted with the reviewers’ published names and
+   lightly tidied for spelling only. The first three are featured on the
+   home page; the full wall appears on reviews.html. */
 export const REVIEWS = [
   {
-    text: 'Very responsive, polite and efficient team and service from the very beginning. Very glad I have chosen them and would gladly recommend!',
-    who: 'Google review · 5.0',
+    text: 'Very professional, specialised, trustworthy and friendly service. Fast and quick response to any question. I strongly recommend to new customers and clients. I have been with this firm over 25 years and I would never change to a different accountant.',
+    name: 'Gulsara Sarah Wennell',
+    meta: 'Client for over 25 years',
   },
   {
-    text: 'I had my tax return done with 381 Accountants. I must say they know what they are doing. I definitely recommend 381 Accountants for tax advice.',
-    who: 'Google review · Self assessment client',
+    text: 'I’ve been using 381 accountants for nearly 7 years. They’ve always provided an excellent service. They are efficient, fast and reliable and also great with giving advice that could benefit your business. I would highly recommend them.',
+    name: 'Sima Akram',
+    meta: 'Client for 7 years',
   },
   {
-    text: 'Used them for over 5 years now and never had a problem. I would highly recommend them to anyone needing accounting services.',
-    who: 'Google review · Long-term client',
+    text: 'Been with 381 Accountancy for a decade now; I have never come across such professionalism. My accountant is very down to earth. Very reliable service, always there to help, no messing around!',
+    name: 'Zulfiqar Ali',
+    meta: 'Client for 10 years',
   },
 ];
 
-export function quoteCards(revs = REVIEWS) {
-  return revs.map((q, i) => `<figure class="quote-card rv${i ? ` rv-d${i}` : ''}">
+export const REVIEWS_ALL = [
+  {
+    text: 'Habib and team offer an amazing service. I have used them for over 5 years now and never had a problem. I would highly recommend them to anyone needing accounting services.',
+    name: 'Dustin Clark',
+    meta: 'Client for 5+ years',
+  },
+  {
+    text: 'We have been using 381 accountancy service for more than 10 years. One of the best decisions we have taken to go with this company.',
+    name: 'Ram Krish',
+    meta: 'Client for 10+ years',
+  },
+  {
+    text: 'I have been using 381 Accountancy service for 5 years now. They have always been very professional, extremely knowledgeable and efficient. They are always available to answer any questions and help resolve any issues promptly. I would recommend them highly.',
+    name: 'William Punter',
+    meta: 'Client for 5 years',
+  },
+  {
+    text: 'Since 2013 we’ve been with the 381 Accountancy & Bookkeeping family. An amazing service provided by Habib and the entire team; the value they give to their customers is remarkable.',
+    name: 'Universal Electronic Limited',
+    meta: 'Business client since 2013',
+  },
+  {
+    text: 'I use them since 2011 and they have never let me down. Trusting and efficient, this is how I describe their services. Thank you so much!',
+    name: 'Priscila Currie',
+    meta: 'Client since 2011',
+  },
+  {
+    text: 'I have been using 381 Accountants since 2017 and never had any issues with them. I found the team very professional and organised, and they are proactive rather than reactive.',
+    name: 'Ajaz Ul Hussin',
+    meta: 'Client since 2017',
+  },
+  {
+    text: 'I’m using this accountancy service for the last 5 years, for my company and for self employment, and found them extremely cooperative and professional in every aspect. Their rates are also competitive with any top-class UK accountancy firm.',
+    name: 'Amir Kh',
+    meta: 'Company & self-employed client',
+  },
+  {
+    text: 'I have been with 381 Accountancy since 2013. They are extremely professional in the accounting process and always respond promptly to my queries. I would definitely recommend this service.',
+    name: 'Srinivas Marisetti',
+    meta: 'Client since 2013',
+  },
+  {
+    text: 'Extremely responsive and prompt, professional integrity, solid competence and advice, very proactive. Above all a joy to work with. 10/10.',
+    name: 'Shubh',
+    meta: 'Google review',
+  },
+  {
+    text: 'Very professional, very helpful and honest, good value for money, and gives great advice. Would definitely recommend Habib and his team at 381 Accountants.',
+    name: 'Zoob Khan',
+    meta: 'Google review',
+  },
+  {
+    text: 'Best service ever seen so far. Very professional and prompt. Very helpful with my first tax returns. Will try them again next year.',
+    name: 'Taqweem Mirza',
+    meta: 'First-time self assessment client',
+  },
+  {
+    text: 'We’ve been working with them since 2012, always very helpful and professional. A pleasure to work with.',
+    name: 'Sofia Gouveia',
+    meta: 'Client since 2012',
+  },
+  {
+    text: 'The best accountancy service provider. Peace of mind, accuracy and no hidden charges. Highly recommended.',
+    name: 'Knowledge Bank',
+    meta: 'Google review',
+  },
+  {
+    text: 'Super helpful, helping with a self assessment on very short notice!',
+    name: 'Carlo Rizzo',
+    meta: 'Self assessment client',
+  },
+  {
+    text: 'Great price. Fast, professional, and hassle-free. Highly recommended.',
+    name: 'Waleed Nawaz',
+    meta: 'Google review',
+  },
+  {
+    text: 'I would highly recommend them as tax consultant and accountant. They are very professional and reliable.',
+    name: 'Qasim Mehmood',
+    meta: 'Google review',
+  },
+  {
+    text: 'Excellent service and they know their job thoroughly. Lucky to have such a good accountant.',
+    name: 'Muhammad Tareen',
+    meta: 'Google review',
+  },
+  {
+    text: 'Excellent and reliable work, always there to help in times of difficulty. A great accountant; I will recommend them to anyone.',
+    name: 'Calm Souls',
+    meta: 'Google review',
+  },
+];
+
+export function quoteCards(revs = REVIEWS, stagger = true) {
+  return revs.map((q, i) => `<figure class="quote-card rv${stagger && i % 3 ? ` rv-d${i % 3}` : ''}">
   <span class="q-stars" aria-label="5 out of 5 stars">${stars5}</span>
   <blockquote>${q.text}</blockquote>
-  <figcaption>${icon('shield')} <span><b>Verified client</b> · ${q.who}</span></figcaption>
+  <figcaption>${icon('google')} <span><b>${q.name}</b> · ${q.meta} · Google review</span></figcaption>
 </figure>`).join('\n');
 }
 
@@ -300,6 +399,6 @@ export function ratingBanner() {
   return `<div class="rating-banner rv">
   <span class="stars" aria-hidden="true">${stars5}</span>
   <b>5.0 on Google</b>
-  <span>Unanimous five-star rating from our clients</span>
+  <span>${SITE.reviewCount} reviews, every one of them five stars</span>
 </div>`;
 }

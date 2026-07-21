@@ -9,7 +9,7 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 - **London Classic Aesthetics** — `london-classic-aesthetics/` (24 page redesign)
 - **Coveworks** — `coveworks/` folder, the studio's own animated site, editorial luxury edition (see `coveworks/README.md`)
 - **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, nine full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
-- **381 Accountants** — `381-accountants/` (12-page site for the Barking accountancy firm, see `381-accountants/README.md`)
+- **381 Accountants** — `381-accountants/` (12-page site for the Canary Wharf accountancy firm, see `381-accountants/README.md`)
 
 ## Site: 381 Accountants (`381-accountants/`)
 
