@@ -1773,8 +1773,8 @@ body.works-open main,body.works-open footer,body.works-open header{opacity:0;poi
         <div>
           <button class="btn primary" type="submit"><i class="fill"></i><span>Send it over</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
         </div>
-        <p class="form-ok" id="formOk">RECEIVED. WE WILL BE IN TOUCH SHORTLY.</p>
-        <p class="form-note">Demo form until it is wired to an inbox.</p>
+        <p class="form-ok" id="formOk">YOUR EMAIL APP HAS OPENED · HIT SEND TO FINISH.</p>
+        <p class="form-note">Sends via your own email app · or write to us directly at hello@coveworks.studio.</p>
       </form>
     </div>
   </section>
@@ -2997,6 +2997,12 @@ form.addEventListener('submit', function(e){
     if (!valid) ok = false;
   });
   if (ok){
+    var n = document.getElementById('cfName').value.trim();
+    var em = document.getElementById('cfEmail').value.trim();
+    var msg = document.getElementById('cfMsg').value.trim();
+    var subject = 'Project enquiry · ' + n;
+    var body = msg + '\n\n· ' + n + '\n· ' + em;
+    window.location.href = 'mailto:hello@coveworks.studio?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
     document.getElementById('formOk').classList.add('show');
     form.querySelectorAll('input,textarea').forEach(function(el){ el.value = ''; });
   }

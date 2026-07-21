@@ -43,8 +43,8 @@ The welcome screen has ambient drifting glows, a word by word title entrance and
 
 ## Content notes
 - The carousel shows live captures of every build in the repo, embedded in the file (~1.3 MB total).
-- `hello@coveworks.studio` is a placeholder and the contact form is a demo until wired to an inbox.
+- The contact form opens the visitor's email app with the message pre-filled, addressed to `hello@coveworks.studio`. Create that mailbox (or search-and-replace the address in `index.html`) before go-live.
 - Copy is dash free by request.
 
 ## Deploy
-Any static host. On GitHub Pages for this repo it lives at `/Websitemaker/coveworks-scifi/` once merged to `main`.
+Any static host. On GitHub Pages for this repo it lives at `/Websitemaker/coveworks-scifi/` once merged to `main`. For IONOS, upload `index.html` and `.htaccess` per the step-by-step guide in the repo root: `DEPLOY-IONOS.md`.
