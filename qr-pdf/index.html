@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR to PDF — make a scannable code for any PDF</title>
+<meta name="description" content="Point a QR code at a PDF. Generate, style, download as PNG or SVG, or print a poster. Runs entirely in your browser.">
+<style>
+  :root {
+    --bg: #f4f4f1;
+    --surface: #ffffff;
+    --surface-2: #faf9f7;
+    --ink: #17171b;
+    --muted: #6c6c78;
+    --line: #e4e3dd;
+    --accent: #4f46e5;
+    --accent-soft: #eef0ff;
+    --warn: #9a5b00;
+    --warn-soft: #fdf3e3;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(20,20,30,.05), 0 12px 32px -18px rgba(20,20,30,.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f0f13;
+      --surface: #17171d;
+      --surface-2: #1c1c24;
+      --ink: #f1f1f4;
+      --muted: #9b9baa;
+      --line: #2b2b35;
+      --accent: #8b85ff;
+      --accent-soft: #23233a;
+      --warn: #e7b169;
+      --warn-soft: #2a2118;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 16px 40px -20px rgba(0,0,0,.8);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-feature-settings: "kern" 1;
+  }
+  a { color: var(--accent); }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+  header.site {
+    padding: 56px 0 32px;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--muted); margin: 0 0 14px;
+  }
+  .eyebrow::before {
+    content: ""; width: 22px; height: 1px; background: currentColor; opacity: .6;
+  }
+  h1 {
+    margin: 0 0 10px;
+    font-size: clamp(30px, 5vw, 46px);
+    line-height: 1.08;
+    letter-spacing: -.025em;
+    font-weight: 640;
+  }
+  .lede { margin: 0; max-width: 62ch; color: var(--muted); font-size: 17px; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 400px);
+    gap: 28px;
+    align-items: start;
+    padding-bottom: 64px;
+  }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+  .panel { padding: 4px 0; }
+
+  .step { padding: 22px 24px; border-bottom: 1px solid var(--line); }
+  .step:last-child { border-bottom: 0; }
+  .step > h2 {
+    margin: 0 0 4px;
+    font-size: 13px; letter-spacing: .1em; text-transform: uppercase; font-weight: 620;
+    color: var(--muted);
+    display: flex; align-items: baseline; gap: 10px;
+  }
+  .step > h2 .n {
+    display: inline-grid; place-items: center;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: var(--accent-soft); color: var(--accent);
+    font-size: 11px; letter-spacing: 0;
+  }
+  .step > p.hint { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+
+  label.field { display: block; margin: 0 0 14px; }
+  label.field > span.lab {
+    display: block; font-size: 13px; font-weight: 560; margin-bottom: 6px;
+  }
+  input[type=text], input[type=url], select {
+    width: 100%; padding: 10px 12px;
+    background: var(--surface-2); color: var(--ink);
+    border: 1px solid var(--line); border-radius: 9px;
+    font: inherit; font-size: 15px;
+  }
+  input[type=text]:focus, input[type=url]:focus, select:focus {
+    outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent;
+  }
+  input[type=color] {
+    width: 100%; height: 40px; padding: 3px;
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px;
+  }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 560px) { .row { grid-template-columns: 1fr; } }
+
+  .seg {
+    display: inline-flex; padding: 3px; gap: 3px;
+    background: var(--surface-2); border: 1px solid var(--line); border-radius: 11px;
+    margin-bottom: 16px; flex-wrap: wrap;
+  }
+  .seg button {
+    appearance: none; border: 0; background: transparent; color: var(--muted);
+    font: inherit; font-size: 14px; font-weight: 540;
+    padding: 7px 14px; border-radius: 8px; cursor: pointer;
+  }
+  .seg button[aria-pressed=true] { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .drop {
+    border: 1.5px dashed var(--line); border-radius: 11px;
+    padding: 18px; text-align: center; color: var(--muted); font-size: 14px;
+    background: var(--surface-2); cursor: pointer; transition: border-color .15s, background .15s;
+  }
+  .drop:hover, .drop.over { border-color: var(--accent); background: var(--accent-soft); }
+  .drop strong { color: var(--ink); font-weight: 580; }
+
+  .callout {
+    margin-top: 14px; padding: 12px 14px; border-radius: 10px;
+    background: var(--surface-2); border: 1px solid var(--line);
+    font-size: 13.5px; color: var(--muted);
+  }
+  .callout code, code.url {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12.5px; color: var(--ink); word-break: break-all;
+  }
+  .callout.warn { background: var(--warn-soft); border-color: transparent; color: var(--warn); }
+  .callout.warn code { color: inherit; }
+
+  .checks { display: grid; gap: 10px; }
+  label.check { display: flex; gap: 10px; align-items: flex-start; font-size: 14.5px; cursor: pointer; }
+  label.check input { margin: 3px 0 0; accent-color: var(--accent); }
+  label.check span.sub { display: block; color: var(--muted); font-size: 13px; }
+
+  /* preview */
+  aside { position: sticky; top: 24px; }
+  @media (max-width: 900px) { aside { position: static; } }
+  .preview-body { padding: 24px; text-align: center; }
+  #stage {
+    display: inline-block; max-width: 100%;
+    border-radius: 10px; overflow: hidden; line-height: 0;
+  }
+  #stage canvas { max-width: 100%; height: auto; display: block; }
+  .meta {
+    margin: 16px 0 0; font-size: 12.5px; color: var(--muted);
+    display: flex; gap: 6px 14px; justify-content: center; flex-wrap: wrap;
+  }
+  .meta b { font-weight: 560; color: var(--ink); }
+  .target {
+    margin: 14px 0 0; padding: 10px 12px; border-radius: 9px;
+    background: var(--surface-2); border: 1px solid var(--line);
+    text-align: left; font-size: 12.5px; word-break: break-all;
+  }
+  .target span.lab { display: block; color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+
+  .actions { display: grid; gap: 8px; padding: 0 24px 24px; }
+  .actions .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  button.btn {
+    appearance: none; font: inherit; font-size: 14.5px; font-weight: 560;
+    padding: 11px 16px; border-radius: 10px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface-2); color: var(--ink);
+    transition: transform .08s ease, background .15s;
+  }
+  button.btn:hover { background: var(--accent-soft); }
+  button.btn:active { transform: translateY(1px); }
+  button.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.btn.primary:hover { filter: brightness(1.07); }
+  button.btn:disabled { opacity: .45; cursor: not-allowed; }
+  button.btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .error {
+    margin: 0 24px 20px; padding: 12px 14px; border-radius: 10px;
+    background: var(--warn-soft); color: var(--warn); font-size: 13.5px;
+  }
+
+  /* help */
+  .help { padding: 8px 0 80px; }
+  .help h2 { font-size: 22px; letter-spacing: -.015em; margin: 0 0 6px; }
+  .help > .wrap > p { color: var(--muted); max-width: 68ch; }
+  .steps3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 24px; }
+  @media (max-width: 760px) { .steps3 { grid-template-columns: 1fr; } }
+  .steps3 article { padding: 20px; }
+  .steps3 h3 { margin: 0 0 6px; font-size: 15px; }
+  .steps3 p { margin: 0; font-size: 14px; color: var(--muted); }
+  .steps3 .num { color: var(--accent); font-size: 12px; font-weight: 640; letter-spacing: .1em; }
+  pre.snippet {
+    margin: 20px 0 0; padding: 14px 16px; overflow-x: auto;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px;
+  }
+
+  footer.site { border-top: 1px solid var(--line); padding: 24px 0 48px; color: var(--muted); font-size: 13px; }
+
+  .visually-hidden {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+  }
+
+  /* print poster */
+  .poster { display: none; }
+  @media print {
+    body { background: #fff; color: #000; }
+    header.site, .layout, .help, footer.site { display: none !important; }
+    .poster {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 96vh; text-align: center; padding: 8vh 10vw;
+    }
+    .poster h1 { font-size: 40pt; letter-spacing: -.02em; margin: 0 0 8pt; }
+    .poster p.sub { font-size: 15pt; color: #444; margin: 0 0 28pt; }
+    .poster img { width: 62vw; max-width: 480pt; height: auto; }
+    .poster p.url { margin-top: 22pt; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 10pt; color: #555; word-break: break-all; }
+    @page { margin: 12mm; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <p class="eyebrow">Websitemaker tools</p>
+    <h1>Point a QR code at a PDF.</h1>
+    <p class="lede">
+      Paste the address of a PDF that is already online, or host one in this repo and let the tool
+      build the address for you. Style the code, then download it as a PNG or a print-ready SVG.
+      Everything runs in your browser: nothing is uploaded anywhere.
+    </p>
+  </div>
+</header>
+
+<div class="wrap">
+<div class="layout">
+
+  <section class="card panel">
+
+    <div class="step">
+      <h2><span class="n">1</span> Which PDF?</h2>
+      <div class="seg" role="group" aria-label="PDF source">
+        <button type="button" id="mode-url" aria-pressed="true">It is already online</button>
+        <button type="button" id="mode-host" aria-pressed="false">Host it in this repo</button>
+      </div>
+
+      <div id="pane-url">
+        <label class="field">
+          <span class="lab">Address of the PDF</span>
+          <input type="url" id="pdf-url" placeholder="https://example.com/files/menu.pdf"
+                 spellcheck="false" autocomplete="off">
+        </label>
+        <p class="callout" style="margin-top:0">
+          It must be a public address a phone can open. A <code>file:///</code> path from your own
+          computer will not work on anyone else's device.
+        </p>
+      </div>
+
+      <div id="pane-host" hidden>
+        <div class="drop" id="drop" tabindex="0" role="button"
+             aria-label="Choose a PDF file to read its name">
+          <strong>Drop a PDF here</strong> or click to pick one<br>
+          this only reads the file name — the file itself stays on your computer
+        </div>
+        <input type="file" id="file" accept="application/pdf,.pdf" class="visually-hidden">
+        <label class="field" style="margin-top:14px">
+          <span class="lab">File name</span>
+          <input type="text" id="pdf-name" placeholder="menu.pdf" spellcheck="false" autocomplete="off">
+        </label>
+        <label class="field">
+          <span class="lab">Where the site is published</span>
+          <input type="url" id="base-url" spellcheck="false" autocomplete="off">
+        </label>
+        <p class="callout">
+          Put the file in <code>qr-pdf/pdfs/</code> in the repo, commit, and push. Once the site
+          redeploys, that address is live and the code below will open it.
+        </p>
+      </div>
+    </div>
+
+    <div class="step" id="step-landing" hidden>
+      <h2><span class="n">2</span> Straight to the file, or via a landing page?</h2>
+      <p class="hint">A landing page shows a title and a download button, which reads better on a phone than a raw PDF.</p>
+      <div class="checks">
+        <label class="check">
+          <input type="radio" name="dest" value="direct" checked>
+          <span><b>Open the PDF directly</b>
+            <span class="sub">Scanning jumps straight into the document.</span></span>
+        </label>
+        <label class="check">
+          <input type="radio" name="dest" value="landing">
+          <span><b>Go via a landing page</b>
+            <span class="sub">Uses <code>view.html</code> in this folder: title, preview and a download button.</span></span>
+        </label>
+      </div>
+      <label class="field" id="landing-title-field" hidden style="margin-top:14px">
+        <span class="lab">Title on the landing page</span>
+        <input type="text" id="landing-title" placeholder="Spring menu" maxlength="120">
+      </label>
+    </div>
+
+    <div class="step">
+      <h2><span class="n" id="style-num">3</span> Style</h2>
+      <label class="field">
+        <span class="lab">Caption under the code <span style="color:var(--muted);font-weight:400">(optional, included in downloads)</span></span>
+        <input type="text" id="caption" placeholder="Scan for the menu" maxlength="60">
+      </label>
+      <div class="row">
+        <label class="field">
+          <span class="lab">Module shape</span>
+          <select id="shape">
+            <option value="square">Square</option>
+            <option value="rounded">Rounded</option>
+            <option value="dots">Dots</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="lab">Error correction</span>
+          <select id="ecl">
+            <option value="L">L — smallest code</option>
+            <option value="M" selected>M — standard</option>
+            <option value="Q">Q — hard wearing</option>
+            <option value="H">H — survives damage</option>
+          </select>
+        </label>
+      </div>
+      <div class="row">
+        <label class="field">
+          <span class="lab">Code colour</span>
+          <input type="color" id="fg" value="#17171b">
+        </label>
+        <label class="field">
+          <span class="lab">Background</span>
+          <input type="color" id="bg" value="#ffffff">
+        </label>
+      </div>
+      <div class="checks">
+        <label class="check">
+          <input type="checkbox" id="transparent">
+          <span><b>Transparent background</b>
+            <span class="sub">PNG and SVG only. Keep plenty of light space around the code when you place it.</span></span>
+        </label>
+      </div>
+      <p class="callout warn" id="contrast-warn" hidden></p>
+    </div>
+
+  </section>
+
+  <aside>
+    <div class="card">
+      <div class="preview-body">
+        <div id="stage"></div>
+        <p class="meta" id="meta"></p>
+        <div class="target" id="target"><span class="lab">Scanning opens</span><code class="url" id="target-url"></code></div>
+      </div>
+      <p class="error" id="error" hidden></p>
+      <div class="actions">
+        <button class="btn primary" id="dl-png" type="button">Download PNG</button>
+        <div class="pair">
+          <button class="btn" id="dl-svg" type="button">SVG</button>
+          <button class="btn" id="print" type="button">Print poster</button>
+        </div>
+        <button class="btn" id="copy" type="button">Copy the address</button>
+      </div>
+    </div>
+    <p style="font-size:12.5px;color:var(--muted);margin:14px 2px 0">
+      Scan it with your own phone before you print a hundred of them. Codes with a pale colour,
+      a dark background or a tight crop are the ones that fail in the wild.
+    </p>
+  </aside>
+
+</div>
+</div>
+
+<section class="help">
+  <div class="wrap">
+    <h2>Hosting a PDF in this repo</h2>
+    <p>
+      A QR code holds an address, not a file, so the PDF has to live somewhere a phone can reach.
+      If you do not already have a home for it, this repo works: it is published as a static site,
+      so anything committed is served as-is.
+    </p>
+    <div class="steps3">
+      <article class="card">
+        <p class="num">01</p>
+        <h3>Add the file</h3>
+        <p>Drop the PDF into <code>qr-pdf/pdfs/</code>. Lower-case names without spaces travel best: <code>spring-menu.pdf</code>.</p>
+      </article>
+      <article class="card">
+        <p class="num">02</p>
+        <h3>Commit and push</h3>
+        <p>The site redeploys on push. Open the address in a browser to confirm the PDF is live before printing anything.</p>
+      </article>
+      <article class="card">
+        <p class="num">03</p>
+        <h3>Generate and print</h3>
+        <p>Use the tool above with that file name. Keep the file name stable and you can replace the PDF later without reprinting the code.</p>
+      </article>
+    </div>
+    <pre class="snippet">qr-pdf/
+  index.html      this tool
+  view.html       optional landing page a code can point at
+  qr.js           the QR encoder
+  pdfs/
+    spring-menu.pdf     → https://your-site/qr-pdf/pdfs/spring-menu.pdf</pre>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="wrap">Part of the Websitemaker repo. No dependencies, no tracking, no uploads.</div>
+</footer>
+
+<!-- print-only poster -->
+<div class="poster" id="poster">
+  <h1 id="poster-title"></h1>
+  <p class="sub" id="poster-sub"></p>
+  <img id="poster-img" alt="">
+  <p class="url" id="poster-url"></p>
+</div>
+
+<script src="qr.js"></script>
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var state = {
+    mode: 'url',
+    url: '',
+    name: '',
+    base: '',
+    dest: 'direct',
+    landingTitle: '',
+    caption: '',
+    shape: 'square',
+    ecl: 'M',
+    fg: '#17171b',
+    bg: '#ffffff',
+    transparent: false
+  };
+
+  var QUIET = 4;          // quiet zone, in modules — 4 is the specified minimum
+  var current = null;     // last successfully generated symbol
+
+  // ---- default publish address -------------------------------------------------
+  // Served over http(s): this page's own folder is exactly right.
+  // Opened from disk: fall back to the repo's published address.
+  function defaultBase() {
+    if (location.protocol === 'http:' || location.protocol === 'https:') {
+      return location.href.replace(/[^/]*$/, '');
+    }
+    return 'https://gensynx.github.io/Websitemaker/qr-pdf/';
+  }
+
+  function trailingSlash(s) { return s.replace(/\/*$/, '/'); }
+
+  function cleanName(name) {
+    return name.replace(/^.*[\\/]/, '').trim();
+  }
+
+  // The address the QR code will carry.
+  function buildTarget() {
+    if (state.mode === 'url') return state.url.trim();
+    var name = cleanName(state.name);
+    if (!name) return '';
+    var base = trailingSlash((state.base || defaultBase()).trim());
+    var direct = base + 'pdfs/' + encodeURIComponent(name);
+    if (state.dest === 'direct') return direct;
+    var q = 'f=' + encodeURIComponent(name);
+    if (state.landingTitle.trim()) q += '&t=' + encodeURIComponent(state.landingTitle.trim());
+    return base + 'view.html?' + q;
+  }
+
+  // ---- drawing -----------------------------------------------------------------
+
+  function isFinderModule(x, y, size) {
+    return (x < 7 && y < 7) || (x >= size - 7 && y < 7) || (x < 7 && y >= size - 7);
+  }
+
+  // Caption height in module units, so exports scale with the code.
+  function captionModules(include) { return include !== false && state.caption.trim() ? 3.4 : 0; }
+
+  function drawTo(ctx, qr, scale, opts) {
+    opts = opts || {};
+    var size = qr.size;
+    var total = size + QUIET * 2;
+    var w = total * scale;
+    var capH = captionModules(opts.caption) * scale;
+
+    if (!(state.transparent && opts.allowTransparent)) {
+      ctx.fillStyle = state.bg;
+      ctx.fillRect(0, 0, w, w + capH);
+    }
+
+    ctx.fillStyle = state.fg;
+    var shape = state.shape;
+
+    for (var y = 0; y < size; y++) {
+      for (var x = 0; x < size; x++) {
+        if (!qr.modules[y][x]) continue;
+        var px = (x + QUIET) * scale, py = (y + QUIET) * scale;
+        // Finder patterns stay square whatever the style — detection depends on them.
+        if (shape === 'square' || isFinderModule(x, y, size)) {
+          ctx.fillRect(px, py, scale, scale);
+        } else if (shape === 'rounded') {
+          roundRect(ctx, px, py, scale, scale, scale * 0.28);
+          ctx.fill();
+        } else {
+          ctx.beginPath();
+          ctx.arc(px + scale / 2, py + scale / 2, scale * 0.46, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+    }
+
+    if (capH) {
+      ctx.fillStyle = state.fg;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'alphabetic';
+      var fontPx = scale * 1.7;
+      ctx.font = '500 ' + fontPx + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+      ctx.fillText(state.caption.trim(), w / 2, w + fontPx * 1.15, w - scale * 2);
+    }
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+
+  function makeCanvas(qr, scale, allowTransparent, withCaption) {
+    var total = qr.size + QUIET * 2;
+    var canvas = document.createElement('canvas');
+    canvas.width = total * scale;
+    canvas.height = total * scale + captionModules(withCaption) * scale;
+    var ctx = canvas.getContext('2d');
+    drawTo(ctx, qr, scale, { allowTransparent: allowTransparent, caption: withCaption });
+    return canvas;
+  }
+
+  function makeSvg(qr, scale) {
+    var size = qr.size;
+    var total = size + QUIET * 2;
+    var w = total * scale;
+    var capH = captionModules() * scale;
+    var parts = [];
+
+    parts.push('<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + (w + capH) +
+      '" viewBox="0 0 ' + w + ' ' + (w + capH) + '" shape-rendering="crispEdges">');
+    if (!state.transparent) {
+      parts.push('<rect width="100%" height="100%" fill="' + state.bg + '"/>');
+    }
+
+    var shape = state.shape;
+    if (shape === 'square') {
+      // Merge runs of dark modules in each row into single rects.
+      var d = [];
+      for (var y = 0; y < size; y++) {
+        var run = 0;
+        for (var x = 0; x <= size; x++) {
+          var dark = x < size && qr.modules[y][x];
+          if (dark) { run++; continue; }
+          if (run) {
+            d.push('M' + ((x - run + QUIET) * scale) + ' ' + ((y + QUIET) * scale) +
+                   'h' + (run * scale) + 'v' + scale + 'h-' + (run * scale) + 'z');
+            run = 0;
+          }
+        }
+      }
+      parts.push('<path fill="' + state.fg + '" d="' + d.join('') + '"/>');
+    } else {
+      var shapes = [];
+      for (var yy = 0; yy < size; yy++) {
+        for (var xx = 0; xx < size; xx++) {
+          if (!qr.modules[yy][xx]) continue;
+          var px = (xx + QUIET) * scale, py = (yy + QUIET) * scale;
+          if (isFinderModule(xx, yy, size)) {
+            shapes.push('<rect x="' + px + '" y="' + py + '" width="' + scale + '" height="' + scale + '"/>');
+          } else if (shape === 'rounded') {
+            shapes.push('<rect x="' + px + '" y="' + py + '" width="' + scale + '" height="' + scale +
+                        '" rx="' + (scale * 0.28).toFixed(2) + '"/>');
+          } else {
+            shapes.push('<circle cx="' + (px + scale / 2) + '" cy="' + (py + scale / 2) +
+                        '" r="' + (scale * 0.46).toFixed(2) + '"/>');
+          }
+        }
+      }
+      parts.push('<g fill="' + state.fg + '" shape-rendering="geometricPrecision">' + shapes.join('') + '</g>');
+    }
+
+    if (capH) {
+      var fontPx = scale * 1.7;
+      parts.push('<text x="' + (w / 2) + '" y="' + (w + fontPx * 1.15) + '" fill="' + state.fg +
+        '" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Helvetica, Arial, sans-serif"' +
+        ' font-size="' + fontPx + '" font-weight="500" text-anchor="middle">' +
+        escapeXml(state.caption.trim()) + '</text>');
+    }
+    parts.push('</svg>');
+    return parts.join('');
+  }
+
+  function escapeXml(s) {
+    return s.replace(/[<>&"']/g, function (c) {
+      return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;', "'": '&apos;' }[c];
+    });
+  }
+
+  // ---- contrast check ----------------------------------------------------------
+
+  function luminance(hex) {
+    var r = parseInt(hex.slice(1, 3), 16) / 255,
+        g = parseInt(hex.slice(3, 5), 16) / 255,
+        b = parseInt(hex.slice(5, 7), 16) / 255;
+    function lin(c) { return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+    return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  }
+
+  function contrastNote() {
+    var lf = luminance(state.fg), lb = luminance(state.bg);
+    if (state.transparent) lb = 1;   // assume it lands on something light
+    var ratio = (Math.max(lf, lb) + 0.05) / (Math.min(lf, lb) + 0.05);
+    if (lf > lb) return 'This code is lighter than its background. Most scanners expect dark modules on a light background and many will refuse to read an inverted code.';
+    if (ratio < 4) return 'Contrast is low (' + ratio.toFixed(1) + ':1). Aim for a ratio above 7:1 or scanners will struggle in poor light.';
+    if (ratio < 7) return 'Contrast is a little tight (' + ratio.toFixed(1) + ':1). It will read in good light; darken the code for anything printed.';
+    return '';
+  }
+
+  // ---- render ------------------------------------------------------------------
+
+  function render() {
+    var target = buildTarget();
+    var stage = $('stage'), err = $('error');
+
+    $('target').hidden = !target;
+    $('target-url').textContent = target;
+
+    var note = contrastNote();
+    $('contrast-warn').hidden = !note;
+    $('contrast-warn').textContent = note;
+
+    if (!target) {
+      stage.innerHTML = placeholder();
+      $('meta').textContent = '';
+      err.hidden = true;
+      current = null;
+      setButtons(false);
+      return;
+    }
+
+    try {
+      var qr = QR.encode(target, { ecl: state.ecl, boost: true });
+      current = qr;
+      err.hidden = true;
+    } catch (e) {
+      current = null;
+      err.hidden = false;
+      err.textContent = e.message;
+      setButtons(false);
+      return;
+    }
+
+    var scale = Math.max(4, Math.round(320 / (qr.size + QUIET * 2)));
+    var canvas = makeCanvas(qr, scale, false);
+    canvas.style.width = Math.min(320, canvas.width) + 'px';
+    canvas.setAttribute('role', 'img');
+    canvas.setAttribute('aria-label', 'QR code for ' + target);
+    stage.innerHTML = '';
+    stage.appendChild(canvas);
+
+    var eclUsed = { 0: 'L', 1: 'M', 2: 'Q', 3: 'H' }[qr.ecl.ord];
+    $('meta').innerHTML =
+      '<span>version <b>' + qr.version + '</b></span>' +
+      '<span><b>' + qr.size + '×' + qr.size + '</b> modules</span>' +
+      '<span>correction <b>' + eclUsed + '</b></span>' +
+      '<span><b>' + target.length + '</b> characters</span>';
+
+    setButtons(true);
+    updatePoster(target);
+  }
+
+  function placeholder() {
+    return '<div style="width:280px;height:280px;border:1.5px dashed var(--line);border-radius:10px;' +
+      'display:grid;place-items:center;color:var(--muted);font-size:13.5px;line-height:1.5;padding:20px;' +
+      'text-align:center;max-width:100%">Add the address of a PDF<br>and the code appears here</div>';
+  }
+
+  function setButtons(on) {
+    ['dl-png', 'dl-svg', 'print', 'copy'].forEach(function (id) { $(id).disabled = !on; });
+  }
+
+  function updatePoster(target) {
+    var title = (state.mode === 'host' && state.landingTitle.trim()) ||
+                state.caption.trim() || 'Scan me';
+    $('poster-title').textContent = title;
+    $('poster-sub').textContent = state.caption.trim() && state.caption.trim() !== title
+      ? state.caption.trim() : 'Point your camera at the code';
+    $('poster-url').textContent = target;
+    // Printed at a generous resolution so it stays sharp on paper. The caption is
+    // already the poster's heading, so it is left out of the image itself.
+    $('poster-img').src = makeCanvas(current, 12, false, false).toDataURL('image/png');
+  }
+
+  // ---- downloads ---------------------------------------------------------------
+
+  function fileStem() {
+    if (state.mode === 'host' && cleanName(state.name)) {
+      return cleanName(state.name).replace(/\.pdf$/i, '') + '-qr';
+    }
+    var t = buildTarget().replace(/^https?:\/\//, '').replace(/[^a-z0-9]+/gi, '-');
+    return (t.slice(0, 40).replace(/^-|-$/g, '') || 'qr-code') + '-qr';
+  }
+
+  function download(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+
+  $('dl-png').addEventListener('click', function () {
+    if (!current) return;
+    // ~1600px across: big enough for print, small enough to email.
+    var scale = Math.max(8, Math.round(1600 / (current.size + QUIET * 2)));
+    makeCanvas(current, scale, true).toBlob(function (blob) {
+      download(blob, fileStem() + '.png');
+    }, 'image/png');
+  });
+
+  $('dl-svg').addEventListener('click', function () {
+    if (!current) return;
+    var svg = makeSvg(current, 10);
+    download(new Blob([svg], { type: 'image/svg+xml' }), fileStem() + '.svg');
+  });
+
+  $('print').addEventListener('click', function () {
+    if (!current) return;
+    window.print();
+  });
+
+  $('copy').addEventListener('click', function () {
+    var target = buildTarget();
+    if (!target) return;
+    var btn = $('copy'), original = 'Copy the address';
+    function done(ok) {
+      btn.textContent = ok ? 'Copied' : 'Press ⌘/Ctrl+C';
+      setTimeout(function () { btn.textContent = original; }, 1600);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(target).then(function () { done(true); }, function () { done(false); });
+    } else {
+      done(false);
+    }
+  });
+
+  // ---- inputs ------------------------------------------------------------------
+
+  function setMode(mode) {
+    state.mode = mode;
+    $('mode-url').setAttribute('aria-pressed', String(mode === 'url'));
+    $('mode-host').setAttribute('aria-pressed', String(mode === 'host'));
+    $('pane-url').hidden = mode !== 'url';
+    $('pane-host').hidden = mode !== 'host';
+    $('step-landing').hidden = mode !== 'host';
+    $('style-num').textContent = mode === 'host' ? '3' : '2';
+    render();
+  }
+
+  $('mode-url').addEventListener('click', function () { setMode('url'); });
+  $('mode-host').addEventListener('click', function () { setMode('host'); });
+
+  function bind(id, key, transform) {
+    var el = $(id);
+    el.addEventListener('input', function () {
+      state[key] = transform ? transform(el) : el.value;
+      render();
+    });
+  }
+
+  bind('pdf-url', 'url');
+  bind('pdf-name', 'name');
+  bind('base-url', 'base');
+  bind('landing-title', 'landingTitle');
+  bind('caption', 'caption');
+  bind('shape', 'shape');
+  bind('ecl', 'ecl');
+  bind('fg', 'fg');
+  bind('bg', 'bg');
+  bind('transparent', 'transparent', function (el) { return el.checked; });
+
+  Array.prototype.forEach.call(document.querySelectorAll('input[name=dest]'), function (radio) {
+    radio.addEventListener('change', function () {
+      state.dest = radio.value;
+      $('landing-title-field').hidden = radio.value !== 'landing';
+      render();
+    });
+  });
+
+  // Picking a PDF only reads its name; the file never leaves the browser.
+  var drop = $('drop'), fileInput = $('file');
+  drop.addEventListener('click', function () { fileInput.click(); });
+  drop.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); }
+  });
+  fileInput.addEventListener('change', function () {
+    if (fileInput.files && fileInput.files[0]) takeFile(fileInput.files[0]);
+  });
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.add('over'); });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    drop.addEventListener(ev, function (e) { e.preventDefault(); drop.classList.remove('over'); });
+  });
+  drop.addEventListener('drop', function (e) {
+    var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) takeFile(f);
+  });
+
+  function takeFile(file) {
+    var name = cleanName(file.name);
+    $('pdf-name').value = name;
+    state.name = name;
+    if (!state.caption.trim()) {
+      var pretty = name.replace(/\.pdf$/i, '').replace(/[-_]+/g, ' ').trim();
+      if (pretty) {
+        var titled = pretty.charAt(0).toUpperCase() + pretty.slice(1);
+        $('landing-title').value = titled;
+        state.landingTitle = titled;
+      }
+    }
+    render();
+  }
+
+  // ---- init --------------------------------------------------------------------
+
+  state.base = defaultBase();
+  $('base-url').value = state.base;
+  if (location.protocol === 'file:') {
+    $('base-url').insertAdjacentHTML('afterend',
+      '<span class="sub" style="display:block;font-size:12.5px;color:var(--muted);margin-top:6px">' +
+      'This page was opened from disk, so the address above is a guess. Change it if the site lives elsewhere.</span>');
+  }
+
+  // Match the initial swatches to the current colour scheme.
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    // A QR code should stay dark-on-light even when the page is dark.
+    state.fg = '#000000';
+    $('fg').value = '#000000';
+  }
+
+  setMode('url');
+})();
+</script>
+</body>
+</html>

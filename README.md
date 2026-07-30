@@ -11,6 +11,17 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 - **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, nine full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
 - **381 Accountants** — `381-accountants/` (12-page site for the Canary Wharf accountancy firm, see `381-accountants/README.md`)
 - **381 Accountants premium** — `381-accountants-premium/` (dark, high-interaction edition: calculator, countdown, wizard, marquee; see its README)
+- **QR to PDF** — `qr-pdf/` (tool page: generate a QR code that opens a PDF, see `qr-pdf/README.md`)
+
+## Tool: QR to PDF (`qr-pdf/`)
+
+Generates a QR code pointing at a PDF: paste the address of one that is already online, or drop a
+file into `qr-pdf/pdfs/` and let the tool build the address from where the site is published.
+Downloads as PNG or SVG, or prints a poster. `view.html` is an optional landing page a code can
+point at instead of the raw file, with a title and a download button.
+
+- Open `qr-pdf/index.html` directly, or serve the repo root.
+- The QR encoder (`qr-pdf/qr.js`) is written from scratch — no libraries, no network calls, nothing uploaded.
 
 ## Site: 381 Accountants (`381-accountants/`)
 
