@@ -14,7 +14,12 @@
 
 export type CameraPreset = 'elevation' | 'three-quarter' | 'hardware';
 
-export const DEFAULT_CAMERA_PRESET: CameraPreset = 'three-quarter';
+/**
+ * Elevation, not three-quarter (Step 2.6). Alignment, proportion and sightline
+ * balance can only be judged square-on; a three-quarter opener flatters the
+ * product and hides exactly what a customer needs to check first.
+ */
+export const DEFAULT_CAMERA_PRESET: CameraPreset = 'elevation';
 
 const CODES: Record<CameraPreset, string> = {
   elevation: 'el',

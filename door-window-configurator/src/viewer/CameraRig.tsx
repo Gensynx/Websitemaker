@@ -118,17 +118,39 @@ export function CameraRig({
   }, [preset, presetToken, bounds, aspect, camera.fov]);
 
   useFrame((_, delta) => {
-    const pose = goal.current;
-    if (pose === null) return;
     const orbit = controls.current;
-    const settled = approach(camera.position, pose.position, delta);
-    if (orbit !== null) {
-      approach(orbit.target, pose.target, delta);
-      orbit.update();
+    const pose = goal.current;
+
+    if (pose === null) {
+      // Damping needs an update every frame, even with no input.
+      orbit?.update();
+      return;
     }
-    // Hand control back once it has arrived, so the customer's next drag is
-    // not fighting an animation.
-    if (settled) goal.current = null;
+
+    // OrbitControls rewrites camera.position from its own spherical state on
+    // every update, so lerping the position while it updates means the two
+    // fight and the camera settles somewhere that is neither pose — visibly
+    // off-square, which a three-quarter view hides and an elevation does not.
+    // Drive the camera directly while animating, and hand control back only
+    // once it has arrived.
+    if (orbit !== null) orbit.enabled = false;
+
+    const positionSettled = approach(camera.position, pose.position, delta);
+    const targetSettled = orbit === null ? true : approach(orbit.target, pose.target, delta);
+    camera.lookAt(orbit === null ? pose.target : orbit.target);
+
+    if (positionSettled && targetSettled) {
+      // Snap to the exact pose: an elevation that is a millimetre off-axis is
+      // still not an elevation.
+      camera.position.copy(pose.position);
+      if (orbit !== null) {
+        orbit.target.copy(pose.target);
+        orbit.enabled = true;
+        orbit.update();
+      }
+      camera.lookAt(pose.target);
+      goal.current = null;
+    }
   });
 
   return (

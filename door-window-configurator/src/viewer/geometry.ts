@@ -20,6 +20,7 @@ import type {
   ConfigState,
   DoorConfigState,
   PanelDetail,
+  SashOpening,
   WindowConfigState,
 } from '../config/types';
 import type { Mm } from '../config/units';
@@ -140,6 +141,24 @@ export function distribute(span: Mm, weights: number[], divider: Mm): Array<{ of
   });
 }
 
+/**
+ * The rectangle a light's glazing and furniture actually occupy: the cell,
+ * less the sash section where the light opens.
+ *
+ * Checking containment against the whole cell is too loose to be useful — the
+ * sash inset is wide enough to swallow a stray part and the test passes while
+ * the render is wrong.
+ */
+export function windowLightRects(config: WindowConfigState): Rect[] {
+  if (config.style.id !== 'casement' && config.style.id !== 'tilt-and-turn') return [];
+  const frame = sightlines(config.material);
+  const grid = config.style.options.grid;
+  return windowCellRects(config).map((rect, index) => {
+    const cell = grid.cells[index];
+    return cell !== undefined && cell.opening !== 'fixed' ? inset(rect, frame.sash) : rect;
+  });
+}
+
 /* ------------------------------------------------------------------ *
  * Doors
  * ------------------------------------------------------------------ */
@@ -213,34 +232,71 @@ function buildDoor(config: DoorConfigState, frame: Sightlines): Part[] {
 function buildLeaf(config: DoorConfigState, frame: Sightlines, rect: Rect): Part[] {
   const parts: Part[] = [];
   const z = frame.leafThickness / 2;
-  parts.push(box('leaf', 'leaf', rect, z, frame.leafThickness));
-
   const style = config.style;
-  if (style.id !== 'solid-panel') {
-    const aperture = style.options.aperture;
-    const glazed: Rect =
-      style.id === 'full-glazed'
-        ? inset(rect, aperture.inset)
-        : {
-            x: rect.x + aperture.inset,
-            y: rect.y + rect.height * (1 - style.options.glazedFraction),
-            width: rect.width - aperture.inset * 2,
-            height: rect.height * style.options.glazedFraction - aperture.inset,
-          };
-    parts.push(...glazedArea('leaf-aperture', glazed, aperture.bars, z, frame));
+
+  // A glazed leaf is stiles and rails around a hole, not a slab with a pane
+  // laid on it. Glass inside an opaque box is invisible — the same mistake as
+  // burying the raised panels, and again only a square-on render shows it.
+  switch (style.id) {
+    case 'solid-panel':
+      parts.push(box('leaf', 'leaf', rect, z, frame.leafThickness));
+      parts.push(...buildPanelDetail(style.options.panelDetail, rect, frame, frame.leafThickness));
+      break;
+
+    case 'full-glazed': {
+      const aperture = style.options.aperture;
+      parts.push(...frameMembers('leaf', 'leaf', rect, aperture.inset, z, frame.leafThickness));
+      parts.push(...glazedArea('leaf-aperture', inset(rect, aperture.inset), aperture.bars, z, frame));
+      break;
+    }
+
+    case 'half-glazed': {
+      const aperture = style.options.aperture;
+      const solidHeight = rect.height * (1 - style.options.glazedFraction);
+      const solid: Rect = { ...rect, height: solidHeight };
+      const glazed: Rect = {
+        x: rect.x,
+        y: rect.y + solidHeight,
+        width: rect.width,
+        height: rect.height - solidHeight,
+      };
+
+      parts.push(...frameMembers('leaf-upper', 'leaf', glazed, aperture.inset, z, frame.leafThickness));
+      parts.push(...glazedArea('leaf-aperture', inset(glazed, aperture.inset), aperture.bars, z, frame));
+
+      parts.push(box('leaf', 'leaf', solid, z, frame.leafThickness));
+      parts.push(...buildPanelDetail(style.options.panelDetail, solid, frame, frame.leafThickness));
+      break;
+    }
   }
 
-  // Panel detailing sits on the solid part of the leaf.
-  if (style.id !== 'full-glazed') {
-    const solid: Rect =
-      style.id === 'solid-panel'
-        ? rect
-        : { ...rect, height: rect.height * (1 - style.options.glazedFraction) };
-    parts.push(...buildPanelDetail(style.options.panelDetail, solid, frame, frame.leafThickness));
-  }
-
-  parts.push(...buildDoorHardware(config, frame, rect, z));
+  parts.push(...buildDoorHardware(config, rect, solidRegion(config, frame, rect), z));
   return parts;
+}
+
+/**
+ * The unglazed part of the leaf, where furniture can actually be fitted, and
+ * the width of the stile the handle sits on.
+ *
+ * Door furniture was positioned against the whole leaf, which put a knocker
+ * and a handle plate on the glass of a half-glazed door.
+ */
+function solidRegion(
+  config: DoorConfigState,
+  frame: Sightlines,
+  rect: Rect,
+): { area: Rect | null; stile: Mm } {
+  switch (config.style.id) {
+    case 'solid-panel':
+      return { area: rect, stile: frame.doorLeafEdge };
+    case 'full-glazed':
+      return { area: null, stile: config.style.options.aperture.inset };
+    case 'half-glazed':
+      return {
+        area: { ...rect, height: rect.height * (1 - config.style.options.glazedFraction) },
+        stile: config.style.options.aperture.inset,
+      };
+  }
 }
 
 function buildPanelDetail(
@@ -293,34 +349,76 @@ function buildPanelDetail(
   }
 }
 
-function buildDoorHardware(config: DoorConfigState, frame: Sightlines, rect: Rect, z: Mm): Part[] {
+function buildDoorHardware(
+  config: DoorConfigState,
+  rect: Rect,
+  solid: { area: Rect | null; stile: Mm },
+  z: Mm,
+): Part[] {
   const parts: Part[] = [];
-  // Handle sits on the leading edge, opposite the hinges, at 1050 mm — the
-  // stile width sets how far in it lands, so it tracks the frame material.
-  const stile = frame.doorLeafEdge * 0.9;
-  const leading = config.hingeSide === 'left' ? rect.x + rect.width - stile : rect.x + stile;
+
+  // The handle sits centred on the STILE, not wherever 90 mm from the edge
+  // happens to land — on a glazed leaf that was the middle of the glass.
   const handleHeight = 1050;
+  const centreline =
+    config.hingeSide === 'left'
+      ? rect.x + rect.width - solid.stile / 2
+      : rect.x + solid.stile / 2;
+  const inward = config.hingeSide === 'left' ? -1 : 1;
 
   if (config.hardware.handle === 'pull-bar') {
-    parts.push(box('handle', 'hardware', { x: leading - 16, y: rect.y + rect.height * 0.25, width: 32, height: rect.height * 0.5 }, z + 40, 32));
+    parts.push(
+      box(
+        'handle',
+        'hardware',
+        { x: centreline - 16, y: rect.y + rect.height * 0.25, width: 32, height: rect.height * 0.5 },
+        z + 40,
+        32,
+      ),
+    );
   } else {
     const plate = config.hardware.handle === 'lever-backplate';
-    parts.push(box('handle-plate', 'hardware', { x: leading - (plate ? 30 : 26), y: handleHeight - (plate ? 110 : 26), width: plate ? 60 : 52, height: plate ? 220 : 52 }, z + 6, 12));
-    if (config.hardware.handle !== 'knob') {
-      parts.push(box('handle-lever', 'hardware', { x: leading - 100, y: handleHeight - 9, width: 110, height: 18 }, z + 26, 18));
+    const plateWidth = Math.min(plate ? 60 : 52, solid.stile);
+    parts.push(
+      box(
+        'handle-plate',
+        'hardware',
+        {
+          x: centreline - plateWidth / 2,
+          y: handleHeight - (plate ? 110 : 26),
+          width: plateWidth,
+          height: plate ? 220 : 52,
+        },
+        z + 6,
+        12,
+      ),
+    );
+    if (config.hardware.handle === 'knob') {
+      parts.push(box('handle-knob', 'hardware', { x: centreline - 27, y: handleHeight - 27, width: 54, height: 54 }, z + 26, 54));
     } else {
-      parts.push(box('handle-knob', 'hardware', { x: leading - 27, y: handleHeight - 27, width: 54, height: 54 }, z + 26, 54));
+      // The lever stands proud of the leaf face, so it may legitimately
+      // overhang glazing — that is how a real lever on a glazed door looks.
+      const lever = 110;
+      const x = inward < 0 ? centreline - lever : centreline;
+      parts.push(box('handle-lever', 'hardware', { x, y: handleHeight - 9, width: lever, height: 18 }, z + 26, 18));
     }
   }
 
+  // Everything else needs somewhere solid to be fixed to. A fully glazed leaf
+  // has nowhere, so nothing is drawn — see the validation question raised with
+  // this change.
+  const area = solid.area;
+  if (area === null || area.height <= 0) return parts;
+
+  const centre = area.x + area.width / 2;
   if (config.hardware.letterplate) {
-    parts.push(box('letterplate', 'hardware', { x: rect.x + rect.width / 2 - 150, y: rect.y + rect.height * 0.42, width: 300, height: 78 }, z + 5, 10));
-  }
-  if (config.hardware.spyhole) {
-    parts.push(box('spyhole', 'hardware', { x: rect.x + rect.width / 2 - 12, y: rect.y + rect.height * 0.78, width: 24, height: 24 }, z + 4, 8));
+    parts.push(box('letterplate', 'hardware', { x: centre - 150, y: area.y + area.height * 0.35, width: 300, height: 78 }, z + 5, 10));
   }
   if (config.hardware.knocker !== null) {
-    parts.push(box('knocker', 'hardware', { x: rect.x + rect.width / 2 - 55, y: rect.y + rect.height * 0.66, width: 110, height: 110 }, z + 8, 16));
+    parts.push(box('knocker', 'hardware', { x: centre - 55, y: area.y + area.height * 0.78, width: 110, height: 110 }, z + 8, 16));
+  }
+  if (config.hardware.spyhole) {
+    parts.push(box('spyhole', 'hardware', { x: centre - 12, y: area.y + area.height * 0.93, width: 24, height: 24 }, z + 4, 8));
   }
   return parts;
 }
@@ -328,6 +426,41 @@ function buildDoorHardware(config: DoorConfigState, frame: Sightlines, rect: Rec
 /* ------------------------------------------------------------------ *
  * Windows
  * ------------------------------------------------------------------ */
+
+/**
+ * The rectangle of every light in a gridded window, row-major from the top.
+ *
+ * Exported because the geometry and the tests that police it must agree on
+ * where a cell is. A test that recomputes the bounds itself only proves the
+ * two derivations match, which is the duplication this codebase has already
+ * been bitten by once.
+ */
+export function windowCellRects(config: WindowConfigState): Rect[] {
+  if (config.style.id !== 'casement' && config.style.id !== 'tilt-and-turn') return [];
+  const frame = sightlines(config.material);
+  const grid = config.style.options.grid;
+  const opening: Rect = {
+    x: -config.dimensions.width / 2 + frame.outerFrame,
+    y: frame.outerFrame,
+    width: config.dimensions.width - frame.outerFrame * 2,
+    height: config.dimensions.height - frame.outerFrame * 2,
+  };
+  const columns = distribute(opening.width, grid.columnWeights, frame.mullion);
+  const rows = distribute(opening.height, grid.rowWeights, frame.transom);
+
+  const rects: Rect[] = [];
+  rows.forEach((row) => {
+    columns.forEach((column) => {
+      rects.push({
+        x: opening.x + column.offset,
+        y: opening.y + opening.height - row.offset - row.size,
+        width: column.size,
+        height: row.size,
+      });
+    });
+  });
+  return rects;
+}
 
 function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
   const { width, height } = config.dimensions;
@@ -348,37 +481,46 @@ function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
     case 'casement':
     case 'tilt-and-turn': {
       const grid = config.style.options.grid;
-      const columns = distribute(opening.width, grid.columnWeights, frame.mullion);
-      // Rows are laid out from the top, which is how a customer reads them.
-      const rows = distribute(opening.height, grid.rowWeights, frame.transom);
+      const cellRects = windowCellRects(config);
+      const columnCount = grid.columnWeights.length;
 
-      columns.forEach((column, columnIndex) => {
+      cellRects.forEach((cellRect, index) => {
+        const columnIndex = index % columnCount;
+        const rowIndex = Math.floor(index / columnCount);
+
         if (columnIndex > 0) {
-          parts.push(box(`mullion-${columnIndex}`, 'mullion', { x: opening.x + column.offset - frame.mullion, y: opening.y, width: frame.mullion, height: opening.height }, z, frame.frameDepth));
+          parts.push(
+            box(
+              `mullion-${rowIndex}-${columnIndex}`,
+              'mullion',
+              { x: cellRect.x - frame.mullion, y: opening.y, width: frame.mullion, height: opening.height },
+              z,
+              frame.frameDepth,
+            ),
+          );
         }
-        rows.forEach((row, rowIndex) => {
-          if (columnIndex === 0 && rowIndex > 0) {
-            parts.push(box(`transom-${rowIndex}`, 'transom', { x: opening.x, y: opening.y + opening.height - row.offset, width: opening.width, height: frame.transom }, z, frame.frameDepth));
-          }
-          const index = rowIndex * columns.length + columnIndex;
-          const cell = grid.cells[index];
-          if (cell === undefined) return;
+        if (columnIndex === 0 && rowIndex > 0) {
+          parts.push(
+            box(
+              `transom-${rowIndex}`,
+              'transom',
+              { x: opening.x, y: cellRect.y + cellRect.height, width: opening.width, height: frame.transom },
+              z,
+              frame.frameDepth,
+            ),
+          );
+        }
 
-          const cellRect: Rect = {
-            x: opening.x + column.offset,
-            y: opening.y + opening.height - row.offset - row.size,
-            width: column.size,
-            height: row.size,
-          };
+        const cell = grid.cells[index];
+        if (cell === undefined) return;
 
-          if (cell.opening === 'fixed') {
-            parts.push(...glazedArea(`cell-${index}`, cellRect, cell.bars, z, frame));
-          } else {
-            parts.push(...frameMembers(`sash-${index}`, 'sash', cellRect, frame.sash, z + 12, frame.sashDepth));
-            parts.push(...glazedArea(`cell-${index}`, inset(cellRect, frame.sash), cell.bars, z + 12, frame));
-            parts.push(...buildWindowHandle(config, cell.opening, cellRect, index, z));
-          }
-        });
+        if (cell.opening === 'fixed') {
+          parts.push(...glazedArea(`cell-${index}`, cellRect, cell.bars, z, frame));
+        } else {
+          parts.push(...frameMembers(`sash-${index}`, 'sash', cellRect, frame.sash, z + 12, frame.sashDepth));
+          parts.push(...glazedArea(`cell-${index}`, inset(cellRect, frame.sash), cell.bars, z + 12, frame));
+          parts.push(...buildWindowHandle(config, cell.opening, inset(cellRect, frame.sash), index, z));
+        }
       });
       break;
     }
@@ -410,14 +552,24 @@ function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
   }
 
   if (config.trickleVents !== null) {
+    // Vents sit IN the head member, not over the glazing: the head spans from
+    // the top of the opening up to the outer frame face.
     const ventWidth = 260;
+    const ventHeight = Math.min(18, frame.outerFrame * 0.4);
+    const headCentre = opening.y + opening.height + frame.outerFrame / 2;
     const spread = distribute(opening.width, Array.from({ length: config.trickleVents.count }, () => 1), 0);
     spread.forEach((slot, index) => {
+      const width = Math.min(ventWidth, slot.size * 0.8);
       parts.push(
         box(
           `vent-${index}`,
           'hardware',
-          { x: opening.x + slot.offset + slot.size / 2 - ventWidth / 2, y: opening.y + opening.height - frame.outerFrame * 0.6, width: Math.min(ventWidth, slot.size * 0.8), height: 18 },
+          {
+            x: opening.x + slot.offset + slot.size / 2 - width / 2,
+            y: headCentre - ventHeight / 2,
+            width,
+            height: ventHeight,
+          },
           z + frame.frameDepth / 2 + 2,
           10,
         ),
@@ -430,26 +582,82 @@ function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
 
 function buildWindowHandle(
   config: WindowConfigState,
-  opening: string,
+  opening: SashOpening,
   cell: Rect,
   index: number,
   z: Mm,
 ): Part[] {
-  // The handle goes opposite the hinge: a left-hung sash is handled on the
-  // right, a top-hung one at the cill.
-  const y = opening === 'top-hung' ? cell.y + 60 : cell.y + cell.height / 2;
-  const x =
-    opening === 'side-hung-left'
-      ? cell.x + cell.width - 70
-      : opening === 'side-hung-right'
-        ? cell.x + 20
-        : cell.x + cell.width / 2 - 25;
+  // The handle goes opposite the hinge, and the lever arm points back TOWARDS
+  // the hinge — which is to say, into the sash. Pointing it outwards ran it
+  // across the mullion and into the neighbouring light.
+  const plate = 50;
+  const lever = 80;
+  const margin = 20;
+
+  let plateX: Mm;
+  let leverX: Mm;
+  let y: Mm;
+
+  switch (opening) {
+    case 'side-hung-left':
+      // Hinged left, handled on the right stile; lever points left.
+      plateX = cell.x + cell.width - margin - plate;
+      leverX = plateX - lever + plate / 2;
+      y = cell.y + cell.height / 2;
+      break;
+    case 'side-hung-right':
+      // Hinged right, handled on the left stile; lever points right.
+      plateX = cell.x + margin;
+      leverX = plateX + plate / 2;
+      y = cell.y + cell.height / 2;
+      break;
+    case 'top-hung':
+      plateX = cell.x + cell.width / 2 - plate / 2;
+      leverX = plateX + plate / 2 - lever / 2;
+      y = cell.y + margin + plate / 2;
+      break;
+    case 'bottom-hung':
+      plateX = cell.x + cell.width / 2 - plate / 2;
+      leverX = plateX + plate / 2 - lever / 2;
+      y = cell.y + cell.height - margin - plate / 2;
+      break;
+    case 'fixed':
+      return [];
+  }
+
+  // Nothing may leave its own light, in either axis. A narrow sash shortens
+  // its furniture rather than lending it to the neighbour, and a shallow one
+  // shrinks it rather than hanging it below the rail.
+  const fit = (rect: Rect): Rect => {
+    const width = Math.min(rect.width, cell.width);
+    const height = Math.min(rect.height, cell.height);
+    return {
+      width,
+      height,
+      x: Math.max(cell.x, Math.min(rect.x, cell.x + cell.width - width)),
+      y: Math.max(cell.y, Math.min(rect.y, cell.y + cell.height - height)),
+    };
+  };
 
   const parts: Part[] = [
-    box(`handle-${index}-plate`, 'hardware', { x, y: y - 25, width: 50, height: 50 }, z + 22, 12),
+    box(
+      `handle-${index}-plate`,
+      'hardware',
+      fit({ x: plateX, y: y - plate / 2, width: plate, height: plate }),
+      z + 22,
+      12,
+    ),
   ];
   if (config.hardware.handle !== 'knob') {
-    parts.push(box(`handle-${index}-lever`, 'hardware', { x: x - 70, y: y - 9, width: 80, height: 18 }, z + 34, 18));
+    parts.push(
+      box(
+        `handle-${index}-lever`,
+        'hardware',
+        fit({ x: leverX, y: y - 9, width: lever, height: 18 }),
+        z + 34,
+        18,
+      ),
+    );
   }
   return parts;
 }

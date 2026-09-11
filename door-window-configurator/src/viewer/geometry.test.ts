@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { buildProduct, distribute } from './geometry';
+import { buildProduct, distribute, windowLightRects } from './geometry';
 import type { Part } from './geometry';
 import { DEFAULT_DOOR, DEFAULT_WINDOW, makeGrid } from '../config/defaults';
 import type { DoorConfigState, WindowConfigState } from '../config/types';
 import { doorLeafWidth } from '../config/validate';
 import { doorLeafHeight } from '../config/safety';
 import { sightlines } from '../config/material';
+import { MAX_BAR_DIVISIONS, MAX_GRID_COLUMNS, MAX_GRID_ROWS } from '../config/limits';
 
 function part(parts: Part[], id: string): Part {
   const found = parts.find((p) => p.id === id);
@@ -198,4 +199,220 @@ describe('panel detail stands proud of the leaf face', () => {
     } satisfies DoorConfigState);
     expect(model.parts.filter((p) => p.id.startsWith('groove-slab-'))).toHaveLength(5);
   });
+});
+
+describe('nothing leaves its own light', () => {
+  /** Every cell saturated: an opener, the maximum bars, uneven weights. */
+  function saturated(): WindowConfigState {
+    const columns = MAX_GRID_COLUMNS;
+    const rows = MAX_GRID_ROWS;
+    const openings = ['side-hung-left', 'side-hung-right', 'top-hung', 'bottom-hung', 'fixed'] as const;
+    const grid = makeGrid(columns, rows);
+    grid.columnWeights = [3, 1, 2, 1, 4, 1];
+    grid.rowWeights = [1, 3, 1, 2, 1, 1];
+    grid.cells = grid.cells.map((_, index) => ({
+      opening: openings[index % openings.length] ?? 'fixed',
+      bars: {
+        style: 'georgian-internal' as const,
+        columns: MAX_BAR_DIVISIONS,
+        rows: MAX_BAR_DIVISIONS,
+        barWidth: 22,
+      },
+      safety: null,
+    }));
+    return {
+      ...DEFAULT_WINDOW,
+      dimensions: { width: 3500, height: 2100 },
+      style: { id: 'casement', options: { grid } },
+    };
+  }
+
+  it('keeps every bar inside the cell it belongs to', () => {
+    const config = saturated();
+    // Against the LIGHT, not the cell: the sash section is wide enough to hide
+    // a stray part inside the cell bounds, which made the first version of
+    // this test pass against code that was visibly wrong in the render.
+    const rects = windowLightRects(config);
+    const parts = buildProduct(config).parts;
+    const bars = parts.filter((p) => p.kind === 'bar');
+    expect(bars.length).toBeGreaterThan(100);
+
+    for (const bar of bars) {
+      const index = Number(/^cell-(\d+)-bar/.exec(bar.id)?.[1]);
+      const cell = rects[index];
+      if (cell === undefined) throw new Error(`bar ${bar.id} belongs to no cell`);
+      expect(bar.position[0] - bar.size[0] / 2, `${bar.id} left`).toBeGreaterThanOrEqual(cell.x - 1e-6);
+      expect(bar.position[0] + bar.size[0] / 2, `${bar.id} right`).toBeLessThanOrEqual(cell.x + cell.width + 1e-6);
+      expect(bar.position[1] - bar.size[1] / 2, `${bar.id} bottom`).toBeGreaterThanOrEqual(cell.y - 1e-6);
+      expect(bar.position[1] + bar.size[1] / 2, `${bar.id} top`).toBeLessThanOrEqual(cell.y + cell.height + 1e-6);
+    }
+  });
+
+  it('keeps every handle inside the cell it belongs to', () => {
+    // Regression: a side-hung-right lever pointed away from its own sash and
+    // crossed the mullion into the neighbouring light, where the mullion then
+    // occluded it — which read as a missing handle, not a stray one.
+    const config = saturated();
+    const rects = windowLightRects(config);
+    const handles = buildProduct(config).parts.filter((p) => p.id.startsWith('handle-'));
+
+    for (const handle of handles) {
+      const index = Number(/^handle-(\d+)-/.exec(handle.id)?.[1]);
+      const cell = rects[index];
+      if (cell === undefined) throw new Error(`handle ${handle.id} belongs to no cell`);
+      expect(handle.position[0] - handle.size[0] / 2, `${handle.id} left`).toBeGreaterThanOrEqual(cell.x - 1e-6);
+      expect(handle.position[0] + handle.size[0] / 2, `${handle.id} right`).toBeLessThanOrEqual(cell.x + cell.width + 1e-6);
+      expect(handle.position[1] - handle.size[1] / 2, `${handle.id} bottom`).toBeGreaterThanOrEqual(cell.y - 1e-6);
+      expect(handle.position[1] + handle.size[1] / 2, `${handle.id} top`).toBeLessThanOrEqual(cell.y + cell.height + 1e-6);
+    }
+  });
+
+  it('gives every opening light a handle and no fixed light one', () => {
+    const config = saturated();
+    const grid = config.style.id === 'casement' ? config.style.options.grid : null;
+    if (grid === null) throw new Error('fixture');
+
+    const openingIndices = grid.cells
+      .map((cell, index) => (cell.opening === 'fixed' ? null : index))
+      .filter((index): index is number => index !== null);
+
+    const handled = new Set(
+      buildProduct(config)
+        .parts.filter((p) => p.id.startsWith('handle-'))
+        .map((p) => Number(/^handle-(\d+)-/.exec(p.id)?.[1])),
+    );
+
+    expect([...handled].sort((a, b) => a - b)).toEqual(openingIndices);
+  });
+
+  it('shortens furniture rather than lending it to a neighbour in a narrow light', () => {
+    const grid = makeGrid(2, 1);
+    grid.columnWeights = [20, 1];
+    grid.cells[1] = { opening: 'side-hung-right', bars: NO_BARS, safety: null };
+    const config: WindowConfigState = {
+      ...DEFAULT_WINDOW,
+      dimensions: { width: 2000, height: 1200 },
+      style: { id: 'casement', options: { grid } },
+    };
+    const rects = windowLightRects(config);
+    const narrow = rects[1];
+    if (narrow === undefined) throw new Error('fixture');
+
+    for (const handle of buildProduct(config).parts.filter((p) => p.id.startsWith('handle-1-'))) {
+      expect(handle.size[0], handle.id).toBeLessThanOrEqual(narrow.width + 1e-6);
+      expect(handle.position[0] - handle.size[0] / 2, handle.id).toBeGreaterThanOrEqual(narrow.x - 1e-6);
+    }
+  });
+});
+
+describe('handle direction', () => {
+  /**
+   * Containment cannot test this. The clamp that keeps furniture inside its
+   * light also quietly corrects a lever pointing the wrong way, so a
+   * bounds-only test passes against a handle that opens into its own hinge.
+   */
+  function leverAndPlate(opening: 'side-hung-left' | 'side-hung-right') {
+    const grid = makeGrid(1, 1);
+    grid.cells[0] = { opening, bars: NO_BARS, safety: null };
+    const parts = buildProduct({
+      ...DEFAULT_WINDOW,
+      dimensions: { width: 1200, height: 1200 },
+      style: { id: 'casement', options: { grid } },
+    } satisfies WindowConfigState).parts;
+
+    const plate = parts.find((p) => p.id === 'handle-0-plate');
+    const lever = parts.find((p) => p.id === 'handle-0-lever');
+    if (plate === undefined || lever === undefined) throw new Error('no handle emitted');
+    return { plate, lever };
+  }
+
+  it('points the lever away from the handle stile on a left-hung sash', () => {
+    const { plate, lever } = leverAndPlate('side-hung-left');
+    // Hinged left, handled on the right stile, so the lever reaches leftwards.
+    expect(lever.position[0]).toBeLessThan(plate.position[0]);
+  });
+
+  it('points the lever away from the handle stile on a right-hung sash', () => {
+    const { plate, lever } = leverAndPlate('side-hung-right');
+    expect(lever.position[0]).toBeGreaterThan(plate.position[0]);
+  });
+});
+
+describe('trickle vents', () => {
+  it('sit in the head member, clear of every light', () => {
+    const config: WindowConfigState = {
+      ...DEFAULT_WINDOW,
+      dimensions: { width: 2400, height: 1400 },
+      trickleVents: { position: 'head-of-frame', count: 2 },
+      style: { id: 'casement', options: { grid: makeGrid(3, 2) } },
+    };
+    const lights = windowLightRects(config);
+    const topOfGlazing = Math.max(...lights.map((light) => light.y + light.height));
+
+    const vents = buildProduct(config).parts.filter((p) => p.id.startsWith('vent-'));
+    expect(vents).toHaveLength(2);
+    for (const vent of vents) {
+      // Regression: vents were drawn across the top of the glazing.
+      expect(vent.position[1] - vent.size[1] / 2, vent.id).toBeGreaterThanOrEqual(topOfGlazing - 1e-6);
+    }
+  });
+});
+
+describe('glass is never buried in an opaque part', () => {
+  /**
+   * The general invariant behind two separate defects: a pane drawn inside the
+   * thickness of a solid box renders as nothing at all. Opaque geometry may
+   * abut a glazed area but must never overlap it in elevation.
+   */
+  function overlapsInElevation(a: Part, b: Part): boolean {
+    const gap = 1e-6;
+    const overlapX =
+      Math.min(a.position[0] + a.size[0] / 2, b.position[0] + b.size[0] / 2) -
+      Math.max(a.position[0] - a.size[0] / 2, b.position[0] - b.size[0] / 2);
+    const overlapY =
+      Math.min(a.position[1] + a.size[1] / 2, b.position[1] + b.size[1] / 2) -
+      Math.max(a.position[1] - a.size[1] / 2, b.position[1] - b.size[1] / 2);
+    return overlapX > gap && overlapY > gap;
+  }
+
+  const OPAQUE: ReadonlyArray<Part['kind']> = ['leaf', 'panel', 'frame', 'mullion', 'transom', 'sash'];
+
+  const styles: Array<DoorConfigState['style']> = [
+    { id: 'solid-panel', options: { panelDetail: { kind: 'raised', panels: 4, moulding: 'ovolo' } } },
+    {
+      id: 'full-glazed',
+      options: { aperture: { shape: 'rectangular', inset: 100, bars: NO_BARS, safety: null } },
+    },
+    {
+      id: 'half-glazed',
+      options: {
+        glazedFraction: 0.5,
+        aperture: { shape: 'rectangular', inset: 120, bars: { style: 'applied-astragal', columns: 2, rows: 3, barWidth: 22 }, safety: null },
+        panelDetail: { kind: 'raised', panels: 2, moulding: 'ovolo' },
+      },
+    },
+  ];
+
+  for (const style of styles) {
+    it(`keeps glazing clear of opaque geometry on a ${style.id} door`, () => {
+      const parts = buildProduct({
+        ...DEFAULT_DOOR,
+        dimensions: { width: 1800, height: 2200 },
+        glazing: { ...DEFAULT_DOOR.glazing, safety: 'toughened' },
+        style,
+      } satisfies DoorConfigState).parts;
+
+      const panes = parts.filter((p) => p.kind === 'glazing');
+      if (style.id !== 'solid-panel') expect(panes.length, 'expected glazing').toBeGreaterThan(0);
+
+      for (const pane of panes) {
+        for (const opaque of parts.filter((p) => OPAQUE.includes(p.kind))) {
+          expect(
+            overlapsInElevation(pane, opaque),
+            `${opaque.id} (${opaque.kind}) covers ${pane.id}`,
+          ).toBe(false);
+        }
+      }
+    });
+  }
 });

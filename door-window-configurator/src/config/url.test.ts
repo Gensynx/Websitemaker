@@ -4,7 +4,7 @@ import { DEFAULT_DOOR, DEFAULT_WINDOW, makeGrid } from './defaults';
 import type { ConfigState, DoorConfigState, SashGrid, WindowConfigState } from './types';
 import { formatMm, roundMmHalfUp } from './units';
 import { MAX_BAR_DIVISIONS, MAX_GRID_COLUMNS, MAX_GRID_ROWS } from './limits';
-import { decodeView, encodeView } from './view';
+import { DEFAULT_CAMERA_PRESET, decodeView, encodeView } from './view';
 import { buildEnquiry, doorLeafWidth, mintQuotable, reconcileWithMaterial, validateConfig } from './validate';
 import { assessCriticalLocations, enforceSafetyGlazing, safetyControlState } from './safety';
 
@@ -376,7 +376,10 @@ describe('view parameter', () => {
   });
 
   it('falls back without touching the configuration', () => {
-    expect(decodeView('view=nonsense')).toEqual({ preset: 'three-quarter', fellBack: true });
+    // Bound to the constant, not a literal: this expectation went stale the
+    // moment the default view changed, which is the test's fault, not the
+    // code's.
+    expect(decodeView('view=nonsense')).toEqual({ preset: DEFAULT_CAMERA_PRESET, fellBack: true });
     expect(decodeConfig('p=d&view=nonsense').issues).toHaveLength(0);
   });
 });
@@ -684,5 +687,12 @@ describe('the enquiry payload has one constructor', () => {
       colour: { external: { mode: 'explore', hex: '#3a7f5c' }, internal: { mode: 'match' } },
     };
     expect(buildEnquiry(explore).kind).toBe('non-orderable');
+  });
+});
+
+describe('the default view', () => {
+  it('is elevation, so a customer reads the product square-on first', () => {
+    expect(DEFAULT_CAMERA_PRESET).toBe('elevation');
+    expect(decodeView('').preset).toBe('elevation');
   });
 });

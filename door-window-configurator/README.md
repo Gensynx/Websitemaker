@@ -28,6 +28,7 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/viewer/Viewer.tsx` | Canvas, studio lighting, contact shadow (lazy-loaded) |
 | `src/viewer/CameraRig.tsx` | Clamped orbit and the three camera presets |
 | `src/viewer/StaticElevation.tsx` | SVG elevation where WebGL is unavailable |
+| `src/config/windowPresets.ts` | Named window configurations — data over the grid model |
 
 ```
 npm install
@@ -104,6 +105,22 @@ Dimensions are the one thing reconciliation does not correct. The URL decoder
 clamps `w` and `h` as it reads them, because a shared link has nobody present
 to tell; an edit has, so validation reports the permitted range instead and the
 viewer keeps showing the last configuration that could be made.
+
+## Window presets
+
+The grid model is four independent axes, which is right architecturally and
+unusable commercially. `windowPresets.ts` sits on top as data: a preset
+EXPANDS to a full `WindowStyle` and is then discarded. `ConfigState` never
+records which preset was chosen and a link carries the expanded grid, so
+renaming or withdrawing a preset cannot alter a product somebody already has,
+and the grid editor underneath stays authoritative.
+
+## Why elevation is the default view
+
+Alignment, sightline balance and bar registration across a mullion can only be
+judged square-on. A three-quarter opener flatters the product and hides
+exactly what a customer needs to check first — and, during Step 2, hid four
+geometry defects from us as well.
 
 ## Outstanding
 
