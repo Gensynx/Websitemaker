@@ -6,63 +6,73 @@
  *      malformed values fall back to defaults and are reported as issues; the
  *      decoder never throws.
  *   2. Links are inspectable. Short keys and mnemonic codes, not an opaque
- *      base64 blob, so a support enquiry quoting a URL can be read by a human.
- *   3. Links stay short. Every field is encoded, not just the non-defaults, so
- *      a link keeps its meaning even after the default configuration changes.
+ *      blob, so a support enquiry quoting a URL can be read by a human.
+ *   3. Links stay short, and bounded. See WORST_CASE notes in url.test.ts.
  *
- * Separator discipline — only characters that `URLSearchParams` leaves
- * unescaped are used, so the query string stays readable rather than turning
- * into a wall of %2C:
+ * Every field is written, including the switched-off ones, with `n` as the
+ * explicit "not fitted" token. Encoding an option by its presence alone makes
+ * "the customer turned this off" indistinguishable from "this link predates
+ * the option", and those two must fall back differently.
+ *
+ * Separator discipline — only characters `URLSearchParams` leaves unescaped:
  *      *   section separator within one value
  *      -   list item separator
  *      .   field separator within a list item, and the decimal point for
  *          standalone numeric values
  *      _   field separator inside a bar-layout token
  * Consequence: values encoded at list depth (grid weights, bar widths) are
- * rounded to whole units in the URL. Sub-millimetre bar widths and fractional
- * grid weights are not representable, which is deliberate.
+ * whole units in the URL. Dimensions, which have their own keys, round-trip to
+ * 0.1 mm.
  *
- * Precision: dimensions round-trip to 0.1 mm. They are held as floats in state
- * and rounded for display only (see units.ts), so the link is not the single
- * rounding point and does not become one.
+ * Key codes are never reused across schema versions — see RETIRED_KEYS in
+ * migrations.ts.
  */
 
 import type {
   BarLayout,
   BarStyle,
+  ColourPair,
+  ColourSelection,
   ConfigState,
   DoorConfigState,
   DoorHandleStyle,
   DoorStyleId,
-  Finish,
   Glazing,
   GlazingUnit,
   HardwareFinish,
+  InternalColour,
   KnockerStyle,
   MouldingProfile,
   ObscurePattern,
   PanelDetail,
   ProductType,
+  SafetyGlazing,
   SashCell,
   SashGrid,
   SashOpening,
   SideLight,
+  ThresholdType,
   TintColour,
   TopLight,
+  TrickleVentPosition,
+  TrickleVents,
   WindowConfigState,
   WindowHandleStyle,
   WindowStyleId,
 } from './types';
 import { CONFIG_SCHEMA_VERSION, NO_BARS } from './types';
+import type { Finish, FrameMaterial } from './material';
 import { isRalCode } from './ral';
 import {
   DEFAULT_DOOR,
   DEFAULT_DOOR_STYLE_OPTIONS,
+  DEFAULT_MATERIAL,
   DEFAULT_WINDOW,
   DEFAULT_WINDOW_STYLE_OPTIONS,
-  makeGrid,
 } from './defaults';
-import { MAX_NUMERAL_LENGTH, SIZE_LIMITS } from './limits';
+import { sizeLimits } from './limits';
+import { migrateParams } from './migrations';
+import { reconcileWithMaterial } from './validate';
 
 export interface DecodeIssue {
   /** Query key the problem was found in, or 'config' for whole-state issues. */
@@ -107,9 +117,16 @@ function int(value: number): string {
 /** Explicit "not fitted" token, so absence always means "field not in link". */
 const NONE = 'n';
 
+const MATERIAL = codes<FrameMaterial>({
+  upvc: 'u',
+  aluminium: 'a',
+  timber: 't',
+  composite: 'c',
+});
 const PRODUCT = codes<ProductType>({ door: 'd', window: 'w' });
 const FINISH = codes<Finish>({ smooth: 'sm', textured: 'tx', 'woodgrain-foil': 'wg' });
 const UNIT = codes<GlazingUnit>({ double: '2', triple: '3' });
+const SAFETY = codes<SafetyGlazing>({ none: 'n', toughened: 't', laminated: 'l' });
 const TINT = codes<TintColour>({ bronze: 'bz', grey: 'gy', blue: 'bl' });
 const OBSCURE = codes<ObscurePattern>({
   sandblast: 'sb',
@@ -128,15 +145,21 @@ const DOOR_HANDLE = codes<DoorHandleStyle>({
   'lever-backplate': 'lb',
   'lever-rose': 'lr',
   'pull-bar': 'pb',
-  knob: 'kn',
+  knob: 'kb',
 });
 const WINDOW_HANDLE = codes<WindowHandleStyle>({
   'lever-backplate': 'lb',
   'lever-rose': 'lr',
-  knob: 'kn',
+  knob: 'kb',
 });
 const KNOCKER = codes<KnockerStyle>({ ring: 'rg', doctor: 'dr', urn: 'ur' });
-const MOULDING = codes<MouldingProfile>({ ovolo: 'ov', chamfer: 'ch', square: 'sq' });
+const MOULDING = codes<MouldingProfile>({ ovolo: 'ov', chamfer: 'cf', square: 'sq' });
+const THRESHOLD = codes<ThresholdType>({ standard: 'st', 'low-level-access': 'lo' });
+const VENT_POSITION = codes<TrickleVentPosition>({
+  'head-of-frame': 'hf',
+  'in-sash': 'is',
+  'through-glazing': 'tg',
+});
 const DOOR_STYLE = codes<DoorStyleId>({
   'solid-panel': 'sp',
   'half-glazed': 'hg',
@@ -146,7 +169,6 @@ const WINDOW_STYLE = codes<WindowStyleId>({
   casement: 'cs',
   'tilt-and-turn': 'tt',
   sash: 'sa',
-  bay: 'by',
   fixed: 'fx',
 });
 const BAR_STYLE = codes<BarStyle>({
@@ -168,21 +190,15 @@ const OPENING = codes<SashOpening>({
  * ------------------------------------------------------------------ */
 
 function encodeBars(bars: BarLayout): string {
-  if (bars.style === 'none') return 'n';
-  return [BAR_STYLE.encode(bars.style), int(bars.columns), int(bars.rows), int(bars.barWidth)].join(
-    '_',
-  );
+  if (bars.style === 'none') return NONE;
+  return [BAR_STYLE.encode(bars.style), int(bars.columns), int(bars.rows), int(bars.barWidth)].join('_');
 }
 
 function encodeGrid(grid: SashGrid): string {
   const cells = grid.cells
     .map((cell) => `${OPENING.encode(cell.opening)}.${encodeBars(cell.bars)}`)
     .join('-');
-  return [
-    grid.columnWeights.map(int).join('-'),
-    grid.rowWeights.map(int).join('-'),
-    cells,
-  ].join('*');
+  return [grid.columnWeights.map(int).join('-'), grid.rowWeights.map(int).join('-'), cells].join('*');
 }
 
 function encodePanelDetail(detail: PanelDetail): string {
@@ -210,12 +226,24 @@ function encodeGlazing(glazing: Glazing): string {
   }
 }
 
+function encodeColour(colour: ColourSelection): string {
+  return colour.mode === 'ral' ? colour.code : `x${colour.hex.slice(1)}`;
+}
+
+function encodeInternalColour(colour: InternalColour): string {
+  return colour.mode === 'match' ? 'm' : encodeColour(colour);
+}
+
 function encodeSideLight(light: SideLight): string {
   return `${int(light.width)}.${encodeBars(light.bars)}`;
 }
 
 function encodeTopLight(light: TopLight): string {
   return `${int(light.height)}.${light.shape === 'arched' ? 'a' : 'r'}.${encodeBars(light.bars)}`;
+}
+
+function encodeTrickleVents(vents: TrickleVents | null): string {
+  return vents === null ? NONE : `${VENT_POSITION.encode(vents.position)}.${int(vents.count)}`;
 }
 
 /* ------------------------------------------------------------------ *
@@ -225,12 +253,16 @@ function encodeTopLight(light: TopLight): string {
 export function encodeConfig(config: ConfigState): URLSearchParams {
   const params = new URLSearchParams();
   params.set('v', String(config.schemaVersion));
+  params.set('m', MATERIAL.encode(config.material));
   params.set('p', PRODUCT.encode(config.productType));
   params.set('w', num(config.dimensions.width));
   params.set('h', num(config.dimensions.height));
-  params.set('c', config.colour.mode === 'ral' ? config.colour.code : `x${config.colour.hex.slice(1)}`);
+  params.set('ce', encodeColour(config.colour.external));
+  params.set('ci', encodeInternalColour(config.colour.internal));
   params.set('f', FINISH.encode(config.finish));
   params.set('g', encodeGlazing(config.glazing));
+  params.set('sg', SAFETY.encode(config.glazing.safety));
+  params.set('tv', encodeTrickleVents(config.trickleVents));
 
   if (config.productType === 'door') {
     encodeDoor(config, params);
@@ -259,10 +291,6 @@ function encodeDoor(config: DoorConfigState, params: URLSearchParams): void {
       break;
   }
 
-  // Every field is written, including the absent ones, with NONE as the
-  // explicit "not fitted" token. Encoding an option by its mere presence would
-  // make "the customer turned this off" indistinguishable from "this link
-  // predates the option", and the two must fall back differently.
   params.set('sl', config.surround.leftSideLight ? encodeSideLight(config.surround.leftSideLight) : NONE);
   params.set('sr', config.surround.rightSideLight ? encodeSideLight(config.surround.rightSideLight) : NONE);
   params.set('tl', config.surround.topLight ? encodeTopLight(config.surround.topLight) : NONE);
@@ -272,17 +300,8 @@ function encodeDoor(config: DoorConfigState, params: URLSearchParams): void {
   params.set('lp', config.hardware.letterplate ? '1' : '0');
   params.set('sh', config.hardware.spyhole ? '1' : '0');
   params.set('kn', config.hardware.knocker ? KNOCKER.encode(config.hardware.knocker) : NONE);
-  if (config.hardware.numerals) {
-    const placement =
-      config.hardware.numerals.placement === 'centre'
-        ? 'c'
-        : config.hardware.numerals.placement === 'above-letterplate'
-          ? 'a'
-          : 's';
-    params.set('nm', `${config.hardware.numerals.value}.${placement}`);
-  } else {
-    params.set('nm', NONE);
-  }
+  params.set('tr', THRESHOLD.encode(config.threshold));
+  // Handing, stated as viewed from outside — see HANDING_CONVENTION.
   params.set('hg', config.hingeSide === 'left' ? 'l' : 'r');
   params.set('od', config.openingDirection === 'inward' ? 'i' : 'o');
 }
@@ -305,16 +324,6 @@ function encodeWindow(config: WindowConfigState, params: URLSearchParams): void 
       params.set('ub', encodeBars(config.style.options.upperBars));
       params.set('lb', encodeBars(config.style.options.lowerBars));
       break;
-    case 'bay':
-      // One key per segment sidesteps a fourth level of nesting, which the
-      // available separator set cannot express.
-      params.set('bs', config.style.options.segments.map((seg) => int(seg.widthShare * 100)).join('-'));
-      config.style.options.segments.forEach((seg, index) => {
-        params.set(`bg${index}`, encodeGrid(seg.grid));
-      });
-      params.set('ca', String(config.style.options.cornerAngle));
-      params.set('rd', int(config.style.options.returnDepth));
-      break;
     case 'fixed':
       params.set('fb', encodeBars(config.style.options.bars));
       break;
@@ -334,10 +343,11 @@ export function configToUrl(config: ConfigState, base: string): string {
 /* ------------------------------------------------------------------ *
  * Decoding
  *
- * The decoder is total: every path returns a configuration. Anything it cannot
- * read is replaced with the default for that field and reported in `issues`,
- * which the UI surfaces as a non-blocking notice ("part of this link could not
- * be read; those options were reset").
+ * Total by construction: every path returns a configuration. Anything
+ * unreadable is replaced with the default for that field and reported in
+ * `issues`, which the UI surfaces as a non-blocking notice. The decoded result
+ * is then reconciled against the frame material, because a link may carry a
+ * combination that was legal when it was shared and is not now.
  * ------------------------------------------------------------------ */
 
 class Issues {
@@ -412,7 +422,7 @@ function readOptionalCode<T extends string>(
 
 function decodeBars(raw: string | null, fallback: BarLayout, key: string, issues: Issues): BarLayout {
   if (raw === null) return fallback;
-  if (raw === 'n') return { ...NO_BARS };
+  if (raw === NONE) return { ...NO_BARS };
   const parts = raw.split('_');
   const style = BAR_STYLE.decode(parts[0]);
   const columns = Number(parts[1]);
@@ -460,7 +470,7 @@ function decodeGrid(raw: string | null, fallback: SashGrid, key: string, issues:
   for (const token of cellTokens) {
     const dot = token.indexOf('.');
     const openingRaw = dot === -1 ? token : token.slice(0, dot);
-    const barsRaw = dot === -1 ? 'n' : token.slice(dot + 1);
+    const barsRaw = dot === -1 ? NONE : token.slice(dot + 1);
     const opening = OPENING.decode(openingRaw);
     if (opening === undefined) {
       issues.add(key, `"${openingRaw}" is not a recognised opening; that light is now fixed`);
@@ -473,8 +483,18 @@ function decodeGrid(raw: string | null, fallback: SashGrid, key: string, issues:
   return { columnWeights, rowWeights, cells };
 }
 
-function decodeGlazing(raw: string | null, fallback: Glazing, issues: Issues): Glazing {
-  if (raw === null) return fallback;
+function decodeGlazing(
+  raw: string | null,
+  safetyRaw: string | null,
+  fallback: Glazing,
+  issues: Issues,
+): Glazing {
+  const safety = safetyRaw === null ? fallback.safety : (SAFETY.decode(safetyRaw) ?? fallback.safety);
+  if (safetyRaw !== null && SAFETY.decode(safetyRaw) === undefined) {
+    issues.add('sg', `"${safetyRaw}" is not a recognised safety glazing; using "${fallback.safety}"`);
+  }
+
+  if (raw === null) return { ...fallback, safety };
   const [appearance, unitRaw, detail] = raw.split('.');
   const unit = UNIT.decode(unitRaw) ?? fallback.unit;
   if (unitRaw !== undefined && UNIT.decode(unitRaw) === undefined) {
@@ -482,25 +502,70 @@ function decodeGlazing(raw: string | null, fallback: Glazing, issues: Issues): G
   }
   switch (appearance) {
     case 'c':
-      return { appearance: 'clear', unit };
+      return { appearance: 'clear', unit, safety };
     case 't': {
       const tint = TINT.decode(detail);
-      if (tint === undefined) {
-        issues.add('g', `"${detail}" is not a recognised tint; using bronze`);
-      }
-      return { appearance: 'tinted', tint: tint ?? 'bronze', unit };
+      if (tint === undefined) issues.add('g', `"${detail}" is not a recognised tint; using bronze`);
+      return { appearance: 'tinted', tint: tint ?? 'bronze', unit, safety };
     }
     case 'o': {
       const pattern = OBSCURE.decode(detail);
       if (pattern === undefined) {
         issues.add('g', `"${detail}" is not a recognised obscure pattern; using sandblast`);
       }
-      return { appearance: 'obscure', pattern: pattern ?? 'sandblast', unit };
+      return { appearance: 'obscure', pattern: pattern ?? 'sandblast', unit, safety };
     }
     default:
       issues.add('g', `"${raw}" is not a recognised glazing; using the default`);
-      return fallback;
+      return { ...fallback, safety };
   }
+}
+
+function decodeColour(
+  raw: string | null,
+  fallback: ColourSelection,
+  key: string,
+  issues: Issues,
+): ColourSelection {
+  if (raw === null) return fallback;
+  if (isRalCode(raw)) return { mode: 'ral', code: raw };
+  if (/^x[0-9a-fA-F]{6}$/.test(raw)) return { mode: 'explore', hex: `#${raw.slice(1).toLowerCase()}` };
+  issues.add(key, `"${raw}" is not an available colour; using the default`);
+  return fallback;
+}
+
+function decodeColourPair(params: URLSearchParams, fallback: ColourPair, issues: Issues): ColourPair {
+  const external = decodeColour(params.get('ce'), fallback.external, 'ce', issues);
+  const internalRaw = params.get('ci');
+  if (internalRaw === null) return { external, internal: fallback.internal };
+  if (internalRaw === 'm') return { external, internal: { mode: 'match' } };
+
+  // An unreadable internal colour falls back to matching the outside rather
+  // than to some other shade: matching is the one answer that is never wrong
+  // for a customer who did not choose a contrasting inside.
+  if (isRalCode(internalRaw)) return { external, internal: { mode: 'ral', code: internalRaw } };
+  if (/^x[0-9a-fA-F]{6}$/.test(internalRaw)) {
+    return { external, internal: { mode: 'explore', hex: `#${internalRaw.slice(1).toLowerCase()}` } };
+  }
+  issues.add('ci', `"${internalRaw}" is not an available colour; the inside now matches the outside`);
+  return { external, internal: { mode: 'match' } };
+}
+
+function decodeTrickleVents(
+  raw: string | null,
+  fallback: TrickleVents | null,
+  issues: Issues,
+): TrickleVents | null {
+  if (raw === null) return fallback;
+  if (raw === NONE) return null;
+  const [positionRaw, countRaw] = raw.split('.');
+  const position = VENT_POSITION.decode(positionRaw);
+  const count = Number(countRaw);
+  if (position === undefined || !Number.isFinite(count) || count < 1 || count > 12) {
+    issues.add('tv', `"${raw}" is not a valid trickle vent specification; using the default`);
+    return fallback;
+  }
+  return { position, count: Math.round(count) };
 }
 
 function decodePanelDetail(raw: string | null, fallback: PanelDetail, issues: Issues): PanelDetail {
@@ -576,10 +641,7 @@ function decodeSideLight(
     issues.add(key, `"${raw}" is not a valid side light; it has been removed`);
     return null;
   }
-  return {
-    width,
-    bars: decodeBars(barParts.join('.') || 'n', { ...NO_BARS }, key, issues),
-  };
+  return { width, bars: decodeBars(barParts.join('.') || NONE, { ...NO_BARS }, key, issues) };
 }
 
 function decodeTopLight(raw: string | null, fallback: TopLight | null, issues: Issues): TopLight | null {
@@ -594,66 +656,60 @@ function decodeTopLight(raw: string | null, fallback: TopLight | null, issues: I
   return {
     shape: shapeRaw === 'a' ? 'arched' : 'rectangular',
     height,
-    bars: decodeBars(barParts.join('.') || 'n', { ...NO_BARS }, 'tl', issues),
+    bars: decodeBars(barParts.join('.') || NONE, { ...NO_BARS }, 'tl', issues),
   };
 }
 
 export function decodeConfig(input: URLSearchParams | string): DecodeResult {
-  const params = typeof input === 'string' ? new URLSearchParams(input) : input;
+  const raw = typeof input === 'string' ? new URLSearchParams(input) : input;
   const issues = new Issues();
 
-  const version = Number(params.get('v') ?? CONFIG_SCHEMA_VERSION);
-  if (Number.isFinite(version) && version > CONFIG_SCHEMA_VERSION) {
-    issues.add(
-      'v',
-      `this link was made with a newer version of the configurator (v${version}); some options may have been reset`,
-    );
-  }
+  // Older links are brought up to the current schema before any field is read.
+  const { params, issues: migrationIssues } = migrateParams(raw);
+  for (const issue of migrationIssues) issues.add(issue.key, issue.reason);
 
   const productType = readCode(params, 'p', PRODUCT, 'door', issues);
+  const material = readCode(params, 'm', MATERIAL, DEFAULT_MATERIAL, issues);
   const base = productType === 'door' ? DEFAULT_DOOR : DEFAULT_WINDOW;
-  const limits = SIZE_LIMITS[productType];
-
-  const dimensions = {
-    width: readNumber(params, 'w', base.dimensions.width, {
-      min: limits.minWidth,
-      max: limits.maxWidth,
-    }, issues),
-    height: readNumber(params, 'h', base.dimensions.height, {
-      min: limits.minHeight,
-      max: limits.maxHeight,
-    }, issues),
-  };
-
-  const colourRaw = params.get('c');
-  let colour = base.colour;
-  if (colourRaw !== null) {
-    if (isRalCode(colourRaw)) {
-      colour = { mode: 'ral', code: colourRaw };
-    } else if (/^x[0-9a-fA-F]{6}$/.test(colourRaw)) {
-      colour = { mode: 'explore', hex: `#${colourRaw.slice(1).toLowerCase()}` };
-    } else {
-      issues.add('c', `"${colourRaw}" is not an available colour; using the default`);
-    }
-  }
+  const limits = sizeLimits(material, productType);
 
   const common = {
     schemaVersion: CONFIG_SCHEMA_VERSION,
-    dimensions,
-    colour,
+    material,
+    dimensions: {
+      width: readNumber(params, 'w', base.dimensions.width, { min: limits.minWidth, max: limits.maxWidth }, issues),
+      height: readNumber(params, 'h', base.dimensions.height, { min: limits.minHeight, max: limits.maxHeight }, issues),
+    },
+    colour: decodeColourPair(params, base.colour, issues),
     finish: readCode(params, 'f', FINISH, base.finish, issues),
-    glazing: decodeGlazing(params.get('g'), base.glazing, issues),
+    glazing: decodeGlazing(params.get('g'), params.get('sg'), base.glazing, issues),
   };
 
-  const config: ConfigState =
+  const decoded: ConfigState =
     productType === 'door'
       ? { ...common, ...decodeDoor(params, issues) }
       : { ...common, ...decodeWindow(params, issues) };
 
+  // A link can carry a combination that the catalogue no longer allows.
+  const { config, issues: reconciliation } = reconcileWithMaterial(decoded);
+  for (const issue of reconciliation) issues.add(issue.field, issue.message);
+
   return { config, issues: issues.list };
 }
 
-function decodeDoor(params: URLSearchParams, issues: Issues): Omit<DoorConfigState, keyof typeof COMMON_KEYS> {
+type DoorSpecific = Omit<DoorConfigState, keyof CommonKeys>;
+type WindowSpecific = Omit<WindowConfigState, keyof CommonKeys>;
+
+interface CommonKeys {
+  schemaVersion: unknown;
+  material: unknown;
+  dimensions: unknown;
+  colour: unknown;
+  finish: unknown;
+  glazing: unknown;
+}
+
+function decodeDoor(params: URLSearchParams, issues: Issues): DoorSpecific {
   const styleId = readCode(params, 's', DOOR_STYLE, DEFAULT_DOOR.style.id, issues);
 
   let style: DoorConfigState['style'];
@@ -689,22 +745,6 @@ function decodeDoor(params: URLSearchParams, issues: Issues): Omit<DoorConfigSta
     }
   }
 
-  const numeralsRaw = params.get('nm');
-  let numerals: DoorConfigState['hardware']['numerals'] =
-    numeralsRaw === null ? DEFAULT_DOOR.hardware.numerals : null;
-  if (numeralsRaw !== null && numeralsRaw !== NONE) {
-    const [value, placementCode] = numeralsRaw.split('.');
-    if (!value || value.length > MAX_NUMERAL_LENGTH) {
-      issues.add('nm', `"${numeralsRaw}" is not a usable house number; numerals have been removed`);
-    } else {
-      numerals = {
-        value,
-        placement:
-          placementCode === 'a' ? 'above-letterplate' : placementCode === 's' ? 'on-side-light' : 'centre',
-      };
-    }
-  }
-
   return {
     productType: 'door',
     style,
@@ -719,17 +759,15 @@ function decodeDoor(params: URLSearchParams, issues: Issues): Omit<DoorConfigSta
       letterplate: readFlag(params, 'lp', DEFAULT_DOOR.hardware.letterplate),
       spyhole: readFlag(params, 'sh', DEFAULT_DOOR.hardware.spyhole),
       knocker: readOptionalCode(params, 'kn', KNOCKER, DEFAULT_DOOR.hardware.knocker, issues),
-      numerals,
     },
+    threshold: readCode(params, 'tr', THRESHOLD, DEFAULT_DOOR.threshold, issues),
+    trickleVents: decodeTrickleVents(params.get('tv'), DEFAULT_DOOR.trickleVents, issues),
     hingeSide: params.get('hg') === 'r' ? 'right' : 'left',
     openingDirection: params.get('od') === 'o' ? 'outward' : 'inward',
   };
 }
 
-function decodeWindow(
-  params: URLSearchParams,
-  issues: Issues,
-): Omit<WindowConfigState, keyof typeof COMMON_KEYS> {
+function decodeWindow(params: URLSearchParams, issues: Issues): WindowSpecific {
   const styleId = readCode(params, 's', WINDOW_STYLE, DEFAULT_WINDOW.style.id, issues);
 
   let style: WindowConfigState['style'];
@@ -737,21 +775,14 @@ function decodeWindow(
     case 'casement':
       style = {
         id: 'casement',
-        options: {
-          grid: decodeGrid(params.get('gd'), DEFAULT_WINDOW_STYLE_OPTIONS.casement.grid, 'gd', issues),
-        },
+        options: { grid: decodeGrid(params.get('gd'), DEFAULT_WINDOW_STYLE_OPTIONS.casement.grid, 'gd', issues) },
       };
       break;
     case 'tilt-and-turn':
       style = {
         id: 'tilt-and-turn',
         options: {
-          grid: decodeGrid(
-            params.get('gd'),
-            DEFAULT_WINDOW_STYLE_OPTIONS['tilt-and-turn'].grid,
-            'gd',
-            issues,
-          ),
+          grid: decodeGrid(params.get('gd'), DEFAULT_WINDOW_STYLE_OPTIONS['tilt-and-turn'].grid, 'gd', issues),
           turnHingeSide: params.get('th') === 'r' ? 'right' : 'left',
         },
       };
@@ -770,39 +801,10 @@ function decodeWindow(
       };
       break;
     }
-    case 'bay': {
-      const defaults = DEFAULT_WINDOW_STYLE_OPTIONS.bay;
-      const sharesRaw = params.get('bs');
-      let segments = defaults.segments;
-      if (sharesRaw !== null) {
-        const shares = sharesRaw.split('-').map(Number);
-        const total = shares.reduce((sum, n) => sum + n, 0);
-        if (shares.length < 2 || shares.length > 5 || shares.some((n) => !Number.isFinite(n) || n <= 0)) {
-          issues.add('bs', `"${sharesRaw}" is not a valid bay layout; using the default`);
-        } else {
-          segments = shares.map((share, index) => ({
-            widthShare: share / total,
-            grid: decodeGrid(params.get(`bg${index}`), makeGrid(1, 1), `bg${index}`, issues),
-          }));
-        }
-      }
-      const angle = Number(params.get('ca') ?? defaults.cornerAngle);
-      style = {
-        id: 'bay',
-        options: {
-          segments,
-          cornerAngle: angle === 90 || angle === 135 || angle === 150 ? angle : defaults.cornerAngle,
-          returnDepth: readNumber(params, 'rd', defaults.returnDepth, { min: 150, max: 1200 }, issues),
-        },
-      };
-      break;
-    }
     case 'fixed':
       style = {
         id: 'fixed',
-        options: {
-          bars: decodeBars(params.get('fb'), DEFAULT_WINDOW_STYLE_OPTIONS.fixed.bars, 'fb', issues),
-        },
+        options: { bars: decodeBars(params.get('fb'), DEFAULT_WINDOW_STYLE_OPTIONS.fixed.bars, 'fb', issues) },
       };
       break;
   }
@@ -814,14 +816,6 @@ function decodeWindow(
       handle: readCode(params, 'hw', WINDOW_HANDLE, DEFAULT_WINDOW.hardware.handle, issues),
       finish: readCode(params, 'hf', HARDWARE_FINISH, DEFAULT_WINDOW.hardware.finish, issues),
     },
+    trickleVents: decodeTrickleVents(params.get('tv'), DEFAULT_WINDOW.trickleVents, issues),
   };
 }
-
-/** Field names owned by ConfigCommon, excluded from the per-product decoders. */
-const COMMON_KEYS = {
-  schemaVersion: 0,
-  dimensions: 0,
-  colour: 0,
-  finish: 0,
-  glazing: 0,
-} as const;

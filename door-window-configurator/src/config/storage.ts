@@ -17,7 +17,10 @@ import { DEFAULT_CONFIG } from './defaults';
 import { decodeConfig, encodeConfig } from './url';
 import type { DecodeIssue } from './url';
 
-const STORAGE_KEY = 'dwc.config.v1';
+// Not versioned: the stored value carries its own `v`, and migrations.ts
+// upgrades a returning customer's saved configuration exactly as it upgrades a
+// shared link.
+const STORAGE_KEY = 'dwc.config';
 
 export interface LoadResult {
   config: ConfigState;

@@ -3,32 +3,78 @@
  *
  * Design rules this file follows:
  *
- * 1. `ConfigState` is a discriminated union on `productType`. Doors and windows
- *    share dimensions, colour, finish and glazing; everything else is specific
- *    to the product and is not representable on the wrong one.
+ * 1. `ConfigState` is a discriminated union on `productType`, and again on
+ *    `style.id`. Per-style options hang off the style discriminant, so
+ *    impossible combinations do not type-check.
  *
- * 2. Per-style options hang off the style discriminant, so impossible
- *    combinations do not type-check. A full-glazed door cannot carry raised
- *    panel detailing; a fixed window cannot carry an opening direction.
+ * 2. Frame material gates colour, finish, sightlines and every size limit.
+ *    Those cross-field rules cannot be expressed in the type system without
+ *    making the model unusable, so they live in validate.ts and are applied on
+ *    every material change and every decode.
  *
- * 3. Adding a style is a new key in the relevant style-option map plus a new
+ * 3. Units and bases live in type names, not comments. `Mm`,
+ *    `GlazedFractionOfLeafHeightFromTop`, `HingeSideViewedFromOutside`.
+ *
+ * 4. Adding a style is a new key in the relevant style-option map plus a new
  *    parametric builder. The compiler then reports every switch that must
  *    handle it. No new art assets, per the core architectural constraint.
  *
- * 4. Nothing here is UI state. Camera preset, silhouette toggle, panel section
- *    expansion and the in-progress text of a numeric input all live in UI
- *    state, not in the shared configuration.
+ * 5. Nothing here is UI state. Camera preset, silhouette toggle, panel section
+ *    expansion and the in-progress text of a numeric input live elsewhere; the
+ *    camera preset travels in its own URL parameter (view.ts), decoded
+ *    independently of ConfigState.
  */
 
-import type { Mm } from './units';
+import type {
+  ColumnWeight,
+  GlazedFractionOfLeafHeightFromTop,
+  MeetingRailFractionFromCill,
+  Mm,
+  RowWeight,
+} from './units';
+import type { FrameMaterial, Finish } from './material';
 import type { RalCode } from './ral';
 
 /**
- * Bumped whenever an existing field changes meaning or is removed. Additive
- * changes (a new style, a new RAL shade) do not require a bump — the decoder
- * falls back to defaults for anything it does not recognise.
+ * Incremented only when an existing field changes meaning or is removed.
+ * Additive changes do not bump it. See migrations.ts for the policy and for
+ * the migration chain applied to older links.
+ *
+ * v1 → v2: single `colour` became an external/internal pair; frame material
+ * added; safety glazing, trickle vents and door threshold added; bay windows
+ * removed from the catalogue.
  */
-export const CONFIG_SCHEMA_VERSION = 1;
+export const CONFIG_SCHEMA_VERSION = 2;
+
+/* ------------------------------------------------------------------ *
+ * Handing
+ *
+ * Wrong-handedness is a manufacturing error, not a display bug, so the
+ * viewpoint is part of the type name at every use site and is restated in an
+ * exported constant that the summary panel (Step 8.1) prints verbatim.
+ *
+ * !! CONFIRM WITH THE FABRICATOR !!  Viewed-from-outside is the common UK
+ * convention for external doors, but it is not universal, and some suppliers
+ * quote handing from the inside. If theirs differs, change it HERE and nowhere
+ * else — every consumer reads the convention from this constant.
+ * ------------------------------------------------------------------ */
+
+export const HANDING_CONVENTION = {
+  viewpoint: 'outside',
+  /** Printed on the summary panel and on the enquiry, verbatim. */
+  statement: 'Hinge side and opening direction are stated as viewed from outside the building.',
+} as const;
+
+/** Side carrying the hinges, as viewed from OUTSIDE the building. */
+export type HingeSideViewedFromOutside = 'left' | 'right';
+
+/** Direction the leaf swings, as viewed from OUTSIDE the building. */
+export type OpeningDirectionViewedFromOutside = 'inward' | 'outward';
+
+/** Restates a hinge side from the opposite viewpoint. Mirrors, by definition. */
+export function hingeSideViewedFromInside(side: HingeSideViewedFromOutside): 'left' | 'right' {
+  return side === 'left' ? 'right' : 'left';
+}
 
 /* ------------------------------------------------------------------ *
  * Shared vocabulary
@@ -36,18 +82,21 @@ export const CONFIG_SCHEMA_VERSION = 1;
 
 export type ProductType = 'door' | 'window';
 
-/** Structural size of the outer frame, i.e. the hole in the wall. */
+/** Structural size of the outer frame: the hole in the wall. */
 export interface Dimensions {
-  /** Overall structural width, including any side lights and their mullions. */
+  /**
+   * Overall structural width, INCLUDING any side lights and their mullions.
+   * The door leaf width is derived from this, not the other way round.
+   */
   width: Mm;
   /** Overall structural height, including any top light and its transom. */
   height: Mm;
 }
 
 /**
- * Colour is split by orderability so that the "explore" path cannot reach a
- * quote by accident. Only `OrderableColour` is accepted by the enquiry payload
- * (Step 8), which the compiler enforces.
+ * Colour is split by orderability so that the explore path cannot reach an
+ * order by accident. An explore colour does not block an enquiry (it is
+ * recorded as non-orderable), but it can never produce a `QuotableConfig`.
  */
 export type ColourSelection = OrderableColour | ExploreColour;
 
@@ -62,49 +111,72 @@ export interface ExploreColour {
   hex: string;
 }
 
+/** Internal colour may simply follow the external one. */
+export type InternalColour = ColourSelection | { mode: 'match' };
+
+export interface ColourPair {
+  external: ColourSelection;
+  /** Defaults to `{ mode: 'match' }`. */
+  internal: InternalColour;
+}
+
 export function isOrderableColour(colour: ColourSelection): colour is OrderableColour {
   return colour.mode === 'ral';
 }
 
-/** Surface finish, selected independently of colour (Step 5.3). */
-export type Finish = 'smooth' | 'textured' | 'woodgrain-foil';
+/** Resolves `match` to the external selection. */
+export function resolveInternalColour(pair: ColourPair): ColourSelection {
+  return pair.internal.mode === 'match' ? pair.external : pair.internal;
+}
 
 export type GlazingUnit = 'double' | 'triple';
 
 export type TintColour = 'bronze' | 'grey' | 'blue';
 
 /**
- * Obscure patterns are rendered procedurally (a generated normal map), not from
- * photographed glass. Named commercial patterns are approximations.
+ * Obscure patterns are generated procedurally (a computed normal map), not
+ * photographed. Named commercial patterns are approximations — covered by the
+ * indicative-only notice, which extends to finishes and obscure glass as well
+ * as colour.
  */
 export type ObscurePattern = 'sandblast' | 'reeded' | 'stippled' | 'cathedral';
 
 /**
- * The brief lists "clear, obscure, tinted, double, triple" as one set. They are
- * two orthogonal axes — how the glass looks, and how many panes the sealed unit
- * has — so they are modelled separately here. See the note raised at Step 1.
+ * Safety glazing, independent of appearance and of pane count. Where Approved
+ * Document K makes a location critical this is not the customer's choice —
+ * see safety.ts, which returns the forced value and the reason for it.
+ */
+export type SafetyGlazing = 'none' | 'toughened' | 'laminated';
+
+/**
+ * The brief listed "clear, obscure, tinted, double, triple" as one set. They
+ * are three independent axes: how the glass looks, how many panes the sealed
+ * unit has, and whether it is a safety glass.
  */
 export type GlazingAppearance =
   | { appearance: 'clear' }
   | { appearance: 'tinted'; tint: TintColour }
   | { appearance: 'obscure'; pattern: ObscurePattern };
 
-export type Glazing = GlazingAppearance & { unit: GlazingUnit };
+export type Glazing = GlazingAppearance & {
+  unit: GlazingUnit;
+  safety: SafetyGlazing;
+};
 
 export type HardwareFinish = 'chrome' | 'satin-chrome' | 'black' | 'brass' | 'anthracite';
 
 /**
  * Glazing bar layout. `true-bar` genuinely divides the glazing into separate
  * sealed units; the other two are applied to a single unit. The distinction is
- * visible at the reveal and affects price, so it is modelled, not styled.
+ * visible at the reveal and changes the price, so it is modelled, not styled.
  */
 export type BarStyle = 'none' | 'georgian-internal' | 'applied-astragal' | 'true-bar';
 
 export interface BarLayout {
   style: BarStyle;
-  /** Number of vertical divisions of the glazed area. 1 = no vertical bar. */
+  /** Vertical divisions of the glazed area. 1 = no vertical bar. */
   columns: number;
-  /** Number of horizontal divisions of the glazed area. 1 = no horizontal bar. */
+  /** Horizontal divisions of the glazed area. 1 = no horizontal bar. */
   rows: number;
   /** Face width of the bar. */
   barWidth: Mm;
@@ -113,12 +185,31 @@ export interface BarLayout {
 export const NO_BARS: BarLayout = { style: 'none', columns: 1, rows: 1, barWidth: 0 };
 
 /* ------------------------------------------------------------------ *
+ * Ventilation
+ *
+ * Background ventilation is a regulatory requirement on most replacement
+ * work in England (Approved Document F), so "fitted or not" is closer to a
+ * compliance output than a customer preference. What actually gets specified
+ * is equivalent area in mm² per room, which depends on the room the unit
+ * serves — information the configurator does not have. See the note raised at
+ * Step 1: `count` is a proxy and the enquiry must not read as a compliance
+ * statement.
+ * ------------------------------------------------------------------ */
+
+export type TrickleVentPosition = 'head-of-frame' | 'in-sash' | 'through-glazing';
+
+export interface TrickleVents {
+  position: TrickleVentPosition;
+  /** Number fitted across the head of the frame. */
+  count: number;
+}
+
+/* ------------------------------------------------------------------ *
  * Doors
  * ------------------------------------------------------------------ */
 
 export type DoorStyleId = 'solid-panel' | 'half-glazed' | 'full-glazed';
 
-/** Shape of the glazed aperture in a door leaf. All parametric. */
 export type ApertureShape = 'rectangular' | 'arched' | 'circular';
 
 export interface DoorAperture {
@@ -128,26 +219,20 @@ export interface DoorAperture {
   inset: Mm;
 }
 
-/** Panel detailing (Step 6.2). Only meaningful where a solid area exists. */
+export type MouldingProfile = 'ovolo' | 'chamfer' | 'square';
+
+/** Panel detailing (Step 6.2). Only where a solid area exists. */
 export type PanelDetail =
   | { kind: 'flush' }
   | { kind: 'raised'; panels: 1 | 2 | 3 | 4; moulding: MouldingProfile }
   | { kind: 'grooved'; grooves: number; grooveWidth: Mm; orientation: 'horizontal' | 'vertical' };
 
-/** Swept profile for a raised panel surround, extruded along the panel path. */
-export type MouldingProfile = 'ovolo' | 'chamfer' | 'square';
-
-/**
- * Per-style door options. A style's options are reachable only through that
- * style, so `solid-panel` has no aperture and `full-glazed` has no panelling.
- */
 export interface DoorStyleOptions {
   'solid-panel': {
     panelDetail: PanelDetail;
   };
   'half-glazed': {
-    /** Proportion of the leaf height that is glazed, measured from the top. */
-    glazedFraction: number;
+    glazedFraction: GlazedFractionOfLeafHeightFromTop;
     aperture: DoorAperture;
     panelDetail: PanelDetail;
   };
@@ -162,7 +247,6 @@ export type DoorStyle = {
 
 /** Side lights and top light (Step 6.1). */
 export interface DoorSurround {
-  /** Structural width of the left side light, or null for none. */
   leftSideLight: SideLight | null;
   rightSideLight: SideLight | null;
   topLight: TopLight | null;
@@ -179,20 +263,26 @@ export interface TopLight {
   bars: BarLayout;
 }
 
+export function hasGlazedSurround(surround: DoorSurround): boolean {
+  return (
+    surround.leftSideLight !== null || surround.rightSideLight !== null || surround.topLight !== null
+  );
+}
+
+/**
+ * Threshold type. A low/level-access threshold trades weather performance for
+ * step-free entry; it is the accessible option for a principal entrance.
+ */
+export type ThresholdType = 'standard' | 'low-level-access';
+
 export type DoorHandleStyle = 'lever-backplate' | 'lever-rose' | 'pull-bar' | 'knob';
 
 /**
- * Knocker forms are restricted to shapes that can be generated parametrically
- * (a lathed ring, a lathed urn body). Figurative knockers are out of scope
- * under the no-asset constraint.
+ * Knocker forms are restricted to shapes that can be lathed or extruded
+ * parametrically. Figurative knockers are out of scope under the no-asset
+ * constraint.
  */
 export type KnockerStyle = 'ring' | 'doctor' | 'urn';
-
-export interface DoorNumerals {
-  /** Free text so that "12A" and "221B" work. Length-capped at validation. */
-  value: string;
-  placement: 'centre' | 'above-letterplate' | 'on-side-light';
-}
 
 export interface DoorHardware {
   handle: DoorHandleStyle;
@@ -200,7 +290,12 @@ export interface DoorHardware {
   letterplate: boolean;
   knocker: KnockerStyle | null;
   spyhole: boolean;
-  numerals: DoorNumerals | null;
+  /**
+   * House numerals are deferred out of phase 1: glyphs require a font, which
+   * is an art asset by any reading of the core constraint. Extension point —
+   * add `numerals: DoorNumerals | null` here, an `nm` key in url.ts, and pick
+   * between an extruded typeface and SVG-extruded digits.
+   */
 }
 
 export interface DoorConfig {
@@ -208,17 +303,21 @@ export interface DoorConfig {
   style: DoorStyle;
   surround: DoorSurround;
   hardware: DoorHardware;
-  /** Side carrying the hinges, viewed from outside. */
-  hingeSide: 'left' | 'right';
-  /** Direction the leaf swings, viewed from outside. */
-  openingDirection: 'inward' | 'outward';
+  threshold: ThresholdType;
+  /**
+   * Only permitted where the door has a glazed surround; a solid door leaf has
+   * nowhere to put one. Cross-field, so enforced in validate.ts.
+   */
+  trickleVents: TrickleVents | null;
+  hingeSide: HingeSideViewedFromOutside;
+  openingDirection: OpeningDirectionViewedFromOutside;
 }
 
 /* ------------------------------------------------------------------ *
  * Windows
  * ------------------------------------------------------------------ */
 
-export type WindowStyleId = 'casement' | 'tilt-and-turn' | 'sash' | 'bay' | 'fixed';
+export type WindowStyleId = 'casement' | 'tilt-and-turn' | 'sash' | 'fixed';
 
 /** How an individual light opens (Step 7.3). */
 export type SashOpening =
@@ -234,24 +333,17 @@ export interface SashCell {
 }
 
 /**
- * A frame divided into a grid of lights. Column and row weights are relative
- * and normalised at render time, so the grid stays proportional as the overall
- * dimensions change — the model is genuinely dimension-driven rather than a
- * fixed shape scaled up.
+ * A frame divided into a grid of lights. Weights are relative and normalised
+ * at render time, so proportions are genuinely driven by the dimensions rather
+ * than a fixed shape being scaled.
  *
  * Invariant: cells.length === columnWeights.length * rowWeights.length, in
- * row-major order. Enforced at decode and by the store's update helpers.
+ * row-major order. Enforced at decode and in validate.ts.
  */
 export interface SashGrid {
-  columnWeights: number[];
-  rowWeights: number[];
+  columnWeights: ColumnWeight[];
+  rowWeights: RowWeight[];
   cells: SashCell[];
-}
-
-export interface BaySegment {
-  /** Share of the overall structural width taken by this facet. */
-  widthShare: number;
-  grid: SashGrid;
 }
 
 export interface WindowStyleOptions {
@@ -260,28 +352,15 @@ export interface WindowStyleOptions {
   };
   'tilt-and-turn': {
     grid: SashGrid;
-    /** Side the turn hinge sits on; tilt is always at the head. */
-    turnHingeSide: 'left' | 'right';
+    /** Side the turn hinge sits on, viewed from outside; tilt is at the head. */
+    turnHingeSide: HingeSideViewedFromOutside;
   };
   sash: {
     operation: 'single-hung' | 'double-hung';
-    /** Height of the meeting rail as a fraction of the frame height. */
-    meetingRailPosition: number;
+    meetingRailPosition: MeetingRailFractionFromCill;
     horns: boolean;
     upperBars: BarLayout;
     lowerBars: BarLayout;
-  };
-  bay: {
-    /**
-     * Facets across the front, left to right. Two segments make a splayed bay,
-     * three or more a classic bay. See the flag raised at Step 1: `width` for a
-     * bay is the overall span across the wall opening, and `returnDepth` is how
-     * far the bay projects from it.
-     */
-    segments: BaySegment[];
-    /** Internal angle between adjacent facets, degrees. */
-    cornerAngle: 90 | 135 | 150;
-    returnDepth: Mm;
   };
   fixed: {
     bars: BarLayout;
@@ -292,9 +371,44 @@ export type WindowStyle = {
   [K in WindowStyleId]: { id: K; options: WindowStyleOptions[K] };
 }[WindowStyleId];
 
+/* ------------------------------------------------------------------ *
+ * Extension point — styles deferred out of phase 1
+ *
+ * BAY (deferred 2026-09-11). A bay is not expressible as width × height: it is
+ * a run of facets with a corner angle and a projection from the wall, so it
+ * needs its own sizing panel in Step 3 rather than the two numeric inputs.
+ *
+ * To restore, in this order:
+ *   1. Add 'bay' to WindowStyleId and an entry to WindowStyleOptions using
+ *      DeferredBayOptions below. The compiler then names every switch that
+ *      must handle it — url.ts, defaults.ts, validate.ts and the Step 2
+ *      geometry builder.
+ *   2. Add the `bs` / `bg<n>` / `ca` / `rd` key group to url.ts. One key per
+ *      segment, because the separator set cannot express a fourth level of
+ *      nesting.
+ *   3. Give Step 3 a per-style sizing panel; `width` for a bay means the span
+ *      across the wall opening, with `returnDepth` as the projection.
+ * No schema version bump is required: adding a style is additive, and older
+ * links are unaffected.
+ * ------------------------------------------------------------------ */
+
+export interface DeferredBaySegment {
+  /** Share of the overall structural width taken by this facet. */
+  widthShare: number;
+  grid: SashGrid;
+}
+
+export interface DeferredBayOptions {
+  segments: DeferredBaySegment[];
+  /** Internal angle between adjacent facets, degrees. */
+  cornerAngle: 90 | 135 | 150;
+  /** Projection from the wall face. */
+  returnDepth: Mm;
+}
+
 /**
  * Window handles mirror the door set minus the pull bar, which does not exist
- * as a window handle. Flagged at Step 1 as a deliberate deviation from 7.4.
+ * as a window handle.
  */
 export type WindowHandleStyle = 'lever-backplate' | 'lever-rose' | 'knob';
 
@@ -307,6 +421,7 @@ export interface WindowConfig {
   productType: 'window';
   style: WindowStyle;
   hardware: WindowHardware;
+  trickleVents: TrickleVents | null;
 }
 
 /* ------------------------------------------------------------------ *
@@ -315,25 +430,31 @@ export interface WindowConfig {
 
 interface ConfigCommon {
   schemaVersion: number;
+  /** Gates colour, finish, sightlines and every size limit. */
+  material: FrameMaterial;
   dimensions: Dimensions;
-  colour: ColourSelection;
+  colour: ColourPair;
   finish: Finish;
   glazing: Glazing;
 }
 
-export type ConfigState = (ConfigCommon & DoorConfig) | (ConfigCommon & WindowConfig);
+export type ConfigState = DoorConfigState | WindowConfigState;
 
 export type DoorConfigState = ConfigCommon & DoorConfig;
 export type WindowConfigState = ConfigCommon & WindowConfig;
 
-/**
- * A configuration that has passed dimension validation and carries an orderable
- * colour. The enquiry payload (Step 8) takes this type and nothing else, so an
- * explore colour or an unmanufacturable size cannot reach a quote.
- */
-export type QuotableConfig = ConfigState & { colour: OrderableColour } & {
-  readonly __quotable: unique symbol;
-};
+/* ------------------------------------------------------------------ *
+ * The quotable brand
+ *
+ * Declared as a module-scoped `unique symbol` so that the only way to obtain a
+ * QuotableConfig is through `mintQuotable` in validate.ts, which owns the sole
+ * type assertion. A brand nobody can construct gates nothing; a brand anybody
+ * can construct gates nothing either. One constructor, one validator.
+ * ------------------------------------------------------------------ */
+
+declare const quotableBrand: unique symbol;
+
+export type QuotableConfig = ConfigState & { readonly [quotableBrand]: true };
 
 /** Exhaustiveness guard for style switches. */
 export function assertNever(value: never): never {

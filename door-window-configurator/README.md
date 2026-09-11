@@ -4,21 +4,23 @@ Phase 1, Step 1 only: the state model and its URL serialisation. **No rendering
 code exists yet and none should be added until the state model is signed off.**
 
 React + Vite + TypeScript. React Three Fiber, drei and Zustand are deliberately
-not yet installed — Step 1 has no need of them, and installing them early
-invites rendering code to creep in ahead of approval.
+not yet installed.
 
 ## What is here
 
 | File | Purpose |
 | --- | --- |
-| `src/config/types.ts` | `ConfigState` — the canonical model (Step 1.1) |
-| `src/config/url.ts` | Total encoder/decoder to and from a query string (Step 1.2) |
-| `src/config/units.ts` | Millimetre handling; the single rounding point (Step 3.5) |
+| `src/config/types.ts` | `ConfigState` — the canonical model |
+| `src/config/material.ts` | Frame material: the gate on colour, finish, sightlines — **placeholder data** |
+| `src/config/limits.ts` | Manufacturable limits per material, grid caps, presets — **placeholder data** |
 | `src/config/ral.ts` | RAL palette — **placeholder data** |
-| `src/config/limits.ts` | Manufacturable limits and size presets — **placeholder data** |
-| `src/config/defaults.ts` | Default configurations and per-style option defaults |
-| `src/config/storage.ts` | localStorage persistence; URL takes precedence |
-| `src/config/url.test.ts` | Round-trip, hostile-input and rounding tests |
+| `src/config/safety.ts` | Approved Document K critical locations — **simplified, not a compliance tool** |
+| `src/config/validate.ts` | Validation, material reconciliation, the sole `QuotableConfig` constructor |
+| `src/config/url.ts` | Total encoder/decoder to and from a query string |
+| `src/config/migrations.ts` | Schema migration policy and the v1 → v2 chain |
+| `src/config/view.ts` | Camera preset, decoded independently of `ConfigState` |
+| `src/config/units.ts` | Millimetres and normalised proportions; the single rounding point |
+| `src/config/storage.ts` | localStorage persistence; the URL takes precedence |
 
 ```
 npm install
@@ -26,41 +28,67 @@ npm run typecheck
 npm test
 ```
 
-## Design decisions taken
+## Design decisions
 
-**Discriminated union on `productType`, and again on style.** Per-style options
-hang off the style discriminant, so a full-glazed door cannot carry raised panel
-detailing and a fixed window cannot carry an opening direction. Adding a style
-is a new key in `DoorStyleOptions` / `WindowStyleOptions` plus a parametric
-builder; the compiler then reports every switch that must handle it.
+**Material gates the catalogue.** Colour, finish, sightlines and every size
+limit hang off `material`. Those are cross-field rules, so they live in
+`validate.ts` rather than the type system; `reconcileWithMaterial` runs on every
+material change and after every decode, because a link can carry a combination
+that was legal when it was shared and is not now.
 
-**Colour is split by orderability.** `OrderableColour` (a RAL code) and
-`ExploreColour` (a free hex value) are separate variants. The enquiry payload in
-Step 8 will accept `QuotableConfig`, which narrows colour to `OrderableColour`,
-so an explore colour cannot reach a quote by accident rather than by discipline.
+**Units and bases live in type names.** `Mm`, `GlazedFractionOfLeafHeightFromTop`,
+`MeetingRailFractionFromCill`, `HingeSideViewedFromOutside`. Handing is also
+restated in the exported `HANDING_CONVENTION`, which the summary panel prints
+verbatim — wrong-handedness is a manufacturing error, not a display bug.
 
-**Glazing is two axes, not one.** The brief lists "clear, obscure, tinted,
-double, triple" as one set. Appearance and pane count are independent, so they
-are modelled separately as `appearance` and `unit`.
+**One brand, one constructor.** `QuotableConfig` is branded with a
+module-scoped `declare const … unique symbol`, and `mintQuotable` in
+`validate.ts` holds the only assertion that produces one. An explore colour or
+a failed dimension check means no brand. Per decision 13 an explore colour does
+not block the enquiry: `buildEnquiry` returns a `non-orderable` payload
+carrying the reasons instead.
 
-**Dimensions are floats in millimetres.** Rounded half-up to whole millimetres
-exactly once, in `formatMm`, at the display boundary. The scene works in metres;
-`toSceneUnits` is the only conversion point.
+**The decoder is total.** Every path returns a usable configuration. Unreadable
+values fall back per field and are reported in `issues`. Out-of-range
+dimensions are clamped, not rejected — a shared link should still open.
 
-**The decoder is total.** Every path returns a usable configuration. Unknown,
-missing or malformed values fall back to the default for that field and are
-reported in `issues` for the UI to surface as a non-blocking notice. An
-out-of-range dimension is clamped, not rejected — a shared link should still
-open.
+**Every field is encoded, including the switched-off ones.** `lp=0` rather than
+omitting the key, and `n` as an explicit "not fitted" token. Encoding by
+presence alone makes "the customer switched this off" indistinguishable from
+"this link predates the option".
 
-**Every field is encoded, including the off ones.** `lp=0` rather than omitting
-the key. Encoding an option by its presence alone makes "the customer switched
-this off" indistinguishable from "this link predates the option", and the two
-must fall back differently. A typical door link is 113 characters.
+## Link length
+
+Worst case at the caps in `limits.ts`, including scheme and host:
+
+| Configuration | Query | Full URL |
+| --- | --- | --- |
+| Door, half-glazed, two side lights, top light, saturated bars | 230 | 262 |
+| Casement, 6 × 6 lights, every light with 12 × 12 true bars | 710 | 742 |
+| Tilt and turn, 6 × 6 saturated | 715 | 747 |
+| Sash | 143 | 175 |
+| Fixed | 110 | 142 |
+
+A typical default door is 137. The worst case is bounded by `MAX_GRID_COLUMNS`,
+`MAX_GRID_ROWS` and `MAX_BAR_DIVISIONS`, which is why those caps are a product
+decision rather than only a technical one.
+
+## Migration policy
+
+Stated in full at the top of `src/config/migrations.ts`. In short: the version
+increments only when a field changes meaning or is removed; key codes are never
+reused and retired ones are listed in `RETIRED_KEYS`; migration runs on the raw
+query parameters as a chain of single-version steps before any field is
+decoded; a step that cannot express an old configuration decodes to the nearest
+equivalent and tells the customer; a link from a newer build is read
+best-effort rather than rejected.
 
 ## Placeholders requiring replacement before launch
 
-- `src/config/limits.ts` — every size limit and preset is a plausible industry
-  figure, not a supplied one.
-- `src/config/ral.ts` — both the list of offered shades and the approximate sRGB
-  values.
+- `material.ts` — which materials are actually sold, their sightlines, and the
+  colour and finish restrictions on each.
+- `limits.ts` — every size limit, grid cap and preset.
+- `ral.ts` — the offered shade list and its approximate sRGB values.
+- `safety.ts` — a simplified reading of Approved Document K (England and
+  Wales). Not a compliance statement, and it cannot assess a window without the
+  cill height above the finished floor.

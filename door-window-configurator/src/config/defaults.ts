@@ -1,6 +1,6 @@
 /**
  * Default configurations, and the per-style option defaults the decoder falls
- * back to when a shared link omits or corrupts a field.
+ * back to when a link omits or corrupts a field.
  */
 
 import type {
@@ -14,6 +14,11 @@ import type {
   WindowStyleOptions,
 } from './types';
 import { CONFIG_SCHEMA_VERSION, NO_BARS } from './types';
+import type { FrameMaterial } from './material';
+
+/** PLACEHOLDER: the material a customer is most likely to want is a business
+ *  question, not a technical one. */
+export const DEFAULT_MATERIAL: FrameMaterial = 'upvc';
 
 export function makeGrid(columns: number, rows: number): SashGrid {
   return {
@@ -26,9 +31,7 @@ export function makeGrid(columns: number, rows: number): SashGrid {
   };
 }
 
-export const DEFAULT_DOOR_STYLE_OPTIONS: {
-  [K in DoorStyleId]: DoorStyleOptions[K];
-} = {
+export const DEFAULT_DOOR_STYLE_OPTIONS: { [K in DoorStyleId]: DoorStyleOptions[K] } = {
   'solid-panel': {
     panelDetail: { kind: 'raised', panels: 2, moulding: 'ovolo' },
   },
@@ -42,9 +45,7 @@ export const DEFAULT_DOOR_STYLE_OPTIONS: {
   },
 };
 
-export const DEFAULT_WINDOW_STYLE_OPTIONS: {
-  [K in WindowStyleId]: WindowStyleOptions[K];
-} = {
+export const DEFAULT_WINDOW_STYLE_OPTIONS: { [K in WindowStyleId]: WindowStyleOptions[K] } = {
   casement: { grid: makeGrid(2, 1) },
   'tilt-and-turn': { grid: makeGrid(1, 1), turnHingeSide: 'left' },
   sash: {
@@ -54,25 +55,17 @@ export const DEFAULT_WINDOW_STYLE_OPTIONS: {
     upperBars: { style: 'applied-astragal', columns: 3, rows: 2, barWidth: 22 },
     lowerBars: { style: 'applied-astragal', columns: 3, rows: 2, barWidth: 22 },
   },
-  bay: {
-    segments: [
-      { widthShare: 0.25, grid: makeGrid(1, 1) },
-      { widthShare: 0.5, grid: makeGrid(2, 1) },
-      { widthShare: 0.25, grid: makeGrid(1, 1) },
-    ],
-    cornerAngle: 135,
-    returnDepth: 450,
-  },
   fixed: { bars: { ...NO_BARS } },
 };
 
 export const DEFAULT_DOOR: DoorConfigState = {
   schemaVersion: CONFIG_SCHEMA_VERSION,
   productType: 'door',
+  material: DEFAULT_MATERIAL,
   dimensions: { width: 838, height: 1981 },
-  colour: { mode: 'ral', code: 'RAL7016' },
+  colour: { external: { mode: 'ral', code: 'RAL7016' }, internal: { mode: 'match' } },
   finish: 'smooth',
-  glazing: { appearance: 'clear', unit: 'double' },
+  glazing: { appearance: 'clear', unit: 'double', safety: 'none' },
   style: { id: 'solid-panel', options: DEFAULT_DOOR_STYLE_OPTIONS['solid-panel'] },
   surround: { leftSideLight: null, rightSideLight: null, topLight: null },
   hardware: {
@@ -81,8 +74,9 @@ export const DEFAULT_DOOR: DoorConfigState = {
     letterplate: true,
     knocker: null,
     spyhole: false,
-    numerals: null,
   },
+  threshold: 'standard',
+  trickleVents: null,
   hingeSide: 'left',
   openingDirection: 'inward',
 };
@@ -90,12 +84,14 @@ export const DEFAULT_DOOR: DoorConfigState = {
 export const DEFAULT_WINDOW: WindowConfigState = {
   schemaVersion: CONFIG_SCHEMA_VERSION,
   productType: 'window',
+  material: DEFAULT_MATERIAL,
   dimensions: { width: 1200, height: 1050 },
-  colour: { mode: 'ral', code: 'RAL9016' },
+  colour: { external: { mode: 'ral', code: 'RAL9016' }, internal: { mode: 'match' } },
   finish: 'smooth',
-  glazing: { appearance: 'clear', unit: 'double' },
+  glazing: { appearance: 'clear', unit: 'double', safety: 'none' },
   style: { id: 'casement', options: DEFAULT_WINDOW_STYLE_OPTIONS.casement },
   hardware: { handle: 'lever-rose', finish: 'satin-chrome' },
+  trickleVents: { position: 'head-of-frame', count: 1 },
 };
 
 export const DEFAULT_CONFIG: ConfigState = DEFAULT_DOOR;

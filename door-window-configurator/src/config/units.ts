@@ -51,3 +51,42 @@ export function formatMm(value: Mm): string {
 export function formatSize(width: Mm, height: Mm): string {
   return `${roundMmHalfUp(width)} × ${roundMmHalfUp(height)} mm (W × H)`;
 }
+
+/* ------------------------------------------------------------------ *
+ * Normalised proportions
+ *
+ * A bare `number` between 0 and 1 says nothing about what it is a proportion
+ * OF, or which end it is measured FROM. Both have been wrong in configurators
+ * before. The aliases below carry the basis in the name, the same way `Mm`
+ * carries the unit, and every consumer reads the basis at the use site.
+ * ------------------------------------------------------------------ */
+
+/** A proportion in the closed interval 0..1. */
+export type Fraction = number;
+
+/**
+ * Proportion of the door LEAF height that is glazed, measured DOWN FROM THE
+ * TOP of the leaf. 0.45 on a 1981 mm leaf glazes the upper 891 mm.
+ */
+export type GlazedFractionOfLeafHeightFromTop = Fraction;
+
+/**
+ * Height of the meeting rail as a proportion of the sash frame height,
+ * measured UP FROM THE CILL. 0.5 puts the rail at mid-height; 0.6 gives the
+ * taller lower sash of a traditional box sash window.
+ */
+export type MeetingRailFractionFromCill = Fraction;
+
+/**
+ * Share of the overall structural width taken by one grid column, relative to
+ * its siblings rather than absolute. Normalised at render time, so the grid
+ * stays proportional as the overall dimensions change.
+ */
+export type ColumnWeight = number;
+
+/** As ColumnWeight, for rows, measured top to bottom. */
+export type RowWeight = number;
+
+export function clampFraction(value: Fraction, min: Fraction, max: Fraction): Fraction {
+  return Math.min(max, Math.max(min, value));
+}
