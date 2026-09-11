@@ -70,6 +70,12 @@ export const MAX_GRID_ROWS = 6;
 /** Maximum divisions of a single glazed area by astragal or Georgian bars. */
 export const MAX_BAR_DIVISIONS = 12;
 
+/** PLACEHOLDER. Upstand of the door threshold above finished floor level. */
+export const THRESHOLD_HEIGHT: Record<'standard' | 'low-level-access', Mm> = {
+  standard: 60,
+  'low-level-access': 15,
+};
+
 /** PLACEHOLDER. Trickle vents fitted across the head of one frame. */
 export const MAX_TRICKLE_VENTS = 6;
 

@@ -37,9 +37,9 @@ import {
   isColourAvailable,
   isFinishAvailable,
   MATERIALS,
-  sightlines,
 } from './material';
-import { assessCriticalLocations, requiredSafetyGlazing } from './safety';
+import { doorLayout } from './layout';
+import { assessCriticalLocations } from './safety';
 import { formatMm } from './units';
 import type { Mm } from './units';
 
@@ -60,13 +60,7 @@ export function isValid(result: ValidationResult): boolean {
 
 /** Door leaf width, derived from the overall opening (decision 10). */
 export function doorLeafWidth(config: DoorConfigState): Mm {
-  const frame = sightlines(config.material);
-  const left = config.surround.leftSideLight;
-  const right = config.surround.rightSideLight;
-  const sideLights =
-    (left === null ? 0 : left.width + frame.mullion) +
-    (right === null ? 0 : right.width + frame.mullion);
-  return config.dimensions.width - sideLights - frame.outerFrame * 2;
+  return doorLayout(config).leaf.width;
 }
 
 export function validateConfig(config: ConfigState): ValidationResult {
@@ -116,29 +110,35 @@ export function validateConfig(config: ConfigState): ValidationResult {
     });
   }
 
-  if (!isFinishAvailable(config.material, config.finish)) {
+  if (!isFinishAvailable(config.material, config.finish.external)) {
     errors.push({
-      field: 'finish',
-      message: `A ${config.finish} finish is not offered in ${material}.`,
+      field: 'finish.external',
+      message: `A ${config.finish.external} external finish is not offered in ${material}.`,
+    });
+  }
+  if (config.finish.internal !== 'match' && !isFinishAvailable(config.material, config.finish.internal)) {
+    errors.push({
+      field: 'finish.internal',
+      message: `A ${config.finish.internal} internal finish is not offered in ${material}.`,
     });
   }
 
   /* ---- safety glazing ---- */
   const assessment = assessCriticalLocations(config);
-  const required = requiredSafetyGlazing(config);
-  if (assessment.safetyGlazingForced && config.glazing.safety === 'none') {
+  // Assessed per pane: a side light reaching the floor is critical while a top
+  // light at 1800 mm is not. This is a backstop — the panel locks the control
+  // and `enforceSafetyGlazing` raises the value before it can get this far.
+  for (const pane of assessment.shortfalls) {
     errors.push({
-      field: 'glazing.safety',
-      message: `This configuration includes a critical location, so ${required} safety glass is required: ${
-        assessment.locations.find((l) => l.status === 'required')?.reason ?? ''
-      }`,
+      field: `glazing.safety.${pane.id}`,
+      message: `${pane.label} is a critical location, so ${pane.minimum} safety glass is required. ${pane.reason}`,
     });
   }
   if (assessment.undetermined) {
     notices.push({
       field: 'glazing.safety',
       message:
-        'Whether safety glass is required depends on the cill height above the finished floor. The surveyor will confirm this.',
+        'Whether safety glass is required depends on the cill height above the finished floor, which is a property of the installation rather than of the product. The enquiry form asks for it optionally, and the surveyor will confirm it.',
     });
   }
 
@@ -315,13 +315,21 @@ export function reconcileWithMaterial(config: ConfigState): {
   const issues: ValidationIssue[] = [];
   let next = config;
 
-  if (!isFinishAvailable(next.material, next.finish)) {
+  if (!isFinishAvailable(next.material, next.finish.external)) {
     const replacement = fallbackFinish(next.material);
     issues.push({
-      field: 'finish',
-      message: `A ${next.finish} finish is not offered in ${MATERIALS[next.material].label}; changed to ${replacement}.`,
+      field: 'finish.external',
+      message: `A ${next.finish.external} finish is not offered in ${MATERIALS[next.material].label}; changed to ${replacement}.`,
     });
-    next = { ...next, finish: replacement };
+    next = { ...next, finish: { ...next.finish, external: replacement } };
+  }
+
+  if (next.finish.internal !== 'match' && !isFinishAvailable(next.material, next.finish.internal)) {
+    issues.push({
+      field: 'finish.internal',
+      message: `A ${next.finish.internal} finish is not offered in ${MATERIALS[next.material].label}; the inside now matches the outside.`,
+    });
+    next = { ...next, finish: { ...next.finish, internal: 'match' } };
   }
 
   const external = next.colour.external;
@@ -343,16 +351,13 @@ export function reconcileWithMaterial(config: ConfigState): {
     next = { ...next, colour: { ...next.colour, internal: { mode: 'match' } } };
   }
 
-  const limits = sizeLimits(next.material, next.productType);
-  const width = Math.min(limits.maxWidth, Math.max(limits.minWidth, next.dimensions.width));
-  const height = Math.min(limits.maxHeight, Math.max(limits.minHeight, next.dimensions.height));
-  if (width !== next.dimensions.width || height !== next.dimensions.height) {
-    issues.push({
-      field: 'dimensions',
-      message: `Size adjusted to the range manufacturable in ${MATERIALS[next.material].label}.`,
-    });
-    next = { ...next, dimensions: { width, height } };
-  }
+  // Dimensions are deliberately NOT clamped here.
+  //
+  // Reconciliation runs on live edits as well as on decode, and silently
+  // resizing what someone just typed is exactly what Step 3.4 forbids: an
+  // invalid size must show an inline reason stating the permitted range. The
+  // URL decoder clamps `w` and `h` as it reads them, because a shared link has
+  // nobody present to tell; an edit has, so validateConfig reports instead.
 
   return { config: next, issues };
 }
@@ -372,13 +377,30 @@ export function mintQuotable(config: ConfigState): QuotableConfig | null {
   return config as QuotableConfig;
 }
 
+/**
+ * Installation facts the configurator cannot know. Optional, never gating: a
+ * customer who does not know their cill height still gets to send an enquiry,
+ * and the surveyor confirms it. Deliberately NOT part of ConfigState — it is a
+ * property of the opening, meaningless in a shared link (decision 3).
+ */
+export interface InstallationDetails {
+  /** Height of the cill above the finished floor, in mm. */
+  cillHeightAboveFloor?: number;
+}
+
 export type EnquiryPayload =
-  | { kind: 'quotable'; config: QuotableConfig; notices: ValidationIssue[] }
+  | {
+      kind: 'quotable';
+      config: QuotableConfig;
+      notices: ValidationIssue[];
+      installation: InstallationDetails;
+    }
   | {
       kind: 'non-orderable';
       config: ConfigState;
       reasons: ValidationIssue[];
       notices: ValidationIssue[];
+      installation: InstallationDetails;
     }
   | { kind: 'invalid'; errors: ValidationIssue[] };
 
@@ -387,7 +409,10 @@ export type EnquiryPayload =
  * does not block submission; it downgrades the payload to `non-orderable` so
  * that whoever picks it up knows the colour has to be agreed before pricing.
  */
-export function buildEnquiry(config: ConfigState): EnquiryPayload {
+export function buildEnquiry(
+  config: ConfigState,
+  installation: InstallationDetails = {},
+): EnquiryPayload {
   const result = validateConfig(config);
   if (result.errors.length > 0) return { kind: 'invalid', errors: result.errors };
 
@@ -397,10 +422,21 @@ export function buildEnquiry(config: ConfigState): EnquiryPayload {
       config,
       reasons: result.nonOrderable,
       notices: result.notices,
+      installation,
     };
   }
 
+  // The only construction of a 'quotable' payload, and it cannot be reached
+  // except through mintQuotable.
   const quotable = mintQuotable(config);
-  if (quotable === null) return { kind: 'invalid', errors: result.errors };
-  return { kind: 'quotable', config: quotable, notices: result.notices };
+  if (quotable === null) {
+    return {
+      kind: 'non-orderable',
+      config,
+      reasons: result.nonOrderable,
+      notices: result.notices,
+      installation,
+    };
+  }
+  return { kind: 'quotable', config: quotable, notices: result.notices, installation };
 }

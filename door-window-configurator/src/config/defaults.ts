@@ -27,6 +27,7 @@ export function makeGrid(columns: number, rows: number): SashGrid {
     cells: Array.from({ length: columns * rows }, () => ({
       opening: 'fixed' as const,
       bars: { ...NO_BARS },
+      safety: null,
     })),
   };
 }
@@ -37,11 +38,11 @@ export const DEFAULT_DOOR_STYLE_OPTIONS: { [K in DoorStyleId]: DoorStyleOptions[
   },
   'half-glazed': {
     glazedFraction: 0.45,
-    aperture: { shape: 'rectangular', bars: { ...NO_BARS }, inset: 120 },
+    aperture: { shape: 'rectangular', bars: { ...NO_BARS }, inset: 120, safety: null },
     panelDetail: { kind: 'raised', panels: 2, moulding: 'ovolo' },
   },
   'full-glazed': {
-    aperture: { shape: 'rectangular', bars: { ...NO_BARS }, inset: 100 },
+    aperture: { shape: 'rectangular', bars: { ...NO_BARS }, inset: 100, safety: null },
   },
 };
 
@@ -64,7 +65,7 @@ export const DEFAULT_DOOR: DoorConfigState = {
   material: DEFAULT_MATERIAL,
   dimensions: { width: 838, height: 1981 },
   colour: { external: { mode: 'ral', code: 'RAL7016' }, internal: { mode: 'match' } },
-  finish: 'smooth',
+  finish: { external: 'smooth', internal: 'match' },
   glazing: { appearance: 'clear', unit: 'double', safety: 'none' },
   style: { id: 'solid-panel', options: DEFAULT_DOOR_STYLE_OPTIONS['solid-panel'] },
   surround: { leftSideLight: null, rightSideLight: null, topLight: null },
@@ -87,7 +88,7 @@ export const DEFAULT_WINDOW: WindowConfigState = {
   material: DEFAULT_MATERIAL,
   dimensions: { width: 1200, height: 1050 },
   colour: { external: { mode: 'ral', code: 'RAL9016' }, internal: { mode: 'match' } },
-  finish: 'smooth',
+  finish: { external: 'smooth', internal: 'match' },
   glazing: { appearance: 'clear', unit: 'double', safety: 'none' },
   style: { id: 'casement', options: DEFAULT_WINDOW_STYLE_OPTIONS.casement },
   hardware: { handle: 'lever-rose', finish: 'satin-chrome' },

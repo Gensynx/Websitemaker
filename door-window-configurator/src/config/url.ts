@@ -30,6 +30,8 @@
 
 import type {
   BarLayout,
+  FinishPair,
+  SafetyOverride,
   BarStyle,
   ColourPair,
   ColourSelection,
@@ -127,6 +129,22 @@ const PRODUCT = codes<ProductType>({ door: 'd', window: 'w' });
 const FINISH = codes<Finish>({ smooth: 'sm', textured: 'tx', 'woodgrain-foil': 'wg' });
 const UNIT = codes<GlazingUnit>({ double: '2', triple: '3' });
 const SAFETY = codes<SafetyGlazing>({ none: 'n', toughened: 't', laminated: 'l' });
+
+/**
+ * Per-pane override. 'i' is an explicit "inherit the product-level value", so
+ * a v3 link always states it. An ABSENT trailing field also reads as inherit,
+ * which is what makes the v2 → v3 addition backward compatible.
+ */
+const INHERIT = 'i';
+
+function encodeSafetyOverride(override: SafetyOverride): string {
+  return override === null ? INHERIT : SAFETY.encode(override);
+}
+
+function decodeSafetyOverride(raw: string | undefined): SafetyOverride {
+  if (raw === undefined || raw === INHERIT) return null;
+  return SAFETY.decode(raw) ?? null;
+}
 const TINT = codes<TintColour>({ bronze: 'bz', grey: 'gy', blue: 'bl' });
 const OBSCURE = codes<ObscurePattern>({
   sandblast: 'sb',
@@ -196,7 +214,10 @@ function encodeBars(bars: BarLayout): string {
 
 function encodeGrid(grid: SashGrid): string {
   const cells = grid.cells
-    .map((cell) => `${OPENING.encode(cell.opening)}.${encodeBars(cell.bars)}`)
+    .map(
+      (cell) =>
+        `${OPENING.encode(cell.opening)}.${encodeBars(cell.bars)}.${encodeSafetyOverride(cell.safety)}`,
+    )
     .join('-');
   return [grid.columnWeights.map(int).join('-'), grid.rowWeights.map(int).join('-'), cells].join('*');
 }
@@ -226,6 +247,11 @@ function encodeGlazing(glazing: Glazing): string {
   }
 }
 
+function encodeFinishPair(finish: FinishPair, params: URLSearchParams): void {
+  params.set('fe', FINISH.encode(finish.external));
+  params.set('fi', finish.internal === 'match' ? 'm' : FINISH.encode(finish.internal));
+}
+
 function encodeColour(colour: ColourSelection): string {
   return colour.mode === 'ral' ? colour.code : `x${colour.hex.slice(1)}`;
 }
@@ -235,11 +261,16 @@ function encodeInternalColour(colour: InternalColour): string {
 }
 
 function encodeSideLight(light: SideLight): string {
-  return `${int(light.width)}.${encodeBars(light.bars)}`;
+  return `${int(light.width)}.${encodeBars(light.bars)}.${encodeSafetyOverride(light.safety)}`;
 }
 
 function encodeTopLight(light: TopLight): string {
-  return `${int(light.height)}.${light.shape === 'arched' ? 'a' : 'r'}.${encodeBars(light.bars)}`;
+  return [
+    int(light.height),
+    light.shape === 'arched' ? 'a' : 'r',
+    encodeBars(light.bars),
+    encodeSafetyOverride(light.safety),
+  ].join('.');
 }
 
 function encodeTrickleVents(vents: TrickleVents | null): string {
@@ -259,7 +290,7 @@ export function encodeConfig(config: ConfigState): URLSearchParams {
   params.set('h', num(config.dimensions.height));
   params.set('ce', encodeColour(config.colour.external));
   params.set('ci', encodeInternalColour(config.colour.internal));
-  params.set('f', FINISH.encode(config.finish));
+  encodeFinishPair(config.finish, params);
   params.set('g', encodeGlazing(config.glazing));
   params.set('sg', SAFETY.encode(config.glazing.safety));
   params.set('tv', encodeTrickleVents(config.trickleVents));
@@ -282,11 +313,17 @@ function encodeDoor(config: DoorConfigState, params: URLSearchParams): void {
     case 'half-glazed':
       params.set('pd', encodePanelDetail(config.style.options.panelDetail));
       params.set('gf', num(config.style.options.glazedFraction));
-      params.set('ap', `${config.style.options.aperture.shape[0]}.${int(config.style.options.aperture.inset)}`);
+      params.set(
+        'ap',
+        `${config.style.options.aperture.shape[0]}.${int(config.style.options.aperture.inset)}.${encodeSafetyOverride(config.style.options.aperture.safety)}`,
+      );
       params.set('ab', encodeBars(config.style.options.aperture.bars));
       break;
     case 'full-glazed':
-      params.set('ap', `${config.style.options.aperture.shape[0]}.${int(config.style.options.aperture.inset)}`);
+      params.set(
+        'ap',
+        `${config.style.options.aperture.shape[0]}.${int(config.style.options.aperture.inset)}.${encodeSafetyOverride(config.style.options.aperture.safety)}`,
+      );
       params.set('ab', encodeBars(config.style.options.aperture.bars));
       break;
   }
@@ -468,16 +505,17 @@ function decodeGrid(raw: string | null, fallback: SashGrid, key: string, issues:
 
   const cells: SashCell[] = [];
   for (const token of cellTokens) {
-    const dot = token.indexOf('.');
-    const openingRaw = dot === -1 ? token : token.slice(0, dot);
-    const barsRaw = dot === -1 ? NONE : token.slice(dot + 1);
+    // Positional: opening.bars[.safety]. The trailing field was added in v3;
+    // a v2 token has two fields and reads as "inherit".
+    const [openingRaw, barsRaw, safetyRaw] = token.split('.');
     const opening = OPENING.decode(openingRaw);
     if (opening === undefined) {
-      issues.add(key, `"${openingRaw}" is not a recognised opening; that light is now fixed`);
+      issues.add(key, `"${openingRaw ?? ''}" is not a recognised opening; that light is now fixed`);
     }
     cells.push({
       opening: opening ?? 'fixed',
-      bars: decodeBars(barsRaw, { ...NO_BARS }, key, issues),
+      bars: decodeBars(barsRaw ?? NONE, { ...NO_BARS }, key, issues),
+      safety: decodeSafetyOverride(safetyRaw),
     });
   }
   return { columnWeights, rowWeights, cells };
@@ -551,6 +589,19 @@ function decodeColourPair(params: URLSearchParams, fallback: ColourPair, issues:
   return { external, internal: { mode: 'match' } };
 }
 
+function decodeFinishPair(params: URLSearchParams, fallback: FinishPair, issues: Issues): FinishPair {
+  const external = readCode(params, 'fe', FINISH, fallback.external, issues);
+  const internalRaw = params.get('fi');
+  if (internalRaw === null) return { external, internal: fallback.internal };
+  if (internalRaw === 'm') return { external, internal: 'match' };
+  const internal = FINISH.decode(internalRaw);
+  if (internal === undefined) {
+    issues.add('fi', `"${internalRaw}" is not a recognised finish; the inside now matches the outside`);
+    return { external, internal: 'match' };
+  }
+  return { external, internal };
+}
+
 function decodeTrickleVents(
   raw: string | null,
   fallback: TrickleVents | null,
@@ -605,14 +656,21 @@ function decodePanelDetail(raw: string | null, fallback: PanelDetail, issues: Is
 
 function decodeAperture(
   params: URLSearchParams,
-  fallback: { shape: 'rectangular' | 'arched' | 'circular'; bars: BarLayout; inset: number },
+  fallback: {
+    shape: 'rectangular' | 'arched' | 'circular';
+    bars: BarLayout;
+    inset: number;
+    safety: SafetyOverride;
+  },
   issues: Issues,
 ) {
   const raw = params.get('ap');
   let shape = fallback.shape;
   let inset = fallback.inset;
+  let safety = fallback.safety;
   if (raw !== null) {
-    const [shapeCode, insetRaw] = raw.split('.');
+    const [shapeCode, insetRaw, safetyRaw] = raw.split('.');
+    safety = decodeSafetyOverride(safetyRaw);
     shape = shapeCode === 'a' ? 'arched' : shapeCode === 'c' ? 'circular' : 'rectangular';
     if (shapeCode !== 'a' && shapeCode !== 'c' && shapeCode !== 'r') {
       issues.add('ap', `"${shapeCode}" is not a recognised aperture shape; using rectangular`);
@@ -624,7 +682,7 @@ function decodeAperture(
       issues.add('ap', `"${insetRaw}" is not a valid aperture inset; using ${fallback.inset}`);
     }
   }
-  return { shape, inset, bars: decodeBars(params.get('ab'), fallback.bars, 'ab', issues) };
+  return { shape, inset, safety, bars: decodeBars(params.get('ab'), fallback.bars, 'ab', issues) };
 }
 
 function decodeSideLight(
@@ -635,19 +693,23 @@ function decodeSideLight(
 ): SideLight | null {
   if (raw === null) return fallback;
   if (raw === NONE) return null;
-  const [widthRaw, ...barParts] = raw.split('.');
+  const [widthRaw, barsRaw, safetyRaw] = raw.split('.');
   const width = Number(widthRaw);
   if (!Number.isFinite(width) || width <= 0) {
     issues.add(key, `"${raw}" is not a valid side light; it has been removed`);
     return null;
   }
-  return { width, bars: decodeBars(barParts.join('.') || NONE, { ...NO_BARS }, key, issues) };
+  return {
+    width,
+    bars: decodeBars(barsRaw ?? NONE, { ...NO_BARS }, key, issues),
+    safety: decodeSafetyOverride(safetyRaw),
+  };
 }
 
 function decodeTopLight(raw: string | null, fallback: TopLight | null, issues: Issues): TopLight | null {
   if (raw === null) return fallback;
   if (raw === NONE) return null;
-  const [heightRaw, shapeRaw, ...barParts] = raw.split('.');
+  const [heightRaw, shapeRaw, barsRaw, safetyRaw] = raw.split('.');
   const height = Number(heightRaw);
   if (!Number.isFinite(height) || height <= 0) {
     issues.add('tl', `"${raw}" is not a valid top light; it has been removed`);
@@ -656,7 +718,8 @@ function decodeTopLight(raw: string | null, fallback: TopLight | null, issues: I
   return {
     shape: shapeRaw === 'a' ? 'arched' : 'rectangular',
     height,
-    bars: decodeBars(barParts.join('.') || NONE, { ...NO_BARS }, 'tl', issues),
+    bars: decodeBars(barsRaw ?? NONE, { ...NO_BARS }, 'tl', issues),
+    safety: decodeSafetyOverride(safetyRaw),
   };
 }
 
@@ -681,7 +744,7 @@ export function decodeConfig(input: URLSearchParams | string): DecodeResult {
       height: readNumber(params, 'h', base.dimensions.height, { min: limits.minHeight, max: limits.maxHeight }, issues),
     },
     colour: decodeColourPair(params, base.colour, issues),
-    finish: readCode(params, 'f', FINISH, base.finish, issues),
+    finish: decodeFinishPair(params, base.finish, issues),
     glazing: decodeGlazing(params.get('g'), params.get('sg'), base.glazing, issues),
   };
 

@@ -1,10 +1,10 @@
 # 3D Door and Window Configurator
 
-Phase 1, Step 1 only: the state model and its URL serialisation. **No rendering
-code exists yet and none should be added until the state model is signed off.**
+Phase 1, Steps 1 and 2: the state model, its URL serialisation, and the 3D
+viewer. **Steps 3 to 8 are not built.** There are no sizing inputs and no
+configuration panel yet; dimensions come from the URL or the last session.
 
-React + Vite + TypeScript. React Three Fiber, drei and Zustand are deliberately
-not yet installed.
+React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 
 ## What is here
 
@@ -21,11 +21,20 @@ not yet installed.
 | `src/config/view.ts` | Camera preset, decoded independently of `ConfigState` |
 | `src/config/units.ts` | Millimetres and normalised proportions; the single rounding point |
 | `src/config/storage.ts` | localStorage persistence; the URL takes precedence |
+| `src/config/layout.ts` | Door layout maths — one source of truth for the leaf |
+| `src/state/store.ts` | The single commit pipeline: reconcile, enforce, validate, persist |
+| `src/viewer/geometry.ts` | Parametric part list, shared by the 3D scene and the SVG fallback |
+| `src/viewer/materials.ts` | Per-face materials; procedural woodgrain shader |
+| `src/viewer/Viewer.tsx` | Canvas, studio lighting, contact shadow (lazy-loaded) |
+| `src/viewer/CameraRig.tsx` | Clamped orbit and the three camera presets |
+| `src/viewer/StaticElevation.tsx` | SVG elevation where WebGL is unavailable |
 
 ```
 npm install
 npm run typecheck
-npm test
+npm test          # 72 unit tests
+npm run dev       # then, in another shell:
+npm run smoke     # browser render across four configurations and two viewports
 ```
 
 ## Design decisions
@@ -82,6 +91,25 @@ query parameters as a chain of single-version steps before any field is
 decoded; a step that cannot express an old configuration decodes to the nearest
 equivalent and tells the customer; a link from a newer build is read
 best-effort rather than rejected.
+
+## The commit pipeline
+
+Every mutation goes through `commit` in `src/state/store.ts`, which reconciles
+against the frame material, enforces safety glazing at critical locations, then
+validates and persists. There is no setter that writes `config` directly:
+reconciliation running only at decode time was a real gap, and the fix is
+structural rather than a rule to remember.
+
+Dimensions are the one thing reconciliation does not correct. The URL decoder
+clamps `w` and `h` as it reads them, because a shared link has nobody present
+to tell; an edit has, so validation reports the permitted range instead and the
+viewer keeps showing the last configuration that could be made.
+
+## Outstanding
+
+- No favicon. It is a branding decision, so none has been invented.
+- Steps 3 to 8: sizing controls, configuration panel, colour system, door and
+  window option UI, summary and enquiry.
 
 ## Placeholders requiring replacement before launch
 

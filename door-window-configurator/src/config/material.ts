@@ -36,6 +36,12 @@ export interface Sightlines {
   transom: Mm;
   doorLeafEdge: Mm;
   glazingBead: Mm;
+  /** Front-to-back depth of the outer frame. */
+  frameDepth: Mm;
+  /** Front-to-back depth of an opening sash. */
+  sashDepth: Mm;
+  /** Thickness of a door leaf. */
+  leafThickness: Mm;
 }
 
 export interface MaterialDefinition {
@@ -53,26 +59,26 @@ export interface MaterialDefinition {
 export const MATERIALS: Record<FrameMaterial, MaterialDefinition> = {
   upvc: {
     label: 'uPVC',
-    sightlines: { outerFrame: 70, sash: 76, mullion: 90, transom: 90, doorLeafEdge: 100, glazingBead: 18 },
+    sightlines: { outerFrame: 70, sash: 76, mullion: 90, transom: 90, doorLeafEdge: 100, glazingBead: 18, frameDepth: 70, sashDepth: 62, leafThickness: 70 },
     finishes: ['smooth', 'textured', 'woodgrain-foil'],
     colours: ['RAL9016', 'RAL9010', 'RAL9001', 'RAL7016', 'RAL7015', 'RAL7035', 'RAL6009', 'RAL5011', 'RAL3005', 'RAL8017', 'RAL1015'],
   },
   aluminium: {
     label: 'Aluminium',
-    sightlines: { outerFrame: 50, sash: 54, mullion: 60, transom: 60, doorLeafEdge: 80, glazingBead: 14 },
+    sightlines: { outerFrame: 50, sash: 54, mullion: 60, transom: 60, doorLeafEdge: 80, glazingBead: 14, frameDepth: 75, sashDepth: 68, leafThickness: 68 },
     finishes: ['smooth', 'textured'],
     // Powder coating takes any RAL.
     colours: null,
   },
   timber: {
     label: 'Timber',
-    sightlines: { outerFrame: 63, sash: 58, mullion: 75, transom: 75, doorLeafEdge: 95, glazingBead: 16 },
+    sightlines: { outerFrame: 63, sash: 58, mullion: 75, transom: 75, doorLeafEdge: 95, glazingBead: 16, frameDepth: 68, sashDepth: 56, leafThickness: 54 },
     finishes: ['smooth'],
     colours: ['RAL9016', 'RAL9010', 'RAL9001', 'RAL7016', 'RAL7012', 'RAL6005', 'RAL6009', 'RAL5003', 'RAL3004', 'RAL8003', 'RAL1015'],
   },
   composite: {
     label: 'Composite',
-    sightlines: { outerFrame: 70, sash: 76, mullion: 90, transom: 90, doorLeafEdge: 110, glazingBead: 18 },
+    sightlines: { outerFrame: 70, sash: 76, mullion: 90, transom: 90, doorLeafEdge: 110, glazingBead: 18, frameDepth: 70, sashDepth: 62, leafThickness: 44 },
     finishes: ['smooth', 'woodgrain-foil'],
     colours: ['RAL9016', 'RAL7016', 'RAL7015', 'RAL6009', 'RAL5011', 'RAL5003', 'RAL3005', 'RAL8017', 'RAL9005'],
   },

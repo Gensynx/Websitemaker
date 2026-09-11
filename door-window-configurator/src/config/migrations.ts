@@ -49,13 +49,34 @@ export const RETIRED_KEYS: ReadonlyArray<{ key: string; retiredIn: number; note:
   { key: 'bs', retiredIn: 2, note: 'v1 bay segment shares; bay deferred out of phase 1.' },
   { key: 'ca', retiredIn: 2, note: 'v1 bay corner angle.' },
   { key: 'rd', retiredIn: 2, note: 'v1 bay return depth.' },
+  { key: 'f', retiredIn: 3, note: 'v2 single finish; replaced by fe (external) and fi (internal).' },
 ];
+
+/**
+ * Why `g` is NOT retired, though glazing went from two axes to three.
+ *
+ * Rule 2 retires a key whose MEANING changed. `g` encoded appearance and pane
+ * count in v1 and encodes exactly that in v3: `c.2` decodes identically in
+ * both. The third axis was given its own key, `sg`, precisely so that `g` did
+ * not have to change — which is what the rule is for. Had safety been appended
+ * as a fourth field of `g`, `g` would have had to be retired and replaced.
+ *
+ * The same reasoning covers the per-pane safety overrides added in v3. They
+ * are optional trailing fields on tokens that were already positional
+ * (`sl`, `sr`, `tl`, `ap`, and the cell tokens inside `gd`), so a v2 value
+ * parses in v3 to the same configuration, with the override reading as
+ * "inherit". Additive, therefore no retirement.
+ *
+ * `f`, by contrast, genuinely changed: it named THE finish, and there are now
+ * two. Retired and replaced by `fe` / `fi`, exactly as `c` was.
+ */
 
 type MigrationStep = (params: URLSearchParams, issues: MigrationIssue[]) => URLSearchParams;
 
 /** Keyed by the version being migrated FROM. */
 const STEPS: Record<number, MigrationStep> = {
   1: migrateV1toV2,
+  2: migrateV2toV3,
 };
 
 /**
@@ -143,5 +164,21 @@ function migrateV1toV2(params: URLSearchParams, issues: MigrationIssue[]): URLSe
     });
   }
 
+  return next;
+}
+
+/**
+ * v2 → v3.
+ *   - `f` (single finish) becomes `fe` (external) with `fi=m` (match).
+ *   - Per-pane safety overrides are additive trailing fields; nothing to do.
+ */
+function migrateV2toV3(params: URLSearchParams, _issues: MigrationIssue[]): URLSearchParams {
+  const next = new URLSearchParams(params.toString());
+  const finish = next.get('f');
+  if (finish !== null) {
+    next.delete('f');
+    next.set('fe', finish);
+    next.set('fi', 'm');
+  }
   return next;
 }

@@ -43,8 +43,11 @@ import type { RalCode } from './ral';
  * v1 → v2: single `colour` became an external/internal pair; frame material
  * added; safety glazing, trickle vents and door threshold added; bay windows
  * removed from the catalogue.
+ * v2 → v3: single `finish` became an external/internal pair, mirroring colour.
+ *          Per-pane safety overrides were ADDED, not changed — see the note on
+ *          `g` in migrations.ts for why that needed no retirement.
  */
-export const CONFIG_SCHEMA_VERSION = 2;
+export const CONFIG_SCHEMA_VERSION = 3;
 
 /* ------------------------------------------------------------------ *
  * Handing
@@ -129,6 +132,21 @@ export function resolveInternalColour(pair: ColourPair): ColourSelection {
   return pair.internal.mode === 'match' ? pair.external : pair.internal;
 }
 
+/**
+ * Finish is per side, like colour. A woodgrain-foil external face with a
+ * smooth white internal face is an ordinary specification, and the renderer
+ * has to know which face carries which material.
+ */
+export interface FinishPair {
+  external: Finish;
+  /** 'match' follows the external face. */
+  internal: Finish | 'match';
+}
+
+export function resolveInternalFinish(pair: FinishPair): Finish {
+  return pair.internal === 'match' ? pair.external : pair.internal;
+}
+
 export type GlazingUnit = 'double' | 'triple';
 
 export type TintColour = 'bronze' | 'grey' | 'blue';
@@ -153,6 +171,29 @@ export type SafetyGlazing = 'none' | 'toughened' | 'laminated';
  * are three independent axes: how the glass looks, how many panes the sealed
  * unit has, and whether it is a safety glass.
  */
+/**
+ * Per-pane override of the product-level safety glazing. `null` inherits.
+ *
+ * A critical location is a property of a PANE, not of a product: a side light
+ * reaching the floor is critical while a top light at 1800 mm is not, and the
+ * two can legitimately carry different glass. Phase 1 only ever sets safety at
+ * product level, but the shape is here now so that per-pane specification is
+ * not a schema change waiting behind the renderer.
+ */
+export type SafetyOverride = SafetyGlazing | null;
+
+/** Identifies one glazed area within a product. */
+export type PaneId =
+  | 'leaf'
+  | 'side-light-left'
+  | 'side-light-right'
+  | 'top-light'
+  | `cell-${number}`;
+
+export function resolveSafety(product: SafetyGlazing, override: SafetyOverride): SafetyGlazing {
+  return override ?? product;
+}
+
 export type GlazingAppearance =
   | { appearance: 'clear' }
   | { appearance: 'tinted'; tint: TintColour }
@@ -217,6 +258,7 @@ export interface DoorAperture {
   bars: BarLayout;
   /** Distance from the leaf edge to the aperture, all four sides. */
   inset: Mm;
+  safety: SafetyOverride;
 }
 
 export type MouldingProfile = 'ovolo' | 'chamfer' | 'square';
@@ -255,12 +297,14 @@ export interface DoorSurround {
 export interface SideLight {
   width: Mm;
   bars: BarLayout;
+  safety: SafetyOverride;
 }
 
 export interface TopLight {
   height: Mm;
   shape: 'rectangular' | 'arched';
   bars: BarLayout;
+  safety: SafetyOverride;
 }
 
 export function hasGlazedSurround(surround: DoorSurround): boolean {
@@ -330,6 +374,7 @@ export type SashOpening =
 export interface SashCell {
   opening: SashOpening;
   bars: BarLayout;
+  safety: SafetyOverride;
 }
 
 /**
@@ -434,7 +479,7 @@ interface ConfigCommon {
   material: FrameMaterial;
   dimensions: Dimensions;
   colour: ColourPair;
-  finish: Finish;
+  finish: FinishPair;
   glazing: Glazing;
 }
 

@@ -6,7 +6,7 @@ import { formatMm, roundMmHalfUp } from './units';
 import { MAX_BAR_DIVISIONS, MAX_GRID_COLUMNS, MAX_GRID_ROWS } from './limits';
 import { decodeView, encodeView } from './view';
 import { buildEnquiry, doorLeafWidth, mintQuotable, reconcileWithMaterial, validateConfig } from './validate';
-import { assessCriticalLocations } from './safety';
+import { assessCriticalLocations, enforceSafetyGlazing, safetyControlState } from './safety';
 
 function roundTrip(config: ConfigState): ConfigState {
   return decodeConfig(encodeConfig(config)).config;
@@ -29,7 +29,7 @@ describe('round trip', () => {
         external: { mode: 'ral', code: 'RAL7016' },
         internal: { mode: 'ral', code: 'RAL9016' },
       },
-      finish: 'textured',
+      finish: { external: 'textured', internal: 'match' },
       glazing: { appearance: 'obscure', pattern: 'reeded', unit: 'triple', safety: 'laminated' },
       style: {
         id: 'half-glazed',
@@ -39,17 +39,19 @@ describe('round trip', () => {
             shape: 'arched',
             inset: 140,
             bars: { style: 'true-bar', columns: 2, rows: 3, barWidth: 24 },
+            safety: null,
           },
           panelDetail: { kind: 'grooved', grooves: 6, grooveWidth: 18, orientation: 'horizontal' },
         },
       },
       surround: {
-        leftSideLight: { width: 400, bars: { style: 'applied-astragal', columns: 1, rows: 4, barWidth: 22 } },
-        rightSideLight: { width: 400, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 } },
+        leftSideLight: { width: 400, bars: { style: 'applied-astragal', columns: 1, rows: 4, barWidth: 22 }, safety: null },
+        rightSideLight: { width: 400, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, safety: null },
         topLight: {
           height: 350,
           shape: 'arched',
           bars: { style: 'georgian-internal', columns: 3, rows: 1, barWidth: 20 },
+          safety: null,
         },
       },
       hardware: {
@@ -72,8 +74,9 @@ describe('round trip', () => {
     grid.cells[0] = {
       opening: 'side-hung-left',
       bars: { style: 'applied-astragal', columns: 2, rows: 2, barWidth: 22 },
+      safety: null,
     };
-    grid.cells[4] = { opening: 'top-hung', bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 } };
+    grid.cells[4] = { opening: 'top-hung', bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, safety: null };
 
     const styles: Array<WindowConfigState['style']> = [
       { id: 'casement', options: { grid } },
@@ -133,8 +136,8 @@ describe('decoding is total', () => {
   });
 
   it('reports what it could not read', () => {
-    const { issues } = decodeConfig('p=d&ce=RAL0000&f=zz');
-    expect(issues.map((i) => i.key)).toEqual(expect.arrayContaining(['ce', 'f']));
+    const { issues } = decodeConfig('p=d&ce=RAL0000&fe=zz');
+    expect(issues.map((i) => i.key)).toEqual(expect.arrayContaining(['ce', 'fe']));
   });
 
   it('clamps an out-of-range size and says so', () => {
@@ -178,10 +181,10 @@ describe('frame material gates the catalogue', () => {
   });
 
   it('moves a finish the material does not offer', () => {
-    const upvc = { ...DEFAULT_DOOR, finish: 'woodgrain-foil' as const };
+    const upvc = { ...DEFAULT_DOOR, finish: { external: 'woodgrain-foil' as const, internal: 'match' as const } };
     const { config, issues } = reconcileWithMaterial({ ...upvc, material: 'timber' });
-    expect(issues.some((i) => i.field === 'finish')).toBe(true);
-    expect(config.finish).toBe('smooth');
+    expect(issues.some((i) => i.field === 'finish.external')).toBe(true);
+    expect(config.finish.external).toBe('smooth');
   });
 
   it('applies different size limits per material', () => {
@@ -213,8 +216,8 @@ describe('the door leaf derives from the overall opening (decision 10)', () => {
       glazing: { ...DEFAULT_DOOR.glazing, safety: 'toughened' },
       surround: {
         ...DEFAULT_DOOR.surround,
-        leftSideLight: { width: 600, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 } },
-        rightSideLight: { width: 600, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 } },
+        leftSideLight: { width: 600, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, safety: null },
+        rightSideLight: { width: 600, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, safety: null },
       },
     };
     expect(validateConfig(withLights).errors).toHaveLength(0);
@@ -231,15 +234,15 @@ describe('safety glazing and critical locations', () => {
       style: {
         id: 'full-glazed',
         options: {
-          aperture: { shape: 'rectangular', bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, inset: 100 },
+          aperture: { shape: 'rectangular', bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, inset: 100, safety: null },
         },
       },
     };
     expect(assessCriticalLocations(glazed).safetyGlazingForced).toBe(true);
-    expect(validateConfig(glazed).errors.some((e) => e.field === 'glazing.safety')).toBe(true);
+    expect(validateConfig(glazed).errors.some((e) => e.field.startsWith('glazing.safety'))).toBe(true);
 
     const toughened = { ...glazed, glazing: { ...glazed.glazing, safety: 'toughened' as const } };
-    expect(validateConfig(toughened).errors.some((e) => e.field === 'glazing.safety')).toBe(false);
+    expect(validateConfig(toughened).errors.some((e) => e.field.startsWith('glazing.safety'))).toBe(false);
   });
 
   it('does not force safety glass on an unglazed leaf', () => {
@@ -253,11 +256,11 @@ describe('safety glazing and critical locations', () => {
       dimensions: { width: 1450, height: 2100 },
       surround: {
         ...DEFAULT_DOOR.surround,
-        leftSideLight: { width: 400, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 } },
+        leftSideLight: { width: 400, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, safety: null },
       },
     };
     const assessment = assessCriticalLocations(withSideLight);
-    expect(assessment.locations.some((l) => l.area === 'Left side light' && l.status === 'required')).toBe(true);
+    expect(assessment.panes.some((p) => p.label === 'Left side light' && p.status === 'required')).toBe(true);
   });
 
   it('cannot determine a window without the cill height, and says so rather than guessing', () => {
@@ -285,7 +288,7 @@ describe('trickle vents', () => {
       dimensions: { width: 1450, height: 2100 },
       surround: {
         ...DEFAULT_DOOR.surround,
-        leftSideLight: { width: 400, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 } },
+        leftSideLight: { width: 400, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, safety: null },
       },
       glazing: { ...DEFAULT_DOOR.glazing, safety: 'toughened' },
       trickleVents: { position: 'head-of-frame', count: 1 },
@@ -336,7 +339,7 @@ describe('schema migration', () => {
 
   it('opens a v1 link, splitting the single colour into a pair', () => {
     const { config, issues } = decodeConfig(V1_DOOR);
-    expect(config.schemaVersion).toBe(2);
+    expect(config.schemaVersion).toBe(3);
     expect(config.colour.external).toEqual({ mode: 'ral', code: 'RAL7016' });
     expect(config.colour.internal).toEqual({ mode: 'match' });
     expect(issues.some((i) => i.key === 'm')).toBe(true);
@@ -400,6 +403,7 @@ function saturatedGrid(): SashGrid {
   grid.cells = grid.cells.map(() => ({
     opening: 'side-hung-right' as const,
     bars: { style: 'true-bar' as const, columns: MAX_BAR_DIVISIONS, rows: MAX_BAR_DIVISIONS, barWidth: 25 },
+    safety: null,
   }));
   return grid;
 }
@@ -422,20 +426,20 @@ export function worstCaseByStyle(): Array<{ label: string; length: number; url: 
     material: 'aluminium',
     dimensions: { width: 2999.9, height: 2699.9 },
     colour: explore,
-    finish: 'woodgrain-foil',
+    finish: { external: 'woodgrain-foil', internal: 'match' },
     glazing: { appearance: 'obscure', pattern: 'sandblast', unit: 'triple', safety: 'laminated' },
     style: {
       id: 'half-glazed',
       options: {
         glazedFraction: 0.55,
-        aperture: { shape: 'rectangular', inset: 140, bars: saturatedBars },
+        aperture: { shape: 'rectangular', inset: 140, bars: saturatedBars, safety: null },
         panelDetail: { kind: 'grooved', grooves: 20, grooveWidth: 18, orientation: 'horizontal' },
       },
     },
     surround: {
-      leftSideLight: { width: 400, bars: saturatedBars },
-      rightSideLight: { width: 400, bars: saturatedBars },
-      topLight: { height: 350, shape: 'arched', bars: saturatedBars },
+      leftSideLight: { width: 400, bars: saturatedBars, safety: null },
+      rightSideLight: { width: 400, bars: saturatedBars, safety: null },
+      topLight: { height: 350, shape: 'arched', bars: saturatedBars, safety: null },
     },
     hardware: { handle: 'lever-backplate', finish: 'satin-chrome', letterplate: true, spyhole: true, knocker: 'doctor' },
     threshold: 'low-level-access',
@@ -503,5 +507,182 @@ describe('link length', () => {
       style: { id: 'casement', options: { grid } },
     };
     expect(roundTrip(config)).toEqual(config);
+  });
+});
+
+/* ------------------------------------------------------------------ *
+ * v3 additions
+ * ------------------------------------------------------------------ */
+
+describe('finish is per side, like colour', () => {
+  it('round-trips a split specification', () => {
+    const door: DoorConfigState = {
+      ...DEFAULT_DOOR,
+      finish: { external: 'woodgrain-foil', internal: 'smooth' },
+    };
+    expect(roundTrip(door)).toEqual(door);
+  });
+
+  it('keeps a matched internal finish matched, not copied', () => {
+    expect(roundTrip(DEFAULT_DOOR).finish).toEqual({ external: 'smooth', internal: 'match' });
+  });
+
+  it('gates each side against the material', () => {
+    const timber: DoorConfigState = {
+      ...DEFAULT_DOOR,
+      material: 'timber',
+      finish: { external: 'smooth', internal: 'woodgrain-foil' },
+    };
+    expect(validateConfig(timber).errors.some((e) => e.field === 'finish.internal')).toBe(true);
+
+    const { config, issues } = reconcileWithMaterial(timber);
+    expect(issues.some((i) => i.field === 'finish.internal')).toBe(true);
+    expect(config.finish.internal).toBe('match');
+  });
+});
+
+describe('safety glazing is expressible per pane', () => {
+  it('round-trips an override on a side light', () => {
+    const door: DoorConfigState = {
+      ...DEFAULT_DOOR,
+      dimensions: { width: 1450, height: 2100 },
+      glazing: { ...DEFAULT_DOOR.glazing, safety: 'toughened' },
+      surround: {
+        ...DEFAULT_DOOR.surround,
+        leftSideLight: {
+          width: 400,
+          bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 },
+          safety: 'laminated',
+        },
+      },
+    };
+    expect(roundTrip(door)).toEqual(door);
+  });
+
+  it('round-trips an override on a single window light', () => {
+    const grid = makeGrid(2, 1);
+    grid.cells[1] = { opening: 'fixed', bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, safety: 'toughened' };
+    const config: WindowConfigState = { ...DEFAULT_WINDOW, style: { id: 'casement', options: { grid } } };
+    expect(roundTrip(config)).toEqual(config);
+  });
+
+  it('assesses a top light separately from a side light on the same door', () => {
+    const door: DoorConfigState = {
+      ...DEFAULT_DOOR,
+      dimensions: { width: 1450, height: 2400 },
+      glazing: { ...DEFAULT_DOOR.glazing, safety: 'toughened' },
+      surround: {
+        leftSideLight: { width: 400, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, safety: null },
+        rightSideLight: null,
+        topLight: { height: 400, shape: 'rectangular', bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, safety: null },
+      },
+    };
+    const panes = assessCriticalLocations(door).panes;
+    expect(panes.find((p) => p.id === 'side-light-left')?.status).toBe('required');
+    expect(panes.find((p) => p.id === 'top-light')?.status).toBe('not-required');
+  });
+
+  it('locks the control rather than silently correcting, and raises with a notice', () => {
+    const unsafe: DoorConfigState = {
+      ...DEFAULT_DOOR,
+      dimensions: { width: 1450, height: 2100 },
+      surround: {
+        ...DEFAULT_DOOR.surround,
+        leftSideLight: { width: 400, bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 }, safety: null },
+      },
+    };
+
+    const control = safetyControlState(unsafe).find((c) => c.id === 'side-light-left');
+    expect(control?.locked).toBe(true);
+    expect(control?.value).toBe('toughened');
+    expect(control?.reason).toContain('critical location');
+
+    const { config, notices } = enforceSafetyGlazing(unsafe);
+    expect(notices).toHaveLength(1);
+    expect(notices[0]?.message).toContain('Left side light');
+    expect(config.glazing.safety).toBe('toughened');
+    expect(validateConfig(config).errors).toHaveLength(0);
+  });
+});
+
+describe('cill height stays out of the configuration', () => {
+  it('is not encoded in a shared link', () => {
+    expect(encodeConfig(DEFAULT_WINDOW).toString()).not.toContain('cill');
+  });
+
+  it('rides on the enquiry as an optional detail and never gates it', () => {
+    const withoutIt = buildEnquiry(DEFAULT_WINDOW);
+    expect(withoutIt.kind).toBe('quotable');
+
+    const withIt = buildEnquiry(DEFAULT_WINDOW, { cillHeightAboveFloor: 600 });
+    expect(withIt.kind).toBe('quotable');
+    if (withIt.kind === 'quotable') expect(withIt.installation.cillHeightAboveFloor).toBe(600);
+  });
+
+  it('carries the cannot-determine notice through to the enquiry', () => {
+    const enquiry = buildEnquiry(DEFAULT_WINDOW);
+    if (enquiry.kind === 'quotable') {
+      expect(enquiry.notices.some((n) => n.message.includes('cill height'))).toBe(true);
+    }
+  });
+});
+
+describe('v2 to v3 migration', () => {
+  const V2_DOOR =
+    'v=2&m=u&p=d&w=838&h=1981&ce=RAL7016&ci=m&f=wg&g=c.2&sg=n&tv=n&s=sp&pd=r.2.ov&sl=n&sr=n&tl=n&hw=lr&hf=sc&lp=1&sh=0&kn=n&tr=st&hg=l&od=i';
+
+  it('splits the single finish into a pair', () => {
+    const { config } = decodeConfig(V2_DOOR);
+    expect(config.schemaVersion).toBe(3);
+    expect(config.finish).toEqual({ external: 'woodgrain-foil', internal: 'match' });
+  });
+
+  it('reads a v2 side light with no safety field as inheriting', () => {
+    // Built by replacement, not by appending: a duplicate key would be read
+    // as its first value and the v2 token would never be exercised.
+    const query = V2_DOOR.replace('w=838', 'w=1450').replace('h=1981', 'h=2100').replace('sl=n', 'sl=400.n');
+    const { config } = decodeConfig(query);
+    if (config.productType === 'door') {
+      expect(config.surround.leftSideLight).toEqual({
+        width: 400,
+        bars: { style: 'none', columns: 1, rows: 1, barWidth: 0 },
+        safety: null,
+      });
+    }
+  });
+
+  it('reads a v2 grid cell with no safety field as inheriting', () => {
+    const { config } = decodeConfig('v=2&p=w&s=cs&gd=1-1*1*f.n-shl.n');
+    if (config.productType === 'window' && config.style.id === 'casement') {
+      expect(config.style.options.grid.cells.every((c) => c.safety === null)).toBe(true);
+      expect(config.style.options.grid.cells[1]?.opening).toBe('side-hung-left');
+    }
+  });
+
+  it('chains v1 straight through to v3', () => {
+    const { config, issues } = decodeConfig('v=1&p=d&c=RAL7016&f=sm&s=sp');
+    expect(config.schemaVersion).toBe(3);
+    expect(config.colour.external).toEqual({ mode: 'ral', code: 'RAL7016' });
+    expect(config.finish).toEqual({ external: 'smooth', internal: 'match' });
+    expect(issues.some((i) => i.key === 'm')).toBe(true);
+  });
+});
+
+describe('the enquiry payload has one constructor', () => {
+  it('reaches kind quotable only through mintQuotable', () => {
+    // Structural, not just behavioural: `buildEnquiry` is the only exported
+    // function that constructs an EnquiryPayload, and its 'quotable' branch is
+    // the only place the literal appears outside a type position.
+    const enquiry = buildEnquiry(DEFAULT_DOOR);
+    expect(enquiry.kind).toBe('quotable');
+    if (enquiry.kind === 'quotable') expect(mintQuotable(enquiry.config)).not.toBeNull();
+  });
+
+  it('downgrades rather than throwing when validation and minting disagree', () => {
+    const explore: DoorConfigState = {
+      ...DEFAULT_DOOR,
+      colour: { external: { mode: 'explore', hex: '#3a7f5c' }, internal: { mode: 'match' } },
+    };
+    expect(buildEnquiry(explore).kind).toBe('non-orderable');
   });
 });
