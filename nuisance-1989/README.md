@@ -1,121 +1,76 @@
-# Nuisance 1989 — design mock-ups
+# Nuisance 1989 — storefront
 
-Two renditions of the same brand, deliberately different in strategy rather than skin:
+A twelve-page static site for **Nuisance 1989** (`nuisance1989` on Instagram), a London
+luxury-streetwear label selling in limited drops. No build step to host: the generated HTML is
+committed.
 
-| File | Name | Direction |
+**Live:** https://gensynx.github.io/Websitemaker/nuisance-1989/
+
+## Two skins, one site
+
+The site ships both design directions as a **skin toggle in the footer**, so the look can be
+decided without a rebuild. The skin is stored in `localStorage` and applied by a tiny inline
+script in each page's `<head>` before first paint, so it never flashes the other one.
+
+| | **Asphalt** (default) | **Paper** |
 |---|---|---|
-| `index.html` | **The Drop** | Dark, commerce-forward. Drop clock, product grid, bag drawer, plate-yellow accent. |
-| `archive.html` | **The Archive** | Paper ground, gallery-led. Cursor-driven colourway reveal, catalogue index instead of a grid, horizontal plate rail. |
+| Ground | `#0B0A09` warm near-black | `#F1EDE4` warm bone paper |
+| Surface | `#14120F` | `#E7E1D5` |
+| Type colour | `#EDE7DB` bone | `#14120F` ink |
+| Muted | `#7A736A` | `#6B6459` |
+| Text face | Archivo | Instrument Sans |
 
-Both are single self-contained files, no build step, and share one `images/` folder.
+Shared across both: **Bodoni Moda** for display (the Didone the wordmark sits in), **JetBrains
+Mono** for SKUs, measurements and the drop clock, and `#F2CB05` plate yellow as the single accent —
+the brand's own UK rear number plate, used as plate objects rather than as glow. Layout, spacing
+and density do not change between skins: a toggle should change the light in the room, not the
+brand.
 
-**Hover depth-of-field.** Every photo slot carries a second copy of the same image, blurred,
-darkened and masked to an ellipse so it covers only the surround. It fades in on hover, dropping the
-location back and leaving the garment sharp — a lifestyle frame then reads as a product shot instead
-of a holiday snap. No extra files: same `src`, masked.
+## Pages
 
----
-
-## Rendition 1 — The Drop (`index.html`)
-
-A single-file, no-build storefront for **Nuisance 1989** (`nuisance1989` on Instagram) — a London
-luxury-streetwear label selling in limited drops.
-
-Open `nuisance-1989/index.html` directly in a browser, or serve the repo root.
-
-## Design system
-
-| | |
+| File | Page |
 |---|---|
-| **Ground** | `#0B0A09` asphalt (warm-biased near-black, not pure black) |
-| **Surface** | `#14120F` tarmac · `#1F1C18` kerb hairline |
-| **Type colour** | `#EDE7DB` bone (the cotton) · `#7A736A` warm smoke |
-| **Accent** | `#F2CB05` plate yellow — the brand's own UK rear number plate, used as *plate objects* (black on yellow, hard edges, keyline), never as glow |
-| **Scarcity** | `#B0342C` glove red — last-pieces state only |
-| **Display** | Bodoni Moda (the Didone class the wordmark sits in) |
-| **Text/UI** | Archivo |
-| **Data** | JetBrains Mono — SKUs, GSM, measurements, drop clock |
+| `index.html` | Home — wordmark, live drop clock, six-piece grid, 1989 teaser |
+| `drop.html` | Drop 03 — catalogue index with a plate that follows the hovered row |
+| `piece-<slug>.html` | Six product pages, one per piece |
+| `cut.html` | The Cut — fabric spec, published measurements, how to measure |
+| `story.html` | 1989 — origin note and the facts stack |
+| `lookbook.html` | Marina — horizontal plate rail |
+| `contact.html` | Contact, delivery and returns, The List signup |
 
-Zero border-radius throughout except the plates, which take the 3px of a real registration plate.
-Single-theme by intent: the brand lives on black, so every colour is painted explicitly rather
-than inherited from the viewer's theme.
+## Structure
 
-## What's on the page
+```
+assets/site.css     both skins as token sets
+assets/site.js      skin toggle, garment flats, bag, drop clock, previews, forms
+assets/data.js      generated — product data shared by pages and the bag
+sitegen/build.mjs   the generator
+images/             photography slots (see images/README.md)
+source/             the untouched master photo the recolour reads
+tools-recolour.py   derives the asphalt colourway from the bone photo
+```
 
-1. **Ticker + sticky nav** with a live bag count
-2. **Hero** — wordmark, thesis line, and a **live drop clock** counting to the next Friday 20:00
-   UK local time (DST-correct via `Intl`, not a hardcoded offset)
-3. **Plate strip** divider — the brand's bio line, set as a moving plate
-4. **Drop 03 · Marina** — six pieces, per-size stock, sold-out sizes struck through, hover reveals
-   the back print, size must be chosen before a piece can be bagged
-5. **The Cut** — fabric spec and a real measurement table (cm, flat, ±1.5 cm on garment-dyed)
-6. **1989** — origin copy, plus a facts stack
-7. **Lookbook** — photography slots at their shooting sizes
-8. **The List** — early-access capture with validation
-9. **Bag drawer** — add, remove, subtotal, free delivery over £100
+Regenerate with `node sitegen/build.mjs` from this folder. Product data lives in one place —
+`PRODUCTS` in `sitegen/build.mjs` — and is emitted to `assets/data.js`, so the pages and the bag
+cannot drift apart.
 
-## Placeholders to replace before launch
+## Behaviour worth knowing
 
-- **Product photography.** Every garment is an **SVG flat** drawn in the page, and each tile carries
-  its slot size (`2000×2500` for product, `1600×1280` for lookbook wides). Shoot to those sizes,
-  drop the files in an `images/` folder and swap the `art()` call in the product renderer for an
-  `<img>`.
-- **Copy.** Prices, stock counts, the sold-out timings, the Portugal manufacturing line and the
-  origin story are written to be plausible, not verified. The founder needs to confirm every factual
-  claim — particularly *made in Portugal*, *34 countries*, and *Drop 02 sold out in 4 min 12 s*.
-- **Commerce.** There is no backend. Bag state is in memory only and Checkout is inert. See the
-  note below before wiring one.
-- **The List** form is a demo — point it at Klaviyo, Mailchimp or Shopify before launch.
+- **The bag persists across pages** in `localStorage`, which a multi-page shop needs.
+- **The drop clock** counts to the next Friday 20:00 UK, DST-correct via `Intl` rather than a
+  hardcoded offset.
+- **Photo slots degrade.** Every slot draws an SVG garment flat first and layers the photo over it.
+  A missing file removes its own `<img>` and the flat shows through, so photography can land one
+  piece at a time without breaking a page.
+- **Hover depth-of-field.** A second masked copy of each photo blurs the surround on hover, so a
+  lifestyle frame reads as a product shot. On the drop page's plate it is always on.
 
-## Note on commerce
+## Before launch
 
-The bag here is a mock-up of the *experience*, not a foundation to build on. A drop model with hard
-stock counts needs real inventory locking at checkout, or two people buy the last Large. Shopify
-handles that out of the box and this page can be rebuilt as a Shopify theme with the same design
-system; a bespoke build would need its own stock reservation, payments and fraud handling. That's a
-decision to take before any more front-end work.
-
-
----
-
-## Rendition 2 — The Archive (`archive.html`)
-
-The counter-proposal. Where The Drop sells, The Archive catalogues — the bet being that a label
-whose feed is Rolexes and Rolls-Royces is better served looking like a gallery than like a hype
-store.
-
-| | |
-|---|---|
-| **Ground** | `#F1EDE4` warm bone paper — the cotton, not the night |
-| **Surface** | `#E7E1D5` leaf · `#D3CBBB` rule |
-| **Type colour** | `#14120F` ink · `#6B6459` graphite |
-| **Accent** | `#F2CB05` plate yellow, carried over, one band only |
-| **Display** | Bodoni Moda — the one element shared across both renditions, because it is the brand |
-| **Text** | Instrument Sans (rendition 1 uses Archivo) |
-| **Data** | DM Mono (rendition 1 uses JetBrains Mono) |
-
-### What is different, structurally
-
-- **Hero is one garment in two colourways.** The bone tee covers the plate at rest; moving the
-  pointer opens a circular aperture onto the asphalt one underneath. Touch and keyboard get an
-  explicit **Invert** control rather than a hover they cannot perform.
-- **The index is a catalogue, not a grid.** Six numbered entries in Roman numerals, because a drop
-  cut in order genuinely is a sequence. The rows are pure typography — numeral, name, spec, sizes,
-  price — and one large plate sits in its own column to the right, cross-fading as you move down
-  the list. An earlier version had that plate follow the cursor: it landed on top of the row text
-  and cut the names in half. A preview that occludes the thing it is previewing is worse than no
-  preview, so it was given its own column where it cannot overlap. Row thumbnails were tried and
-  removed — with the plate doing the work they only crowded the list.
-- **Below 1000px there is no right-hand column**, so the plate moves above the list rather than
-  disappearing. With no row thumbnails it is the section's only product imagery, and a shop index
-  with no pictures at all on a phone is not a trade worth making.
-- **Plates run horizontally** on a snap rail rather than stacking.
-- **Dark colophon** bookends the paper ground.
-
-### Sourcing
-
-Interaction patterns were sourced from the 21st.dev catalogue — cursor-mask image reveal, hover-reveal
-rows, sliding product peek — and reimplemented in vanilla JS. The catalogue's components are
-React/shadcn packages installed over npm, which would break this repo's no-build convention, so they
-were used as reference rather than installed. See the note in the handover about what adopting them
-literally would cost.
+- **Photography.** Only three slots have real files. See `images/README.md` for the filenames.
+- **Copy.** Prices, stock counts, the Portugal manufacturing line and the sold-out timings are
+  plausible placeholders. Every factual claim needs the founder's confirmation.
+- **Commerce.** No backend. The bag is in-memory-plus-localStorage and Checkout is inert. A drop
+  model with hard stock counts needs real inventory locking at checkout or two people buy the last
+  Large — Shopify handles that out of the box and this design system ports to a theme.
+- **Forms** are demos. Point them at a real inbox or Klaviyo.
