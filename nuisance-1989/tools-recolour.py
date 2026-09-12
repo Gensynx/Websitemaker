@@ -14,7 +14,7 @@ import numpy as np
 from PIL import Image, ImageFilter
 from scipy import ndimage
 
-SRC = "Screenshot 2026-09-12 122943.png"
+SRC = "source/tee-bone-onbody-master.png"
 im = Image.open(SRC).convert("RGB")
 im = im.crop((0, 0, im.size[0], im.size[1] - 26))     # strip the story dots
 W, H = im.size
@@ -45,23 +45,32 @@ solid = (lab == int(np.argmax(ndimage.sum(solid, lab, range(1, n+1)))) + 1)
 solid = ndimage.binary_fill_holes(solid)
 print(f"garment after grow  {solid.sum():>8,} px  ({100*solid.mean():.1f}% of frame)")
 
-# --- the printed wordmark: dark ink, in the band where the print actually is
-band = (yy > H*0.37) & (yy < H*0.56) & (xx > W*0.405) & (xx < W*0.715)
-local = ndimage.uniform_filter(lum, size=61)          # cloth brightness nearby
-ink = solid & band & (lum < local*0.62)
-ink = ndimage.binary_closing(ink, np.ones((3, 3)))
-lab2, n2 = ndimage.label(ink)
-if n2:
-    s2 = ndimage.sum(ink, lab2, range(1, n2+1))
-    ink = np.isin(lab2, [i+1 for i, v in enumerate(s2) if v >= 55])
-print(f"print mask          {ink.sum():>8,} px  ({n2} components found)")
+# --- the printed wordmark -------------------------------------------------
+# A binary threshold destroys this. The strokes are thin and anti-aliased at
+# 777 px, so any hard cut eats the serifs and a component-size filter deletes
+# parts of the digits. Instead take a CONTINUOUS alpha from how much darker
+# each pixel is than the cloth around it: cloth -> 0, ink core -> 1, and the
+# anti-aliased edge lands in between exactly as the camera recorded it.
+band = (yy > H*0.36) & (yy < H*0.57) & (xx > W*0.395) & (xx < W*0.725)
+local = ndimage.uniform_filter(lum, size=75)          # cloth brightness nearby
+depth = np.clip((local - lum) / np.maximum(local*0.55, 1e-6), 0, 1)
+depth = np.where(solid & band, depth, 0.0)
+
+# A crease is also darker than its surround, so depth alone paints the folds as
+# ink — that was the streaking. Ink bottoms out at luminance 0.03-0.07 while a
+# crease only reaches 0.22-0.35, so gate the depth term with an absolute
+# darkness term. Both are continuous, so anti-aliased stroke edges survive.
+depth_t = np.clip((depth - 0.55) / 0.40, 0, 1)
+lum_t   = np.clip((0.24 - lum) / 0.16, 0, 1)
+p_soft  = ndimage.gaussian_filter(depth_t * lum_t, 0.45)
+p_soft  = np.clip(p_soft * 1.25, 0, 1)
+cover = float((p_soft > 0.5).sum())
+print(f"print alpha         {cover:>8,.0f} px above 0.5   mean {p_soft[band].mean():.3f}")
 
 g_soft = np.asarray(Image.fromarray((solid*255).astype(np.uint8)).filter(
     ImageFilter.GaussianBlur(1.6))).astype(np.float32)/255.0
-p_soft = np.asarray(Image.fromarray((ink*255).astype(np.uint8)).filter(
-    ImageFilter.GaussianBlur(0.6))).astype(np.float32)/255.0
 
-cl = solid & ~ink
+cl = solid & (p_soft < 0.25)
 p3, p97 = np.percentile(lum[cl], 3), np.percentile(lum[cl], 97)
 LO, HI = 0.032, 0.215
 t = np.clip((lum - p3) / max(p97 - p3, 1e-6), 0, 1)
@@ -71,17 +80,18 @@ TINT = np.array([1.00, 0.985, 0.95])
 INK  = np.array([0.929, 0.906, 0.859])
 dark = np.clip((LO + t*(HI-LO))[..., None] * TINT, 0, 1)
 
+shade = np.clip(0.72 + 0.55*t, 0.55, 1.12)[..., None]   # the fold the print lies on
 out = a*(1-g_soft[..., None]) + dark*g_soft[..., None]
-out = out*(1-p_soft[..., None]) + INK*p_soft[..., None]
+out = out*(1-p_soft[..., None]) + np.clip(INK*shade, 0, 1)*p_soft[..., None]
 rng = np.random.default_rng(1989)
 out = np.clip(out + rng.normal(0, 0.009, out.shape)*g_soft[..., None], 0, 1)
 
-Image.fromarray((out*255).astype(np.uint8)).save("tee-asphalt-back.jpg", quality=93)
-im.save("look-01.jpg", quality=93)
-im.save("tee-bone-back.jpg", quality=93)
+Image.fromarray((out*255).astype(np.uint8)).save("images/tee-asphalt-back.jpg", quality=93)
+im.save("images/look-01.jpg", quality=93)
+im.save("images/tee-bone-back.jpg", quality=93)
 
 SC = "/tmp/claude-0/-home-user-Websitemaker/968dd78d-823a-50e1-8c57-38bfbf455297/scratchpad/"
-ov = a.copy(); ov[..., 1] = np.clip(ov[..., 1] + solid*0.45, 0, 1); ov[..., 0] = np.clip(ov[..., 0] + ink*0.9, 0, 1)
+ov = a.copy(); ov[..., 1] = np.clip(ov[..., 1] + solid*0.45, 0, 1); ov[..., 0] = np.clip(ov[..., 0] + p_soft*0.9, 0, 1)
 Image.fromarray((ov*255).astype(np.uint8)).save(SC+"mask-check.png")
 Image.fromarray((out*255).astype(np.uint8)).save(SC+"recolour-check.png")
 print("wrote               tee-asphalt-back.jpg, tee-bone-back.jpg, look-01.jpg")

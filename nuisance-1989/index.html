@@ -214,6 +214,19 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   transition:transform .6s cubic-bezier(.2,.7,.2,1)}
 .card:hover .photo{transform:scale(1.035)}
 .card__media:has(.photo) .card__slot,.shot:has(.photo) .shot__no{display:none}
+/* Hover depth-of-field. A second copy of the same photo sits on top, blurred
+   and masked so it covers only the surround, and fades in on hover — the
+   subject stays sharp and the location stops competing with the garment.
+   No extra files: it is the same <img> src, masked. */
+.photo--blur{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  filter:blur(13px) brightness(.66) saturate(.7);
+  opacity:0;transition:opacity .45s ease;pointer-events:none;transform:scale(1.06);
+  -webkit-mask-image:radial-gradient(ellipse 44% 56% at 52% 47%,rgba(0,0,0,0) 40%,#000 84%);
+          mask-image:radial-gradient(ellipse 44% 56% at 52% 47%,rgba(0,0,0,0) 40%,#000 84%);
+}
+.card:hover .photo--blur,.card:focus-within .photo--blur,.shot:hover .photo--blur{opacity:1}
+.card:hover .photo,.card:focus-within .photo{transform:none}
 .shot:has(.photo){padding:0}
 .shot .photo{position:absolute}
 .card:hover .card__media .flat{transform:scale(1.045)}
@@ -732,7 +745,9 @@ caption{caption-side:bottom;text-align:left;color:var(--smoke);font-size:.78rem;
     if (!file) return art(p, side);
     return art(p, side) +
       '<img class="photo" src="images/' + file + '" alt="' + alt +
-      '" loading="lazy" onerror="this.remove()">';
+      '" loading="lazy" onerror="this.remove()">' +
+      '<img class="photo--blur" src="images/' + file + '" alt="" aria-hidden="true" ' +
+      'loading="lazy" onerror="this.remove()">';
   }
 
   function art(p, side){
@@ -818,6 +833,7 @@ caption{caption-side:bottom;text-align:left;color:var(--smoke);font-size:.78rem;
       '<span class="shot__no">' + s.spec + "</span>" +
       '<div style="width:min(62%,240px);opacity:.9">' + s.flat + "</div>" +
       '<img class="photo" src="images/' + s.file + '" alt="' + s.t + '" loading="lazy" onerror="this.remove()">' +
+      '<img class="photo--blur" src="images/' + s.file + '" alt="" aria-hidden="true" loading="lazy" onerror="this.remove()">' +
       '<figcaption class="shot__label" style="z-index:2"><b>' + s.t + "</b><span>" + s.m + "</span></figcaption>" +
       "</figure>";
   }).join("");

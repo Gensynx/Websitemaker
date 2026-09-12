@@ -9,6 +9,11 @@ Two renditions of the same brand, deliberately different in strategy rather than
 
 Both are single self-contained files, no build step, and share one `images/` folder.
 
+**Hover depth-of-field.** Every photo slot carries a second copy of the same image, blurred,
+darkened and masked to an ellipse so it covers only the surround. It fades in on hover, dropping the
+location back and leaving the garment sharp — a lifestyle frame then reads as a product shot instead
+of a holiday snap. No extra files: same `src`, masked.
+
 ---
 
 ## Rendition 1 — The Drop (`index.html`)

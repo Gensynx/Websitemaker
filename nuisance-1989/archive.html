@@ -64,6 +64,18 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .layer img{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
 .layer__flat{width:min(34%,300px);max-width:100%}
 .layer__flat svg{width:100%;height:auto}
+/* Hover depth-of-field. A second copy of the same photo sits on top, blurred
+   and masked so it covers only the surround, and fades in on hover — the
+   subject stays sharp and the location stops competing with the garment.
+   No extra files: it is the same <img> src, masked. */
+.photo--blur{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  filter:blur(13px) brightness(.66) saturate(.7);
+  opacity:0;transition:opacity .45s ease;pointer-events:none;transform:scale(1.06);
+  -webkit-mask-image:radial-gradient(ellipse 44% 56% at 52% 47%,rgba(0,0,0,0) 40%,#000 84%);
+          mask-image:radial-gradient(ellipse 44% 56% at 52% 47%,rgba(0,0,0,0) 40%,#000 84%);
+}
+.plateview__frame:hover .photo--blur,.plate2:hover .photo--blur{opacity:1}
 .layer--dark{background:#14120F}
 .layer--light{background:var(--leaf)}
 /* the reveal aperture follows the pointer; no JS = the light layer simply sits on top */
@@ -223,10 +235,12 @@ caption{caption-side:bottom;text-align:left;color:var(--graphite);font-size:.75r
     <div class="layer layer--dark">
       <div class="layer__flat" data-shape="tee" data-cloth="asphalt"></div>
       <img src="images/tee-asphalt-back.jpg" alt="Heavyweight tee in Asphalt, back print" onerror="this.remove()">
+      <img class="photo--blur" src="images/tee-asphalt-back.jpg" alt="" aria-hidden="true" onerror="this.remove()">
     </div>
     <div class="layer layer--light" id="lightLayer">
       <div class="layer__flat" data-shape="tee" data-cloth="bone"></div>
       <img src="images/tee-bone-back.jpg" alt="Heavyweight tee in Bone, back print" onerror="this.remove()">
+      <img class="photo--blur" src="images/tee-bone-back.jpg" alt="" aria-hidden="true" onerror="this.remove()">
     </div>
     <div class="hero2">
       <div class="hero2__top">
@@ -520,7 +534,8 @@ caption{caption-side:bottom;text-align:left;color:var(--graphite);font-size:.75r
   document.getElementById("rail").innerHTML = PLATES.map(function(p){
     return '<figure class="plate2' + (p.wide ? " plate2--wide" : "") + '" style="margin:0">' +
       '<div style="width:min(64%,250px)">' + flat(p.shape, p.cloth) + "</div>" +
-      '<img src="images/' + p.f + '" alt="' + p.t + '" loading="lazy" style="position:absolute;inset:0" onerror="this.remove()">' +
+      '<img src="images/' + p.f + '" alt="' + p.t + '" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">' +
+      '<img class="photo--blur" src="images/' + p.f + '" alt="" aria-hidden="true" loading="lazy" onerror="this.remove()">' +
       '<figcaption class="plate2__cap"><b>' + p.t + "</b><span>" + p.m + "</span></figcaption></figure>";
   }).join("");
 

@@ -40,6 +40,7 @@ distance or the hover swap will jump.
 ## The black colourway — how `tee-asphalt-back.jpg` was made
 
 Regenerate it with `python3 tools-recolour.py` from the site folder (needs `pillow numpy scipy`).
+The master is kept at `source/tee-bone-onbody-master.png` — do not delete it, the script reads it.
 
 The photograph is lit from one side at night, so the garment spans luminance 0.11 in the shadowed
 left to 0.76 on the lit right — no single brightness threshold holds both. Saturation separates it
@@ -49,6 +50,14 @@ garment's own tonal range (0.22–0.68) into a dark one (0.03–0.22) so the fol
 crushing to a flat slab. The printed wordmark is masked separately and re-rendered in bone, because
 on a black tee it is a different ink, not the same ink darkened. Fine grain is added over the
 recoloured area so it sits in the same photograph as the background.
+
+**Why the print is masked with a continuous alpha, not a threshold.** The strokes are thin and
+anti-aliased at 777 px. A binary cut eats the serifs and a component-size filter deletes parts of
+the digits, which is what made the first attempt look chewed up. The alpha now comes from how much
+darker each pixel is than the cloth around it, so anti-aliased edges survive exactly as the camera
+recorded them. That alone paints the creases as ink too — a fold is also darker than its surround —
+so it is gated by an absolute darkness term as well: ink bottoms out at luminance 0.03-0.07 while a
+crease only reaches 0.22-0.35. Both terms are continuous, so the letterforms stay smooth.
 
 **It is a mock-up asset, not a product shot.** It is derived from a 777 px screenshot, the mask
 edge against the bag at lower left is slightly blocky, and no customer should be sold a black tee
