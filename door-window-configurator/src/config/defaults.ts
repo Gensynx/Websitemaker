@@ -16,8 +16,7 @@ import type {
 import { CONFIG_SCHEMA_VERSION, NO_BARS } from './types';
 import type { FrameMaterial } from './material';
 
-/** PLACEHOLDER: the material a customer is most likely to want is a business
- *  question, not a technical one. */
+/** ANSWERED 2026-09-12: uPVC, the only material currently offered. */
 export const DEFAULT_MATERIAL: FrameMaterial = 'upvc';
 
 export function makeGrid(columns: number, rows: number): SashGrid {

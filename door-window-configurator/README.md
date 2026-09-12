@@ -130,8 +130,8 @@ geometry defects from us as well.
 
 ## Placeholders requiring replacement before launch
 
-- `material.ts` — which materials are actually sold, their sightlines, and the
-  colour and finish restrictions on each.
+- `material.ts` — the sightlines and the colour and finish restrictions.
+  (Which materials are sold is answered: uPVC only, `OFFERED_MATERIALS`.)
 - `limits.ts` — every size limit, grid cap and preset.
 - `ral.ts` — the offered shade list and its approximate sRGB values.
 - `safety.ts` — a simplified reading of Approved Document K (England and

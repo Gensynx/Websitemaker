@@ -7,11 +7,18 @@
  * can invalidate selections that were legal a moment ago (see `reconcile` in
  * validate.ts).
  *
- * !! PLACEHOLDER CATALOGUE REQUIRING REPLACEMENT !!
- * All four materials are modelled because the brief did not say which are
- * actually sold. Narrowing the list is a data change here, not a schema change.
- * Every sightline, colour restriction and finish restriction below is a
- * plausible industry figure, not a supplied one.
+ * ANSWERED 2026-09-12: uPVC only. `OFFERED_MATERIALS` is the list actually
+ * sold and is what the picker and the size limits key off.
+ *
+ * The other three definitions are kept rather than deleted. They are dormant,
+ * not dead: adding aluminium to the range is one entry in OFFERED_MATERIALS,
+ * and deleting them now would mean rebuilding the sightlines, colour lists and
+ * limits from scratch when the range grows. Nothing reaches a customer that is
+ * not in OFFERED_MATERIALS.
+ *
+ * !! The NUMBERS are still placeholders. !! Every sightline, colour
+ * restriction and finish restriction below is a plausible industry figure, not
+ * a supplied one, uPVC's included.
  */
 
 import type { Mm } from './units';
@@ -20,7 +27,18 @@ import { RAL_PALETTE } from './ral';
 
 export type FrameMaterial = 'upvc' | 'aluminium' | 'timber' | 'composite';
 
+/** Every material the model can express, sold or not. */
 export const FRAME_MATERIALS: readonly FrameMaterial[] = ['upvc', 'aluminium', 'timber', 'composite'];
+
+/**
+ * The materials actually sold. Drives the picker, and from Step 3 the size
+ * limits and the quote gate. Adding one to the range is one entry here.
+ */
+export const OFFERED_MATERIALS: readonly FrameMaterial[] = ['upvc'];
+
+export function isMaterialOffered(material: FrameMaterial): boolean {
+  return OFFERED_MATERIALS.includes(material);
+}
 
 export type Finish = 'smooth' | 'textured' | 'woodgrain-foil';
 
