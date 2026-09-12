@@ -116,6 +116,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   background:var(--plate);color:#0B0A09;font-weight:700;border-radius:2px;font-size:.65rem;
 }
 .bag__n[data-empty="1"]{background:var(--kerb);color:var(--smoke)}
+/* Below 760px the wordmark, four links and the bag need 481px in one row and
+   drag the whole document sideways. Links drop to their own scrolling rail. */
+@media(max-width:760px){
+  .nav__in{height:auto;flex-wrap:wrap;padding-block:.65rem;row-gap:.3rem}
+  .nav__links{
+    order:3;width:100%;gap:1.3rem;overflow-x:auto;
+    scrollbar-width:none;-ms-overflow-style:none;
+  }
+  .nav__links::-webkit-scrollbar{display:none}
+  .nav__links a{white-space:nowrap}
+}
 
 /* ---------- hero ---------- */
 .hero{padding-block:clamp(48px,8vw,104px) clamp(40px,6vw,72px);position:relative}
@@ -197,6 +208,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   overflow:hidden;background:var(--tarmac);
 }
 .card__media .flat{width:82%;height:auto;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+/* Real photography layers over the drawn flat. If the file is missing the
+   <img> removes itself and the flat behind it shows through. */
+.photo{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+  transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.card:hover .photo{transform:scale(1.035)}
+.card__media:has(.photo) .card__slot,.shot:has(.photo) .shot__no{display:none}
+.shot:has(.photo){padding:0}
+.shot .photo{position:absolute}
 .card:hover .card__media .flat{transform:scale(1.045)}
 /* the back print, revealed on hover — the way the feed shoots them */
 .card__back{
@@ -650,14 +669,13 @@ caption{caption-side:bottom;text-align:left;color:var(--smoke);font-size:.78rem;
     plate:  {fill:"#F2CB05", seam:"#C0A104", ink:"#0B0A09"}
   };
 
-  function print(c, y, scale, mark){
-    var s = scale || 1;
+  function print(c, y, size, mark){
     return '<text x="200" y="' + y + '" text-anchor="middle" fill="' + c.ink +
-      '" font-family="Bodoni Moda, Didot, Georgia, serif" font-size="' + (34*s) +
-      '" letter-spacing="' + (1.2*s) + '">NUISANCE</text>' +
-      (mark ? '<text x="200" y="' + (y + 26*s) + '" text-anchor="middle" fill="' + c.ink +
-        '" font-family="JetBrains Mono, monospace" font-size="' + (11*s) +
-        '" letter-spacing="' + (3.4*s) + '">1989</text>' : '');
+      '" font-family="Bodoni Moda, Didot, Georgia, serif" font-size="' + size +
+      '" letter-spacing="' + (size * 0.035).toFixed(2) + '">NUISANCE</text>' +
+      (mark ? '<text x="200" y="' + (y + size * 0.88).toFixed(1) + '" text-anchor="middle" fill="' + c.ink +
+        '" font-family="Bodoni Moda, Didot, Georgia, serif" font-size="' + (size * 0.38).toFixed(1) +
+        '" letter-spacing="' + (size * 0.10).toFixed(2) + '">1989</text>' : '');
   }
 
   function tee(key, side){
@@ -667,7 +685,7 @@ caption{caption-side:bottom;text-align:left;color:var(--smoke);font-size:.78rem;
       '<path d="M143 32 C146 76 254 76 257 32" fill="none" stroke="' + c.seam + '" stroke-width="7" stroke-linecap="round"/>' +
       '<path d="M308 186 L308 448 M92 186 L92 448" stroke="' + c.seam + '" stroke-width="1.5" opacity=".7"/>' +
       '<path d="M96 436 L304 436" stroke="' + c.seam + '" stroke-width="1.5" opacity=".7"/>' +
-      (side === "back" ? print(c, 250, 1, true) : print(c, 148, .38, false)) +
+      (side === "back" ? print(c, 208, 25, true) : print(c, 150, 12, false)) +
       '</svg>';
   }
 
@@ -681,7 +699,7 @@ caption{caption-side:bottom;text-align:left;color:var(--smoke);font-size:.78rem;
       (side === "back" ? "" :
         '<path d="M124 306 L276 306 L286 380 L114 380 Z" fill="none" stroke="' + c.seam + '" stroke-width="2"/>' +
         '<path d="M188 82 L184 150 M212 82 L216 150" stroke="' + c.seam + '" stroke-width="4" stroke-linecap="round"/>') +
-      (side === "back" ? print(c, 246, 1, true) : print(c, 176, .38, false)) +
+      (side === "back" ? print(c, 216, 25, true) : print(c, 178, 12, false)) +
       '</svg>';
   }
 
@@ -708,6 +726,15 @@ caption{caption-side:bottom;text-align:left;color:var(--smoke);font-size:.78rem;
       '</svg>';
   }
 
+  /* A named photo layers over the flat; the flat is the fallback, always drawn. */
+  function media(p, side, alt){
+    var file = side === "back" ? p.photoBack : p.photo;
+    if (!file) return art(p, side);
+    return art(p, side) +
+      '<img class="photo" src="images/' + file + '" alt="' + alt +
+      '" loading="lazy" onerror="this.remove()">';
+  }
+
   function art(p, side){
     if (p.shape === "tee") return tee(p.cloth, side);
     if (p.shape === "hoodie") return hoodie(p.cloth, side);
@@ -718,10 +745,14 @@ caption{caption-side:bottom;text-align:left;color:var(--smoke);font-size:.78rem;
   /* ---------- drop 03 ---------- */
   var SIZES = ["S","M","L","XL","XXL"];
   var PRODUCTS = [
-    {sku:"NSC-T03-BN", name:"Heavyweight Tee",  colour:"Bone",         price:85,  shape:"tee",    cloth:"bone",    spec:"380 GSM · Boxy", stock:{S:6,M:11,L:0,XL:7,XXL:3}},
-    {sku:"NSC-T03-AS", name:"Heavyweight Tee",  colour:"Asphalt",      price:85,  shape:"tee",    cloth:"asphalt", spec:"380 GSM · Boxy", stock:{S:4,M:9,L:12,XL:5,XXL:2}},
-    {sku:"NSC-H03-BN", name:"Arch Hoodie",      colour:"Bone",         price:165, shape:"hoodie", cloth:"bone",    spec:"450 GSM · Loopback", stock:{S:2,M:3,L:2,XL:0,XXL:0}},
-    {sku:"NSC-H03-AS", name:"Arch Hoodie",      colour:"Asphalt",      price:165, shape:"hoodie", cloth:"asphalt", spec:"450 GSM · Loopback", stock:{S:5,M:8,L:9,XL:4,XXL:1}},
+    {sku:"NSC-T03-BN", name:"Heavyweight Tee",  colour:"Bone",         price:85,  shape:"tee",    cloth:"bone",    spec:"380 GSM · Boxy", stock:{S:6,M:11,L:0,XL:7,XXL:3},
+     photo:"tee-bone-front.jpg",    photoBack:"tee-bone-back.jpg"},
+    {sku:"NSC-T03-AS", name:"Heavyweight Tee",  colour:"Asphalt",      price:85,  shape:"tee",    cloth:"asphalt", spec:"380 GSM · Boxy", stock:{S:4,M:9,L:12,XL:5,XXL:2},
+     photo:"tee-asphalt-front.jpg", photoBack:"tee-asphalt-back.jpg"},
+    {sku:"NSC-H03-BN", name:"Arch Hoodie",      colour:"Bone",         price:165, shape:"hoodie", cloth:"bone",    spec:"450 GSM · Loopback", stock:{S:2,M:3,L:2,XL:0,XXL:0},
+     photo:"hoodie-bone-front.jpg",    photoBack:"hoodie-bone-back.jpg"},
+    {sku:"NSC-H03-AS", name:"Arch Hoodie",      colour:"Asphalt",      price:165, shape:"hoodie", cloth:"asphalt", spec:"450 GSM · Loopback", stock:{S:5,M:8,L:9,XL:4,XXL:1},
+     photo:"hoodie-asphalt-front.jpg", photoBack:"hoodie-asphalt-back.jpg"},
     {sku:"NSC-S03-RG", name:"Ring Short",       colour:"Glove Red",    price:95,  shape:"shorts", cloth:"ring",    spec:"Satin · Gym cut", stock:{S:0,M:0,L:0,XL:0,XXL:0}},
     {sku:"NSC-C03-PL", name:"Plate Cap",        colour:"Plate Yellow", price:45,  shape:"cap",    cloth:"plate",   spec:"6 panel · One size", stock:{S:0,M:0,L:24,XL:0,XXL:0}, onesize:true}
   ];
@@ -754,8 +785,8 @@ caption{caption-side:bottom;text-align:left;color:var(--smoke);font-size:.78rem;
       '<article class="card" data-sku="' + p.sku + '">' +
         '<div class="card__media">' +
           '<div class="card__tag">' + tag + '</div>' +
-          art(p, "front") +
-          '<div class="card__back">' + art(p, "back") + '</div>' +
+          media(p, "front", p.name + ", " + p.colour) +
+          '<div class="card__back">' + media(p, "back", p.name + ", " + p.colour + ", back print") + "</div>" +
           '<span class="card__slot">Image ' + ("0" + (i + 1)) + ' · 2000×2500</span>' +
         '</div>' +
         '<div class="card__body">' +
@@ -775,16 +806,19 @@ caption{caption-side:bottom;text-align:left;color:var(--smoke);font-size:.78rem;
 
   /* ---------- lookbook slots ---------- */
   var SHOTS = [
-    {t:"Back print, Palm Jumeirah", m:"Drop 03 · Frame 04", cls:"shot--tall", spec:"2000×2500"},
-    {t:"Flat lay, Bone tee",        m:"Drop 03 · Frame 09", cls:"shot--wide", spec:"1600×1280"},
-    {t:"The ring, Ladbroke Grove",  m:"Archive · 1989",     cls:"shot--wide", spec:"1600×1280"}
+    {t:"Back print, Palm Jumeirah", m:"Drop 03 · Frame 04", cls:"shot--tall", spec:"2000×2500",
+     file:"look-01.jpg", flat:tee("bone","back")},
+    {t:"Flat lay, Bone tee",        m:"Drop 03 · Frame 09", cls:"shot--wide", spec:"1600×1280",
+     file:"look-02.jpg", flat:tee("bone","back")},
+    {t:"The ring, Ladbroke Grove",  m:"Archive · 1989",     cls:"shot--wide", spec:"1600×1280",
+     file:"look-03.jpg", flat:hoodie("asphalt","back")}
   ];
-  document.getElementById("look").innerHTML = SHOTS.map(function(s, i){
-    var sample = i === 1 ? tee("bone","back") : (i === 2 ? hoodie("asphalt","back") : tee("bone","back"));
+  document.getElementById("look").innerHTML = SHOTS.map(function(s){
     return '<figure class="shot ' + s.cls + '" style="margin:0">' +
       '<span class="shot__no">' + s.spec + "</span>" +
-      '<div style="width:min(62%,240px);opacity:.9">' + sample + "</div>" +
-      '<figcaption class="shot__label"><b>' + s.t + "</b><span>" + s.m + "</span></figcaption>" +
+      '<div style="width:min(62%,240px);opacity:.9">' + s.flat + "</div>" +
+      '<img class="photo" src="images/' + s.file + '" alt="' + s.t + '" loading="lazy" onerror="this.remove()">' +
+      '<figcaption class="shot__label" style="z-index:2"><b>' + s.t + "</b><span>" + s.m + "</span></figcaption>" +
       "</figure>";
   }).join("");
 
