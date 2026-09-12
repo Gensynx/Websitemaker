@@ -1,4 +1,17 @@
-# Nuisance 1989 — storefront design mock-up
+# Nuisance 1989 — design mock-ups
+
+Two renditions of the same brand, deliberately different in strategy rather than skin:
+
+| File | Name | Direction |
+|---|---|---|
+| `index.html` | **The Drop** | Dark, commerce-forward. Drop clock, product grid, bag drawer, plate-yellow accent. |
+| `archive.html` | **The Archive** | Paper ground, gallery-led. Cursor-driven colourway reveal, catalogue index instead of a grid, horizontal plate rail. |
+
+Both are single self-contained files, no build step, and share one `images/` folder.
+
+---
+
+## Rendition 1 — The Drop (`index.html`)
 
 A single-file, no-build storefront for **Nuisance 1989** (`nuisance1989` on Instagram) — a London
 luxury-streetwear label selling in limited drops.
@@ -56,3 +69,40 @@ stock counts needs real inventory locking at checkout, or two people buy the las
 handles that out of the box and this page can be rebuilt as a Shopify theme with the same design
 system; a bespoke build would need its own stock reservation, payments and fraud handling. That's a
 decision to take before any more front-end work.
+
+
+---
+
+## Rendition 2 — The Archive (`archive.html`)
+
+The counter-proposal. Where The Drop sells, The Archive catalogues — the bet being that a label
+whose feed is Rolexes and Rolls-Royces is better served looking like a gallery than like a hype
+store.
+
+| | |
+|---|---|
+| **Ground** | `#F1EDE4` warm bone paper — the cotton, not the night |
+| **Surface** | `#E7E1D5` leaf · `#D3CBBB` rule |
+| **Type colour** | `#14120F` ink · `#6B6459` graphite |
+| **Accent** | `#F2CB05` plate yellow, carried over, one band only |
+| **Display** | Bodoni Moda — the one element shared across both renditions, because it is the brand |
+| **Text** | Instrument Sans (rendition 1 uses Archivo) |
+| **Data** | DM Mono (rendition 1 uses JetBrains Mono) |
+
+### What is different, structurally
+
+- **Hero is one garment in two colourways.** The bone tee covers the plate at rest; moving the
+  pointer opens a circular aperture onto the asphalt one underneath. Touch and keyboard get an
+  explicit **Invert** control rather than a hover they cannot perform.
+- **The index is a catalogue, not a grid.** Six numbered entries in Roman numerals, because a drop
+  cut in order genuinely is a sequence. Hovering a row raises a plate that tracks the cursor.
+- **Plates run horizontally** on a snap rail rather than stacking.
+- **Dark colophon** bookends the paper ground.
+
+### Sourcing
+
+Interaction patterns were sourced from the 21st.dev catalogue — cursor-mask image reveal, hover-reveal
+rows, sliding product peek — and reimplemented in vanilla JS. The catalogue's components are
+React/shadcn packages installed over npm, which would break this repo's no-build convention, so they
+were used as reference rather than installed. See the note in the handover about what adopting them
+literally would cost.
