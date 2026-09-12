@@ -106,47 +106,69 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .idxhead h2{font-family:var(--display);font-weight:400;font-size:clamp(1.9rem,5vw,3.4rem);line-height:1;margin:.45rem 0 0}
 .idxhead p{margin:0;max-width:36ch;color:var(--graphite);font-size:.9375rem}
 
+/* Rows on the left, one plate on the right. The preview used to follow the
+   cursor and sat on top of the row text, cutting words in half; giving it its
+   own column means it can never occlude anything. */
+.idxwrap{display:grid;grid-template-columns:1fr;gap:clamp(28px,3.5vw,56px);align-items:start}
+@media(min-width:1000px){.idxwrap{grid-template-columns:minmax(0,1.4fr) minmax(0,.6fr)}}
+.idxwrap>*{min-width:0}
+
 .idx{border-top:1px solid var(--ink)}
 .row{
-  display:grid;grid-template-columns:2.6rem 1fr auto;gap:1rem;align-items:center;
-  padding:clamp(.85rem,1.6vw,1.25rem) 0;border-bottom:1px solid var(--hair);
-  position:relative;transition:padding-left .28s cubic-bezier(.2,.7,.2,1);
+  display:grid;grid-template-columns:1.9rem 58px minmax(0,1fr) auto;
+  gap:clamp(.7rem,1.4vw,1.1rem);align-items:center;
+  padding:clamp(.8rem,1.5vw,1.1rem) 0;border-bottom:1px solid var(--hair);
+  transition:background .25s ease;
 }
-.row:hover,.row:focus-within{padding-left:.7rem}
+@media(max-width:640px){.row{grid-template-columns:46px minmax(0,1fr) auto}.row__no{display:none}}
+.row:hover,.row:focus-within{background:rgba(20,18,15,.035)}
 .row__no{font-family:var(--mono);font-size:.7rem;color:var(--graphite);font-variant-numeric:tabular-nums}
-.row__name{font-family:var(--display);font-size:clamp(1.05rem,2.4vw,1.6rem);line-height:1.15;margin:0;font-weight:400}
-.row__meta{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--graphite);margin:.3rem 0 0}
-.row__right{display:flex;align-items:center;gap:clamp(.8rem,2vw,1.8rem)}
-.row__price{font-family:var(--mono);font-size:.9rem;font-variant-numeric:tabular-nums}
-.row__sizes{display:none;gap:4px}
-@media(min-width:820px){.row__sizes{display:flex}}
+.row__thumb{
+  aspect-ratio:4/5;background:var(--leaf);border:1px solid var(--hair);
+  overflow:hidden;position:relative;display:grid;place-items:center;
+}
+.row__thumb svg,.row__thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.row__thumb img{position:absolute;inset:0}
+.row__name{font-family:var(--display);font-size:clamp(1rem,2.1vw,1.42rem);line-height:1.18;margin:0;font-weight:400}
+.row__meta{font-family:var(--mono);font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;color:var(--graphite);margin:.28rem 0 0}
+.row__sizes{display:flex;gap:4px;flex-wrap:wrap;margin-top:.5rem}
+.row__right{display:flex;flex-direction:column;align-items:flex-end;gap:.45rem}
 .sz{
-  font-family:var(--mono);font-size:.64rem;border:1px solid var(--hair);padding:.28rem .45rem;
+  font-family:var(--mono);font-size:.62rem;border:1px solid var(--hair);padding:.24rem .4rem;
   transition:background .15s,color .15s,border-color .15s;
 }
 .sz:hover:not([disabled]){border-color:var(--ink)}
 .sz[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .sz[disabled]{color:#BDB5A5;border-color:#E2DACA;cursor:not-allowed;text-decoration:line-through}
+.row__price{font-family:var(--mono);font-size:.88rem;font-variant-numeric:tabular-nums}
 .row__add{
-  font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;
-  border:1px solid var(--ink);padding:.5rem .8rem;white-space:nowrap;
+  font-family:var(--mono);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;
+  border:1px solid var(--ink);padding:.42rem .7rem;white-space:nowrap;
   transition:background .16s,color .16s;
 }
 .row__add:hover:not([disabled]){background:var(--ink);color:var(--paper)}
 .row__add[disabled]{border-color:var(--hair);color:#B4AC9C;cursor:not-allowed}
 .row--gone .row__name{color:var(--graphite)}
-.row__flag{font-family:var(--mono);font-size:.58rem;letter-spacing:.12em;text-transform:uppercase;color:var(--glove)}
+.row__flag{font-family:var(--mono);font-size:.56rem;letter-spacing:.12em;text-transform:uppercase;color:var(--glove)}
 
-/* the catalogue plate that follows the cursor over a row */
-.peek{
-  position:fixed;width:190px;aspect-ratio:4/5;pointer-events:none;z-index:70;
-  opacity:0;transform:translate(-50%,-50%) scale(.94);
-  transition:opacity .2s ease,transform .28s cubic-bezier(.2,.7,.2,1);
-  border:1px solid var(--ink);background:var(--leaf);overflow:hidden;
+/* the plate: one frame, cross-fading as you move down the index */
+.preview{margin:0;position:sticky;top:92px;display:none}
+@media(min-width:1000px){.preview{display:block}}
+.preview__frame{
+  position:relative;aspect-ratio:4/5;border:1px solid var(--ink);background:var(--leaf);overflow:hidden;
 }
-.peek[data-on="1"]{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.peek img,.peek svg{width:100%;height:100%;object-fit:cover}
-@media(hover:none){.peek{display:none}}
+.pv{position:absolute;inset:0;opacity:0;transition:opacity .5s ease;display:grid;place-items:center}
+.pv[data-on="1"]{opacity:1}
+.pv svg{width:64%;height:auto}
+.pv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+/* the location is always held back here — this is a product plate, not a holiday snap */
+.pv .photo--blur{opacity:1}
+.preview__cap{
+  display:flex;justify-content:space-between;gap:1rem;align-items:baseline;
+  margin-top:.7rem;font-family:var(--mono);font-size:.62rem;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--graphite);
+}
+.preview__cap b{font-family:var(--display);font-size:1rem;letter-spacing:0;text-transform:none;color:var(--ink);font-weight:400}
 
 /* ---------- lookbook: a horizontal plate rail ---------- */
 .rail{display:flex;gap:1px;overflow-x:auto;background:var(--hair);
@@ -268,7 +290,15 @@ caption{caption-side:bottom;text-align:left;color:var(--graphite);font-size:.75r
     </div>
     <p>Catalogued in the order they were cut. Two hundred units across the run, numbered, not restocked.</p>
   </div>
-  <div class="idx" id="idx"></div>
+  <div class="idxwrap">
+    <div class="idx" id="idx"></div>
+    <figure class="preview">
+      <div class="preview__frame" id="pvFrame"></div>
+      <figcaption class="preview__cap">
+        <b id="pvName">Heavyweight Tee</b><span id="pvMeta">Bone · 380 GSM</span>
+      </figcaption>
+    </figure>
+  </div>
   <p class="mono" style="margin-top:1.1rem">Prices in GBP · Free UK delivery over £100 · DPD next day</p>
 </section>
 
@@ -382,16 +412,17 @@ caption{caption-side:bottom;text-align:left;color:var(--graphite);font-size:.75r
 </footer>
 </main>
 
-<div class="peek" id="peek" aria-hidden="true"></div>
 <div class="mockbar2">Design mock-up · <b>Nuisance 1989 — The Archive</b> · imagery and checkout are placeholders</div>
 
 <script>
 /* ============================================================
    THE ARCHIVE — interactions
    Patterns sourced from the 21st.dev catalogue (cursor-mask
-   image reveal, hover-reveal rows, sliding product peek) and
-   implemented in vanilla so the page stays a single static
-   file with no build step, matching the rest of the repo.
+   image reveal, hover-reveal rows) and implemented in vanilla
+   so the page stays a single static file with no build step,
+   matching the rest of the repo. The cursor-following preview
+   card was dropped: it sat on top of the row text and cut the
+   names in half. The plate has its own column instead.
    ============================================================ */
 (function(){
   "use strict";
@@ -453,30 +484,61 @@ caption{caption-side:bottom;text-align:left;color:var(--graphite);font-size:.75r
   ];
   function left(e){ var n=0,k; for(k in e.stock){ if(Object.prototype.hasOwnProperty.call(e.stock,k)) n+=e.stock[k]; } return n; }
 
+  /* a plate: the drawn flat, the photo over it, and the blurred surround on top */
+  function plateHTML(e){
+    var fb = flat(e.shape, e.cloth);
+    if (!e.photo) return fb;
+    return fb +
+      '<img src="images/' + e.photo + '" alt="' + e.name + ', ' + e.colour + '" loading="lazy" onerror="this.remove()">' +
+      '<img class="photo--blur" src="images/' + e.photo + '" alt="" aria-hidden="true" loading="lazy" onerror="this.remove()">';
+  }
+
   var idx = document.getElementById("idx");
   idx.innerHTML = ENTRIES.map(function(e){
     var n = left(e);
     var sizes = e.onesize
       ? '<button class="sz" data-sku="' + e.sku + '" data-size="OS" aria-pressed="false">One size</button>'
-      : SIZES.map(function(s){
-          var q = e.stock[s] || 0;
-          return '<button class="sz" data-sku="' + e.sku + '" data-size="' + s + '" aria-pressed="false"' +
-            (q ? "" : " disabled") + ' aria-label="Size ' + s + (q ? "" : ", sold out") + '">' + s + "</button>";
+      : SIZES.map(function(sz){
+          var q = e.stock[sz] || 0;
+          return '<button class="sz" data-sku="' + e.sku + '" data-size="' + sz + '" aria-pressed="false"' +
+            (q ? "" : " disabled") + ' aria-label="Size ' + sz + (q ? "" : ", sold out") + '">' + sz + "</button>";
         }).join("");
-    return '<div class="row' + (n ? "" : " row--gone") + '" data-sku="' + e.sku + '" data-shape="' + e.shape +
-        '" data-cloth="' + e.cloth + '" data-photo="' + e.photo + '">' +
+    return '<div class="row' + (n ? "" : " row--gone") + '" data-sku="' + e.sku + '" tabindex="0">' +
       '<span class="row__no">' + e.no + "</span>" +
+      '<div class="row__thumb">' + plateHTML(e) + "</div>" +
       "<div><h3 class='row__name'>" + e.name + " &mdash; " + e.colour + "</h3>" +
         "<p class='row__meta'>" + e.gsm + " · " + e.sku +
-        (n === 0 ? " · <span class='row__flag'>Sold out</span>" : (n <= 8 ? " · <span class='row__flag'>" + n + " left</span>" : "")) +
-        "</p></div>" +
+        (n === 0 ? " · <span class='row__flag'>Sold out</span>"
+                 : (n <= 8 ? " · <span class='row__flag'>" + n + " left</span>" : "")) +
+        "</p>" +
+        '<div class="row__sizes">' + sizes + "</div></div>" +
       '<div class="row__right">' +
-        '<div class="row__sizes">' + sizes + "</div>" +
         '<span class="row__price">£' + e.price + "</span>" +
         '<button class="row__add" data-add="' + e.sku + '"' + (n ? "" : " disabled") + ">" +
           (n ? "Add" : "Gone") + "</button>" +
       "</div></div>";
   }).join("");
+
+  /* ---------- the preview plate, one per entry, cross-fading ---------- */
+  var pvFrame = document.getElementById("pvFrame");
+  var pvName  = document.getElementById("pvName");
+  var pvMeta  = document.getElementById("pvMeta");
+  pvFrame.innerHTML = ENTRIES.map(function(e, i){
+    return '<div class="pv" data-i="' + i + '"' + (i ? "" : ' data-on="1"') + ">" + plateHTML(e) + "</div>";
+  }).join("");
+
+  function showPreview(i){
+    var e = ENTRIES[i];
+    pvFrame.querySelectorAll(".pv").forEach(function(el){
+      el.setAttribute("data-on", el.getAttribute("data-i") === String(i) ? "1" : "0");
+    });
+    pvName.textContent = e.name;
+    pvMeta.textContent = e.colour + " · " + e.gsm;
+  }
+  idx.querySelectorAll(".row").forEach(function(row, i){
+    row.addEventListener("pointerenter", function(){ showPreview(i); });
+    row.addEventListener("focusin", function(){ showPreview(i); });
+  });
 
   /* size selection */
   var picked = {};
@@ -498,30 +560,6 @@ caption{caption-side:bottom;text-align:left;color:var(--graphite);font-size:.75r
     b.textContent = size ? "Added · " + size : "Pick a size";
     setTimeout(function(){ b.textContent = "Add"; }, 1700);
   });
-
-  /* ---------- the plate that follows the pointer over a row ---------- */
-  var peek = document.getElementById("peek");
-  function fillPeek(row){
-    var file = row.getAttribute("data-photo");
-    var fb = flat(row.getAttribute("data-shape"), row.getAttribute("data-cloth"));
-    peek.innerHTML = file
-      ? fb + '<img src="images/' + file + '" alt="" style="position:absolute;inset:0" onerror="this.remove()">'
-      : fb;
-    peek.style.position = "fixed";
-  }
-  idx.addEventListener("pointerover", function(ev){
-    if (ev.pointerType === "touch") return;
-    var row = ev.target.closest(".row");
-    if (!row) return;
-    fillPeek(row);
-    peek.setAttribute("data-on", "1");
-  });
-  idx.addEventListener("pointermove", function(ev){
-    if (ev.pointerType === "touch") return;
-    peek.style.left = ev.clientX + "px";
-    peek.style.top  = ev.clientY + "px";
-  });
-  idx.addEventListener("pointerleave", function(){ peek.setAttribute("data-on", "0"); });
 
   /* ---------- plates rail ---------- */
   var PLATES = [

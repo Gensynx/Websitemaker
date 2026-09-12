@@ -100,7 +100,11 @@ store.
   pointer opens a circular aperture onto the asphalt one underneath. Touch and keyboard get an
   explicit **Invert** control rather than a hover they cannot perform.
 - **The index is a catalogue, not a grid.** Six numbered entries in Roman numerals, because a drop
-  cut in order genuinely is a sequence. Hovering a row raises a plate that tracks the cursor.
+  cut in order genuinely is a sequence. Each row carries a thumbnail, so the clothes are visible
+  without hovering anything, and one large plate sits in its own column to the right, cross-fading
+  as you move down the list. An earlier version had that plate follow the cursor: it landed on top
+  of the row text and cut the names in half. A preview that occludes the thing it is previewing is
+  worse than no preview, so it was given its own column where it cannot overlap.
 - **Plates run horizontally** on a snap rail rather than stacking.
 - **Dark colophon** bookends the paper ground.
 
