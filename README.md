@@ -11,6 +11,7 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 - **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, nine full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
 - **381 Accountants** — `381-accountants/` (12-page site for the Canary Wharf accountancy firm, see `381-accountants/README.md`)
 - **381 Accountants premium** — `381-accountants-premium/` (dark, high-interaction edition: calculator, countdown, wizard, marquee; see its README)
+- **Nuisance 1989** — `nuisance-1989/` (luxury streetwear storefront mock-up: drop clock, six-piece drop grid, bag drawer; see its README)
 
 ## Site: 381 Accountants (`381-accountants/`)
 
