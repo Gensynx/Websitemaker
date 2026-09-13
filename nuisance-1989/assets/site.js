@@ -247,6 +247,43 @@
     });
   }
 
+  /* ---------- the plate: cursor-driven colourway reveal ---------- */
+  var pvw = $("#plateview");
+  if (pvw) {
+    $$(".layer__flat", pvw).forEach(function (el) {
+      el.innerHTML = flat(el.getAttribute("data-shape"), el.getAttribute("data-cloth"));
+    });
+    var frame = $(".plateview__f", pvw), hint = $("#pvHint"), swap = $("#pvSwap"), R = 190;
+    function aperture(x, y, r) {
+      pvw.style.setProperty("--x", x + "px");
+      pvw.style.setProperty("--y", y + "px");
+      pvw.style.setProperty("--r", r + "px");
+    }
+    aperture(0, 0, 4000);                       /* at rest the bone colourway covers the frame */
+    frame.addEventListener("pointerenter", function (e) {
+      if (e.pointerType === "touch") return;
+      var b = frame.getBoundingClientRect();
+      aperture(e.clientX - b.left, e.clientY - b.top, R);
+      if (hint) hint.style.opacity = "0";
+    });
+    frame.addEventListener("pointermove", function (e) {
+      if (e.pointerType === "touch") return;
+      var b = frame.getBoundingClientRect();
+      aperture(e.clientX - b.left, e.clientY - b.top, R);
+    });
+    frame.addEventListener("pointerleave", function () {
+      aperture(0, 0, 4000);
+      if (hint) hint.style.opacity = "1";
+    });
+    if (swap) swap.addEventListener("click", function () {
+      var on = pvw.getAttribute("data-inverted") === "1";
+      pvw.setAttribute("data-inverted", on ? "0" : "1");
+      swap.setAttribute("aria-pressed", String(!on));
+      swap.textContent = on ? "Invert" : "Revert";
+      aperture(0, 0, 4000);
+    });
+  }
+
   /* ---------- forms ---------- */
   $$("form[data-demo]").forEach(function (form) {
     form.addEventListener("submit", function (e) {

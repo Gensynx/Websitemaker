@@ -55,6 +55,7 @@ const NAV = [
   { href:"cut.html", label:"The Cut" },
   { href:"story.html", label:"1989" },
   { href:"lookbook.html", label:"Lookbook" },
+  { href:"archive.html", label:"Archive" },
   { href:"contact.html", label:"Contact" }
 ];
 
@@ -196,13 +197,68 @@ const specList = `<dl class="dl" style="margin-top:0">${SPEC.map(([k, v]) => `<d
 
 export { PRODUCTS, SIZES, NAV, shell, sizesFor, tagFor, strip, sizeTable, specList, total, out };
 
+/* the plate: one garment, two colourways, shared by home and the archive */
+const plate = (caption) => `
+<section class="plateview" id="plateview" data-inverted="0">
+  <div class="plateview__f">
+    <div class="layer layer--dark">
+      <div class="layer__flat" data-shape="tee" data-cloth="asphalt"></div>
+      <img src="images/tee-asphalt-back.jpg" alt="Heavyweight Tee in Asphalt, back print" onerror="this.remove()">
+    </div>
+    <div class="layer layer--light">
+      <div class="layer__flat" data-shape="tee" data-cloth="bone"></div>
+      <img src="images/tee-bone-back.jpg" alt="Heavyweight Tee in Bone, back print" onerror="this.remove()">
+    </div>
+    <div class="pvw">
+      <div class="pvw__top"><span class="mono">Drop 03 · Marina</span></div>
+      <div>
+        <h1 class="pvw__mark">Nuisance</h1>
+        <div class="pvw__bot">
+          <span class="mono">${caption}</span>
+          <span class="mono">Plate I of VI &nbsp;·&nbsp; £85</span>
+        </div>
+      </div>
+    </div>
+    <button class="swap" id="pvSwap" aria-pressed="false">Invert</button>
+    <span class="hint" id="pvHint">Move across the plate to reveal the second colourway</span>
+  </div>
+</section>`;
+
+/* the catalogue index, shared by the drop page and the archive */
+const index = () => `
+  <div class="idxwrap">
+    <div class="idx" id="idx">
+      ${PRODUCTS.map(p => {
+        const n = total(p);
+        const flagTxt = n === 0 ? ` · <span class="flag">Sold out</span>` : (n <= 8 ? ` · <span class="flag">${n} left</span>` : "");
+        return `<div class="row${n ? "" : " row--gone"}" data-sku="${p.sku}" tabindex="0">
+        <span class="row__no">${p.no}</span>
+        <div>
+          <h3 class="row__n"><a href="piece-${p.slug}.html">${p.name} &mdash; ${p.colour}</a></h3>
+          <p class="row__m">${p.gsm} · ${p.sku}${flagTxt}</p>
+          <div class="row__s">${sizesFor(p)}</div>
+        </div>
+        <div class="row__r">
+          <span class="row__p">£${p.price}</span>
+          <button class="mini" data-add="${p.sku}"${n ? "" : " disabled"}>${n ? "Add" : "Gone"}</button>
+        </div></div>`;
+      }).join("\n      ")}
+    </div>
+    <figure class="preview">
+      <div class="preview__f" id="pvFrame"></div>
+      <figcaption class="preview__c"><b id="pvName">${PRODUCTS[0].name}</b><span id="pvMeta">${PRODUCTS[0].colour} · ${PRODUCTS[0].gsm}</span></figcaption>
+    </figure>
+  </div>`;
+
 /* ---------------- pages ---------------- */
 
-/* home */
+/* home — opens on the plate, then the drop */
 out("index.html", shell({
   title: "Nuisance 1989", current: "",
   desc: "Nuisance 1989 — heavyweight streetwear cut in limited drops. London W10, worn worldwide.",
   body: `
+${plate("Heavyweight Tee · 380 GSM · Bone / Asphalt")}
+
 <section class="hero wrap">
   <div class="hero__g">
     <div>
@@ -211,9 +267,9 @@ out("index.html", shell({
         <span class="plate plate--sm">1989</span>
         <span class="mono">London · W10</span>
       </div>
-      <h1 class="wordmark">Nuisance</h1>
-      <p class="hero__sub"><span>Est. 1989</span><i></i><span>Drop 03 · Marina</span></p>
+      <p class="hero__sub" style="margin-top:0"><span>Est. 1989</span><i></i><span>Drop 03 · Marina</span></p>
       <p class="hero__thesis">Cut heavy, dyed once, made in counts of two hundred. <b>Exclusive pieces only.</b></p>
+      <a class="btn btn--auto" href="piece-heavyweight-tee-bone.html" style="margin-top:1.6rem"><span>Shop the tee</span><span>&rarr;</span></a>
     </div>
     <div class="clock">
       <div class="clock__h"><span class="mono">Drop 03 opens</span><span class="mono" style="color:var(--accent)">200 pieces</span></div>
@@ -281,29 +337,7 @@ out("drop.html", shell({
     <div><span class="mono">Index · Drop 03</span><h1>Six entries</h1></div>
     <p>Catalogued in the order they were cut. Two hundred units across the run, numbered, not restocked.</p>
   </div>
-  <div class="idxwrap">
-    <div class="idx" id="idx">
-      ${PRODUCTS.map(p => {
-        const n = total(p);
-        const flagTxt = n === 0 ? ` · <span class="flag">Sold out</span>` : (n <= 8 ? ` · <span class="flag">${n} left</span>` : "");
-        return `<div class="row${n ? "" : " row--gone"}" data-sku="${p.sku}" tabindex="0">
-        <span class="row__no">${p.no}</span>
-        <div>
-          <h2 class="row__n"><a href="piece-${p.slug}.html">${p.name} &mdash; ${p.colour}</a></h2>
-          <p class="row__m">${p.gsm} · ${p.sku}${flagTxt}</p>
-          <div class="row__s">${sizesFor(p)}</div>
-        </div>
-        <div class="row__r">
-          <span class="row__p">£${p.price}</span>
-          <button class="mini" data-add="${p.sku}"${n ? "" : " disabled"}>${n ? "Add" : "Gone"}</button>
-        </div></div>`;
-      }).join("\n      ")}
-    </div>
-    <figure class="preview">
-      <div class="preview__f" id="pvFrame"></div>
-      <figcaption class="preview__c"><b id="pvName">${PRODUCTS[0].name}</b><span id="pvMeta">${PRODUCTS[0].colour} · ${PRODUCTS[0].gsm}</span></figcaption>
-    </figure>
-  </div>
+  ${index()}
   <p class="mono" style="margin-top:1.2rem">Prices in GBP · Free UK delivery over £100 · DPD next day</p>
 </section>`
 }));
@@ -511,9 +545,73 @@ out("contact.html", shell({
 </section>`
 }));
 
+/* archive — the single-page edition. Same shell, same shop, same data:
+   the plate, the index, the plates rail and the note in one scroll. */
+out("archive.html", shell({
+  title: "The Archive", current: "archive.html",
+  desc: "Nuisance 1989 on one page — the plate, the index, the plates and the note.",
+  body: `
+${plate("Heavyweight Tee · 380 GSM · Bone / Asphalt")}
+
+<section class="band wrap">
+  <div class="phead">
+    <div><span class="mono">Index · Drop 03</span><h2>Six entries</h2></div>
+    <p>Catalogued in the order they were cut. Two hundred units across the run, numbered, not restocked. Everything here adds to the same bag as the shop.</p>
+  </div>
+  ${index()}
+  <p class="mono" style="margin-top:1.2rem">Prices in GBP · Free UK delivery over £100 · DPD next day</p>
+</section>
+
+${strip}
+
+<section class="band wrap" style="padding-bottom:clamp(24px,3.4vw,44px)">
+  <div class="phead"><div><span class="mono">Plates · Drop 03</span><h2>Marina</h2></div>
+  <p>Shot over two nights. Scroll the rail.</p></div>
+</section>
+<div class="rail">
+  ${PLATES.map(pl => `<figure class="plate2${pl.wide ? " plate2--wide" : ""}" style="margin:0">
+    <div class="pl-flat" data-shape="${pl.shape}" data-cloth="${pl.cloth}"></div>
+    <img src="images/${pl.f}" alt="${pl.t}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" onerror="this.remove()">
+    <img class="blur" src="images/${pl.f}" alt="" aria-hidden="true" loading="lazy" onerror="this.remove()" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">
+    <figcaption class="plate2__c"><b>${pl.t}</b><span>${pl.m}</span></figcaption>
+  </figure>`).join("\n  ")}
+</div>
+
+<section class="band wrap">
+  <div class="phead"><div><span class="mono">Specification</span><h2>The Cut</h2></div>
+  <p>Published so you buy your size once. Measured flat, in centimetres.</p></div>
+  <div class="two">
+    ${specList}
+    <div>${sizeTable}
+      <a class="btn btn--auto" href="cut.html" style="margin-top:1.2rem"><span>Full size guide</span><span>&rarr;</span></a>
+    </div>
+  </div>
+</section>
+
+<section class="band wrap" style="padding-top:0">
+  <div class="phead"><div><span class="mono">Archive note</span><h2>1989</h2></div><p>Two postcodes, one wardrobe.</p></div>
+  <div class="two">
+    <div class="prose">
+      <p class="lede">Nuisance was what they called us before it was what we called ourselves.</p>
+      <p>It started in a gym off Ladbroke Grove — the kind with a ring in the middle, a board on the ropes and no mirrors. Everyone in there had somewhere else to be by ten. The clothes had to work for both.</p>
+      <p>That is still the brief. Heavy enough to hold its shape through a night out, plain enough that the only loud thing about it is the fact you own one.</p>
+      <a class="btn btn--auto" href="story.html"><span>Read the full note</span><span>&rarr;</span></a>
+    </div>
+    <dl class="stack">
+      <div class="fact"><dt>Established</dt><dd>1989</dd></div>
+      <div class="fact"><dt>Pieces per run</dt><dd>200</dd></div>
+      <div class="fact"><dt>Restocks to date</dt><dd>0</dd></div>
+      <div class="fact"><dt>Cloth weight</dt><dd>380 GSM</dd></div>
+      <div class="fact"><dt>Shipped to</dt><dd>34 countries</dd></div>
+      <div class="fact"><dt>Drop 02 sold out in</dt><dd>4 min 12 s</dd></div>
+    </dl>
+  </div>
+</section>`
+}));
+
 /* data for the client side — one source of truth with these templates */
 out("assets/data.js", "window.NSC_PRODUCTS = " + JSON.stringify(
   PRODUCTS.map(p => ({ sku:p.sku, slug:p.slug, name:p.name, colour:p.colour, price:p.price,
     shape:p.shape, cloth:p.cloth, gsm:p.gsm, photo:p.photo, onesize:!!p.onesize, stock:p.stock })), null, 1) + ";\n");
 
-console.log(`built ${PRODUCTS.length + 6} pages + assets/data.js`);
+console.log(`built ${PRODUCTS.length + 7} pages + assets/data.js`);

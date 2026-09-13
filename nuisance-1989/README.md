@@ -11,7 +11,8 @@ Both looks are shareable as links:
 | | |
 |---|---|
 | Asphalt (default) | https://gensynx.github.io/Websitemaker/nuisance-1989/ |
-| Paper (the old Archive design) | https://gensynx.github.io/Websitemaker/nuisance-1989/?skin=paper |
+| Paper | https://gensynx.github.io/Websitemaker/nuisance-1989/?skin=paper |
+| The Archive, in paper | https://gensynx.github.io/Websitemaker/nuisance-1989/archive.html?skin=paper |
 
 `?skin=paper` or `?skin=asphalt` on any page opens in that skin and is then remembered, so the rest
 of the visit stays in it. Toggling in the footer stamps the URL to match, so copying the address
@@ -49,6 +50,7 @@ brand.
 | `cut.html` | The Cut — fabric spec, published measurements, how to measure |
 | `story.html` | 1989 — origin note and the facts stack |
 | `lookbook.html` | Marina — horizontal plate rail |
+| `archive.html` | The Archive — the whole label on one scroll: plate, index, plates rail, spec, note |
 | `contact.html` | Contact, delivery and returns, The List signup |
 
 ## Structure
@@ -69,6 +71,12 @@ cannot drift apart.
 
 ## Behaviour worth knowing
 
+- **The plate** on the home page and the archive is one garment in two colourways: bone covers the
+  frame at rest and the pointer opens a circular aperture onto asphalt underneath. Touch and
+  keyboard get the Invert control, since a hover they cannot perform is not an interaction.
+- **The archive is generated from the same source** as the rest of the site — the same product
+  data, the same shell, the same bag — so it cannot drift out of step with the shop. The plate and
+  the catalogue index are shared fragments in the generator, written once and used on both.
 - **The bag persists across pages** in `localStorage`, which a multi-page shop needs.
 - **The drop clock** counts to the next Friday 20:00 UK, DST-correct via `Intl` rather than a
   hardcoded offset.

@@ -35,6 +35,7 @@ if(q)localStorage.setItem("nsc-skin",s);}}catch(e){}})();</script>
       <a href="cut.html">The Cut</a>
       <a href="story.html">1989</a>
       <a href="lookbook.html">Lookbook</a>
+      <a href="archive.html">Archive</a>
       <a href="contact.html">Contact</a>
     </nav>
     <button class="bag" id="bagBtn" aria-label="Open bag">Bag <span class="bag__n" id="bagN" data-empty="1">0</span></button>
@@ -42,6 +43,32 @@ if(q)localStorage.setItem("nsc-skin",s);}}catch(e){}})();</script>
 </header>
 
 <main id="main">
+
+
+<section class="plateview" id="plateview" data-inverted="0">
+  <div class="plateview__f">
+    <div class="layer layer--dark">
+      <div class="layer__flat" data-shape="tee" data-cloth="asphalt"></div>
+      <img src="images/tee-asphalt-back.jpg" alt="Heavyweight Tee in Asphalt, back print" onerror="this.remove()">
+    </div>
+    <div class="layer layer--light">
+      <div class="layer__flat" data-shape="tee" data-cloth="bone"></div>
+      <img src="images/tee-bone-back.jpg" alt="Heavyweight Tee in Bone, back print" onerror="this.remove()">
+    </div>
+    <div class="pvw">
+      <div class="pvw__top"><span class="mono">Drop 03 · Marina</span></div>
+      <div>
+        <h1 class="pvw__mark">Nuisance</h1>
+        <div class="pvw__bot">
+          <span class="mono">Heavyweight Tee · 380 GSM · Bone / Asphalt</span>
+          <span class="mono">Plate I of VI &nbsp;·&nbsp; £85</span>
+        </div>
+      </div>
+    </div>
+    <button class="swap" id="pvSwap" aria-pressed="false">Invert</button>
+    <span class="hint" id="pvHint">Move across the plate to reveal the second colourway</span>
+  </div>
+</section>
 
 <section class="hero wrap">
   <div class="hero__g">
@@ -51,9 +78,9 @@ if(q)localStorage.setItem("nsc-skin",s);}}catch(e){}})();</script>
         <span class="plate plate--sm">1989</span>
         <span class="mono">London · W10</span>
       </div>
-      <h1 class="wordmark">Nuisance</h1>
-      <p class="hero__sub"><span>Est. 1989</span><i></i><span>Drop 03 · Marina</span></p>
+      <p class="hero__sub" style="margin-top:0"><span>Est. 1989</span><i></i><span>Drop 03 · Marina</span></p>
       <p class="hero__thesis">Cut heavy, dyed once, made in counts of two hundred. <b>Exclusive pieces only.</b></p>
+      <a class="btn btn--auto" href="piece-heavyweight-tee-bone.html" style="margin-top:1.6rem"><span>Shop the tee</span><span>&rarr;</span></a>
     </div>
     <div class="clock">
       <div class="clock__h"><span class="mono">Drop 03 opens</span><span class="mono" style="color:var(--accent)">200 pieces</span></div>
