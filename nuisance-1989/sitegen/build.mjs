@@ -198,7 +198,7 @@ const specList = `<dl class="dl" style="margin-top:0">${SPEC.map(([k, v]) => `<d
 export { PRODUCTS, SIZES, NAV, shell, sizesFor, tagFor, strip, sizeTable, specList, total, out };
 
 /* the plate: one garment, two colourways, shared by home and the archive */
-const plate = (caption) => `
+const plate = () => `
 <section class="plateview" id="plateview" data-inverted="0">
   <div class="plateview__f">
     <div class="layer layer--dark">
@@ -214,7 +214,7 @@ const plate = (caption) => `
       <div>
         <h1 class="pvw__mark">Nuisance</h1>
         <div class="pvw__bot">
-          <span class="mono">${caption}</span>
+          <span class="mono">Heavyweight Tee · 380 GSM<span class="cap-b"> · Bone / Asphalt</span></span>
           <span class="mono">Plate I of VI &nbsp;·&nbsp; £85</span>
         </div>
       </div>
@@ -257,7 +257,7 @@ out("index.html", shell({
   title: "Nuisance 1989", current: "",
   desc: "Nuisance 1989 — heavyweight streetwear cut in limited drops. London W10, worn worldwide.",
   body: `
-${plate("Heavyweight Tee · 380 GSM · Bone / Asphalt")}
+${plate()}
 
 <section class="hero wrap">
   <div class="hero__g">
@@ -551,7 +551,7 @@ out("archive.html", shell({
   title: "The Archive", current: "archive.html",
   desc: "Nuisance 1989 on one page — the plate, the index, the plates and the note.",
   body: `
-${plate("Heavyweight Tee · 380 GSM · Bone / Asphalt")}
+${plate()}
 
 <section class="band wrap">
   <div class="phead">
