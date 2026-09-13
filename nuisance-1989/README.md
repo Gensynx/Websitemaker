@@ -6,11 +6,24 @@ committed.
 
 **Live:** https://gensynx.github.io/Websitemaker/nuisance-1989/
 
+Both looks are shareable as links:
+
+| | |
+|---|---|
+| Asphalt (default) | https://gensynx.github.io/Websitemaker/nuisance-1989/ |
+| Paper (the old Archive design) | https://gensynx.github.io/Websitemaker/nuisance-1989/?skin=paper |
+
+`?skin=paper` or `?skin=asphalt` on any page opens in that skin and is then remembered, so the rest
+of the visit stays in it. Toggling in the footer stamps the URL to match, so copying the address
+always shares what is actually on screen.
+
 ## Two skins, one site
 
 The site ships both design directions as a **skin toggle in the footer**, so the look can be
 decided without a rebuild. The skin is stored in `localStorage` and applied by a tiny inline
-script in each page's `<head>` before first paint, so it never flashes the other one.
+script in each page's `<head>` before first paint, so it never flashes the other one. A `?skin=`
+parameter beats the stored choice, which is what makes a skin shareable rather than only
+togglable in the viewer's own browser.
 
 | | **Asphalt** (default) | **Paper** |
 |---|---|---|

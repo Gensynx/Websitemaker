@@ -28,6 +28,20 @@
   });
   setSkin(document.documentElement.getAttribute("data-skin") || "asphalt", false);
 
+  /* Toggling writes the choice into the URL too, so whatever is on screen is
+     always the thing that gets shared when the address is copied. */
+  function stampUrl(s) {
+    if (!window.history || !history.replaceState) return;
+    try {
+      var u = new URL(location.href);
+      if (s === "asphalt") u.searchParams.delete("skin"); else u.searchParams.set("skin", s);
+      history.replaceState(null, "", u.pathname + (u.search || "") + u.hash);
+    } catch (e) {}
+  }
+  $$("[data-skin-btn]").forEach(function (b) {
+    b.addEventListener("click", function () { stampUrl(b.getAttribute("data-skin-btn")); });
+  });
+
   /* ---------- garment flats (drawn, so a missing photo never breaks a page) ---------- */
   var CLOTH = {
     bone:    { fill: "#E8E2D6", seam: "#C4BBA9", ink: "#14120F", bg: "#E7E1D5" },

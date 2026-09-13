@@ -14,8 +14,13 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400&family=Archivo:wght@400;500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="assets/site.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%230B0A09'/><text x='16' y='23' font-size='20' font-family='Georgia,serif' fill='%23F2CB05' text-anchor='middle'>N</text></svg>">
-<script>/* set the skin before first paint so the page never flashes the other one */
-(function(){try{var s=localStorage.getItem("nsc-skin");if(s==="paper"||s==="asphalt")document.documentElement.setAttribute("data-skin",s);}catch(e){}})();</script>
+<script>/* Set the skin before first paint so the page never flashes the other one.
+   ?skin=paper wins over the stored choice and is then remembered, so a skin
+   can be shared as a link rather than only toggled in the viewer's own browser. */
+(function(){try{var q=new URLSearchParams(location.search).get("skin");
+var s=(q==="paper"||q==="asphalt")?q:localStorage.getItem("nsc-skin");
+if(s==="paper"||s==="asphalt"){document.documentElement.setAttribute("data-skin",s);
+if(q)localStorage.setItem("nsc-skin",s);}}catch(e){}})();</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
