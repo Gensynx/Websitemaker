@@ -12,6 +12,32 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 - **381 Accountants** — `381-accountants/` (12-page site for the Canary Wharf accountancy firm, see `381-accountants/README.md`)
 - **381 Accountants premium** — `381-accountants-premium/` (dark, high-interaction edition: calculator, countdown, wizard, marquee; see its README)
 - **Nuisance 1989** — `nuisance-1989/` (12-page luxury streetwear storefront with a two-skin design system; live at https://gensynx.github.io/Websitemaker/nuisance-1989/ — see its README)
+- **Vassallo Developments** — `vassallo/` (single-page site for the property developer, with a scroll-scrubbed renovation video intro; live at https://gensynx.github.io/Websitemaker/vassallo/)
+
+## Site: Vassallo Developments (`vassallo/`)
+
+A single-page site for Vassallo Developments (acquisition, design and development): intro, approach, work,
+track record and enquiry sections. Opens with a 12s renovation film — into a derelict house, through the decayed
+rooms, then back out as every room rebuilds itself around the camera.
+
+### Structure
+```
+vassallo/
+  index.html                          the site (fonts embedded as data URIs)
+  assets/
+    vassallo-transformation.mp4       the intro film — committed, 1280x720, all-intra
+    README.txt                        asset provenance and re-encode instructions
+```
+
+### Notes
+- On desktop the film is **scrubbed by scroll**. Touch devices cannot seek a video reliably frame by frame, so
+  phones and tablets autoplay the film straight through instead and time the copy beats to it. Upright phones show
+  the whole wide frame (`object-fit:contain`) rather than a zoom-crop, so it stays sharp.
+- The video is encoded all-intra (every frame a keyframe) specifically so scroll-scrubbing lands instantly on any
+  frame. Re-encode the same way if it is ever replaced — the command is in `assets/README.txt`.
+- If the video fails to load, the intro removes itself and the rest of the site still works.
+- **Contact details are placeholders**: `hello@vassallodevelopments.com` and `tel:+00000000000`. Replace both
+  before treating this as a live public site.
 
 ## Site: 381 Accountants (`381-accountants/`)
 

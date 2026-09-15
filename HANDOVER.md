@@ -13,7 +13,11 @@ A redesign of **darulamir.com** (Dar Ul Amir — a Thobe Atelier and Perfumery, 
 | **Design skill used to build it** | `Mehdi-Gensynx/ui-ux-pro-max-skill` (private) — a Claude Code skill, loaded from a repo's `.claude/skills/`, NOT a claude.ai account Skill |
 | **NOT here** | The production app `Gensynx/gensynx` was deliberately kept clean — none of this work touched it |
 
-A separate earlier build (Vassallo Developments) exists only as a Claude artifact + a sent HTML file; it was never committed anywhere.
+A separate earlier build (Vassallo Developments) lives in `vassallo/` — seven commits made 12–15 July 2026.
+It was originally developed on `claude/multi-site-single-repo-aru63d` and went unmerged for a long time, which is
+why an earlier note here wrongly claimed it had never been committed. A standalone single-file copy (the HTML with
+the intro video inlined as a data URI) was also sent in chat at the time; that copy is the 13 July `b4f431d` build
+and predates the three mobile-intro fixes, so it should not be treated as current.
 
 ## 3. Current state
 **Done and deployed:**
