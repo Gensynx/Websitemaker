@@ -36,6 +36,13 @@
   --pad:clamp(1.25rem, 5vw, 6rem);
   --maxw:1400px;
 
+  /* How much page scroll the intro film is stretched across (desktop only).
+     The usable scroll range is this minus one viewport, so 700vh gives 600vh
+     of scrolling for the 12s film. Raise it to scrub slower, lower to speed up:
+     the copy beats and the video position are both derived from a 0..1 progress
+     value across that range, so they follow automatically. */
+  --intro-scroll:700vh;
+
   --e-out:cubic-bezier(.16,1,.3,1);
   --e-inout:cubic-bezier(.76,0,.24,1);
 }
@@ -326,7 +333,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 /* ============================================================
    INTRO — scroll-scrubbed transformation film
    ============================================================ */
-.intro{position:relative;height:400vh;z-index:3;background:#100D0A}
+.intro{position:relative;height:var(--intro-scroll,700vh);z-index:3;background:#100D0A}
 .intro-sticky{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;background:#100D0A}
 /* touch devices can't reliably scrub video on scroll — the film autoplays
    through instead, so the intro is just one screen tall */
