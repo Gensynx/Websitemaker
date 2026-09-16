@@ -36,7 +36,15 @@ npm run typecheck
 npm test          # 72 unit tests
 npm run dev       # then, in another shell:
 npm run smoke     # browser render across four configurations and two viewports
+
+npm run build:share   # two shareable files in dist-singlefile/
 ```
+
+`build:share` produces `door-window-configurator.html` (the whole app inlined,
+opens from the filesystem) and `catalogue.html` (every style as an SVG
+elevation, each tile deep-linking into the 3D app). The Vite build empties
+`dist-singlefile`, so the catalogue must be generated after it — which is what
+`build:share` is for.
 
 ## Design decisions
 
@@ -122,9 +130,18 @@ judged square-on. A three-quarter opener flatters the product and hides
 exactly what a customer needs to check first — and, during Step 2, hid four
 geometry defects from us as well.
 
+## The catalogue
+
+`catalogue.html` draws every door style, panel detail, surround and window
+preset from `buildProduct` — the same part list the 3D scene uses. It is not
+an illustration of the range: if a style is wrong on that page it is wrong in
+the product.
+
 ## Outstanding
 
 - No favicon. It is a branding decision, so none has been invented.
+- The product switch in the viewer is a stopgap so the range is reachable
+  before Step 4 builds the configuration panel.
 - Steps 3 to 8: sizing controls, configuration panel, colour system, door and
   window option UI, summary and enquiry.
 

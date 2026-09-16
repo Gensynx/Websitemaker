@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "smoke": "node scripts/smoke.mjs",
-    "build:singlefile": "node scripts/build-singlefile.mjs"
+    "build:singlefile": "node scripts/build-singlefile.mjs",
+    "build:catalogue": "node scripts/build-catalogue.mjs",
+    "build:share": "npm run build:singlefile && npm run build:catalogue"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",

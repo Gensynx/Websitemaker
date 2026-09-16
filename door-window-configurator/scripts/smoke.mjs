@@ -53,7 +53,7 @@ const browser = await chromium.launch({
   // Headless Chromium has no GPU; SwiftShader gives it a real WebGL context.
   args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
 });
-const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 2 });
+const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 2, hasTouch: true });
 
 const problems = [];
 page.on('console', (message) => {
@@ -104,6 +104,57 @@ for (const label of ['Elevation', 'Hardware', 'Scale figure', 'Reset view']) {
 }
 console.log('url carries the configuration and the view:', page.url().includes('view='));
 await page.screenshot({ path: `${SHOTS}/shot-controls.png` });
+
+/*
+ * Touch orbit, both axes.
+ *
+ * Added after a false alarm: the canvas carries an inline `touch-action: auto`
+ * which LOOKS like the page will steal a drag, and it does not — OrbitControls
+ * owns the gesture on the R3F event container. Two things confounded the first
+ * measurement: the polar clamp blocks an upward drag from the elevation preset,
+ * and Playwright's own screenshot() scrolls the element into view. Hence a
+ * control run, a downward drag, and scroll measured before any screenshot.
+ */
+await page.setViewportSize({ width: 390, height: 460 });
+await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+await page.waitForSelector('canvas');
+await page.waitForTimeout(2500);
+
+async function dragAndCompare(dx, dy) {
+  const box = await page.locator('canvas').boundingBox();
+  const before = await page.locator('canvas').screenshot();
+  const scrollBefore = await page.evaluate(() => window.scrollY);
+  const cx = box.x + box.width / 2;
+  const cy = box.y + box.height / 2;
+
+  if (dx !== 0 || dy !== 0) {
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: cx, y: cy }] });
+    for (let step = 1; step <= 12; step += 1) {
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [{ x: cx + step * dx, y: cy + step * dy }],
+      });
+      await page.waitForTimeout(16);
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  }
+  await page.waitForTimeout(1200);
+  const scrollAfter = await page.evaluate(() => window.scrollY);
+  const after = await page.locator('canvas').screenshot();
+  return { moved: Buffer.compare(before, after) !== 0, scrolled: scrollAfter - scrollBefore };
+}
+
+const control = await dragAndCompare(0, 0);
+if (control.moved) problems.push('control: the canvas changed with no input, so the drag results mean nothing');
+
+// Downward, away from the polar clamp that an elevation view sits against.
+const vertical = await dragAndCompare(0, 12);
+const horizontal = await dragAndCompare(-14, 0);
+console.log(`touch orbit: vertical=${vertical.moved} horizontal=${horizontal.moved} pageScroll=${vertical.scrolled + horizontal.scrolled}`);
+if (!vertical.moved) problems.push('a vertical touch drag does not orbit the model');
+if (!horizontal.moved) problems.push('a horizontal touch drag does not orbit the model');
+if (vertical.scrolled !== 0 || horizontal.scrolled !== 0) problems.push('a touch drag on the canvas scrolled the page');
 
 await page.setViewportSize({ width: 390, height: 844 });
 await page.waitForTimeout(800);

@@ -37,6 +37,7 @@ function hasWebGL(): boolean {
 
 export function App(): JSX.Element {
   const config = useConfigurator((state) => state.config);
+  const setProductType = useConfigurator((state) => state.setProductType);
   const lastValid = useConfigurator((state) => state.lastValid);
   const validation = useConfigurator((state) => state.validation);
   const notices = useConfigurator((state) => state.notices);
@@ -83,6 +84,25 @@ export function App(): JSX.Element {
         ) : (
           <StaticElevation config={rendered} />
         )}
+
+        <div className="controls controls--product" role="group" aria-label="Product">
+          <button
+            type="button"
+            className="control"
+            aria-pressed={config.productType === 'door'}
+            onClick={() => setProductType('door')}
+          >
+            Door
+          </button>
+          <button
+            type="button"
+            className="control"
+            aria-pressed={config.productType === 'window'}
+            onClick={() => setProductType('window')}
+          >
+            Window
+          </button>
+        </div>
 
         <div className="controls" role="group" aria-label="View controls">
           {PRESETS.map((preset) => (

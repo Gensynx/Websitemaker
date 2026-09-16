@@ -96,6 +96,8 @@ h1 {
 
 .stage canvas {
   display: block;
+  /* Belt and braces: OrbitControls sets touch-action on the R3F event
+     container, which is what actually owns the gesture. Verified by test. */
   touch-action: none;
 }
 
@@ -132,6 +134,15 @@ h1 {
   .controls {
     background: var(--surface);
   }
+}
+
+/* Product switch sits top-left, away from the view controls: it changes WHAT
+   is shown, not how it is looked at, and conflating the two reads badly. */
+.controls--product {
+  top: 1.25rem;
+  bottom: auto;
+  left: 1.25rem;
+  transform: none;
 }
 
 .controls::-webkit-scrollbar {
