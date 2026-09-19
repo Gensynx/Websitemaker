@@ -156,8 +156,111 @@ if (!vertical.moved) problems.push('a vertical touch drag does not orbit the mod
 if (!horizontal.moved) problems.push('a horizontal touch drag does not orbit the model');
 if (vertical.scrolled !== 0 || horizontal.scrolled !== 0) problems.push('a touch drag on the canvas scrolled the page');
 
+/* ------------------------------------------------------------------ *
+ * Step 3 — sizing
+ * ------------------------------------------------------------------ */
+
+await page.setViewportSize({ width: 1280, height: 1100 });
+await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+await page.waitForSelector('canvas');
+await page.waitForTimeout(2500);
+
+const widthField = page.getByLabel(/^Width/);
+const heightField = page.getByLabel(/^Height/);
+
+// A valid resize redraws. 1000 mm leaves an 860 mm leaf, inside the leaf
+// range — 1200 would not, and a fixture that quietly breaks a derived rule
+// reads as a failing renderer.
+{
+  const before = await page.locator('canvas').screenshot();
+  await widthField.fill('1000');
+  await page.waitForTimeout(1500);
+  const redrew = Buffer.compare(before, await page.locator('canvas').screenshot()) !== 0;
+  const errors = await page.locator('.field__error').count();
+  console.log(`sizing: valid resize redrew=${redrew} errors=${errors}`);
+  if (!redrew) problems.push('a valid resize did not redraw the model');
+  if (errors !== 0) problems.push('a valid size reported an error');
+}
+
+// An unmanufacturable size states the range inline and never reaches the model.
+{
+  const before = await page.locator('canvas').screenshot();
+  await widthField.fill('9000');
+  await page.waitForTimeout(1500);
+  const reason = (await page.locator('.field__error').allTextContents()).join(' ');
+  const held = Buffer.compare(before, await page.locator('canvas').screenshot()) === 0;
+  console.log(`sizing: oversize held=${held} statesRange=${/between .* and .*/.test(reason)}`);
+  if (!held) problems.push('an unmanufacturable size was rendered');
+  if (!/between .* and .*/.test(reason) || !reason.includes('mm')) {
+    problems.push(`the inline reason does not state the permitted range: ${JSON.stringify(reason)}`);
+  }
+  if ((await widthField.getAttribute('aria-invalid')) !== 'true') {
+    problems.push('an invalid field is not marked aria-invalid');
+  }
+}
+
+// Reasons belong to the field the customer can act on, not to a banner.
+{
+  await widthField.fill('900');
+  await heightField.fill('500');
+  await page.waitForTimeout(1200);
+  const perField = await page.locator('.field').evaluateAll((fields) =>
+    fields.map((field) => ({
+      label: field.querySelector('label')?.textContent?.trim().split(' ')[0],
+      count: field.querySelectorAll('.field__error').length,
+    })),
+  );
+  console.log('sizing: errors per field', JSON.stringify(perField));
+  const height = perField.find((f) => f.label === 'Height');
+  const width = perField.find((f) => f.label === 'Width');
+  if (height?.count !== 1 || width?.count !== 0) {
+    problems.push('an inline reason landed against the wrong field');
+  }
+}
+
+// Recovery, then a preset.
+{
+  await heightField.fill('1981');
+  await page.waitForTimeout(1000);
+  if ((await page.locator('.field__error').count()) !== 0) problems.push('a valid size still reports an error');
+
+  await page.getByRole('button', { name: /Metric/ }).click();
+  await page.waitForTimeout(900);
+  const applied = `${await widthField.inputValue()}x${await heightField.inputValue()}`;
+  const pressed = await page.getByRole('button', { name: /Metric/ }).getAttribute('aria-pressed');
+  console.log(`sizing: preset applied=${applied} pressed=${pressed}`);
+  if (applied !== '926x2040') problems.push(`a size preset did not apply: ${applied}`);
+  if (pressed !== 'true') problems.push('the applied preset is not marked as pressed');
+}
+
+// Limits follow the product type.
+{
+  await page.getByRole('button', { name: 'Window', exact: true }).click();
+  await page.waitForTimeout(1000);
+  const hints = (await page.locator('.field__hint').allTextContents()).join(' / ');
+  console.log('sizing: window range', hints);
+  if (!hints.includes('300 mm')) problems.push(`window limits did not replace door limits: ${hints}`);
+  await page.getByRole('button', { name: 'Door', exact: true }).click();
+  await page.waitForTimeout(800);
+}
+
+// Operable by keyboard alone, without touching the canvas (Step 4.4 ahead of time).
+{
+  // Relative, not absolute: switching product type resets to that product's
+  // defaults by design, so whatever the preset was is gone by now.
+  await widthField.focus();
+  const start = Number(await widthField.inputValue());
+  await page.keyboard.press('ArrowUp');
+  await page.waitForTimeout(500);
+  const stepped = Number(await widthField.inputValue());
+  console.log(`sizing: keyboard step ${start} -> ${stepped}`);
+  if (stepped !== start + 1) problems.push(`the width field did not step by 1 mm from the keyboard: ${start} -> ${stepped}`);
+}
+
 await page.setViewportSize({ width: 390, height: 844 });
-await page.waitForTimeout(800);
+await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
+await page.waitForSelector('canvas');
+await page.waitForTimeout(1500);
 const overflows = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
 console.log('horizontal overflow at 390px:', overflows);
 if (overflows) problems.push('the page scrolls sideways at 390px');

@@ -36,16 +36,34 @@ import {
   fallbackFinish,
   isColourAvailable,
   isFinishAvailable,
+  isMaterialOffered,
   MATERIALS,
+  OFFERED_MATERIALS,
 } from './material';
 import { doorLayout } from './layout';
 import { assessCriticalLocations } from './safety';
 import { formatMm } from './units';
 import type { Mm } from './units';
 
+/**
+ * What an error stops.
+ *
+ * `render` — the geometry must not be shown. Step 3.4: an unmanufacturable
+ *   size never renders, and the last valid one stays on screen instead.
+ * `order`  — the product draws correctly but cannot be bought as specified.
+ *   A material that has left the range is the clearest case: the shape, size
+ *   and style are all fine, so replacing the customer's whole configuration
+ *   with a default would hide work they can still use.
+ *
+ * Declared where each error is raised rather than inferred from the field
+ * name, so adding a rule forces the question to be answered.
+ */
+export type Blocks = 'render' | 'order';
+
 export interface ValidationIssue {
   field: string;
   message: string;
+  blocks: Blocks;
 }
 
 export interface ValidationResult {
@@ -58,6 +76,11 @@ export function isValid(result: ValidationResult): boolean {
   return result.errors.length === 0;
 }
 
+/** Errors that must stop the model being drawn. */
+export function renderBlockers(result: ValidationResult): ValidationIssue[] {
+  return result.errors.filter((error) => error.blocks === 'render');
+}
+
 /** Door leaf width, derived from the overall opening (decision 10). */
 export function doorLeafWidth(config: DoorConfigState): Mm {
   return doorLayout(config).leaf.width;
@@ -68,19 +91,30 @@ export function validateConfig(config: ConfigState): ValidationResult {
   const nonOrderable: ValidationIssue[] = [];
   const notices: ValidationIssue[] = [];
 
+  /* ---- material ---- */
+  const material = MATERIALS[config.material].label;
+  if (!isMaterialOffered(config.material)) {
+    errors.push({
+      field: 'material',
+      message: `${material} is not currently offered. Available: ${OFFERED_MATERIALS.map((m) => MATERIALS[m].label).join(', ')}.`,
+      blocks: 'order',
+    });
+  }
+
   /* ---- dimensions ---- */
   const limits = sizeLimits(config.material, config.productType);
-  const material = MATERIALS[config.material].label;
   if (config.dimensions.width < limits.minWidth || config.dimensions.width > limits.maxWidth) {
     errors.push({
       field: 'width',
       message: `Width for a ${material} ${config.productType} must be between ${formatMm(limits.minWidth)} and ${formatMm(limits.maxWidth)}.`,
+      blocks: 'render',
     });
   }
   if (config.dimensions.height < limits.minHeight || config.dimensions.height > limits.maxHeight) {
     errors.push({
       field: 'height',
       message: `Height for a ${material} ${config.productType} must be between ${formatMm(limits.minHeight)} and ${formatMm(limits.maxHeight)}.`,
+      blocks: 'render',
     });
   }
 
@@ -90,11 +124,13 @@ export function validateConfig(config: ConfigState): ValidationResult {
     nonOrderable.push({
       field: 'colour.external',
       message: 'The external colour was picked in explore mode and is not available to order.',
+      blocks: 'order',
     });
   } else if (!isColourAvailable(config.material, external.code)) {
     errors.push({
       field: 'colour.external',
       message: `${external.code} is not offered in ${material}.`,
+      blocks: 'order',
     });
   }
 
@@ -102,11 +138,13 @@ export function validateConfig(config: ConfigState): ValidationResult {
     nonOrderable.push({
       field: 'colour.internal',
       message: 'The internal colour was picked in explore mode and is not available to order.',
+      blocks: 'order',
     });
   } else if (internal.mode === 'ral' && !isColourAvailable(config.material, internal.code)) {
     errors.push({
       field: 'colour.internal',
       message: `${internal.code} is not offered in ${material}.`,
+      blocks: 'order',
     });
   }
 
@@ -114,12 +152,14 @@ export function validateConfig(config: ConfigState): ValidationResult {
     errors.push({
       field: 'finish.external',
       message: `A ${config.finish.external} external finish is not offered in ${material}.`,
+      blocks: 'order',
     });
   }
   if (config.finish.internal !== 'match' && !isFinishAvailable(config.material, config.finish.internal)) {
     errors.push({
       field: 'finish.internal',
       message: `A ${config.finish.internal} internal finish is not offered in ${material}.`,
+      blocks: 'order',
     });
   }
 
@@ -132,6 +172,7 @@ export function validateConfig(config: ConfigState): ValidationResult {
     errors.push({
       field: `glazing.safety.${pane.id}`,
       message: `${pane.label} is a critical location, so ${pane.minimum} safety glass is required. ${pane.reason}`,
+      blocks: 'order',
     });
   }
   if (assessment.undetermined) {
@@ -139,6 +180,7 @@ export function validateConfig(config: ConfigState): ValidationResult {
       field: 'glazing.safety',
       message:
         'Whether safety glass is required depends on the cill height above the finished floor, which is a property of the installation rather than of the product. The enquiry form asks for it optionally, and the surveyor will confirm it.',
+      blocks: 'order',
     });
   }
 
@@ -162,12 +204,14 @@ function validateDoor(
     errors.push({
       field: 'width',
       message: `This leaves a door leaf of ${formatMm(leaf)}. The narrowest manufacturable leaf is ${formatMm(MIN_DOOR_LEAF_WIDTH)} — reduce the side lights or increase the overall width.`,
+      blocks: 'render',
     });
   }
   if (leaf > MAX_DOOR_LEAF.width) {
     errors.push({
       field: 'width',
       message: `This leaves a door leaf of ${formatMm(leaf)}. The widest manufacturable leaf is ${formatMm(MAX_DOOR_LEAF.width)} — add a side light or reduce the overall width.`,
+      blocks: 'render',
     });
   }
 
@@ -179,6 +223,7 @@ function validateDoor(
       errors.push({
         field,
         message: `A side light must be at least ${formatMm(MIN_SIDE_LIGHT_WIDTH)} wide.`,
+        blocks: 'render',
       });
     }
     if (light !== null) validateBars(light.bars, field, errors);
@@ -190,6 +235,7 @@ function validateDoor(
       errors.push({
         field: 'surround.topLight',
         message: `A top light must be at least ${formatMm(MIN_TOP_LIGHT_HEIGHT)} high.`,
+        blocks: 'render',
       });
     }
     validateBars(topLight.bars, 'surround.topLight', errors);
@@ -200,6 +246,7 @@ function validateDoor(
       field: 'trickleVents',
       message:
         'Trickle vents can only be fitted to a door with a glazed side light or top light. Remove them, or add a surround.',
+      blocks: 'order',
     });
   }
   validateTrickleVents(config, errors);
@@ -210,6 +257,7 @@ function validateDoor(
       errors.push({
         field: 'style.glazedFraction',
         message: 'The glazed portion must be between 10% and 90% of the leaf height.',
+        blocks: 'render',
       });
     }
   }
@@ -222,6 +270,7 @@ function validateDoor(
       field: 'threshold',
       message:
         'A low threshold gives step-free access and slightly reduces weather performance on exposed elevations.',
+      blocks: 'order',
     });
   }
 }
@@ -240,6 +289,7 @@ function validateWindow(config: WindowConfigState, errors: ValidationIssue[]): v
         errors.push({
           field: 'style.meetingRailPosition',
           message: 'The meeting rail must sit between 20% and 80% of the frame height above the cill.',
+          blocks: 'render',
         });
       }
       validateBars(config.style.options.upperBars, 'style.upperBars', errors);
@@ -260,6 +310,7 @@ function validateTrickleVents(config: ConfigState, errors: ValidationIssue[]): v
     errors.push({
       field: 'trickleVents.count',
       message: `Between 1 and ${MAX_TRICKLE_VENTS} trickle vents can be fitted.`,
+      blocks: 'order',
     });
   }
 }
@@ -271,6 +322,7 @@ function validateGrid(grid: SashGrid, field: string, errors: ValidationIssue[]):
     errors.push({
       field,
       message: `A window can be divided into at most ${MAX_GRID_COLUMNS} columns and ${MAX_GRID_ROWS} rows.`,
+      blocks: 'render',
     });
     return;
   }
@@ -278,6 +330,7 @@ function validateGrid(grid: SashGrid, field: string, errors: ValidationIssue[]):
     errors.push({
       field,
       message: `This layout describes ${columns} × ${rows} lights but lists ${grid.cells.length}.`,
+      blocks: 'render',
     });
     return;
   }
@@ -295,6 +348,7 @@ function validateBars(bars: import('./types').BarLayout, field: string, errors: 
     errors.push({
       field,
       message: `Glazing bars can divide a light into at most ${MAX_BAR_DIVISIONS} parts in each direction.`,
+      blocks: 'render',
     });
   }
 }
@@ -315,11 +369,20 @@ export function reconcileWithMaterial(config: ConfigState): {
   const issues: ValidationIssue[] = [];
   let next = config;
 
+  // Material is deliberately NOT reconciled.
+  //
+  // It is a customer choice, and silently rewriting a deliberate choice is the
+  // mistake already made once with dimension clamping. A material that has
+  // left the range is reported by validateConfig, which blocks the quote and
+  // states what is available, exactly as an unmakeable size does. The picker
+  // only ever offers OFFERED_MATERIALS, so this arises only from an old link.
+
   if (!isFinishAvailable(next.material, next.finish.external)) {
     const replacement = fallbackFinish(next.material);
     issues.push({
       field: 'finish.external',
       message: `A ${next.finish.external} finish is not offered in ${MATERIALS[next.material].label}; changed to ${replacement}.`,
+      blocks: 'order',
     });
     next = { ...next, finish: { ...next.finish, external: replacement } };
   }
@@ -328,6 +391,7 @@ export function reconcileWithMaterial(config: ConfigState): {
     issues.push({
       field: 'finish.internal',
       message: `A ${next.finish.internal} finish is not offered in ${MATERIALS[next.material].label}; the inside now matches the outside.`,
+      blocks: 'order',
     });
     next = { ...next, finish: { ...next.finish, internal: 'match' } };
   }
@@ -338,6 +402,7 @@ export function reconcileWithMaterial(config: ConfigState): {
     issues.push({
       field: 'colour.external',
       message: `${external.code} is not offered in ${MATERIALS[next.material].label}; changed to ${replacement}.`,
+      blocks: 'order',
     });
     next = { ...next, colour: { ...next.colour, external: { mode: 'ral', code: replacement } } };
   }
@@ -347,6 +412,7 @@ export function reconcileWithMaterial(config: ConfigState): {
     issues.push({
       field: 'colour.internal',
       message: `${internal.code} is not offered in ${MATERIALS[next.material].label}; the inside now matches the outside.`,
+      blocks: 'order',
     });
     next = { ...next, colour: { ...next.colour, internal: { mode: 'match' } } };
   }

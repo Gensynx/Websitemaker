@@ -10,9 +10,11 @@
  * the last session.
  */
 
-import { lazy, Suspense, useMemo, useState } from 'react';
+import { lazy, Suspense, useDeferredValue, useMemo, useState } from 'react';
 import { useConfigurator } from './state/store';
 import { StaticElevation } from './viewer/StaticElevation';
+import { SizePanel } from './ui/SizePanel';
+import { renderBlockers } from './config/validate';
 import { formatSize } from './config/units';
 import type { CameraPreset } from './config/view';
 
@@ -52,9 +54,17 @@ export function App(): JSX.Element {
   const [presetToken, setPresetToken] = useState(0);
   const webgl = useMemo(hasWebGL, []);
 
-  // Step 3.4: an unmanufacturable size never renders. The last valid
-  // configuration stays on screen, with the reason stated beside it.
-  const rendered = validation.errors.length === 0 ? config : lastValid;
+  // Step 3.4: an unmanufacturable size never renders. Only errors that block
+  // the RENDER fall back — an unavailable material or an explore colour leaves
+  // the product on screen, because its shape is not what is wrong with it.
+  const blockers = renderBlockers(validation);
+  const rendered = blockers.length === 0 ? config : lastValid;
+
+  // Throttles the viewer during continuous dimension input (performance
+  // budget). The panel stays responsive on every keystroke while the scene
+  // rebuilds at a lower priority and catches up, rather than rebuilding the
+  // geometry and materials once per character.
+  const deferred = useDeferredValue(rendered);
 
   return (
     <div className="app">
@@ -74,7 +84,7 @@ export function App(): JSX.Element {
           <div className="stage__canvas">
             <Suspense fallback={<div className="stage__placeholder">Preparing the 3D view…</div>}>
               <Viewer
-                config={rendered}
+                config={deferred}
                 camera={camera}
                 presetToken={presetToken}
                 showSilhouette={showSilhouette}
@@ -82,7 +92,7 @@ export function App(): JSX.Element {
             </Suspense>
           </div>
         ) : (
-          <StaticElevation config={rendered} />
+          <StaticElevation config={deferred} />
         )}
 
         <div className="controls controls--product" role="group" aria-label="Product">
@@ -140,12 +150,24 @@ export function App(): JSX.Element {
         </div>
       </main>
 
+      <SizePanel />
+
+      {/* Reasons that belong to a specific input are shown against that input.
+          What is left here is everything else, plus the statement of what the
+          viewer is actually showing. */}
       {validation.errors.length > 0 && (
         <div className="messages messages--blocking" role="alert">
-          {validation.errors.map((error) => (
-            <p key={`${error.field}-${error.message}`}>{error.message}</p>
-          ))}
-          <p className="messages__note">Showing the last size that can be made.</p>
+          {validation.errors
+            .filter((error) => error.field !== 'width' && error.field !== 'height')
+            .map((error) => (
+              <p key={`${error.field}-${error.message}`}>{error.message}</p>
+            ))}
+          {blockers.length > 0 && (
+            <p className="messages__note">
+              This size cannot be made, so the drawing still shows{' '}
+              {formatSize(lastValid.dimensions.width, lastValid.dimensions.height)}.
+            </p>
+          )}
         </div>
       )}
 

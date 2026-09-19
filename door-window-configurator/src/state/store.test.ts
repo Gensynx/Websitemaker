@@ -72,8 +72,11 @@ describe('the commit pipeline', () => {
 
     const state = useConfigurator.getState();
     expect(state.config.dimensions.width).toBe(3000);
-    expect(state.validation.errors.some((e) => e.message.includes('Timber'))).toBe(true);
-    expect(state.validation.errors[0]?.message).toMatch(/between .* and .*/);
+    // Found by field rather than by index: relying on errors[0] broke the
+    // moment another rule started reporting first.
+    const width = state.validation.errors.find((e) => e.field === 'width');
+    expect(width?.message).toContain('Timber');
+    expect(width?.message).toMatch(/between .* and .*/);
   });
 
   it('starts a fresh configuration when the product type changes', () => {
@@ -94,6 +97,54 @@ describe('the commit pipeline', () => {
     expect(result.config.finish.external).toBe('smooth');       // reconciled
     expect(result.config.glazing.safety).toBe('toughened');     // enforced
     expect(result.notices).toHaveLength(2);
-    expect(result.validation.errors).toHaveLength(0);
+    // Timber is outside the offered range, so a material error is expected and
+    // is not what this test is about; nothing else may fail.
+    expect(result.validation.errors.map((e) => e.field)).toEqual(['material']);
+  });
+});
+
+describe('what an error blocks', () => {
+  beforeEach(reset);
+
+  it('keeps the product on screen when only the order is blocked', () => {
+    // Regression: gating unsold materials made every aluminium link render the
+    // DEFAULT product, silently discarding a shape, size and style that were
+    // all perfectly drawable. An unsold material is not a geometry fault.
+    const aluminium: DoorConfigState = {
+      ...DEFAULT_DOOR,
+      material: 'aluminium',
+      dimensions: { width: 900, height: 2100 },
+    };
+    useConfigurator.setState({ config: aluminium, lastValid: DEFAULT_DOOR });
+    useConfigurator.getState().setDimensions(900, 2100);
+
+    const state = useConfigurator.getState();
+    expect(state.validation.errors.some((e) => e.field === 'material')).toBe(true);
+    expect(state.validation.errors.every((e) => e.blocks === 'order')).toBe(true);
+    // The size the customer asked for is still what gets drawn.
+    expect(state.lastValid.dimensions).toEqual({ width: 900, height: 2100 });
+    expect(state.lastValid.material).toBe('aluminium');
+  });
+
+  it('falls back only when the render itself is blocked', () => {
+    useConfigurator.getState().setDimensions(9000, 1981);
+    const state = useConfigurator.getState();
+    expect(state.validation.errors.some((e) => e.blocks === 'render')).toBe(true);
+    expect(state.lastValid.dimensions.width).toBe(838);
+  });
+
+  it('declares what every error blocks', () => {
+    // A new rule cannot be added without answering the question.
+    const broken: DoorConfigState = {
+      ...DEFAULT_DOOR,
+      material: 'timber',
+      dimensions: { width: 9000, height: 100 },
+      trickleVents: { position: 'head-of-frame', count: 99 },
+    };
+    const errors = validateConfig(broken).errors;
+    expect(errors.length).toBeGreaterThan(2);
+    for (const error of errors) {
+      expect(['render', 'order'], `${error.field}: ${error.message}`).toContain(error.blocks);
+    }
   });
 });

@@ -172,12 +172,28 @@ describe('frame material gates the catalogue', () => {
       material: 'timber',
       colour: { external: { mode: 'ral', code: 'RAL6005' }, internal: { mode: 'match' } },
     };
-    expect(validateConfig(timber).errors).toHaveLength(0);
+    // Asserted by field, not by count: timber is no longer in the offered
+    // range, so it now carries a material error. The claim under test is about
+    // COLOUR availability, and that is what is checked.
+    expect(validateConfig(timber).errors.some((e) => e.field.startsWith('colour'))).toBe(false);
 
     const { config, issues } = reconcileWithMaterial({ ...timber, material: 'upvc' });
     expect(issues.some((i) => i.field === 'colour.external')).toBe(true);
     expect(config.colour.external).not.toEqual({ mode: 'ral', code: 'RAL6005' });
     expect(validateConfig(config).errors).toHaveLength(0);
+  });
+
+  it('blocks a material that has left the range, without rewriting the choice', () => {
+    // Reconciliation must not silently change a deliberate choice — the same
+    // rule dimensions follow. The error states what is available instead.
+    const timber = { ...DEFAULT_DOOR, material: 'timber' as const };
+    const { config, issues } = reconcileWithMaterial(timber);
+    expect(config.material).toBe('timber');
+    expect(issues.some((i) => i.field === 'material')).toBe(false);
+
+    const error = validateConfig(timber).errors.find((e) => e.field === 'material');
+    expect(error?.message).toContain('not currently offered');
+    expect(error?.message).toContain('uPVC');
   });
 
   it('moves a finish the material does not offer', () => {

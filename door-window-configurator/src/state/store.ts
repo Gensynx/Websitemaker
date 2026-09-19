@@ -20,7 +20,7 @@ import { defaultFor } from '../config/defaults';
 import { encodeConfig, decodeConfig } from '../config/url';
 import type { DecodeIssue } from '../config/url';
 import { enforceSafetyGlazing } from '../config/safety';
-import { reconcileWithMaterial, validateConfig } from '../config/validate';
+import { reconcileWithMaterial, renderBlockers, validateConfig } from '../config/validate';
 import type { ValidationResult } from '../config/validate';
 import { loadConfig, saveConfig } from '../config/storage';
 import type { CameraPreset } from '../config/view';
@@ -39,9 +39,13 @@ export interface ConfiguratorState {
   /** Blocking problems. Step 3.4: an unmanufacturable size never renders. */
   validation: ValidationResult;
   /**
-   * The last configuration that passed validation. The viewer renders this, so
-   * an invalid size shows the previous good model plus an inline reason rather
-   * than an empty canvas.
+   * The last configuration with nothing blocking its render. The viewer shows
+   * this, so an unmakeable size keeps the previous good model on screen with
+   * the reason beside the input, rather than blanking the canvas.
+   *
+   * An order-blocking error (an unavailable material, an explore colour) does
+   * NOT fall back: the product still draws as specified, because the shape is
+   * not what is wrong with it.
    */
   lastValid: ConfigState;
 
@@ -137,7 +141,8 @@ export const useConfigurator = create<ConfiguratorState>((set, get) => {
 
   function apply(next: ConfigState, carried: Notice[] = []): void {
     const committed = commit(next, carried);
-    const lastValid = committed.validation.errors.length === 0 ? committed.config : get().lastValid;
+    const lastValid =
+      renderBlockers(committed.validation).length === 0 ? committed.config : get().lastValid;
     set({ ...committed, lastValid });
     persist(committed.config, get().camera);
   }
@@ -146,7 +151,10 @@ export const useConfigurator = create<ConfiguratorState>((set, get) => {
     config: initial.config,
     notices: initial.notices,
     validation: initial.validation,
-    lastValid: initial.validation.errors.length === 0 ? initial.config : defaultFor(initial.config.productType),
+    lastValid:
+      renderBlockers(initial.validation).length === 0
+        ? initial.config
+        : defaultFor(initial.config.productType),
     camera: initial.camera,
     showSilhouette: false,
 

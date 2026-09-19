@@ -79,19 +79,30 @@ export const THRESHOLD_HEIGHT: Record<'standard' | 'low-level-access', Mm> = {
 /** PLACEHOLDER. Trickle vents fitted across the head of one frame. */
 export const MAX_TRICKLE_VENTS = 6;
 
-/** Standard-size presets (Step 3.1). PLACEHOLDER. */
+/**
+ * Standard-size presets (Step 3.1). PLACEHOLDER SIZES.
+ *
+ * A size preset sets the SIZE and nothing else. Sizes that only make sense
+ * with a surround fitted — "with one side light", 1450 mm — are not size
+ * presets at all: applied on their own they imply a 1310 mm door leaf, which
+ * is not manufacturable, and validation correctly rejects them. Door sets
+ * belong with the surround options in Step 6, as the window presets already
+ * do for grids.
+ *
+ * Every entry below is checked by test to validate as-is.
+ */
 export const SIZE_PRESETS: Record<ProductType, ReadonlyArray<{ label: string; width: Mm; height: Mm }>> = {
   door: [
-    { label: 'Standard', width: 838, height: 1981 },
-    { label: 'Wide', width: 914, height: 2032 },
+    { label: "2'6\"", width: 762, height: 1981 },
+    { label: "2'9\"", width: 838, height: 1981 },
+    { label: "3'0\"", width: 914, height: 1981 },
     { label: 'Metric', width: 926, height: 2040 },
-    { label: 'With one side light', width: 1450, height: 2100 },
-    { label: 'With two side lights', width: 1800, height: 2100 },
+    { label: 'Wide', width: 1067, height: 2083 },
   ],
   window: [
-    { label: 'Small casement', width: 600, height: 900 },
-    { label: 'Standard casement', width: 1200, height: 1050 },
-    { label: 'Large casement', width: 1770, height: 1200 },
+    { label: 'Small', width: 600, height: 900 },
+    { label: 'Standard', width: 1200, height: 1050 },
+    { label: 'Large', width: 1770, height: 1200 },
     { label: 'Sash', width: 860, height: 1500 },
   ],
 };

@@ -1,8 +1,8 @@
 # 3D Door and Window Configurator
 
-Phase 1, Steps 1 and 2: the state model, its URL serialisation, and the 3D
-viewer. **Steps 3 to 8 are not built.** There are no sizing inputs and no
-configuration panel yet; dimensions come from the URL or the last session.
+Phase 1, Steps 1 to 3: the state model, its URL serialisation, the 3D viewer,
+and sizing. **Steps 4 to 8 are not built** — there is no configuration panel
+yet, so the Size section sits below the stage rather than in one.
 
 React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 
@@ -23,6 +23,7 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/config/storage.ts` | localStorage persistence; the URL takes precedence |
 | `src/config/layout.ts` | Door layout maths — one source of truth for the leaf |
 | `src/state/store.ts` | The single commit pipeline: reconcile, enforce, validate, persist |
+| `src/ui/SizePanel.tsx` | Sizing controls: two mm inputs, inline reasons, standard sizes |
 | `src/viewer/geometry.ts` | Parametric part list, shared by the 3D scene and the SVG fallback |
 | `src/viewer/materials.ts` | Per-face materials; procedural woodgrain shader |
 | `src/viewer/Viewer.tsx` | Canvas, studio lighting, contact shadow (lazy-loaded) |
@@ -129,6 +130,19 @@ Alignment, sightline balance and bar registration across a mullion can only be
 judged square-on. A three-quarter opener flatters the product and hides
 exactly what a customer needs to check first — and, during Step 2, hid four
 geometry defects from us as well.
+
+## What an error blocks
+
+Every validation error declares whether it blocks the `render` or only the
+`order`, at the point it is raised rather than inferred from its field name.
+
+An unmanufacturable size blocks the render: the last valid model stays on
+screen with the reason beside the input (Step 3.4). A material that has left
+the range, an explore colour or a safety-glazing shortfall blocks only the
+order — the product still draws as specified, because its shape is not what is
+wrong with it. Treating the two the same made every link naming an
+unsold material render the default product instead, silently discarding a
+shape, size and style that were all perfectly drawable.
 
 ## The catalogue
 
