@@ -242,9 +242,9 @@ section{position:relative;z-index:2}
 .trade .scope{color:var(--ink-faint);font-size:.88rem;margin-top:.4rem}
 a.trade:hover .frame,a.trade:focus-visible .frame{border-color:var(--brass)}
 a.trade:hover .frame svg,a.trade:focus-visible .frame svg{opacity:1;transform:scale(1.05)}
-.trade.soon{cursor:default}
-.trade.soon .frame svg{opacity:.34}
-.trade.soon .meta h3,.trade.soon .scope{opacity:.62}
+/* .soon stays visually muted but is a real link, so interest can be registered early */
+.trade.soon .frame svg{opacity:.46}
+.trade.soon .meta h3,.trade.soon .scope{opacity:.74}
 @media (prefers-reduced-motion: reduce){a.trade:hover .frame svg{transform:none}}
 
 /* ============================================================
@@ -555,7 +555,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
         <div class="meta"><h3>Roofing works</h3></div>
         <p class="scope">Re-roofs, recovers and repairs, with flashing, guttering and rainwater goods put right at the same time.</p>
       </a>
-      <div class="trade soon reveal d1" aria-label="Bathrooms — coming soon">
+      <a class="trade soon reveal d1" href="#enquire" data-service="Bathrooms">
         <div class="frame">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M20 50h80v10a14 14 0 0 1-14 14H34a14 14 0 0 1-14-14z"/>
@@ -566,8 +566,8 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
         </div>
         <div class="meta"><h3>Bathrooms</h3></div>
         <p class="scope">Full bathroom design and installation, from first fix plumbing to tiling and finish.</p>
-      </div>
-      <div class="trade soon reveal d2" aria-label="Kitchens — coming soon">
+      </a>
+      <a class="trade soon reveal d2" href="#enquire" data-service="Kitchens">
         <div class="frame">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M18 48h84"/><path d="M20 48v30h80V48"/>
@@ -579,7 +579,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
         </div>
         <div class="meta"><h3>Kitchens</h3></div>
         <p class="scope">Kitchen design, supply and installation, coordinated with the electrics and plumbing behind it.</p>
-      </div>
+      </a>
     </div>
   </div>
 </section>
@@ -620,6 +620,8 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
               <button type="button" class="chip" aria-pressed="false" data-v="Minor works">Minor works</button>
               <button type="button" class="chip" aria-pressed="false" data-v="Window and door replacements">Windows &amp; doors</button>
               <button type="button" class="chip" aria-pressed="false" data-v="Roofing works">Roofing works</button>
+              <button type="button" class="chip" aria-pressed="false" data-v="Bathrooms">Bathrooms</button>
+              <button type="button" class="chip" aria-pressed="false" data-v="Kitchens">Kitchens</button>
               <button type="button" class="chip" aria-pressed="false" data-v="Full service">Full service</button>
               <button type="button" class="chip" aria-pressed="false" data-v="Not sure yet">Not sure yet</button>
             </div>
