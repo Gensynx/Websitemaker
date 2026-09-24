@@ -27,6 +27,22 @@
     });
   }
 
+  /* Header booking button: while the page's own primary button is (mostly)
+     on screen, the header copy steps back so there is only ever one "Book"
+     competing for attention; once that button scrolls away, it returns.
+     Without JavaScript (or IntersectionObserver) it simply stays visible. */
+  var navBook = document.querySelector('.nav-book');
+  var pageBook = document.querySelector('main .btn-gold');
+  if (navBook && pageBook && 'IntersectionObserver' in window) {
+    document.body.classList.add('cta-dock');
+    /* The sticky header covers the top of the viewport, so a button tucked
+       underneath it counts as gone. */
+    var headerH = header ? header.offsetHeight : 0;
+    new IntersectionObserver(function (entries) {
+      document.body.classList.toggle('cta-docked', entries[0].intersectionRatio < 0.5);
+    }, { rootMargin: '-' + headerH + 'px 0px 0px 0px', threshold: [0, 0.5, 1] }).observe(pageBook);
+  }
+
   /* Scroll reveal */
   var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var items = document.querySelectorAll('.rv');

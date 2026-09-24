@@ -38,9 +38,19 @@ const BUSINESS_LD = {
     closes: '17:30',
   },
   areaServed: SITE.areas.map((name) => ({ '@type': 'Place', name })),
+  /* Prices are only published in structured data once the firm has
+     confirmed them; placeholders never reach search engines. */
   makesOffer: services.map((s) => ({
     '@type': 'Offer',
     itemOffered: { '@type': 'Service', name: s.name },
+    ...(s.fee.from == null ? {} : {
+      priceSpecification: {
+        '@type': 'PriceSpecification',
+        minPrice: s.fee.from,
+        priceCurrency: 'GBP',
+        description: `From £${s.fee.from} ${s.fee.basis}`,
+      },
+    }),
   })),
 };
 
@@ -56,7 +66,7 @@ const pages = [
   {
     path: 'services/index.html',
     title: 'Our Services · 381 Accountants, Canary Wharf & London',
-    desc: 'All accounting services under one roof: bookkeeping, payroll, self assessment tax returns, VAT returns, annual accounts, company formation and tax planning. Fixed fees, free consultation.',
+    desc: 'All accounting services under one roof: bookkeeping, payroll, self assessment tax returns, VAT returns, annual accounts, company formation and tax planning. Starting fees for each, fixed and agreed up front, and a free consultation.',
     active: 'services',
     body: servicesHubBody,
   },
