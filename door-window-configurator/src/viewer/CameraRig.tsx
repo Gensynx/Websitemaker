@@ -128,9 +128,15 @@ export function poseFor(preset: CameraPreset, bounds: Bounds, frustum: Frustum, 
   }
 }
 
-export function distanceLimits(bounds: Bounds): { min: number; max: number } {
+/** How far back the elevation stands to fit the product in the clear area. */
+export function framingDistance(bounds: Bounds, frustum: Frustum): number {
+  const pose = poseFor('elevation', bounds, frustum);
+  return pose.position.distanceTo(pose.target);
+}
+
+export function distanceLimits(bounds: Bounds, framing = 0): { min: number; max: number } {
   const fit = Math.max(bounds.width, bounds.height) / MM_PER_SCENE_UNIT;
-  return { min: 0.35, max: fit * 4 + 3 };
+  return { min: 0.35, max: Math.max(fit * 4 + 3, framing * 1.5) };
 }
 
 /** Eased approach; `1 - pow(decay, dt)` is frame-rate independent. */
@@ -158,8 +164,12 @@ export function CameraRig({
   const camera = useThree((state) => state.camera) as THREE.PerspectiveCamera;
   const size = useThree((state) => state.size);
   const goal = useRef<CameraPose | null>(null);
-  const limits = distanceLimits(bounds);
   const frustum = frustumFor(camera.fov, size.width, size.height, insets);
+  // The zoom-out limit must never be tighter than the distance the elevation
+  // needs to fit the product into the CLEAR area. With the phone sheet open
+  // that area is small, the fit is far away, and a fixed limit clamped the
+  // camera short of it — the door ran up behind the title.
+  const limits = distanceLimits(bounds, framingDistance(bounds, frustum));
 
   // Recomputed whenever the framing inputs change — including the panel
   // opening, the sheet expanding, or a phone rotating.

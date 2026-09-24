@@ -86,12 +86,41 @@ body {
 .stage {
   position: absolute;
   inset: 0;
+  /* A stacking context of its own: whatever the 3D layer's labels do with
+     z-index stays inside the stage, below the panel. */
+  z-index: 0;
 }
 
+.stage__picture,
 .stage__canvas,
 .stage__poster {
   position: absolute;
   inset: 0;
+}
+
+/* ------------------------------------------------------------------ *
+ * Skip link: first tab stop, straight to the controls (Step 4.4)
+ * ------------------------------------------------------------------ */
+
+.skip {
+  position: absolute;
+  z-index: 10;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.625rem 1rem;
+  background: var(--ink);
+  color: var(--surface);
+  border-radius: var(--radius);
+  font-size: var(--step-small);
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform var(--duration) var(--ease);
+}
+
+.skip:focus {
+  transform: none;
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .stage canvas {
@@ -151,6 +180,7 @@ body {
 
 .title {
   position: absolute;
+  z-index: 2;
   top: var(--edge);
   left: var(--edge);
   max-width: min(36rem, calc(100% - var(--panel-width) - var(--edge) * 3));
@@ -207,6 +237,7 @@ h1 {
 
 .viewbar {
   position: absolute;
+  z-index: 2;
   bottom: var(--edge);
   /* Centred under the product, in the part of the screen the panel leaves. */
   left: calc((100% - var(--panel-width) - var(--edge)) / 2);
@@ -319,36 +350,174 @@ h1 {
 }
 
 /* ------------------------------------------------------------------ *
- * Sections inside the panel
+ * Panel groups and collapsible sections (Step 4.2)
  * ------------------------------------------------------------------ */
 
-.section {
+/* Arriving by the skip link focuses the panel itself; that needs no ring. */
+.panel:focus {
+  outline: none;
+}
+
+.panel__group {
   display: grid;
-  gap: 1.125rem;
-  padding: 1.5rem 0;
+  gap: 1rem;
+  padding: 1.25rem 0 1.5rem;
   border-bottom: 1px solid var(--line);
 }
 
-.section:last-child {
+.panel__group--quiet {
   border-bottom: 0;
+  padding-top: 1.75rem;
 }
 
-.section__head {
+.panel__group-title {
+  margin: 0;
+  font-size: var(--step-small);
+  font-weight: 500;
+  color: var(--ink-soft);
+}
+
+.section {
+  border-bottom: 1px solid var(--line);
+}
+
+.section__heading {
+  margin: 0;
+  font: inherit;
+}
+
+.section__toggle {
+  appearance: none;
   display: grid;
-  gap: 0.25rem;
+  grid-template-columns: 1fr auto;
+  grid-template-areas:
+    'title chevron'
+    'summary chevron'
+    'issues chevron';
+  align-items: center;
+  column-gap: 1rem;
+  row-gap: 0.1875rem;
+  width: 100%;
+  padding: 1.125rem 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.section__toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
 }
 
 .section__title {
-  margin: 0;
+  grid-area: title;
   font-size: 1.0625rem;
   font-weight: 600;
   letter-spacing: -0.01em;
+}
+
+/* What is chosen, visible while collapsed. Hidden when open: the content
+   below says it in full, and saying it twice is noise. */
+.section__summary {
+  grid-area: summary;
+  font-size: var(--step-small);
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  transition: opacity var(--duration) var(--ease);
+}
+
+.section[data-open='true'] .section__summary {
+  opacity: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* In words, not colour alone. */
+.section__issues {
+  grid-area: issues;
+  justify-self: start;
+  margin-top: 0.25rem;
+  padding: 0.0625rem 0.5rem;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  font-size: var(--step-micro);
+  font-weight: 500;
+  color: var(--warn);
+}
+
+.section__chevron {
+  grid-area: chevron;
+  width: 0.5625rem;
+  height: 0.5625rem;
+  margin-right: 0.25rem;
+  border-right: 1.5px solid var(--ink-soft);
+  border-bottom: 1.5px solid var(--ink-soft);
+  transform: rotate(45deg) translateY(-3px);
+  transition: transform var(--duration) var(--ease);
+}
+
+.section[data-open='true'] .section__chevron {
+  transform: rotate(-135deg) translateY(-1px);
+}
+
+/* Height animates 0fr -> 1fr. Collapsed content is visibility:hidden, which
+   takes it out of the tab order and the accessibility tree; the visibility
+   change waits for the collapse to finish, and is immediate on the way open. */
+.section__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition: grid-template-rows var(--duration) var(--ease), visibility 0s linear var(--duration);
+}
+
+.section[data-open='true'] .section__panel {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows var(--duration) var(--ease), visibility 0s linear 0s;
+}
+
+.section__inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.section__content {
+  display: grid;
+  gap: 1.125rem;
+  padding: 0 0 1.5rem;
 }
 
 .section__hint {
   margin: 0;
   color: var(--ink-faint);
   font-size: var(--step-small);
+}
+
+/* A read-only statement of what is chosen, for sections without controls yet. */
+.readout {
+  display: grid;
+  gap: 0.625rem;
+  margin: 0;
+}
+
+.readout__row {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 38%) 1fr;
+  gap: 1rem;
+  font-size: var(--step-small);
+}
+
+.readout dt {
+  color: var(--ink-faint);
+}
+
+.readout dd {
+  margin: 0;
+  color: var(--ink);
 }
 
 /* ------------------------------------------------------------------ *
@@ -473,10 +642,12 @@ h1 {
   border-color: rgba(22, 24, 26, 0.32);
 }
 
+/* The same 2 px accent ring as every other control. A tinted glow alone
+   fell short of the 3:1 a focus indicator needs against the panel. */
 .field__input:focus-visible {
-  outline: none;
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
   border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(31, 95, 75, 0.16);
 }
 
 .field__input[aria-invalid='true'] {
@@ -484,7 +655,8 @@ h1 {
 }
 
 .field__input[aria-invalid='true']:focus-visible {
-  box-shadow: 0 0 0 3px rgba(138, 51, 36, 0.16);
+  outline-color: var(--warn);
+  border-color: var(--warn);
 }
 
 .field__hint {
@@ -619,6 +791,14 @@ h1 {
     left: var(--edge);
     transform: none;
     max-width: calc(100% - var(--edge) * 2);
+    /* Five controls do not fit a phone's width. The bar scrolls sideways, and
+       the fade says so rather than leaving a word sliced off at the edge. */
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+    mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+  }
+
+  .viewbar__button {
+    padding: 0.5rem 0.625rem;
   }
 
   .panel {
@@ -627,13 +807,17 @@ h1 {
     right: 0;
     bottom: 0;
     width: auto;
-    max-height: 82svh;
+    /* Open, the sheet stops a little over half-way so the product stays in
+       view above it, re-framed to fit, while it is being configured. */
+    max-height: 56svh;
     border-radius: 12px 12px 0 0;
     border-bottom: 0;
   }
 
   .panel__toggle {
     appearance: none;
+    /* The handle takes the drag itself; the browser must not scroll with it. */
+    touch-action: none;
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;
@@ -711,6 +895,40 @@ h1 {
 
   .fields__by {
     display: none;
+  }
+}
+
+/* Some people ask for less transparency; frosted glass is exactly that. */
+@media (prefers-reduced-transparency: reduce) {
+  .panel,
+  .viewbar,
+  .shell[data-scene='wall'] .title {
+    background: rgb(var(--panel-rgb));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .title {
+    background: rgb(var(--ground-rgb));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+/* Windows High Contrast and similar replace every colour. Selection shown by
+   background or shadow alone would vanish, so it is restated as an outline in
+   the system highlight colour. */
+@media (forced-colors: active) {
+  .segmented__option input:checked + span,
+  .viewbar__button[aria-pressed='true'],
+  .preset[aria-pressed='true'] {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  .section__chevron,
+  .panel__chevron {
+    border-color: CanvasText;
   }
 }
 

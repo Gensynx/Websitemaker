@@ -107,7 +107,7 @@ await page.setViewportSize({ width: 1280, height: 900 });
 
 await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
 await page.waitForSelector('canvas');
-for (const label of ['Elevation', 'Hardware', 'Scale figure', 'Reset view']) {
+for (const label of ['Elevation view', 'Hardware close-up', 'Scale figure', 'Reset view']) {
   await page.getByRole('button', { name: label }).click();
   await page.waitForTimeout(600);
 }
@@ -120,14 +120,14 @@ await page.screenshot({ path: `${SHOTS}/shot-controls.png` });
  * failed: black heading on an anthracite leaf, with no backing.
  */
 {
-  await page.getByRole('button', { name: 'Hardware' }).click();
+  await page.getByRole('button', { name: 'Hardware close-up' }).click();
   await page.waitForTimeout(1200);
   const backing = await page.locator('.title').evaluate((el) => getComputedStyle(el).backgroundColor);
   const alpha = /rgba?\(([^)]+)\)/.exec(backing)?.[1].split(',')[3];
   const opaqueEnough = alpha === undefined || Number(alpha) >= 0.85;
   console.log(`title backing over the close-up: ${backing}`);
   if (!opaqueEnough) problems.push(`the title has no backing over the canvas: ${backing}`);
-  await page.getByRole('button', { name: 'Elevation' }).click();
+  await page.getByRole('button', { name: 'Elevation view' }).click();
   await page.waitForTimeout(600);
 }
 

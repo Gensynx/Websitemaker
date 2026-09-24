@@ -13,6 +13,13 @@
  */
 
 import { Html, Line } from '@react-three/drei';
+
+/**
+ * drei's default z-index range for <Html> is in the millions, which put these
+ * labels on top of the configuration panel and the mobile sheet. Kept at the
+ * bottom of the stage's own stacking context instead.
+ */
+const LABEL_LAYER: [number, number] = [1, 0];
 import type { Dimensions } from '../config/types';
 import { formatMm, MM_PER_SCENE_UNIT } from '../config/units';
 
@@ -33,7 +40,7 @@ export function Annotations({ dimensions }: { dimensions: Dimensions }): JSX.Ele
       <Line points={[[-halfWidth, widthLineY, 0], [halfWidth, widthLineY, 0]]} color="#9aa0a6" lineWidth={1} />
       <Line points={[[-halfWidth, widthLineY - TICK, 0], [-halfWidth, widthLineY + TICK, 0]]} color="#9aa0a6" lineWidth={1} />
       <Line points={[[halfWidth, widthLineY - TICK, 0], [halfWidth, widthLineY + TICK, 0]]} color="#9aa0a6" lineWidth={1} />
-      <Html position={[0, widthLineY - gap * 0.45, 0]} center distanceFactor={3.2}>
+      <Html position={[0, widthLineY - gap * 0.45, 0]} center distanceFactor={3.2} zIndexRange={LABEL_LAYER}>
         <span className="annotation" aria-hidden="true">
           {formatMm(dimensions.width)}
         </span>
@@ -43,7 +50,7 @@ export function Annotations({ dimensions }: { dimensions: Dimensions }): JSX.Ele
       <Line points={[[heightLineX, 0, 0], [heightLineX, height, 0]]} color="#9aa0a6" lineWidth={1} />
       <Line points={[[heightLineX - TICK, 0, 0], [heightLineX + TICK, 0, 0]]} color="#9aa0a6" lineWidth={1} />
       <Line points={[[heightLineX - TICK, height, 0], [heightLineX + TICK, height, 0]]} color="#9aa0a6" lineWidth={1} />
-      <Html position={[heightLineX + gap * 0.5, height / 2, 0]} center distanceFactor={3.2}>
+      <Html position={[heightLineX + gap * 0.5, height / 2, 0]} center distanceFactor={3.2} zIndexRange={LABEL_LAYER}>
         <span className="annotation" aria-hidden="true">
           {formatMm(dimensions.height)}
         </span>

@@ -23,6 +23,10 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/config/storage.ts` | localStorage persistence; the URL takes precedence |
 | `src/config/layout.ts` | Door layout maths — one source of truth for the leaf |
 | `src/state/store.ts` | The single commit pipeline: reconcile, enforce, validate, persist |
+| `src/config/describe.ts` | The configuration in plain language: section summaries, the preview's text alternative, the Step 8 summary to come |
+| `src/ui/Section.tsx` | Collapsible panel section (disclosure pattern) and the read-only readout |
+| `src/ui/useSections.ts` | Which sections are open; sections with a problem start open |
+| `src/ui/useSheetGesture.ts` | Phone sheet handle: tap or drag, non-modal |
 | `src/ui/SizePanel.tsx` | Sizing controls: two mm inputs, inline reasons, standard sizes |
 | `src/viewer/geometry.ts` | Parametric part list, shared by the 3D scene and the SVG fallback |
 | `src/viewer/shapes.ts` | Geometry per part shape: raised mouldings, lathed hardware |
@@ -37,9 +41,10 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 ```
 npm install
 npm run typecheck
-npm test          # 163 unit tests, including text contrast read from styles.css
+npm test          # 200 unit tests, including text contrast read from styles.css
 npm run dev -- --port 5180   # then, in another shell:
 npm run smoke                # browser render, controls, wall scene, sizing
+npm run a11y                 # keyboard-only walk, sheet by keys and drag, axe scans
 node scripts/lighting-metric.mjs   # relief on a dark finish: panelled vs flush, >= 2x
 node scripts/colour-metric.mjs     # rendered RAL shades vs reference, CIE76 dE <= 6
 
@@ -149,6 +154,30 @@ wrong with it. Treating the two the same made every link naming an
 unsold material render the default product instead, silently discarding a
 shape, size and style that were all perfectly drawable.
 
+## The configuration panel (Step 4)
+
+- **Sections** Style, Size, Colour, Glazing, Hardware, each a disclosure: a
+  real button inside the section heading, `aria-expanded`, height animated
+  over 240 ms. Collapsed, the header states what is chosen; a section with a
+  problem says so in words ("1 issue") and starts open. Size has its controls;
+  the other four show the current selection read-only until Steps 5-7.
+- **Problems are shown where they can be fixed.** `sectionForField` routes
+  every validation field to its section; unit tests fail if one is unrouted.
+- **Phone:** a non-modal bottom sheet. Tap or drag the handle, Escape closes it
+  and returns focus to the handle. Open, it stops just over half-way and the
+  camera re-frames the product above it.
+- **Keyboard and screen reader (Step 4.4):** a skip link is the first tab
+  stop; every control is native; the canvas is never a tab stop; the preview
+  is one image whose text alternative is written by `describeProduct`.
+  `npm run a11y` checks it by doing it, and scans with axe (WCAG 2.2 AA and
+  best practice): no violations. Axe cannot compute contrast over the frosted
+  panel and lists it for review; `tokens.test.ts` covers that case instead.
+- **Styling** stays plain CSS with tokens rather than the Tailwind the brief
+  named — decided at Step 4, since the tokens are contrast-tested and the
+  Steps 1-3 UI was already built on them. Interaction patterns were taken from
+  21st.dev (a Base UI accordion and a snap-point drawer) and reimplemented,
+  not installed.
+
 ## Rendering
 
 Lighting is measured, not judged by eye, because the defects it has had were
@@ -180,9 +209,15 @@ the product.
 ## Outstanding
 
 - No favicon. It is a branding decision, so none has been invented.
-- Steps 4 to 8: the rest of the configuration panel (style, colour, glazing,
-  hardware), summary and enquiry. The panel shell, product switch, sizing and
-  setting are built.
+- Steps 5 to 8: the controls inside Style, Colour, Glazing and Hardware,
+  then summary and enquiry. The panel, its sections and sizing are built.
+- There is no control for frame material in any step of the brief. A link
+  carrying a material that is not offered shows the issue in Style, but the
+  customer cannot fix it there — only by switching product, which resets.
+- The default window is a casement in which no light opens (two fixed
+  lights). Step 7 data, flagged rather than changed.
+- Screen-reader behaviour is verified structurally (accessibility tree, axe),
+  not by listening. NVDA and VoiceOver passes are outstanding.
 - Shadows on the wall face are disabled. With the wall casting or receiving,
   the key light's shadow map put false shadows of the reveal and the door
   furniture on the brickwork up to 1.5 m from the opening. The root cause is

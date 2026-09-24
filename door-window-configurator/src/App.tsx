@@ -12,26 +12,45 @@
  * fades in over it once its first real frame is ready. Where WebGL is
  * unavailable, the elevation simply stays.
  *
- * Only the Size section of the panel exists. Style, Colour, Glazing and
- * Hardware are Steps 4-7 and are not built; the panel does not pretend they are.
+ * The panel has its five collapsible sections (Step 4.2). Size has its
+ * controls; Style, Colour, Glazing and Hardware state what is currently chosen,
+ * read-only, until Steps 5-7 give them controls. The panel does not pretend
+ * otherwise.
+ *
+ * Operable without the canvas (Step 4.4): every control is a native form
+ * control; a skip link leads straight to them; the preview carries a text
+ * alternative written from the same words as the summary; and the canvas is
+ * never a tab stop.
  */
 
 import { lazy, Suspense, useDeferredValue, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import type { ReactNode } from 'react';
 import { useConfigurator } from './state/store';
 import { StaticElevation } from './viewer/StaticElevation';
 import { SizePanel } from './ui/SizePanel';
 import { Segmented } from './ui/Segmented';
+import { Readout, Section } from './ui/Section';
 import { useInsets } from './ui/useInsets';
+import { useSections } from './ui/useSections';
+import { useSheetGesture } from './ui/useSheetGesture';
 import { renderBlockers } from './config/validate';
+import type { ValidationIssue } from './config/validate';
 import { formatSize } from './config/units';
+import { describeProduct, describeSection, HANDING_STATEMENT, productName as nameOf, sectionForField } from './config/describe';
+import type { SectionId } from './config/describe';
 import type { CameraPreset } from './config/view';
 
 const Viewer = lazy(() => import('./viewer/Viewer'));
 
-const PRESETS: Array<{ id: CameraPreset; label: string }> = [
-  { id: 'elevation', label: 'Elevation' },
-  { id: 'three-quarter', label: 'Three-quarter' },
-  { id: 'hardware', label: 'Hardware' },
+/**
+ * `spoken` is the accessible name. It starts with the visible label (WCAG
+ * 2.5.3, label in name) and says what the button does — without it, "Hardware"
+ * here and the Hardware section of the panel were two buttons of one name.
+ */
+const PRESETS: Array<{ id: CameraPreset; label: string; spoken: string }> = [
+  { id: 'elevation', label: 'Elevation', spoken: 'Elevation view' },
+  { id: 'three-quarter', label: 'Three-quarter', spoken: 'Three-quarter view' },
+  { id: 'hardware', label: 'Hardware', spoken: 'Hardware close-up' },
 ];
 
 function hasWebGL(): boolean {
@@ -41,6 +60,46 @@ function hasWebGL(): boolean {
   } catch {
     return false;
   }
+}
+
+const SECTIONS: Array<{ id: SectionId; title: string; pending?: string }> = [
+  { id: 'style', title: 'Style', pending: 'Style options are not built yet. This is what is currently chosen.' },
+  { id: 'size', title: 'Size' },
+  { id: 'colour', title: 'Colour', pending: 'Colour options are not built yet. This is what is currently chosen.' },
+  { id: 'glazing', title: 'Glazing', pending: 'Glazing options are not built yet. This is what is currently chosen.' },
+  { id: 'hardware', title: 'Hardware', pending: 'Hardware options are not built yet. This is what is currently chosen.' },
+];
+
+/** Messages shown inside a section: errors stop an order, notes only inform. */
+function Messages({ errors, notes }: { errors: string[]; notes: string[] }): JSX.Element | null {
+  if (errors.length === 0 && notes.length === 0) return null;
+  return (
+    <>
+      {errors.length > 0 && (
+        <div className="messages messages--blocking" role="alert">
+          {errors.map((message) => (
+            <p key={message}>{message}</p>
+          ))}
+        </div>
+      )}
+      {notes.length > 0 && (
+        <div className="messages" role="status">
+          {notes.map((message) => (
+            <p key={message}>{message}</p>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+function bySection<T extends { field: string }>(items: T[]): Map<SectionId | null, T[]> {
+  const grouped = new Map<SectionId | null, T[]>();
+  for (const item of items) {
+    const section = sectionForField(item.field);
+    grouped.set(section, [...(grouped.get(section) ?? []), item]);
+  }
+  return grouped;
 }
 
 const NARROW = '(max-width: 899px)';
@@ -75,6 +134,8 @@ export function App(): JSX.Element {
   const [presetToken, setPresetToken] = useState(0);
   const [ready, setReady] = useState(false);
   const [sheetOpen, setSheetOpen] = useState(false);
+  const sheetToggleRef = useRef<HTMLButtonElement>(null);
+  const sheetGesture = useSheetGesture(sheetOpen, setSheetOpen);
   const webgl = useMemo(hasWebGL, []);
   const narrow = useIsNarrow();
 
@@ -90,24 +151,50 @@ export function App(): JSX.Element {
   const stageRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLElement>(null);
   const viewbarRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLElement>(null);
+  const panelRef = useRef<HTMLFormElement>(null);
   const insets = useInsets(
     { stage: stageRef, title: titleRef, viewbar: viewbarRef, panel: panelRef },
     `${narrow}-${sheetOpen}-${validation.errors.length}-${notices.length}`,
   );
 
   const panelOpen = !narrow || sheetOpen;
-  const productName = config.productType === 'door' ? 'External door' : 'Window';
-  const orderIssues = validation.errors.filter((error) => error.field !== 'width' && error.field !== 'height');
+  const productName = nameOf(config);
+  const description = useMemo(() => describeProduct(deferred), [deferred]);
+
+  // Every problem is shown in the section it can be fixed in. Size shows its
+  // own inline against the field, so here it only counts towards the badge.
+  const errors = bySection<ValidationIssue>(validation.errors);
+  const nonOrderable = bySection<ValidationIssue>(validation.nonOrderable);
+  const sectionNotices = bySection(notices);
+  const issuesIn = (id: SectionId) => errors.get(id)?.length ?? 0;
+  const sections = useSections(SECTIONS.map((section) => section.id), ['size'], (id) => issuesIn(id) > 0);
+
+  const sectionMessages = (id: SectionId): ReactNode => {
+    const blocking = id === 'size' ? [] : (errors.get(id) ?? []).map((issue) => issue.message);
+    const notes = [...(nonOrderable.get(id) ?? []), ...(sectionNotices.get(id) ?? [])].map((issue) => issue.message);
+    return <Messages errors={blocking} notes={notes} />;
+  };
+  const generalErrors = (errors.get(null) ?? []).map((issue) => issue.message);
+  const generalNotes = [...(nonOrderable.get(null) ?? []), ...(sectionNotices.get(null) ?? [])].map((issue) => issue.message);
 
   return (
-    <div className="shell" data-scene={scene}>
-      <main className="stage" ref={stageRef} aria-label="Product preview">
+    <main className="shell" data-scene={scene}>
+      <a className="skip" href="#configure">
+        Skip to the configuration
+      </a>
+
+      <section className="stage" ref={stageRef} aria-label="Preview">
+        {/*
+          The picture, as one image with a text alternative. Everything inside
+          — the SVG elevation, the WebGL canvas, the floating dimension labels
+          — is presentational to assistive technology; the description says
+          what they show, in the same words as the panel.
+        */}
+        <div className="stage__picture" role="img" aria-label={description}>
         <div
           className="stage__poster"
           data-hidden={webgl && ready}
           style={{ padding: `${insets.top}px ${insets.right}px ${insets.bottom}px ${insets.left}px` }}
-          aria-hidden={webgl && ready}
         >
           <StaticElevation config={deferred} caption={!webgl} />
         </div>
@@ -128,13 +215,13 @@ export function App(): JSX.Element {
             </Suspense>
           </div>
         )}
+        </div>
 
         <header className="title" ref={titleRef}>
           <p className="eyebrow">Configurator</p>
           <h1>{productName}</h1>
-          <p className="lede" aria-live="polite">
-            {formatSize(config.dimensions.width, config.dimensions.height)}
-          </p>
+          {/* Not a live region: it changes on every keystroke in the size fields, which already say the value. */}
+          <p className="lede">{formatSize(config.dimensions.width, config.dimensions.height)}</p>
         </header>
 
         <div className="viewbar" ref={viewbarRef} role="group" aria-label="View">
@@ -143,6 +230,7 @@ export function App(): JSX.Element {
               key={preset.id}
               type="button"
               className="viewbar__button"
+              aria-label={preset.spoken}
               aria-pressed={camera === preset.id}
               onClick={() => {
                 setCamera(preset.id);
@@ -167,16 +255,34 @@ export function App(): JSX.Element {
             Scale figure
           </button>
         </div>
-      </main>
+      </section>
 
-      <aside className="panel" ref={panelRef} aria-label="Configure" data-open={panelOpen}>
+      <form
+        className="panel"
+        id="configure"
+        ref={panelRef}
+        aria-label="Configure"
+        data-open={panelOpen}
+        tabIndex={-1}
+        noValidate
+        // Nothing submits from here: Enter in a size field must not reload the page.
+        onSubmit={(event) => event.preventDefault()}
+        onKeyDown={(event) => {
+          // Escape folds the bottom sheet away and returns focus to its handle.
+          if (event.key === 'Escape' && narrow && sheetOpen) {
+            setSheetOpen(false);
+            sheetToggleRef.current?.focus();
+          }
+        }}
+      >
         {narrow && (
           <button
             type="button"
             className="panel__toggle"
+            ref={sheetToggleRef}
             aria-expanded={sheetOpen}
             aria-controls="panel-body"
-            onClick={() => setSheetOpen((open) => !open)}
+            {...sheetGesture}
           >
             <span className="panel__grip" aria-hidden="true" />
             <span className="panel__toggle-text">
@@ -190,7 +296,7 @@ export function App(): JSX.Element {
         )}
 
         <div className="panel__body" id="panel-body" hidden={!panelOpen}>
-          <section className="section">
+          <div className="panel__group">
             <Segmented
               legend="Product"
               value={config.productType}
@@ -200,33 +306,50 @@ export function App(): JSX.Element {
               ]}
               onChange={setProductType}
             />
-          </section>
+          </div>
 
-          <SizePanel />
+          <Messages errors={generalErrors} notes={generalNotes} />
 
-          {orderIssues.length > 0 && (
-            <div className="messages messages--blocking" role="alert">
-              {orderIssues.map((error) => (
-                <p key={`${error.field}-${error.message}`}>{error.message}</p>
-              ))}
-            </div>
-          )}
-          {blockers.length > 0 && (
-            <p className="messages messages--note" role="status">
-              This size cannot be made, so the drawing still shows{' '}
-              {formatSize(lastValid.dimensions.width, lastValid.dimensions.height)}.
-            </p>
-          )}
-          {notices.length > 0 && (
-            <div className="messages" role="status">
-              {notices.map((notice) => (
-                <p key={`${notice.field}-${notice.message}`}>{notice.message}</p>
-              ))}
-            </div>
-          )}
+          {SECTIONS.map((section) => {
+            const description = describeSection(section.id, config);
+            return (
+              <Section
+                key={section.id}
+                id={`section-${section.id}`}
+                title={section.title}
+                summary={description.summary}
+                issues={issuesIn(section.id)}
+                open={sections.isOpen(section.id)}
+                onToggle={() => sections.toggle(section.id)}
+              >
+                {sectionMessages(section.id)}
+                {section.id === 'size' ? (
+                  <>
+                    <SizePanel />
+                    {blockers.length > 0 && (
+                      <p className="messages messages--note" role="status">
+                        This size cannot be made, so the drawing still shows{' '}
+                        {formatSize(lastValid.dimensions.width, lastValid.dimensions.height)}.
+                      </p>
+                    )}
+                  </>
+                ) : (
+                  <Readout
+                    lines={description.lines}
+                    {...(section.pending !== undefined ? { note: section.pending } : {})}
+                  />
+                )}
+                {section.id === 'style' && config.productType === 'door' && (
+                  <p className="section__hint">{HANDING_STATEMENT}</p>
+                )}
+              </Section>
+            );
+          })}
 
-          <section className="section section--quiet">
-            <h2 className="section__title">Setting</h2>
+          <section className="panel__group panel__group--quiet" aria-labelledby="setting-title">
+            <h2 className="panel__group-title" id="setting-title">
+              Setting
+            </h2>
             <Segmented
               legend="Show the product"
               hideLegend
@@ -260,7 +383,7 @@ export function App(): JSX.Element {
           On-screen colours, finishes and obscure glass patterns are indicative only. Confirm against a physical
           sample before ordering.
         </p>
-      </aside>
-    </div>
+      </form>
+    </main>
   );
 }

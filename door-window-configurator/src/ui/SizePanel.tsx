@@ -1,9 +1,9 @@
 /**
  * Sizing controls (Step 3).
  *
- * Two numeric inputs and a row of standard sizes. This lives in its own
- * component because Step 4 moves it into the configuration panel; nothing here
- * assumes where it sits on the page.
+ * Two numeric inputs and a row of standard sizes: the content of the Size
+ * section. The section itself — heading, collapse, summary — is the panel's
+ * (Section.tsx); nothing here assumes where it sits on the page.
  *
  * The in-progress text of an input is UI state, not configuration state. A
  * field holds a draft string while it is being typed and commits a number only
@@ -93,13 +93,8 @@ export function SizePanel(): JSX.Element {
   const heightErrors = validation.errors.filter((error) => error.field === 'height');
 
   return (
-    <section className="section" aria-labelledby="size-heading">
-      <div className="section__head">
-        <h2 className="section__title" id="size-heading">
-          Size
-        </h2>
-        <p className="section__hint">Width × height, in millimetres.</p>
-      </div>
+    <>
+      <p className="section__hint">Width × height, in millimetres.</p>
 
       <div className="fields">
         <DimensionField
@@ -144,6 +139,6 @@ export function SizePanel(): JSX.Element {
           );
         })}
       </div>
-    </section>
+    </>
   );
 }

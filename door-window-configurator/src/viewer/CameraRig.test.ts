@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { frustumFor, NO_INSETS, viewOffset } from './CameraRig';
+import { distanceLimits, framingDistance, frustumFor, NO_INSETS, viewOffset } from './CameraRig';
 
 describe('framing around the UI', () => {
   it('puts the optical centre in the middle of the clear area', () => {
@@ -32,5 +32,15 @@ describe('framing around the UI', () => {
     // 800 clear pixels out of a virtual 800-high frame.
     expect(covered.tanHalfH).toBeCloseTo(tan * (800 / 800), 9);
     expect(covered.tanHalfV).toBeCloseTo(tan, 9);
+  });
+});
+
+describe('the zoom-out limit follows the framing', () => {
+  it('never clamps the camera short of fitting the product into a small clear area', () => {
+    const bounds = { width: 838, height: 1981 };
+    // A phone with the sheet open: 390 x 844, 175 px above, 470 px below.
+    const frustum = frustumFor(32, 390, 844, { top: 175, right: 0, bottom: 470, left: 0 });
+    const needed = framingDistance(bounds, frustum);
+    expect(distanceLimits(bounds, needed).max).toBeGreaterThanOrEqual(needed);
   });
 });
