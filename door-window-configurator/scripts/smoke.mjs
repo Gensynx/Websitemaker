@@ -56,6 +56,15 @@ const browser = await chromium.launch({
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 2, hasTouch: true });
 
 const problems = [];
+
+/*
+ * The canvas is full-bleed and the panel, title and view bar float over it, so
+ * a screenshot of the canvas's box includes them. Compared as-is, an error
+ * message appearing in the panel reads as "the model redrew". They are masked
+ * out of every canvas comparison; the dimension labels are not, because they
+ * belong to the picture.
+ */
+const CHROME = ['.panel', '.title', '.viewbar'].map((selector) => page.locator(selector));
 page.on('console', (message) => {
   if (message.type() !== 'error') return;
   // The URL is on the location, not in the text: a bare "404 (Not Found)"
@@ -106,6 +115,52 @@ console.log('url carries the configuration and the view:', page.url().includes('
 await page.screenshot({ path: `${SHOTS}/shot-controls.png` });
 
 /*
+ * The title stays legible whatever the canvas puts behind it. The hardware
+ * close-up fills the screen with the door, which is exactly the case that
+ * failed: black heading on an anthracite leaf, with no backing.
+ */
+{
+  await page.getByRole('button', { name: 'Hardware' }).click();
+  await page.waitForTimeout(1200);
+  const backing = await page.locator('.title').evaluate((el) => getComputedStyle(el).backgroundColor);
+  const alpha = /rgba?\(([^)]+)\)/.exec(backing)?.[1].split(',')[3];
+  const opaqueEnough = alpha === undefined || Number(alpha) >= 0.85;
+  console.log(`title backing over the close-up: ${backing}`);
+  if (!opaqueEnough) problems.push(`the title has no backing over the canvas: ${backing}`);
+  await page.getByRole('button', { name: 'Elevation' }).click();
+  await page.waitForTimeout(600);
+}
+
+/*
+ * The wall setting. View-only: it changes the picture, never the order, so
+ * the configuration in the URL must not move when it is switched.
+ */
+for (const product of ['Door', 'Window']) {
+  await page.goto(`${BASE}/?view=el`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('canvas');
+  await page.getByRole('radio', { name: product, exact: true }).check();
+  await page.waitForTimeout(1200);
+  const configBefore = new URL(page.url()).search;
+  const before = await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' });
+  await page.getByRole('radio', { name: 'In a wall', exact: true }).check();
+  await page.waitForTimeout(2000);
+  const inWall = await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' });
+  await page.getByRole('radio', { name: 'Render', exact: true }).check();
+  await page.waitForTimeout(2000);
+  const rendered = await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' });
+  const configAfter = new URL(page.url()).search;
+  await page.screenshot({ path: `${SHOTS}/shot-wall-${product.toLowerCase()}.png` });
+  const changed = Buffer.compare(before, inWall) !== 0;
+  const finishChanged = Buffer.compare(inWall, rendered) !== 0;
+  console.log(`wall/${product.toLowerCase()}: redrew=${changed} finishRedrew=${finishChanged} configUnchanged=${configBefore === configAfter}`);
+  if (!changed) problems.push(`${product}: switching to a wall did not change the picture`);
+  if (!finishChanged) problems.push(`${product}: switching wall finish did not change the picture`);
+  if (configBefore !== configAfter) problems.push(`${product}: the wall setting changed the configuration: ${configBefore} -> ${configAfter}`);
+  await page.getByRole('radio', { name: 'Studio', exact: true }).check();
+  await page.waitForTimeout(600);
+}
+
+/*
  * Touch orbit, both axes.
  *
  * Added after a false alarm: the canvas carries an inline `touch-action: auto`
@@ -122,7 +177,7 @@ await page.waitForTimeout(2500);
 
 async function dragAndCompare(dx, dy) {
   const box = await page.locator('canvas').boundingBox();
-  const before = await page.locator('canvas').screenshot();
+  const before = await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' });
   const scrollBefore = await page.evaluate(() => window.scrollY);
   const cx = box.x + box.width / 2;
   const cy = box.y + box.height / 2;
@@ -141,7 +196,7 @@ async function dragAndCompare(dx, dy) {
   }
   await page.waitForTimeout(1200);
   const scrollAfter = await page.evaluate(() => window.scrollY);
-  const after = await page.locator('canvas').screenshot();
+  const after = await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' });
   return { moved: Buffer.compare(before, after) !== 0, scrolled: scrollAfter - scrollBefore };
 }
 
@@ -165,6 +220,11 @@ await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
 await page.waitForSelector('canvas');
 await page.waitForTimeout(2500);
 
+// The product persists in localStorage, so whatever an earlier section left
+// selected would carry into this one. Sizing is exercised on a door.
+await page.getByRole('radio', { name: 'Door', exact: true }).check();
+await page.waitForTimeout(1500);
+
 const widthField = page.getByLabel(/^Width/);
 const heightField = page.getByLabel(/^Height/);
 
@@ -172,10 +232,10 @@ const heightField = page.getByLabel(/^Height/);
 // range — 1200 would not, and a fixture that quietly breaks a derived rule
 // reads as a failing renderer.
 {
-  const before = await page.locator('canvas').screenshot();
+  const before = await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' });
   await widthField.fill('1000');
   await page.waitForTimeout(1500);
-  const redrew = Buffer.compare(before, await page.locator('canvas').screenshot()) !== 0;
+  const redrew = Buffer.compare(before, await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' })) !== 0;
   const errors = await page.locator('.field__error').count();
   console.log(`sizing: valid resize redrew=${redrew} errors=${errors}`);
   if (!redrew) problems.push('a valid resize did not redraw the model');
@@ -184,11 +244,11 @@ const heightField = page.getByLabel(/^Height/);
 
 // An unmanufacturable size states the range inline and never reaches the model.
 {
-  const before = await page.locator('canvas').screenshot();
+  const before = await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' });
   await widthField.fill('9000');
   await page.waitForTimeout(1500);
   const reason = (await page.locator('.field__error').allTextContents()).join(' ');
-  const held = Buffer.compare(before, await page.locator('canvas').screenshot()) === 0;
+  const held = Buffer.compare(before, await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' })) === 0;
   console.log(`sizing: oversize held=${held} statesRange=${/between .* and .*/.test(reason)}`);
   if (!held) problems.push('an unmanufacturable size was rendered');
   if (!/between .* and .*/.test(reason) || !reason.includes('mm')) {
@@ -235,12 +295,12 @@ const heightField = page.getByLabel(/^Height/);
 
 // Limits follow the product type.
 {
-  await page.getByRole('button', { name: 'Window', exact: true }).click();
+  await page.getByRole('radio', { name: 'Window', exact: true }).check();
   await page.waitForTimeout(1000);
   const hints = (await page.locator('.field__hint').allTextContents()).join(' / ');
   console.log('sizing: window range', hints);
   if (!hints.includes('300 mm')) problems.push(`window limits did not replace door limits: ${hints}`);
-  await page.getByRole('button', { name: 'Door', exact: true }).click();
+  await page.getByRole('radio', { name: 'Door', exact: true }).check();
   await page.waitForTimeout(800);
 }
 

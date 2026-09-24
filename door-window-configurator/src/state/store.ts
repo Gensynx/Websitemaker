@@ -23,7 +23,7 @@ import { enforceSafetyGlazing } from '../config/safety';
 import { reconcileWithMaterial, renderBlockers, validateConfig } from '../config/validate';
 import type { ValidationResult } from '../config/validate';
 import { loadConfig, saveConfig } from '../config/storage';
-import type { CameraPreset } from '../config/view';
+import type { CameraPreset, SceneMode, WallFinish } from '../config/view';
 import { decodeView, DEFAULT_CAMERA_PRESET, encodeView } from '../config/view';
 
 export interface Notice {
@@ -51,6 +51,9 @@ export interface ConfiguratorState {
 
   camera: CameraPreset;
   showSilhouette: boolean;
+  /** View only — never in ConfigState or a shared link. */
+  scene: SceneMode;
+  wallFinish: WallFinish;
 
   setProductType: (productType: ProductType) => void;
   setMaterial: (material: FrameMaterial) => void;
@@ -61,6 +64,8 @@ export interface ConfiguratorState {
   setCamera: (preset: CameraPreset) => void;
   resetView: () => void;
   toggleSilhouette: () => void;
+  setScene: (scene: SceneMode) => void;
+  setWallFinish: (finish: WallFinish) => void;
   dismissNotices: () => void;
 }
 
@@ -157,6 +162,8 @@ export const useConfigurator = create<ConfiguratorState>((set, get) => {
         : defaultFor(initial.config.productType),
     camera: initial.camera,
     showSilhouette: false,
+    scene: 'studio',
+    wallFinish: 'brick',
 
     setProductType: (productType) => {
       if (get().config.productType === productType) return;
@@ -182,6 +189,8 @@ export const useConfigurator = create<ConfiguratorState>((set, get) => {
       persist(get().config, DEFAULT_CAMERA_PRESET);
     },
     toggleSilhouette: () => set({ showSilhouette: !get().showSilhouette }),
+    setScene: (scene) => set({ scene }),
+    setWallFinish: (wallFinish) => set({ wallFinish }),
     dismissNotices: () => set({ notices: [] }),
   };
 });

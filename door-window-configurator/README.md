@@ -25,18 +25,23 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/state/store.ts` | The single commit pipeline: reconcile, enforce, validate, persist |
 | `src/ui/SizePanel.tsx` | Sizing controls: two mm inputs, inline reasons, standard sizes |
 | `src/viewer/geometry.ts` | Parametric part list, shared by the 3D scene and the SVG fallback |
-| `src/viewer/materials.ts` | Per-face materials; procedural woodgrain shader |
-| `src/viewer/Viewer.tsx` | Canvas, studio lighting, contact shadow (lazy-loaded) |
-| `src/viewer/CameraRig.tsx` | Clamped orbit and the three camera presets |
+| `src/viewer/shapes.ts` | Geometry per part shape: raised mouldings, lathed hardware |
+| `src/viewer/materials.ts` | Physical materials; procedural woodgrain, texture and obscure-glass shaders |
+| `src/viewer/Lighting.tsx` | Studio environment from Lightformers (no HDRI, works offline) and the key light |
+| `src/viewer/Backdrop.tsx` | Studio contact shadow and glazing card; the wall scene (brick or render) |
+| `src/viewer/Viewer.tsx` | Canvas, tone mapping, scene assembly (lazy-loaded) |
+| `src/viewer/CameraRig.tsx` | Clamped orbit, the three camera presets, framing clear of the UI |
 | `src/viewer/StaticElevation.tsx` | SVG elevation where WebGL is unavailable |
 | `src/config/windowPresets.ts` | Named window configurations — data over the grid model |
 
 ```
 npm install
 npm run typecheck
-npm test          # 72 unit tests
-npm run dev       # then, in another shell:
-npm run smoke     # browser render across four configurations and two viewports
+npm test          # 163 unit tests, including text contrast read from styles.css
+npm run dev -- --port 5180   # then, in another shell:
+npm run smoke                # browser render, controls, wall scene, sizing
+node scripts/lighting-metric.mjs   # relief on a dark finish: panelled vs flush, >= 2x
+node scripts/colour-metric.mjs     # rendered RAL shades vs reference, CIE76 dE <= 6
 
 npm run build:share   # two shareable files in dist-singlefile/
 ```
@@ -144,6 +149,27 @@ wrong with it. Treating the two the same made every link naming an
 unsold material render the default product instead, silently discarding a
 shape, size and style that were all perfectly drawable.
 
+## Rendering
+
+Lighting is measured, not judged by eye, because the defects it has had were
+invisible in a single screenshot:
+
+- **Relief on dark finishes comes from reflections, not shadows.** A shadow on
+  RAL 7016 is still RAL 7016. The studio environment is built from uneven
+  Lightformers so bevels facing different ways reflect different things.
+  `lighting-metric.mjs` holds panelled against flush at 2x edge energy or more
+  (currently 3.1x raised, 2.6x grooved).
+- **Colour fidelity** uses Khronos PBR Neutral tone mapping, not ACES, which
+  shifts saturated colours. `colour-metric.mjs` holds four RAL shades within
+  dE 6 (currently 4.1 worst, on white).
+- **Glass is transmissive with a real light transmittance** (78% double, 70%
+  triple). In the studio a graded card behind the product, seen only through
+  the glazing, gives the panes something to show; in the wall scene the room
+  behind does the same job.
+- **In a wall** is view-only: never in the link, never in the order. The wall
+  and floor fade into the page. The wall does not take part in shadow
+  mapping at all — see Outstanding.
+
 ## The catalogue
 
 `catalogue.html` draws every door style, panel detail, surround and window
@@ -154,10 +180,15 @@ the product.
 ## Outstanding
 
 - No favicon. It is a branding decision, so none has been invented.
-- The product switch in the viewer is a stopgap so the range is reachable
-  before Step 4 builds the configuration panel.
-- Steps 3 to 8: sizing controls, configuration panel, colour system, door and
-  window option UI, summary and enquiry.
+- Steps 4 to 8: the rest of the configuration panel (style, colour, glazing,
+  hardware), summary and enquiry. The panel shell, product switch, sizing and
+  setting are built.
+- Shadows on the wall face are disabled. With the wall casting or receiving,
+  the key light's shadow map put false shadows of the reveal and the door
+  furniture on the brickwork up to 1.5 m from the opening. The root cause is
+  not identified; the cost of the workaround is that the reveal throws no
+  shadow across the frame head and a window cill none on the wall below.
+- Vertical sliding sashes have no seal line round them yet; casements do.
 
 ## Placeholders requiring replacement before launch
 

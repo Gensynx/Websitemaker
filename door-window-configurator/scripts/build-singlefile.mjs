@@ -24,10 +24,13 @@ const css = readFileSync(join(OUT_DIR, 'assets', assets.find((f) => f.endsWith('
 let html = readFileSync(join(OUT_DIR, 'index.html'), 'utf8')
   .replace(/<script[^>]*src="[^"]+"[^>]*><\/script>/g, '')
   .replace(/<link[^>]*rel="(stylesheet|modulepreload)"[^>]*>/g, '')
-  .replace('</head>', `<style>\n${css}\n</style>\n</head>`)
+  // Function replacers, not strings: in a replacement STRING, `$'`, `$&` and
+  // `` $` `` are patterns, and a minified bundle contains them — the file was
+  // silently spliced with fragments of itself and failed to parse.
+  .replace('</head>', () => `<style>\n${css}\n</style>\n</head>`)
   // Escape any literal closing tag inside the bundle so it cannot end the
   // script element early.
-  .replace('</body>', `<script type="module">\n${js.replace(/<\/script>/g, '<\\/script>')}\n</script>\n</body>`);
+  .replace('</body>', () => `<script type="module">\n${js.replace(/<\/script>/g, () => '<\\/script>')}\n</script>\n</body>`);
 
 mkdirSync(OUT_DIR, { recursive: true });
 const out = join(OUT_DIR, 'door-window-configurator.html');

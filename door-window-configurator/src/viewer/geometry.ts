@@ -19,6 +19,7 @@ import type {
   BarLayout,
   ConfigState,
   DoorConfigState,
+  MouldingProfile,
   PanelDetail,
   SashOpening,
   WindowConfigState,
@@ -30,6 +31,8 @@ import { doorLayout } from '../config/layout';
 import type { Rect } from '../config/layout';
 
 export type PartKind =
+  | 'seal'
+  | 'spacer'
   | 'frame'
   | 'mullion'
   | 'transom'
@@ -39,7 +42,38 @@ export type PartKind =
   | 'panel'
   | 'bar'
   | 'glazing'
+  | 'vent'
   | 'hardware';
+
+/**
+ * How a part is shaped WITHIN its bounding box.
+ *
+ * The bounding box (`position`, `size`) remains the contract: every
+ * containment and overlap test, and the SVG fallback, work on it alone. The
+ * shape only tells the 3D renderer what to draw inside it.
+ *
+ * `raised` is a stepped frustum whose front face is inset by the moulding
+ * profile. It exists because a raised panel drawn as a plain box has a front
+ * face parallel to the leaf — the same normal, the same reflection — and on a
+ * dark finish is therefore invisible however it is lit. Relief on a dark
+ * surface is carried by faces at DIFFERENT angles catching different parts of
+ * the environment, which is what a real moulding is.
+ */
+export type PartShape =
+  | { kind: 'box' }
+  | {
+      kind: 'raised';
+      profile: MouldingProfile;
+      /**
+       * Width of the bevel, where it is dictated by something real rather than
+       * proportion — a routed groove's V is half the groove each side.
+       */
+      bevel?: Mm;
+    }
+  | { kind: 'cylinder'; axis: 'x' | 'y' | 'z' }
+  | { kind: 'sphere' }
+  /** A ring lying in the plane of the product, facing out. */
+  | { kind: 'torus' };
 
 export interface Part {
   id: string;
@@ -48,6 +82,14 @@ export interface Part {
   position: [Mm, Mm, Mm];
   /** Full extent of the part, in mm. */
   size: [Mm, Mm, Mm];
+  /** Defaults to a box. */
+  shape?: PartShape;
+  /**
+   * Which face of the product the part sits on, and so which finish it takes.
+   * Defaults to external. Only meaningful for parts that are not six-sided
+   * boxes, which carry both finishes on their own faces.
+   */
+  facing?: 'external' | 'internal';
 }
 
 export interface ProductModel {
@@ -106,16 +148,43 @@ function inset(rect: Rect, by: Mm): Rect {
 }
 
 /** Glazing plus its bars, filling a rectangle. */
-function glazedArea(id: string, rect: Rect, bars: BarLayout, z: Mm, frame: Sightlines): Part[] {
+/**
+ * Glazing, its spacer bars, and its glazing bars, filling a rectangle.
+ *
+ * `cavities` is 1 for a double-glazed unit and 2 for triple. Each cavity has a
+ * spacer bar round its edge, just inside the bead — the thin dark line seen in
+ * every real sealed unit. It is most of what makes a pane read as GLAZING
+ * rather than as a pale panel, and it is the visible difference between double
+ * and triple when the product is turned.
+ */
+function glazedArea(id: string, rect: Rect, bars: BarLayout, z: Mm, frame: Sightlines, cavities: 1 | 2 = 1): Part[] {
   const pane = inset(rect, frame.glazingBead);
   if (pane.width <= 0 || pane.height <= 0) return [];
 
-  const parts: Part[] = [box(`${id}-glass`, 'glazing', pane, z, 24)];
+  const unitDepth = cavities === 2 ? 36 : 24;
+  const parts: Part[] = [box(`${id}-glass`, 'glazing', pane, z, unitDepth)];
+
+  const spacer = 7;
+  const edge = inset(pane, 1.5);
+  if (edge.width > spacer * 3 && edge.height > spacer * 3) {
+    const offsets = cavities === 2 ? [-unitDepth / 4, unitDepth / 4] : [0];
+    offsets.forEach((dz, layer) => {
+      const tag = `${id}-spacer${cavities === 2 ? `-${layer}` : ''}`;
+      parts.push(
+        box(`${tag}-head`, 'spacer', { x: edge.x, y: edge.y + edge.height - spacer, width: edge.width, height: spacer }, z + dz, 6),
+        box(`${tag}-foot`, 'spacer', { x: edge.x, y: edge.y, width: edge.width, height: spacer }, z + dz, 6),
+        box(`${tag}-left`, 'spacer', { x: edge.x, y: edge.y + spacer, width: spacer, height: edge.height - spacer * 2 }, z + dz, 6),
+        box(`${tag}-right`, 'spacer', { x: edge.x + edge.width - spacer, y: edge.y + spacer, width: spacer, height: edge.height - spacer * 2 }, z + dz, 6),
+      );
+    });
+  }
+
   if (bars.style === 'none') return parts;
 
   // Bars divide the pane into `columns` x `rows`, so there are columns-1
-  // vertical bars and rows-1 horizontal ones, evenly spaced.
-  const barDepth = bars.style === 'georgian-internal' ? 20 : 26;
+  // vertical bars and rows-1 horizontal ones, evenly spaced. Georgian bars sit
+  // INSIDE the unit, so they are thinner in depth than applied astragals.
+  const barDepth = bars.style === 'georgian-internal' ? 10 : unitDepth + 4;
   for (let index = 1; index < bars.columns; index += 1) {
     const x = pane.x + (pane.width * index) / bars.columns - bars.barWidth / 2;
     parts.push(box(`${id}-bar-v${index}`, 'bar', { x, y: pane.y, width: bars.barWidth, height: pane.height }, z, barDepth));
@@ -164,6 +233,7 @@ export function windowLightRects(config: WindowConfigState): Rect[] {
  * ------------------------------------------------------------------ */
 
 function buildDoor(config: DoorConfigState, frame: Sightlines): Part[] {
+  const cavities: 1 | 2 = config.glazing.unit === 'triple' ? 2 : 1;
   const { width, height } = config.dimensions;
   const layout = doorLayout(config);
   const parts: Part[] = [];
@@ -185,7 +255,7 @@ function buildDoor(config: DoorConfigState, frame: Sightlines): Part[] {
 
   const topLight = config.surround.topLight;
   if (topLight !== null && layout.topLight !== null) {
-    parts.push(...glazedArea('top-light', layout.topLight, topLight.bars, z, frame));
+    parts.push(...glazedArea('top-light', layout.topLight, topLight.bars, z, frame, cavities));
     parts.push(
       box(
         'transom',
@@ -199,7 +269,7 @@ function buildDoor(config: DoorConfigState, frame: Sightlines): Part[] {
 
   const leftLight = config.surround.leftSideLight;
   if (leftLight !== null && layout.leftSideLight !== null) {
-    parts.push(...glazedArea('side-light-left', layout.leftSideLight, leftLight.bars, z, frame));
+    parts.push(...glazedArea('side-light-left', layout.leftSideLight, leftLight.bars, z, frame, cavities));
     parts.push(
       box(
         'mullion-left',
@@ -213,7 +283,7 @@ function buildDoor(config: DoorConfigState, frame: Sightlines): Part[] {
 
   const rightLight = config.surround.rightSideLight;
   if (rightLight !== null && layout.rightSideLight !== null) {
-    parts.push(...glazedArea('side-light-right', layout.rightSideLight, rightLight.bars, z, frame));
+    parts.push(...glazedArea('side-light-right', layout.rightSideLight, rightLight.bars, z, frame, cavities));
     parts.push(
       box(
         'mullion-right',
@@ -229,10 +299,45 @@ function buildDoor(config: DoorConfigState, frame: Sightlines): Part[] {
   return parts;
 }
 
-function buildLeaf(config: DoorConfigState, frame: Sightlines, rect: Rect): Part[] {
+/**
+ * Clearance between the leaf and its frame, sides and head. Real, and
+ * visible: the fine dark line it makes is most of what tells a frame from
+ * a leaf of the same colour. Without it the two read as one slab.
+ */
+export const LEAF_CLEARANCE = 4;
+
+/** The same, round an opening casement sash. */
+export const SASH_CLEARANCE = 3;
+
+function buildLeaf(config: DoorConfigState, frame: Sightlines, opening: Rect): Part[] {
   const parts: Part[] = [];
-  const z = frame.leafThickness / 2;
+  const cavities: 1 | 2 = config.glazing.unit === 'triple' ? 2 : 1;
+  // The leaf sits FLUSH with the frame face, as a uPVC or composite door
+  // does, and stands back from it only by its thickness. It used to stand
+  // 35 mm proud, which the flat lighting hid and a raking light turned into a
+  // shadow line down the whole closing edge.
+  const leafFaces = { external: frame.frameDepth / 2, internal: frame.frameDepth / 2 - frame.leafThickness };
+  const z = (leafFaces.external + leafFaces.internal) / 2;
+  // Clearance at the sides and head; the foot sits on the threshold.
+  const rect: Rect = {
+    x: opening.x + LEAF_CLEARANCE,
+    y: opening.y,
+    width: opening.width - LEAF_CLEARANCE * 2,
+    height: opening.height - LEAF_CLEARANCE,
+  };
   const style = config.style;
+
+  // The clearance is not empty: it holds a black rubber weatherseal, as every
+  // uPVC and composite door does. Leaving the gap open made it a sub-pixel
+  // slot whose inside the environment lit unevenly, so the line between frame
+  // and leaf rendered dashed. The seal is both correct and a line that reads.
+  const sealDepth = 12;
+  const sealZ = leafFaces.external - 4 - sealDepth / 2;
+  parts.push(
+    box('seal-left', 'seal', { x: opening.x, y: opening.y, width: LEAF_CLEARANCE, height: opening.height }, sealZ, sealDepth),
+    box('seal-right', 'seal', { x: opening.x + opening.width - LEAF_CLEARANCE, y: opening.y, width: LEAF_CLEARANCE, height: opening.height }, sealZ, sealDepth),
+    box('seal-head', 'seal', { x: opening.x, y: opening.y + opening.height - LEAF_CLEARANCE, width: opening.width, height: LEAF_CLEARANCE }, sealZ, sealDepth),
+  );
 
   // A glazed leaf is stiles and rails around a hole, not a slab with a pane
   // laid on it. Glass inside an opaque box is invisible — the same mistake as
@@ -240,13 +345,13 @@ function buildLeaf(config: DoorConfigState, frame: Sightlines, rect: Rect): Part
   switch (style.id) {
     case 'solid-panel':
       parts.push(box('leaf', 'leaf', rect, z, frame.leafThickness));
-      parts.push(...buildPanelDetail(style.options.panelDetail, rect, frame, frame.leafThickness));
+      parts.push(...buildPanelDetail(style.options.panelDetail, rect, frame, leafFaces));
       break;
 
     case 'full-glazed': {
       const aperture = style.options.aperture;
       parts.push(...frameMembers('leaf', 'leaf', rect, aperture.inset, z, frame.leafThickness));
-      parts.push(...glazedArea('leaf-aperture', inset(rect, aperture.inset), aperture.bars, z, frame));
+      parts.push(...glazedArea('leaf-aperture', inset(rect, aperture.inset), aperture.bars, z, frame, cavities));
       break;
     }
 
@@ -262,16 +367,41 @@ function buildLeaf(config: DoorConfigState, frame: Sightlines, rect: Rect): Part
       };
 
       parts.push(...frameMembers('leaf-upper', 'leaf', glazed, aperture.inset, z, frame.leafThickness));
-      parts.push(...glazedArea('leaf-aperture', inset(glazed, aperture.inset), aperture.bars, z, frame));
+      parts.push(...glazedArea('leaf-aperture', inset(glazed, aperture.inset), aperture.bars, z, frame, cavities));
 
       parts.push(box('leaf', 'leaf', solid, z, frame.leafThickness));
-      parts.push(...buildPanelDetail(style.options.panelDetail, solid, frame, frame.leafThickness));
+      parts.push(...buildPanelDetail(style.options.panelDetail, solid, frame, leafFaces));
       break;
     }
   }
 
-  parts.push(...buildDoorHardware(config, rect, solidRegion(config, frame, rect), z));
+  parts.push(
+    ...buildDoorHardware(config, rect, solidRegion(config, frame, rect), leafFaces, panelRails(config, frame, rect)),
+  );
   return parts;
+}
+
+/**
+ * The horizontal rails between raised panels, as y-ranges. A letterplate
+ * belongs on one: drawn over the whole leaf, it ended up buried behind the
+ * lower panel.
+ */
+function panelRails(config: DoorConfigState, frame: Sightlines, rect: Rect): Array<{ y: Mm; height: Mm }> {
+  if (config.style.id === 'full-glazed') return [];
+  const detail = config.style.options.panelDetail;
+  if (detail.kind !== 'raised') return [];
+  const solidHeight =
+    config.style.id === 'half-glazed' ? rect.height * (1 - config.style.options.glazedFraction) : rect.height;
+  const margin = frame.doorLeafEdge;
+  const field = inset({ ...rect, height: solidHeight }, margin);
+  const rows = distribute(field.height, Array.from({ length: detail.panels }, () => 1), margin);
+  const rails: Array<{ y: Mm; height: Mm }> = [];
+  for (let index = 1; index < rows.length; index += 1) {
+    const below = rows[index - 1];
+    if (below === undefined) continue;
+    rails.push({ y: field.y + below.offset + below.size, height: margin });
+  }
+  return rails;
 }
 
 /**
@@ -303,35 +433,51 @@ function buildPanelDetail(
   detail: PanelDetail,
   rect: Rect,
   frame: Sightlines,
-  faceZ: Mm,
+  /** The leaf's external and internal face planes. */
+  faces: { external: Mm; internal: Mm },
 ): Part[] {
   const margin = frame.doorLeafEdge;
   const field = inset(rect, margin);
   if (field.width <= 0 || field.height <= 0) return [];
 
+  // Moulded door skins carry the detail on BOTH faces. Drawing it on the
+  // outside only left the inside of every panelled door blank.
+  const onBothFaces = (id: string, area: Rect, depth: Mm, overlap: Mm, shape: PartShape): Part[] => [
+    {
+      ...box(id, 'panel', area, faces.external + depth / 2 - overlap, depth),
+      shape,
+      facing: 'external',
+    },
+    {
+      ...box(`${id}-inside`, 'panel', area, faces.internal - depth / 2 + overlap, depth),
+      shape,
+      facing: 'internal',
+    },
+  ];
+
   switch (detail.kind) {
     case 'flush':
       return [];
     case 'raised': {
-      // Panels stand PROUD of the leaf face. Sitting them inside its thickness
-      // made them invisible, which is what a render showed and no unit test
-      // could have.
+      // Panels stand PROUD of the leaf face and carry the moulding profile, so
+      // their bevels catch light at a different angle from the field.
       const depth = 18;
       const rows = distribute(field.height, Array.from({ length: detail.panels }, () => 1), margin);
-      return rows.map((row, index) =>
-        box(
+      return rows.flatMap((row, index) =>
+        onBothFaces(
           `panel-${index}`,
-          'panel',
           { x: field.x, y: field.y + row.offset, width: field.width, height: row.size },
-          faceZ + depth / 2 - 4,
           depth,
+          4,
+          { kind: 'raised', profile: detail.moulding },
         ),
       );
     }
     case 'grooved': {
       // A routed groove is an absence, and a box cannot subtract one. The face
-      // is built instead as slabs standing proud with gaps between them, so
-      // the groove is the leaf showing through — which is what it is.
+      // is built as slabs with gaps between them; each slab's edges are
+      // chamfered, so a groove reads as the V it is cut as rather than as a
+      // shadow line that vanishes on a dark finish.
       const depth = 10;
       const horizontal = detail.orientation === 'horizontal';
       const slabs = distribute(
@@ -339,21 +485,94 @@ function buildPanelDetail(
         Array.from({ length: detail.grooves + 1 }, () => 1),
         detail.grooveWidth,
       );
-      return slabs.map((slab, index) => {
-        const slabRect: Rect = horizontal
-          ? { x: field.x, y: field.y + slab.offset, width: field.width, height: slab.size }
-          : { x: field.x + slab.offset, y: field.y, width: slab.size, height: field.height };
-        return box(`groove-slab-${index}`, 'panel', slabRect, faceZ + depth / 2 - 3, depth);
-      });
+      return slabs.flatMap((slab, index) =>
+        onBothFaces(
+          `groove-slab-${index}`,
+          horizontal
+            ? { x: field.x, y: field.y + slab.offset, width: field.width, height: slab.size }
+            : { x: field.x + slab.offset, y: field.y, width: slab.size, height: field.height },
+          depth,
+          3,
+          // Each slab edge is half of the routed V; together they make the
+          // groove. Scaled with the slab, the bevels read as boards instead.
+          { kind: 'raised', profile: 'chamfer', bevel: detail.grooveWidth / 2 },
+        ),
+      );
     }
   }
 }
+
+/**
+ * A handle set on one face of the leaf: rose or backplate, neck, and lever or
+ * knob. `out` is +1 on the external face and -1 on the internal one, so the
+ * same code builds both sides without anything ending up inside the leaf.
+ */
+function handleSet(
+  prefix: string,
+  style: 'lever-rose' | 'lever-backplate' | 'knob',
+  centreline: Mm,
+  height: Mm,
+  stile: Mm,
+  towardsHinge: 1 | -1,
+  face: Mm,
+  out: 1 | -1,
+  facing: 'external' | 'internal',
+): Part[] {
+  const at = (standoff: Mm, depth: Mm): Mm => face + out * (standoff + depth / 2);
+  const parts: Part[] = [];
+
+  if (style === 'lever-backplate') {
+    const width = Math.min(44, stile * 0.8);
+    parts.push({
+      ...box(`${prefix}-plate`, 'hardware', { x: centreline - width / 2, y: height - 110, width, height: 220 }, at(0, 8), 8),
+      facing,
+    });
+  } else {
+    parts.push({
+      ...box(`${prefix}-plate`, 'hardware', { x: centreline - 26, y: height - 26, width: 52, height: 52 }, at(0, 10), 10),
+      shape: { kind: 'cylinder', axis: 'z' },
+      facing,
+    });
+  }
+
+  // The neck carries the grip out from the plate.
+  parts.push({
+    ...box(`${prefix}-neck`, 'hardware', { x: centreline - 8, y: height - 8, width: 16, height: 16 }, at(8, 40), 40),
+    shape: { kind: 'cylinder', axis: 'z' },
+    facing,
+  });
+
+  if (style === 'knob') {
+    parts.push({
+      ...box(`${prefix}-knob`, 'hardware', { x: centreline - 28, y: height - 28, width: 56, height: 56 }, at(40, 48), 48),
+      shape: { kind: 'sphere' },
+      facing,
+    });
+  } else {
+    // UK levers point towards the hinge, so a hand pressing down clears the
+    // frame on the closing edge.
+    const length = 125;
+    const x = towardsHinge < 0 ? centreline - length + 9 : centreline - 9;
+    parts.push({
+      ...box(`${prefix}-lever`, 'hardware', { x, y: height - 9, width: length, height: 18 }, at(40, 18), 18),
+      shape: { kind: 'cylinder', axis: 'x' },
+      facing,
+    });
+  }
+  return parts;
+}
+
+/** Height of a letterplate's centre that suits posting and bending alike. */
+const LETTERPLATE_IDEAL = 900;
+/** How far a raised panel stands proud of the leaf face. Mirrors buildPanelDetail. */
+const PANEL_PROUD = 14;
 
 function buildDoorHardware(
   config: DoorConfigState,
   rect: Rect,
   solid: { area: Rect | null; stile: Mm },
-  z: Mm,
+  faces: { external: Mm; internal: Mm },
+  rails: Array<{ y: Mm; height: Mm }>,
 ): Part[] {
   const parts: Part[] = [];
 
@@ -364,44 +583,38 @@ function buildDoorHardware(
     config.hingeSide === 'left'
       ? rect.x + rect.width - solid.stile / 2
       : rect.x + solid.stile / 2;
-  const inward = config.hingeSide === 'left' ? -1 : 1;
+  const towardsHinge: 1 | -1 = config.hingeSide === 'left' ? -1 : 1;
 
   if (config.hardware.handle === 'pull-bar') {
+    // A bar on two stand-offs. Pull-bar doors are opened from inside with a
+    // lever, so the inside gets a backplate set rather than a second bar.
+    const length = rect.height * 0.5;
+    const bottom = rect.y + rect.height * 0.25;
+    const standoff = 58;
+    parts.push({
+      ...box('handle', 'hardware', { x: centreline - 16, y: bottom, width: 32, height: length }, faces.external + standoff + 16, 32),
+      shape: { kind: 'cylinder', axis: 'y' },
+      facing: 'external',
+    });
+    for (const [id, y] of [
+      ['handle-standoff-top', bottom + length - 60],
+      ['handle-standoff-bottom', bottom + 40],
+    ] as const) {
+      parts.push({
+        ...box(id, 'hardware', { x: centreline - 10, y: y - 10, width: 20, height: 20 }, faces.external + standoff / 2, standoff),
+        shape: { kind: 'cylinder', axis: 'z' },
+        facing: 'external',
+      });
+    }
     parts.push(
-      box(
-        'handle',
-        'hardware',
-        { x: centreline - 16, y: rect.y + rect.height * 0.25, width: 32, height: rect.height * 0.5 },
-        z + 40,
-        32,
-      ),
+      ...handleSet('handle-inside', 'lever-backplate', centreline, handleHeight, solid.stile, towardsHinge, faces.internal, -1, 'internal'),
     );
   } else {
-    const plate = config.hardware.handle === 'lever-backplate';
-    const plateWidth = Math.min(plate ? 60 : 52, solid.stile);
+    const style = config.hardware.handle;
+    parts.push(...handleSet('handle', style, centreline, handleHeight, solid.stile, towardsHinge, faces.external, 1, 'external'));
     parts.push(
-      box(
-        'handle-plate',
-        'hardware',
-        {
-          x: centreline - plateWidth / 2,
-          y: handleHeight - (plate ? 110 : 26),
-          width: plateWidth,
-          height: plate ? 220 : 52,
-        },
-        z + 6,
-        12,
-      ),
+      ...handleSet('handle-inside', style, centreline, handleHeight, solid.stile, towardsHinge, faces.internal, -1, 'internal'),
     );
-    if (config.hardware.handle === 'knob') {
-      parts.push(box('handle-knob', 'hardware', { x: centreline - 27, y: handleHeight - 27, width: 54, height: 54 }, z + 26, 54));
-    } else {
-      // The lever stands proud of the leaf face, so it may legitimately
-      // overhang glazing — that is how a real lever on a glazed door looks.
-      const lever = 110;
-      const x = inward < 0 ? centreline - lever : centreline;
-      parts.push(box('handle-lever', 'hardware', { x, y: handleHeight - 9, width: lever, height: 18 }, z + 26, 18));
-    }
   }
 
   // Everything else needs somewhere solid to be fixed to. A fully glazed leaf
@@ -412,13 +625,54 @@ function buildDoorHardware(
 
   const centre = area.x + area.width / 2;
   if (config.hardware.letterplate) {
-    parts.push(box('letterplate', 'hardware', { x: centre - 150, y: area.y + area.height * 0.35, width: 300, height: 78 }, z + 5, 10));
+    const plateHeight = 78;
+    // On the rail closest to a comfortable height, if there is one it fits on;
+    // otherwise on the face, standing clear of any panel it crosses.
+    const rail = rails
+      .filter((r) => r.height >= plateHeight)
+      .sort((a, b) => Math.abs(a.y + a.height / 2 - LETTERPLATE_IDEAL) - Math.abs(b.y + b.height / 2 - LETTERPLATE_IDEAL))[0];
+    const y = rail ? rail.y + (rail.height - plateHeight) / 2 : area.y + area.height * 0.35;
+    const standoff = rail || config.style.id === 'full-glazed' ? 0 : PANEL_PROUD;
+    // A chamfered plate with a flap standing on it: flat slabs of brass read
+    // as a sticker, because a flat metal face only reflects one thing.
+    const plateFront = faces.external + standoff + 10;
+    parts.push({
+      ...box('letterplate', 'hardware', { x: centre - 150, y, width: 300, height: plateHeight }, plateFront - 5, 10),
+      shape: { kind: 'raised', profile: 'chamfer', bevel: 5 },
+      facing: 'external',
+    });
+    parts.push({
+      ...box('letterplate-flap', 'hardware', { x: centre - 124, y: y + 17, width: 248, height: plateHeight - 34 }, plateFront + 2, 4),
+      shape: { kind: 'raised', profile: 'square' },
+      facing: 'external',
+    });
+    // Internal tidy: a larger, flatter cover over the aperture.
+    parts.push({
+      ...box('letterplate-inside', 'hardware', { x: centre - 165, y: y - 11, width: 330, height: 100 }, faces.internal - 3, 6),
+      facing: 'internal',
+    });
   }
   if (config.hardware.knocker !== null) {
-    parts.push(box('knocker', 'hardware', { x: centre - 55, y: area.y + area.height * 0.78, width: 110, height: 110 }, z + 8, 16));
+    // A lathed ring hanging from a boss — the parametric forms promised for
+    // the knocker, rather than a square slab.
+    const ringTop = area.y + area.height * 0.78 + 110;
+    parts.push({
+      ...box('knocker', 'hardware', { x: centre - 55, y: ringTop - 110, width: 110, height: 110 }, faces.external + 14, 16),
+      shape: { kind: 'torus' },
+      facing: 'external',
+    });
+    parts.push({
+      ...box('knocker-boss', 'hardware', { x: centre - 17, y: ringTop - 17, width: 34, height: 34 }, faces.external + 11, 22),
+      shape: { kind: 'cylinder', axis: 'z' },
+      facing: 'external',
+    });
   }
   if (config.hardware.spyhole) {
-    parts.push(box('spyhole', 'hardware', { x: centre - 12, y: area.y + area.height * 0.93, width: 24, height: 24 }, z + 4, 8));
+    parts.push({
+      ...box('spyhole', 'hardware', { x: centre - 14, y: area.y + area.height * 0.93, width: 28, height: 28 }, faces.external + 4, 8),
+      shape: { kind: 'cylinder', axis: 'z' },
+      facing: 'external',
+    });
   }
   return parts;
 }
@@ -463,6 +717,7 @@ export function windowCellRects(config: WindowConfigState): Rect[] {
 }
 
 function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
+  const cavities: 1 | 2 = config.glazing.unit === 'triple' ? 2 : 1;
   const { width, height } = config.dimensions;
   const left = -width / 2;
   const parts: Part[] = [];
@@ -515,11 +770,22 @@ function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
         if (cell === undefined) return;
 
         if (cell.opening === 'fixed') {
-          parts.push(...glazedArea(`cell-${index}`, cellRect, cell.bars, z, frame));
+          parts.push(...glazedArea(`cell-${index}`, cellRect, cell.bars, z, frame, cavities));
         } else {
-          parts.push(...frameMembers(`sash-${index}`, 'sash', cellRect, frame.sash, z + 12, frame.sashDepth));
-          parts.push(...glazedArea(`cell-${index}`, inset(cellRect, frame.sash), cell.bars, z + 12, frame));
-          parts.push(...buildWindowHandle(config, cell.opening, inset(cellRect, frame.sash), index, z));
+          // The sash stands a clearance in from the cell all round, and the
+          // clearance holds its weatherseal — the same dark line that tells a
+          // leaf from its frame. Flush to the cell, the sash's edge rendered
+          // as broken fragments of line, or not at all. The glass is not
+          // moved: the sash member is narrower by the clearance instead.
+          const sashFront = z + 12 + frame.sashDepth / 2;
+          parts.push(...frameMembers(`sash-${index}`, 'sash', inset(cellRect, SASH_CLEARANCE), frame.sash - SASH_CLEARANCE, z + 12, frame.sashDepth));
+          parts.push(...frameMembers(`sash-${index}-seal`, 'seal', cellRect, SASH_CLEARANCE, sashFront - 3 - 6, 12));
+          parts.push(...glazedArea(`cell-${index}`, inset(cellRect, frame.sash), cell.bars, z + 12, frame, cavities));
+          // Handles are fitted on the INSIDE of the sash; from outside they are
+          // seen through the glass, if at all.
+          parts.push(
+            ...buildWindowHandle(config, cell.opening, inset(cellRect, frame.sash), index, z + 12 - frame.sashDepth / 2),
+          );
         }
       });
       break;
@@ -531,9 +797,9 @@ function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
       const upper: Rect = { x: opening.x, y: railY, width: opening.width, height: opening.y + opening.height - railY };
 
       parts.push(...frameMembers('sash-upper', 'sash', upper, frame.sash, z + 6, frame.sashDepth));
-      parts.push(...glazedArea('sash-upper', inset(upper, frame.sash), options.upperBars, z + 6, frame));
+      parts.push(...glazedArea('sash-upper', inset(upper, frame.sash), options.upperBars, z + 6, frame, cavities));
       parts.push(...frameMembers('sash-lower', 'sash', lower, frame.sash, z + 24, frame.sashDepth));
-      parts.push(...glazedArea('sash-lower', inset(lower, frame.sash), options.lowerBars, z + 24, frame));
+      parts.push(...glazedArea('sash-lower', inset(lower, frame.sash), options.lowerBars, z + 24, frame, cavities));
 
       if (options.horns) {
         const hornHeight = frame.sash * 1.4;
@@ -547,7 +813,7 @@ function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
       break;
     }
     case 'fixed':
-      parts.push(...glazedArea('fixed', opening, config.style.options.bars, z, frame));
+      parts.push(...glazedArea('fixed', opening, config.style.options.bars, z, frame, cavities));
       break;
   }
 
@@ -560,19 +826,18 @@ function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
     const spread = distribute(opening.width, Array.from({ length: config.trickleVents.count }, () => 1), 0);
     spread.forEach((slot, index) => {
       const width = Math.min(ventWidth, slot.size * 0.8);
+      const x = opening.x + slot.offset + slot.size / 2 - width / 2;
+      const front = z + frame.frameDepth / 2;
+      // A moulded housing in the frame colour, as fitted, with a dark slot
+      // along it. Drawn as one black bar in the hardware finish, it read as a
+      // hole in the frame.
+      parts.push({
+        ...box(`vent-${index}`, 'vent', { x, y: headCentre - ventHeight / 2, width, height: ventHeight }, front + 5, 10),
+        shape: { kind: 'raised', profile: 'chamfer', bevel: 4 },
+        facing: 'external',
+      });
       parts.push(
-        box(
-          `vent-${index}`,
-          'hardware',
-          {
-            x: opening.x + slot.offset + slot.size / 2 - width / 2,
-            y: headCentre - ventHeight / 2,
-            width,
-            height: ventHeight,
-          },
-          z + frame.frameDepth / 2 + 2,
-          10,
-        ),
+        box(`ventslot-${index}`, 'seal', { x: x + 14, y: headCentre - 2, width: width - 28, height: 4 }, front + 9.5, 2),
       );
     });
   }
@@ -640,24 +905,30 @@ function buildWindowHandle(
   };
 
   const parts: Part[] = [
-    box(
-      `handle-${index}-plate`,
-      'hardware',
-      fit({ x: plateX, y: y - plate / 2, width: plate, height: plate }),
-      z + 22,
-      12,
-    ),
+    {
+      ...box(
+        `handle-${index}-plate`,
+        'hardware',
+        fit({ x: plateX, y: y - plate / 2, width: plate, height: plate }),
+        // `z` is the sash's internal face; the plate sits on it, facing in.
+        z - 5,
+        10,
+      ),
+      facing: 'internal',
+    },
   ];
   if (config.hardware.handle !== 'knob') {
-    parts.push(
-      box(
-        `handle-${index}-lever`,
-        'hardware',
-        fit({ x: leverX, y: y - 9, width: lever, height: 18 }),
-        z + 34,
-        18,
-      ),
-    );
+    parts.push({
+      ...box(`handle-${index}-lever`, 'hardware', fit({ x: leverX, y: y - 9, width: lever, height: 18 }), z - 28, 18),
+      shape: { kind: 'cylinder', axis: 'x' },
+      facing: 'internal',
+    });
+  } else {
+    parts.push({
+      ...box(`handle-${index}-knob`, 'hardware', fit({ x: plateX + plate / 2 - 20, y: y - 20, width: 40, height: 40 }), z - 26, 36),
+      shape: { kind: 'sphere' },
+      facing: 'internal',
+    });
   }
   return parts;
 }

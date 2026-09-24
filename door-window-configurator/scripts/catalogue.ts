@@ -8,7 +8,7 @@ import { colourToHex } from '../src/viewer/materials';
 import { encodeConfig } from '../src/config/url';
 import { formatSize } from '../src/config/units';
 
-const FILLS: Record<string, string> = { glazing: '#cfd8dc', hardware: '#9aa0a6' };
+const FILLS: Record<string, string> = { glazing: '#cfd8dc', hardware: '#9aa0a6', seal: '#141516', spacer: '#3a3c3e' };
 
 function svg(config: ConfigState): string {
   const model = buildProduct(config);

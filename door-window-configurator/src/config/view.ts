@@ -15,6 +15,15 @@
 export type CameraPreset = 'elevation' | 'three-quarter' | 'hardware';
 
 /**
+ * What the product is shown against. View state only: like orbit position and
+ * the scale figure, it is not part of the configuration and does not travel in
+ * a shared link (decision 14). Two people looking at the same link are looking
+ * at the same product, whatever backdrop each prefers.
+ */
+export type SceneMode = 'studio' | 'wall';
+export type WallFinish = 'render' | 'brick';
+
+/**
  * Elevation, not three-quarter (Step 2.6). Alignment, proportion and sightline
  * balance can only be judged square-on; a three-quarter opener flatters the
  * product and hides exactly what a customer needs to check first.

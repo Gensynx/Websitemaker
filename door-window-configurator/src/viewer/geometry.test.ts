@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { buildProduct, distribute, windowLightRects } from './geometry';
+import { buildProduct, distribute, LEAF_CLEARANCE, windowLightRects } from './geometry';
 import type { Part } from './geometry';
 import { DEFAULT_DOOR, DEFAULT_WINDOW, makeGrid } from '../config/defaults';
 import type { DoorConfigState, WindowConfigState } from '../config/types';
@@ -68,9 +68,11 @@ describe('the door leaf agrees with validation', () => {
     };
     const leaf = part(buildProduct(door).parts, 'leaf');
     // One layout module feeds validation, the safety assessment and the
-    // geometry. These three agreeing is the point of that refactor.
-    expect(leaf.size[0]).toBeCloseTo(doorLeafWidth(door), 6);
-    expect(leaf.size[1]).toBeCloseTo(doorLeafHeight(door), 6);
+    // geometry. These agreeing is the point of that refactor. The drawn leaf
+    // is the layout's leaf opening less a NAMED clearance — sides and head,
+    // not the foot — rather than a second derivation of its own.
+    expect(leaf.size[0]).toBeCloseTo(doorLeafWidth(door) - LEAF_CLEARANCE * 2, 6);
+    expect(leaf.size[1]).toBeCloseTo(doorLeafHeight(door) - LEAF_CLEARANCE, 6);
   });
 
   it('narrows the leaf by the side light plus its mullion', () => {
@@ -169,35 +171,121 @@ describe('glazing bars', () => {
   });
 });
 
-describe('panel detail stands proud of the leaf face', () => {
-  it('puts raised panels outside the leaf, not buried in it', () => {
+describe('panel detail stands proud of the leaf, on both faces', () => {
+  const external = (p: Part) => p.facing !== 'internal';
+  const internal = (p: Part) => p.facing === 'internal';
+
+  it('puts raised panels outside the leaf on each face, never buried in it', () => {
     const model = buildProduct({
       ...DEFAULT_DOOR,
       style: { id: 'solid-panel', options: { panelDetail: { kind: 'raised', panels: 2, moulding: 'ovolo' } } },
     } satisfies DoorConfigState);
 
     const leaf = part(model.parts, 'leaf');
-    const leafFaceZ = leaf.position[2] + leaf.size[2] / 2;
+    const outsideFace = leaf.position[2] + leaf.size[2] / 2;
+    const insideFace = leaf.position[2] - leaf.size[2] / 2;
     const panels = model.parts.filter((p) => p.id.startsWith('panel-'));
-    expect(panels).toHaveLength(2);
 
-    for (const panel of panels) {
-      const panelFaceZ = panel.position[2] + panel.size[2] / 2;
-      // Regression: panels used to sit inside the leaf's thickness and were
-      // invisible in the render while every unit test passed.
-      expect(panelFaceZ, panel.id).toBeGreaterThan(leafFaceZ);
+    // Regression: panels once sat inside the leaf's thickness and were
+    // invisible in the render while every unit test passed. They now appear
+    // on BOTH faces, because moulded door skins carry the detail both sides.
+    expect(panels.filter(external)).toHaveLength(2);
+    expect(panels.filter(internal)).toHaveLength(2);
+    for (const panel of panels.filter(external)) {
+      expect(panel.position[2] + panel.size[2] / 2, panel.id).toBeGreaterThan(outsideFace);
+    }
+    for (const panel of panels.filter(internal)) {
+      expect(panel.position[2] - panel.size[2] / 2, panel.id).toBeLessThan(insideFace);
     }
   });
 
-  it('builds a grooved face as slabs with gaps, one more slab than grooves', () => {
-    const model = buildProduct({
+  it('carries the moulding profile, so the bevel has something to catch light with', () => {
+    for (const moulding of ['ovolo', 'chamfer', 'square'] as const) {
+      const panels = buildProduct({
+        ...DEFAULT_DOOR,
+        style: { id: 'solid-panel', options: { panelDetail: { kind: 'raised', panels: 1, moulding } } },
+      } satisfies DoorConfigState).parts.filter((p) => p.kind === 'panel');
+      for (const panel of panels) expect(panel.shape, panel.id).toEqual({ kind: 'raised', profile: moulding });
+    }
+  });
+
+  it('cuts grooves as a V: each slab edge is half the groove width', () => {
+    const slabs = buildProduct({
+      ...DEFAULT_DOOR,
+      style: {
+        id: 'solid-panel',
+        options: { panelDetail: { kind: 'grooved', grooves: 3, grooveWidth: 18, orientation: 'horizontal' } },
+      },
+    } satisfies DoorConfigState).parts.filter((p) => p.id.startsWith('groove-slab-'));
+    for (const slab of slabs) {
+      expect(slab.shape, slab.id).toEqual({ kind: 'raised', profile: 'chamfer', bevel: 9 });
+    }
+  });
+
+  it('builds a grooved face as slabs with gaps, one more slab than grooves, each side', () => {
+    const slabs = buildProduct({
       ...DEFAULT_DOOR,
       style: {
         id: 'solid-panel',
         options: { panelDetail: { kind: 'grooved', grooves: 4, grooveWidth: 18, orientation: 'horizontal' } },
       },
-    } satisfies DoorConfigState);
-    expect(model.parts.filter((p) => p.id.startsWith('groove-slab-'))).toHaveLength(5);
+    } satisfies DoorConfigState).parts.filter((p) => p.id.startsWith('groove-slab-'));
+    expect(slabs.filter(external)).toHaveLength(5);
+    expect(slabs.filter(internal)).toHaveLength(5);
+  });
+});
+
+describe('furniture stands on the face it is fixed to', () => {
+  /**
+   * Regression. Door hardware was positioned from the leaf's CENTRE with
+   * offsets written as if it were the FACE, so the plate spanned 35-47 mm and
+   * the lever 52-70 mm inside a leaf spanning 0-70 mm. It was visible only on
+   * glazed doors, and only because it could be seen through the glass.
+   */
+  const handles = ['lever-rose', 'lever-backplate', 'knob', 'pull-bar'] as const;
+
+  for (const handle of handles) {
+    it(`keeps every ${handle} part clear of the leaf`, () => {
+      const model = buildProduct({
+        ...DEFAULT_DOOR,
+        hardware: { ...DEFAULT_DOOR.hardware, handle, letterplate: true, spyhole: true, knocker: 'ring' },
+      } satisfies DoorConfigState);
+      const leaf = part(model.parts, 'leaf');
+      const outsideFace = leaf.position[2] + leaf.size[2] / 2;
+      const insideFace = leaf.position[2] - leaf.size[2] / 2;
+
+      const hardware = model.parts.filter((p) => p.kind === 'hardware');
+      expect(hardware.length).toBeGreaterThan(3);
+      for (const piece of hardware) {
+        const back = piece.position[2] - piece.size[2] / 2;
+        const front = piece.position[2] + piece.size[2] / 2;
+        if (piece.facing === 'internal') {
+          expect(front, `${piece.id} sinks into the leaf from inside`).toBeLessThanOrEqual(insideFace + 1e-6);
+        } else {
+          expect(back, `${piece.id} sinks into the leaf from outside`).toBeGreaterThanOrEqual(outsideFace - 1e-6);
+        }
+      }
+    });
+  }
+
+  it('puts a handle on both sides of the door', () => {
+    const parts = buildProduct(DEFAULT_DOOR).parts.filter((p) => p.id.startsWith('handle'));
+    expect(parts.some((p) => p.facing === 'external')).toBe(true);
+    expect(parts.some((p) => p.facing === 'internal')).toBe(true);
+  });
+
+  it('fits window handles on the inside of the sash', () => {
+    const grid = makeGrid(1, 1);
+    grid.cells[0] = { opening: 'side-hung-left', bars: NO_BARS, safety: null };
+    const parts = buildProduct({ ...DEFAULT_WINDOW, style: { id: 'casement', options: { grid } } } satisfies WindowConfigState).parts;
+    const handle = parts.filter((p) => p.id.startsWith('handle-0'));
+    const sash = parts.filter((p) => p.id.startsWith('sash-0'));
+    const sashInsideFace = Math.min(...sash.map((p) => p.position[2] - p.size[2] / 2));
+    expect(handle.length).toBeGreaterThan(0);
+    for (const piece of handle) {
+      expect(piece.facing, piece.id).toBe('internal');
+      expect(piece.position[2] + piece.size[2] / 2, piece.id).toBeLessThanOrEqual(sashInsideFace + 1e-6);
+    }
   });
 });
 
@@ -355,6 +443,64 @@ describe('trickle vents', () => {
       // Regression: vents were drawn across the top of the glazing.
       expect(vent.position[1] - vent.size[1] / 2, vent.id).toBeGreaterThanOrEqual(topOfGlazing - 1e-6);
     }
+  });
+});
+
+describe('the leaf sits in its frame as a real one does', () => {
+  it('is flush with the frame face, not standing proud of it', () => {
+    // Regression: the leaf stood 35 mm proud, which a raking light turned
+    // into a shadow line down the whole closing edge.
+    const parts = buildProduct(DEFAULT_DOOR).parts;
+    const leaf = part(parts, 'leaf');
+    const frame = part(parts, 'frame-left');
+    expect(leaf.position[2] + leaf.size[2] / 2).toBeCloseTo(frame.position[2] + frame.size[2] / 2, 6);
+  });
+
+  it('leaves a clearance gap at the sides, so frame and leaf read apart', () => {
+    const parts = buildProduct(DEFAULT_DOOR).parts;
+    const leaf = part(parts, 'leaf');
+    const frame = part(parts, 'frame-left');
+    const frameInner = frame.position[0] + frame.size[0] / 2;
+    const leafOuter = leaf.position[0] - leaf.size[0] / 2;
+    expect(leafOuter - frameInner).toBeCloseTo(LEAF_CLEARANCE, 6);
+  });
+});
+
+describe('the letterplate is never buried behind a panel', () => {
+  // Regression: drawn at 35% of the leaf regardless of the panelling, the
+  // letterplate sat behind the lower raised panel and could not be seen.
+  const overlaps = (a: Part, b: Part) =>
+    Math.min(a.position[0] + a.size[0] / 2, b.position[0] + b.size[0] / 2) >
+      Math.max(a.position[0] - a.size[0] / 2, b.position[0] - b.size[0] / 2) &&
+    Math.min(a.position[1] + a.size[1] / 2, b.position[1] + b.size[1] / 2) >
+      Math.max(a.position[1] - a.size[1] / 2, b.position[1] - b.size[1] / 2);
+
+  for (const panels of [1, 2, 3, 4] as const) {
+    it(`${panels} raised panel${panels > 1 ? 's' : ''}: on a rail, or standing in front of the panel`, () => {
+      const parts = buildProduct({
+        ...DEFAULT_DOOR,
+        hardware: { ...DEFAULT_DOOR.hardware, letterplate: true },
+        style: { id: 'solid-panel', options: { panelDetail: { kind: 'raised', panels, moulding: 'ovolo' } } },
+      } satisfies DoorConfigState).parts;
+      const plate = part(parts, 'letterplate');
+      const front = (p: Part) => p.position[2] + p.size[2] / 2;
+      for (const panel of parts.filter((p) => p.kind === 'panel' && p.facing !== 'internal')) {
+        if (overlaps(plate, panel)) {
+          expect(plate.position[2] - plate.size[2] / 2, `${plate.id} behind ${panel.id}`).toBeGreaterThanOrEqual(front(panel) - 1e-6);
+        }
+      }
+    });
+  }
+
+  it('goes on the mid-rail of a two-panel door', () => {
+    const parts = buildProduct({
+      ...DEFAULT_DOOR,
+      hardware: { ...DEFAULT_DOOR.hardware, letterplate: true },
+      style: { id: 'solid-panel', options: { panelDetail: { kind: 'raised', panels: 2, moulding: 'ovolo' } } },
+    } satisfies DoorConfigState).parts;
+    const plate = part(parts, 'letterplate');
+    const panels = parts.filter((p) => p.kind === 'panel' && p.facing !== 'internal');
+    for (const panel of panels) expect(overlaps(plate, panel), panel.id).toBe(false);
   });
 });
 

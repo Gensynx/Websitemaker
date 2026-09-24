@@ -1,19 +1,27 @@
 /**
- * Application shell for Step 2.
+ * Application shell.
  *
- * The 3D bundle is lazy: first paint shows the shell and the dimension
- * readout, and never waits on WebGL. Where WebGL is absent the SVG elevation
- * takes its place, drawn from the same parametric part list.
+ * The product is the hero: the canvas fills the viewport, and the interface
+ * sits over it — title top-left, view controls along the bottom, and the
+ * configuration panel on the right (a bottom sheet on a phone, Step 4.3). The
+ * panel is frosted glass over the canvas with an opaque fallback, and its text
+ * holds 4.5:1 contrast whatever is rendered behind it (Step 4.1).
  *
- * The configuration panel is Step 4 and the sizing controls are Step 3, so
- * neither is here. Until Step 3 lands, dimensions come from the URL or from
- * the last session.
+ * The 3D bundle is lazy. First paint shows an SVG elevation drawn from the
+ * same part list — dimensionally exact, not a placeholder — and the 3D view
+ * fades in over it once its first real frame is ready. Where WebGL is
+ * unavailable, the elevation simply stays.
+ *
+ * Only the Size section of the panel exists. Style, Colour, Glazing and
+ * Hardware are Steps 4-7 and are not built; the panel does not pretend they are.
  */
 
-import { lazy, Suspense, useDeferredValue, useMemo, useState } from 'react';
+import { lazy, Suspense, useDeferredValue, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { useConfigurator } from './state/store';
 import { StaticElevation } from './viewer/StaticElevation';
 import { SizePanel } from './ui/SizePanel';
+import { Segmented } from './ui/Segmented';
+import { useInsets } from './ui/useInsets';
 import { renderBlockers } from './config/validate';
 import { formatSize } from './config/units';
 import type { CameraPreset } from './config/view';
@@ -29,97 +37,112 @@ const PRESETS: Array<{ id: CameraPreset; label: string }> = [
 function hasWebGL(): boolean {
   try {
     const canvas = document.createElement('canvas');
-    return Boolean(
-      window.WebGLRenderingContext && (canvas.getContext('webgl') ?? canvas.getContext('experimental-webgl')),
-    );
+    return Boolean(window.WebGLRenderingContext && (canvas.getContext('webgl2') ?? canvas.getContext('webgl')));
   } catch {
     return false;
   }
 }
 
+const NARROW = '(max-width: 899px)';
+function useIsNarrow(): boolean {
+  return useSyncExternalStore(
+    (notify) => {
+      const query = window.matchMedia(NARROW);
+      query.addEventListener('change', notify);
+      return () => query.removeEventListener('change', notify);
+    },
+    () => window.matchMedia(NARROW).matches,
+    () => false,
+  );
+}
+
 export function App(): JSX.Element {
   const config = useConfigurator((state) => state.config);
-  const setProductType = useConfigurator((state) => state.setProductType);
   const lastValid = useConfigurator((state) => state.lastValid);
   const validation = useConfigurator((state) => state.validation);
   const notices = useConfigurator((state) => state.notices);
   const camera = useConfigurator((state) => state.camera);
   const showSilhouette = useConfigurator((state) => state.showSilhouette);
+  const scene = useConfigurator((state) => state.scene);
+  const wallFinish = useConfigurator((state) => state.wallFinish);
   const setCamera = useConfigurator((state) => state.setCamera);
   const resetView = useConfigurator((state) => state.resetView);
   const toggleSilhouette = useConfigurator((state) => state.toggleSilhouette);
+  const setProductType = useConfigurator((state) => state.setProductType);
+  const setScene = useConfigurator((state) => state.setScene);
+  const setWallFinish = useConfigurator((state) => state.setWallFinish);
 
-  // A preset can be re-selected to recentre after an orbit, so the rig needs a
-  // change it can see even when the preset itself has not changed.
   const [presetToken, setPresetToken] = useState(0);
+  const [ready, setReady] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const webgl = useMemo(hasWebGL, []);
+  const narrow = useIsNarrow();
 
   // Step 3.4: an unmanufacturable size never renders. Only errors that block
   // the RENDER fall back — an unavailable material or an explore colour leaves
   // the product on screen, because its shape is not what is wrong with it.
   const blockers = renderBlockers(validation);
   const rendered = blockers.length === 0 ? config : lastValid;
-
-  // Throttles the viewer during continuous dimension input (performance
-  // budget). The panel stays responsive on every keystroke while the scene
-  // rebuilds at a lower priority and catches up, rather than rebuilding the
-  // geometry and materials once per character.
+  // Keeps the panel responsive on every keystroke while the scene rebuilds at
+  // lower priority (performance budget: throttle during continuous input).
   const deferred = useDeferredValue(rendered);
 
-  return (
-    <div className="app">
-      <header className="app__header">
-        <p className="eyebrow">Configurator</p>
-        <h1>{config.productType === 'door' ? 'External door' : 'Window'}</h1>
-        <p className="lede" aria-live="polite">
-          {formatSize(config.dimensions.width, config.dimensions.height)}
-        </p>
-      </header>
+  const stageRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLElement>(null);
+  const viewbarRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const insets = useInsets(
+    { stage: stageRef, title: titleRef, viewbar: viewbarRef, panel: panelRef },
+    `${narrow}-${sheetOpen}-${validation.errors.length}-${notices.length}`,
+  );
 
-      <main className="stage">
-        {webgl ? (
-          // Absolutely filled rather than relying on a percentage height: the
-          // canvas measures its parent, and a flex item's height is not a
-          // definite containing block for one.
-          <div className="stage__canvas">
-            <Suspense fallback={<div className="stage__placeholder">Preparing the 3D view…</div>}>
+  const panelOpen = !narrow || sheetOpen;
+  const productName = config.productType === 'door' ? 'External door' : 'Window';
+  const orderIssues = validation.errors.filter((error) => error.field !== 'width' && error.field !== 'height');
+
+  return (
+    <div className="shell" data-scene={scene}>
+      <main className="stage" ref={stageRef} aria-label="Product preview">
+        <div
+          className="stage__poster"
+          data-hidden={webgl && ready}
+          style={{ padding: `${insets.top}px ${insets.right}px ${insets.bottom}px ${insets.left}px` }}
+          aria-hidden={webgl && ready}
+        >
+          <StaticElevation config={deferred} caption={!webgl} />
+        </div>
+
+        {webgl && (
+          <div className="stage__canvas" data-ready={ready}>
+            <Suspense fallback={null}>
               <Viewer
                 config={deferred}
                 camera={camera}
                 presetToken={presetToken}
                 showSilhouette={showSilhouette}
+                scene={scene}
+                wallFinish={wallFinish}
+                insets={insets}
+                onReady={() => setReady(true)}
               />
             </Suspense>
           </div>
-        ) : (
-          <StaticElevation config={deferred} />
         )}
 
-        <div className="controls controls--product" role="group" aria-label="Product">
-          <button
-            type="button"
-            className="control"
-            aria-pressed={config.productType === 'door'}
-            onClick={() => setProductType('door')}
-          >
-            Door
-          </button>
-          <button
-            type="button"
-            className="control"
-            aria-pressed={config.productType === 'window'}
-            onClick={() => setProductType('window')}
-          >
-            Window
-          </button>
-        </div>
+        <header className="title" ref={titleRef}>
+          <p className="eyebrow">Configurator</p>
+          <h1>{productName}</h1>
+          <p className="lede" aria-live="polite">
+            {formatSize(config.dimensions.width, config.dimensions.height)}
+          </p>
+        </header>
 
-        <div className="controls" role="group" aria-label="View controls">
+        <div className="viewbar" ref={viewbarRef} role="group" aria-label="View">
           {PRESETS.map((preset) => (
             <button
               key={preset.id}
               type="button"
-              className="control"
+              className="viewbar__button"
               aria-pressed={camera === preset.id}
               onClick={() => {
                 setCamera(preset.id);
@@ -129,9 +152,10 @@ export function App(): JSX.Element {
               {preset.label}
             </button>
           ))}
+          <span className="viewbar__rule" aria-hidden="true" />
           <button
             type="button"
-            className="control"
+            className="viewbar__button"
             onClick={() => {
               resetView();
               setPresetToken((token) => token + 1);
@@ -139,52 +163,104 @@ export function App(): JSX.Element {
           >
             Reset view
           </button>
-          <button
-            type="button"
-            className="control"
-            aria-pressed={showSilhouette}
-            onClick={toggleSilhouette}
-          >
+          <button type="button" className="viewbar__button" aria-pressed={showSilhouette} onClick={toggleSilhouette}>
             Scale figure
           </button>
         </div>
       </main>
 
-      <SizePanel />
+      <aside className="panel" ref={panelRef} aria-label="Configure" data-open={panelOpen}>
+        {narrow && (
+          <button
+            type="button"
+            className="panel__toggle"
+            aria-expanded={sheetOpen}
+            aria-controls="panel-body"
+            onClick={() => setSheetOpen((open) => !open)}
+          >
+            <span className="panel__grip" aria-hidden="true" />
+            <span className="panel__toggle-text">
+              <span className="panel__toggle-title">Configure</span>
+              <span className="panel__toggle-summary">
+                {productName} · {formatSize(config.dimensions.width, config.dimensions.height)}
+              </span>
+            </span>
+            <span className="panel__chevron" aria-hidden="true" />
+          </button>
+        )}
 
-      {/* Reasons that belong to a specific input are shown against that input.
-          What is left here is everything else, plus the statement of what the
-          viewer is actually showing. */}
-      {validation.errors.length > 0 && (
-        <div className="messages messages--blocking" role="alert">
-          {validation.errors
-            .filter((error) => error.field !== 'width' && error.field !== 'height')
-            .map((error) => (
-              <p key={`${error.field}-${error.message}`}>{error.message}</p>
-            ))}
+        <div className="panel__body" id="panel-body" hidden={!panelOpen}>
+          <section className="section">
+            <Segmented
+              legend="Product"
+              value={config.productType}
+              options={[
+                { value: 'door', label: 'Door' },
+                { value: 'window', label: 'Window' },
+              ]}
+              onChange={setProductType}
+            />
+          </section>
+
+          <SizePanel />
+
+          {orderIssues.length > 0 && (
+            <div className="messages messages--blocking" role="alert">
+              {orderIssues.map((error) => (
+                <p key={`${error.field}-${error.message}`}>{error.message}</p>
+              ))}
+            </div>
+          )}
           {blockers.length > 0 && (
-            <p className="messages__note">
+            <p className="messages messages--note" role="status">
               This size cannot be made, so the drawing still shows{' '}
               {formatSize(lastValid.dimensions.width, lastValid.dimensions.height)}.
             </p>
           )}
-        </div>
-      )}
+          {notices.length > 0 && (
+            <div className="messages" role="status">
+              {notices.map((notice) => (
+                <p key={`${notice.field}-${notice.message}`}>{notice.message}</p>
+              ))}
+            </div>
+          )}
 
-      {notices.length > 0 && (
-        <div className="messages" role="status">
-          {notices.map((notice) => (
-            <p key={`${notice.field}-${notice.message}`}>{notice.message}</p>
-          ))}
+          <section className="section section--quiet">
+            <h2 className="section__title">Setting</h2>
+            <Segmented
+              legend="Show the product"
+              hideLegend
+              value={scene}
+              options={[
+                { value: 'studio', label: 'Studio' },
+                { value: 'wall', label: 'In a wall' },
+              ]}
+              onChange={setScene}
+            />
+            {scene === 'wall' && (
+              <Segmented
+                legend="Wall"
+                value={wallFinish}
+                options={[
+                  { value: 'brick', label: 'Brick' },
+                  { value: 'render', label: 'Render' },
+                ]}
+                onChange={setWallFinish}
+              />
+            )}
+            <p className="section__hint">
+              {scene === 'wall' && config.productType === 'window'
+                ? 'Shown at a nominal 900 mm cill. The setting changes the picture, never the order.'
+                : 'The setting changes the picture, never the order.'}
+            </p>
+          </section>
         </div>
-      )}
 
-      <footer className="app__footer">
-        <p>
-          On-screen colours, finishes and obscure glass patterns are indicative only. Confirm
-          against a physical sample before ordering.
+        <p className="panel__note">
+          On-screen colours, finishes and obscure glass patterns are indicative only. Confirm against a physical
+          sample before ordering.
         </p>
-      </footer>
+      </aside>
     </div>
   );
 }

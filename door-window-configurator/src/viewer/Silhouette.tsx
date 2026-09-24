@@ -41,7 +41,7 @@ function buildOutline(): THREE.Shape {
   return shape;
 }
 
-export function Silhouette({ offsetX }: { offsetX: number }): JSX.Element {
+export function Silhouette({ offsetX, z = 0.02 }: { offsetX: number; z?: number }): JSX.Element {
   const geometry = useMemo(() => {
     const height = SILHOUETTE_HEIGHT_MM / 1000;
     const geo = new THREE.ExtrudeGeometry(buildOutline(), { depth: 0.004, bevelEnabled: false });
@@ -50,7 +50,7 @@ export function Silhouette({ offsetX }: { offsetX: number }): JSX.Element {
   }, []);
 
   return (
-    <mesh geometry={geometry} position={[offsetX, 0, 0.02]} renderOrder={2}>
+    <mesh geometry={geometry} position={[offsetX, 0, z]} renderOrder={2}>
       <meshBasicMaterial color="#9aa0a6" transparent opacity={0.32} depthWrite={false} />
     </mesh>
   );

@@ -17,9 +17,11 @@ import { resolveInternalColour } from '../config/types';
 const FILLS: Record<string, string> = {
   glazing: '#cfd8dc',
   hardware: '#9aa0a6',
+  seal: '#141516',
+  spacer: '#3a3c3e',
 };
 
-export function StaticElevation({ config }: { config: ConfigState }): JSX.Element {
+export function StaticElevation({ config, caption = true }: { config: ConfigState; caption?: boolean }): JSX.Element {
   const model = useMemo(() => buildProduct(config), [config]);
   const frameFill = colourToHex(config.colour.external);
   void resolveInternalColour; // internal face is not visible in elevation
@@ -54,10 +56,12 @@ export function StaticElevation({ config }: { config: ConfigState }): JSX.Elemen
           ))}
         </g>
       </svg>
+      {caption && (
       <figcaption>
         3D preview is unavailable in this browser. This elevation is drawn to the configured
         dimensions: {formatMm(width)} × {formatMm(height)} (W × H).
       </figcaption>
+      )}
     </figure>
   );
 }

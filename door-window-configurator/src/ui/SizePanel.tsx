@@ -93,12 +93,12 @@ export function SizePanel(): JSX.Element {
   const heightErrors = validation.errors.filter((error) => error.field === 'height');
 
   return (
-    <section className="panel" aria-labelledby="size-heading">
-      <div className="panel__head">
-        <h2 className="panel__title" id="size-heading">
+    <section className="section" aria-labelledby="size-heading">
+      <div className="section__head">
+        <h2 className="section__title" id="size-heading">
           Size
         </h2>
-        <p className="panel__note">Width × height, in millimetres.</p>
+        <p className="section__hint">Width × height, in millimetres.</p>
       </div>
 
       <div className="fields">
