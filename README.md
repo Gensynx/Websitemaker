@@ -11,6 +11,7 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 - **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, nine full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
 - **381 Accountants** — `381-accountants/` (12-page site for the Canary Wharf accountancy firm, see `381-accountants/README.md`)
 - **381 Accountants premium** — `381-accountants-premium/` (dark, high-interaction edition: calculator, countdown, wizard, marquee; see its README)
+- **381 Accountants Ledger** — `381-accountants-ledger/` (calm, typographic third edition: Swiss grid, self-hosted fonts, deadline finder; shares its facts with the standard edition; see its README)
 - **Nuisance 1989** — `nuisance-1989/` (12-page luxury streetwear storefront with a two-skin design system; live at https://gensynx.github.io/Websitemaker/nuisance-1989/ — see its README)
 - **Vassallo Developments** — `vassallo/` (single-page site for the property developer, with a scroll-scrubbed renovation video intro; live at https://gensynx.github.io/Websitemaker/vassallo/)
 
