@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Vassallo Developments — acquisition, design and development. We rebuild homes floor by floor and make the impossible possible.">
+<meta name="description" content="Vassallo Developments — acquisition, design and development. Full refurbs, minor works, window and door replacements and roofing across London. We rebuild properties floor by floor and make the impossible possible.">
 <title>Vassallo Developments — Acquisition, Design, Development</title>
 
 <style>
@@ -225,6 +225,28 @@ section{position:relative;z-index:2}
 .project .meta .loc{font-size:.82rem;letter-spacing:.08em;color:var(--ink-soft);text-transform:uppercase}
 .project .scope{color:var(--ink-faint);font-size:.9rem;margin-top:.35rem}
 
+/* ---- trade / service cards ---- */
+.trade-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(1.2rem,2.6vw,2.4rem)}
+@media (max-width:980px){.trade-grid{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:600px){.trade-grid{grid-template-columns:1fr}}
+.trade{position:relative;display:block;text-decoration:none;color:inherit}
+.trade .frame{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--surface);border:1px solid var(--line);
+  display:grid;place-items:center;transition:border-color .5s var(--e-out)}
+.trade .frame svg{width:58%;height:auto;color:var(--ink);opacity:.62;transition:opacity .5s, transform .7s var(--e-out)}
+.trade .frame svg .hl{stroke:var(--brass)}
+.trade .badge{position:absolute;top:1rem;left:1rem;z-index:3;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+  background:var(--paper);color:var(--ink);padding:.5em .9em;border:1px solid var(--line)}
+.trade .badge.live{color:var(--brass);border-color:var(--brass)}
+.trade .meta{padding-top:1.05rem}
+.trade .meta h3{font-size:clamp(1.12rem,1.7vw,1.42rem);line-height:1.2}
+.trade .scope{color:var(--ink-faint);font-size:.88rem;margin-top:.4rem}
+a.trade:hover .frame,a.trade:focus-visible .frame{border-color:var(--brass)}
+a.trade:hover .frame svg,a.trade:focus-visible .frame svg{opacity:1;transform:scale(1.05)}
+.trade.soon{cursor:default}
+.trade.soon .frame svg{opacity:.34}
+.trade.soon .meta h3,.trade.soon .scope{opacity:.62}
+@media (prefers-reduced-motion: reduce){a.trade:hover .frame svg{transform:none}}
+
 /* ============================================================
    NUMBERS
    ============================================================ */
@@ -382,7 +404,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
   </a>
   <div class="nav-links">
     <a class="desk" href="#approach">Approach</a>
-    <a class="desk" href="#work">Work</a>
+    <a class="desk" href="#trades">Services</a>
     <a class="desk" href="#numbers">Track record</a>
     <a class="nav-cta" href="#enquire">Enquire</a>
     <button class="theme-toggle" id="theme" aria-label="Toggle light and dark theme">
@@ -421,7 +443,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       <span class="ln"><i>worth <span class="accent">living in.</span></i></span>
     </h1>
     <div class="hero-foot">
-      <p class="hero-lede">Vassallo Developments transforms tired houses and flats into modern spaces — from the day we secure the keys to the day we hand them back.</p>
+      <p class="hero-lede">Vassallo Developments transforms tired properties into modern spaces — from the day we secure the keys to the day we hand them back.</p>
       <span class="scroll-cue">Scroll<span class="dot"></span></span>
     </div>
     <div class="triad-strip">
@@ -444,7 +466,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       <article class="pillar reveal">
         <span class="num">01 / Acquisition</span>
         <h3>We find the right property.</h3>
-        <p>We source houses and flats with real potential — including off-market opportunities — and handle the valuation, negotiation and purchase so you don't have to.</p>
+        <p>We source properties with real potential — including off-market opportunities — and handle the valuation, negotiation and purchase so you don't have to.</p>
         <div class="tags"><i>Sourcing</i><i>Off-market</i><i>Negotiation</i><i>Due diligence</i></div>
       </article>
       <article class="pillar reveal d1">
@@ -471,35 +493,93 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
   </div>
 </section>
 
-<!-- WORK -->
-<section class="band work" id="work">
+<!-- SERVICES -->
+<section class="band work" id="trades">
   <div class="wrap">
     <div class="band-head reveal">
-      <span class="eyebrow">Selected work</span>
-      <h2>Homes we've brought back to life.</h2>
-      <p>A sample of recent transformations. Replace these with your own photography and project details.</p>
+      <span class="eyebrow">What we take on</span>
+      <h2>Projects we've worked on.</h2>
+      <p>From a property stripped back to brick to a single window replaced properly. Pick the work you need and it carries straight through to the enquiry form.</p>
     </div>
-    <div class="work-grid">
-      <a class="project reveal" href="#enquire">
-        <div class="frame"><canvas class="proj-canvas" data-seed="1"></canvas><span class="badge">Completed 2025</span><span class="plate">01</span></div>
-        <div class="meta"><h3>The Terrace House</h3><span class="loc">Central</span></div>
-        <p class="scope">Victorian terrace — full modern refit, rear extension, four bedrooms.</p>
+    <div class="trade-grid">
+      <a class="trade reveal" href="#enquire" data-service="Full refurbs">
+        <div class="frame">
+          <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 44 60 18l40 26"/><path d="M28 44v32h64V44"/>
+            <path d="M54 76V58h12v18"/><rect x="36" y="52" width="13" height="11"/>
+            <path class="hl" d="M14 28v54M106 28v54M14 40h14M92 40h14M14 58h14M92 58h14M14 76h14M92 76h14"/>
+          </svg>
+          <span class="badge live">Enquire</span>
+        </div>
+        <div class="meta"><h3>Full refurbs</h3></div>
+        <p class="scope">Whole-property renovation — structure, first fix, second fix and finish, managed end to end.</p>
       </a>
-      <a class="project reveal d1" href="#enquire">
-        <div class="frame"><canvas class="proj-canvas" data-seed="2"></canvas><span class="badge">Completed 2024</span><span class="plate">02</span></div>
-        <div class="meta"><h3>Harbour Apartments</h3><span class="loc">Waterside</span></div>
-        <p class="scope">Six dated flats reconfigured into light-filled open-plan homes.</p>
+      <a class="trade reveal d1" href="#enquire" data-service="Minor works">
+        <div class="frame">
+          <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 76h76M22 62h76M22 48h76"/>
+            <path d="M46 76V62M74 76V62M34 62V48M62 62V48M90 62V48"/>
+            <path d="M22 76V48"/><path d="M98 76V48"/>
+            <path class="hl" d="M34 44h30v-14H34z"/>
+            <path class="hl" d="M74 34 92 16M88 12l10 10-6 6-10-10z"/>
+          </svg>
+          <span class="badge live">Enquire</span>
+        </div>
+        <div class="meta"><h3>Minor works</h3></div>
+        <p class="scope">Smaller jobs done properly: repairs, making good, brickwork, plastering and remedial work.</p>
       </a>
-      <a class="project reveal" href="#enquire">
-        <div class="frame"><canvas class="proj-canvas" data-seed="3"></canvas><span class="badge">Completed 2024</span><span class="plate">03</span></div>
-        <div class="meta"><h3>The Townhouse</h3><span class="loc">Old Town</span></div>
-        <p class="scope">Period townhouse — restored façade, contemporary interior throughout.</p>
+      <a class="trade reveal d2" href="#enquire" data-service="Window and door replacements">
+        <div class="frame">
+          <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M22 78V22h32v56"/><path d="M16 78h46"/>
+            <circle cx="47" cy="52" r="2.6"/>
+            <path class="hl" d="M68 26h34v34H68z"/><path class="hl" d="M85 26v34M68 43h34"/>
+            <path d="M64 66h42"/>
+          </svg>
+          <span class="badge live">Enquire</span>
+        </div>
+        <div class="meta"><h3>Window and door replacements</h3></div>
+        <p class="scope">Supply and fit throughout — frames, glazing units, entrance doors and making good around the opening.</p>
       </a>
-      <a class="project reveal d1" href="#enquire">
-        <div class="frame"><canvas class="proj-canvas" data-seed="4"></canvas><span class="badge live">In development</span><span class="plate">04</span></div>
-        <div class="meta"><h3>Garden Mews</h3><span class="loc">Suburban</span></div>
-        <p class="scope">A pair of new-build mews homes on a reclaimed infill plot.</p>
+      <a class="trade reveal" href="#enquire" data-service="Roofing works">
+        <div class="frame">
+          <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 68h96"/><path d="M16 68 60 26l44 42"/>
+            <path class="hl" d="M26 68 60 36l34 32"/>
+            <path class="hl" d="M36 68 60 46l24 22"/>
+            <path class="hl" d="M46 68 60 56l14 12"/>
+            <path d="M60 26v-8"/>
+          </svg>
+          <span class="badge live">Enquire</span>
+        </div>
+        <div class="meta"><h3>Roofing works</h3></div>
+        <p class="scope">Re-roofs, recovers and repairs, with flashing, guttering and rainwater goods put right at the same time.</p>
       </a>
+      <div class="trade soon reveal d1" aria-label="Bathrooms — coming soon">
+        <div class="frame">
+          <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 50h80v10a14 14 0 0 1-14 14H34a14 14 0 0 1-14-14z"/>
+            <path d="M34 74v6M86 74v6"/><path d="M20 50h80"/>
+            <path class="hl" d="M82 50V32a8 8 0 0 0-8-8h-8"/><path class="hl" d="M62 18v12"/>
+          </svg>
+          <span class="badge">Coming soon</span>
+        </div>
+        <div class="meta"><h3>Bathrooms</h3></div>
+        <p class="scope">Full bathroom design and installation, from first fix plumbing to tiling and finish.</p>
+      </div>
+      <div class="trade soon reveal d2" aria-label="Kitchens — coming soon">
+        <div class="frame">
+          <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M18 48h84"/><path d="M20 48v30h80V48"/>
+            <path d="M48 48v30M76 48v30"/>
+            <path d="M28 58h10M56 58h10M84 58h10"/>
+            <path class="hl" d="M52 16h30l8 16H44z"/><path class="hl" d="M60 40h14"/>
+          </svg>
+          <span class="badge">Coming soon</span>
+        </div>
+        <div class="meta"><h3>Kitchens</h3></div>
+        <p class="scope">Kitchen design, supply and installation, coordinated with the electrics and plumbing behind it.</p>
+      </div>
     </div>
   </div>
 </section>
@@ -508,10 +588,10 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 <section class="band numbers" id="numbers" style="padding-block:0">
   <div class="wrap" style="padding-inline:0">
     <div class="stat-row">
-      <div class="stat reveal"><div class="n" data-to="42"><span class="v">0</span><small>+</small></div><div class="l">Homes delivered</div></div>
-      <div class="stat reveal d1"><div class="n" data-to="15"><span class="v">0</span></div><div class="l">Years building</div></div>
-      <div class="stat reveal d2"><div class="n" data-to="120"><span class="v">0</span><small>k</small></div><div class="l">Sq ft transformed</div></div>
-      <div class="stat reveal d3"><div class="n" data-to="100"><span class="v">0</span><small>%</small></div><div class="l">Delivered on brief</div></div>
+      <div class="stat reveal"><div class="n" data-to="42"><span class="v">0</span></div><div class="l">Projects delivered</div></div>
+      <div class="stat reveal d1"><div class="n" data-to="12"><span class="v">0</span></div><div class="l">Years building</div></div>
+      <div class="stat reveal d2"><div class="n" data-to="3000"><span class="v">0</span><small>+</small></div><div class="l">Stock condition surveys completed</div></div>
+      <div class="stat reveal d3"><div class="n" data-to="100"><span class="v">0</span><small>%</small></div><div class="l">Client success rate</div></div>
     </div>
   </div>
 </section>
@@ -522,7 +602,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
     <div class="enq-grid">
       <div class="enq-intro reveal">
         <span class="eyebrow">Start a project</span>
-        <h2>Tell us about your&nbsp;property.</h2>
+        <h2>Tell us about your&nbsp;project.</h2>
         <p>Whether you have a building in mind or just an idea, tell us where you are and what you'd like help with. We'll come back within two working days.</p>
         <div class="contact-line">
           <a href="mailto:hello@vassallodevelopments.com"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="m3 7 9 6 9-6"/></svg>hello@vassallodevelopments.com</a>
@@ -536,9 +616,10 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
           <div>
             <span class="field-label">What do you need help with? <b>*</b></span>
             <div class="chips" id="services" role="group" aria-label="Services required">
-              <button type="button" class="chip" aria-pressed="false" data-v="Acquisition">Acquisition</button>
-              <button type="button" class="chip" aria-pressed="false" data-v="Design">Design</button>
-              <button type="button" class="chip" aria-pressed="false" data-v="Development">Development</button>
+              <button type="button" class="chip" aria-pressed="false" data-v="Full refurbs">Full refurbs</button>
+              <button type="button" class="chip" aria-pressed="false" data-v="Minor works">Minor works</button>
+              <button type="button" class="chip" aria-pressed="false" data-v="Window and door replacements">Windows &amp; doors</button>
+              <button type="button" class="chip" aria-pressed="false" data-v="Roofing works">Roofing works</button>
               <button type="button" class="chip" aria-pressed="false" data-v="Full service">Full service</button>
               <button type="button" class="chip" aria-pressed="false" data-v="Not sure yet">Not sure yet</button>
             </div>
@@ -598,7 +679,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
         <div class="foot-col">
           <h4>Explore</h4>
           <a href="#approach">Approach</a>
-          <a href="#work">Selected work</a>
+          <a href="#trades">Services</a>
           <a href="#numbers">Track record</a>
           <a href="#enquire">Enquire</a>
         </div>
@@ -670,13 +751,15 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
   function countUp(el){
     var v = el.querySelector(".v");
     var to = parseInt(el.getAttribute("data-to"),10);
-    if(reduce){ v.textContent = to; return; }
+    if(reduce){ v.textContent = to.toLocaleString("en-GB"); return; }
     var start=null, dur=1600;
+    /* four-figure counts need separators to stay readable at display size */
+    function fmt(n){ return n.toLocaleString("en-GB"); }
     function step(t){
       if(!start) start=t;
       var p = Math.min((t-start)/dur,1);
       var eased = 1-Math.pow(1-p,3);
-      v.textContent = Math.round(to*eased);
+      v.textContent = fmt(Math.round(to*eased));
       if(p<1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
@@ -701,54 +784,26 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
     });
   }
 
-  /* ---- project canvas art (blueprint-ish plan lines) ---- */
-  function drawPlan(cv){
-    var seed = parseInt(cv.getAttribute("data-seed"),10) || 1;
-    var dpr = Math.min(window.devicePixelRatio||1, 2);
-    var w = cv.clientWidth, h = cv.clientHeight;
-    if(!w||!h) return;
-    cv.width = w*dpr; cv.height = h*dpr;
-    var ctx = cv.getContext("2d");
-    ctx.scale(dpr,dpr);
-    var cs = getComputedStyle(document.body);
-    var ink = cs.getPropertyValue("--ink").trim();
-    ctx.clearRect(0,0,w,h);
-    ctx.globalAlpha = .10; ctx.strokeStyle = ink; ctx.lineWidth = 1;
-    // pseudo-random plan using seed
-    var s = seed*9301;
-    function rnd(){ s = (s*9301+49297)%233280; return s/233280; }
-    var gx = 28, gy = 24;
-    for(var x=gx;x<w;x+=gx){ ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,h); ctx.stroke(); }
-    for(var y=gy;y<h;y+=gy){ ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(w,y); ctx.stroke(); }
-    ctx.globalAlpha = .35; ctx.lineWidth = 1.5;
-    var pad = 26;
-    // outer wall
-    ctx.strokeRect(pad,pad,w-pad*2,h-pad*2);
-    // a few interior partitions
-    var n = 3 + Math.floor(rnd()*3);
-    for(var i=0;i<n;i++){
-      if(rnd()>.5){
-        var xx = pad + rnd()*(w-pad*2);
-        ctx.beginPath(); ctx.moveTo(xx,pad); ctx.lineTo(xx, pad + rnd()*(h-pad*2)); ctx.stroke();
-      } else {
-        var yy = pad + rnd()*(h-pad*2);
-        ctx.beginPath(); ctx.moveTo(pad,yy); ctx.lineTo(pad + rnd()*(w-pad*2), yy); ctx.stroke();
-      }
-    }
-  }
-  function drawAll(){ document.querySelectorAll(".proj-canvas").forEach(drawPlan); }
-  drawAll();
-  window.addEventListener("resize", drawAll);
-  // redraw on theme change so line colour tracks
-  new MutationObserver(drawAll).observe(root,{attributes:true,attributeFilter:["data-theme"]});
-
   /* ---- service chips ---- */
   var chosen = new Set();
+  function setChip(chip, on){
+    chip.setAttribute("aria-pressed", on?"true":"false");
+    if(on) chosen.add(chip.dataset.v); else chosen.delete(chip.dataset.v);
+  }
   document.querySelectorAll("#services .chip").forEach(function(chip){
     chip.addEventListener("click", function(){
-      var on = chip.getAttribute("aria-pressed")==="true";
-      chip.setAttribute("aria-pressed", on?"false":"true");
-      if(on) chosen.delete(chip.dataset.v); else chosen.add(chip.dataset.v);
+      setChip(chip, chip.getAttribute("aria-pressed")!=="true");
+    });
+  });
+
+  /* a trade card carries its own service into the form, so the enquiry arrives
+     already saying which trade it is about */
+  document.querySelectorAll(".trade[data-service]").forEach(function(card){
+    card.addEventListener("click", function(){
+      var want = card.getAttribute("data-service");
+      document.querySelectorAll("#services .chip").forEach(function(c){
+        if(c.dataset.v === want && c.getAttribute("aria-pressed")!=="true") setChip(c, true);
+      });
     });
   });
 
