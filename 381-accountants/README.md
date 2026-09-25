@@ -1,6 +1,6 @@
 # 381 Accountants — website
 
-A 12-page, conversion-focused site for **381 Accountancy & Bookkeeping Services Ltd**
+A 13-page, conversion-focused site for **381 Accountancy & Bookkeeping Services Ltd**
 (trading as 381 Accountants), the certified accountancy firm at 30 Churchill
 Place, Canary Wharf, London E14 5RE, serving clients across London since 2010.
 
@@ -12,7 +12,8 @@ signals, and clear calls to action on every page.
 ## Pages
 
 ```
-index.html                          Home — hero, stats, services, booking, why-us, steps, reviews, CTA
+index.html                          Home — hero, stats, services, deadline finder, booking, why-us, steps, reviews, CTA
+deadlines.html                      Deadline finder — company, VAT and self assessment dates, plus the rules
 about.html                          About Us — story, credentials, how we work, areas served
 reviews.html                        Client reviews — real Google quotes, praise themes, review CTA
 contact.html                        Contact — phones, email, address, hours, booking form
@@ -35,6 +36,29 @@ services/tax-planning.html          ┘
 - Testimonials are real Google reviews (5.0 from 42 reviews), quoted with the
   reviewers' published names and lightly tidied for spelling only. Three are
   featured on the home page; reviews.html carries a wall of eighteen more.
+
+## Logo
+
+The firm's logo artwork (supplied as a JPEG on a paper background) is cut
+onto a transparent background in `assets/img/`:
+
+- `logo-mark.png`: the "381" mark with the chart-and-ledger icon, used in
+  the header (on its own) and in the footer (on a white chip, so the blue
+  stays visible on navy). Exported at 2x for sharp rendering.
+- `logo-full.png`: the full lockup with "Accountancy and Bookkeeping
+  Services Ltd", for use elsewhere (e.g. email signatures, print).
+
+The favicon is the logo's blue (`#005179`) square with a white "381".
+
+## Deadline finder
+
+`deadlines.html`, plus a compact version on the home page: enter a company
+year end and VAT quarters to see the Companies House accounts, corporation
+tax, CT600, next two VAT returns and self assessment dates, soonest first,
+with the next one highlighted and days remaining. Month-end year ends
+follow the month-end rule (30 June + 9 months = 31 March). Without
+JavaScript the table shows the rules instead. The logic lives in
+`assets/js/site.js`; service pages' "Key dates" notes link to it.
 
 ## Facts still to confirm before launch
 

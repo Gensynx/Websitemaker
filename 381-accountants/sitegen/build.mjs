@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { page, SITE } from './lib.mjs';
 import { services, servicesNav } from './content-services.mjs';
 import {
-  homeBody, servicesHubBody, servicePage,
+  homeBody, servicesHubBody, servicePage, deadlinesBody,
   aboutBody, reviewsBody, contactBody,
 } from './content-pages.mjs';
 
@@ -69,6 +69,13 @@ const pages = [
     desc: 'All accounting services under one roof: bookkeeping, payroll, self assessment tax returns, VAT returns, annual accounts, company formation and tax planning. Starting fees for each, fixed and agreed up front, and a free consultation.',
     active: 'services',
     body: servicesHubBody,
+  },
+  {
+    path: 'deadlines.html',
+    title: 'Deadline Finder: Accounts, Corporation Tax & VAT Dates · 381 Accountants',
+    desc: 'Enter your company year end and VAT quarters to see your Companies House accounts, corporation tax, CT600 and VAT deadlines, worked out using the standard rules.',
+    active: 'deadlines',
+    body: deadlinesBody,
   },
   {
     path: 'about.html',

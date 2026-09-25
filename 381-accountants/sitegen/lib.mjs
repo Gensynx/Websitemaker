@@ -87,16 +87,22 @@ export const arrow = icon('arrow');
 const starFilled = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2.8 2.8 5.9 6.2.8-4.6 4.4 1.2 6.3L12 17.1l-5.6 3.1 1.2-6.3L3 9.5l6.2-.8L12 2.8Z"/></svg>';
 export const stars5 = starFilled.repeat(5);
 
-/* Favicon: navy rounded square, gold “381” */
+/* Favicon: the logo's blue rounded square with a white “381” */
 const FAVICON = 'data:image/svg+xml,' + encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#0d1f42"/><rect x="2.5" y="2.5" width="59" height="59" rx="12" fill="none" stroke="#e8a33d" stroke-opacity=".55" stroke-width="2"/><text x="32" y="42" font-family="Georgia,serif" font-size="26" font-weight="600" fill="#e8a33d" text-anchor="middle">381</text></svg>`
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#005179"/><text x="32" y="43" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="700" fill="#ffffff" text-anchor="middle">381</text></svg>`
 );
+
+/* The firm's logo: the "381" mark with the chart-and-ledger icon, cut from
+   the supplied artwork onto a transparent background (2x for sharp
+   rendering). The full lockup is assets/img/logo-full.png. */
+const logoMark = (r) => `<img class="brand-logo" src="${r}assets/img/logo-mark.png" width="87" height="46" alt="">`;
 
 /* ---------------- Nav ---------------- */
 export const NAV = [
   ['index.html', 'Home', 'home'],
   ['services/index.html', 'Services', 'services'],
   ['about.html', 'About Us', 'about'],
+  ['deadlines.html', 'Deadlines', 'deadlines'],
   ['reviews.html', 'Reviews', 'reviews'],
   ['contact.html', 'Contact', 'contact'],
 ];
@@ -144,7 +150,7 @@ function header_({ path, active }) {
   return `<header class="site-header">
   <div class="wrap nav-bar">
     <a class="brand" href="${r}index.html" aria-label="${SITE.name} home">
-      <span class="brand-mark"><span>381</span></span>
+      ${logoMark(r)}
       <span class="brand-text"><b>381 Accountants</b><small>Accountancy &amp; Bookkeeping</small></span>
     </a>
     <nav aria-label="Main">
@@ -173,8 +179,8 @@ function footer_(path, servicesNav) {
   <div class="wrap">
     <div class="footer-grid">
       <div>
-        <a class="brand" href="${r}index.html">
-          <span class="brand-mark"><span>381</span></span>
+        <a class="brand" href="${r}index.html" aria-label="${SITE.name} home">
+          <span class="brand-chip">${logoMark(r)}</span>
           <span class="brand-text"><b>381 Accountants</b><small>Accountancy &amp; Bookkeeping</small></span>
         </a>
         <p class="footer-about">${SITE.legal} is an independent firm of certified accountants in ${SITE.town}, serving businesses and individuals across London since ${SITE.established}. Efficient, proactive and personal.</p>
@@ -189,6 +195,7 @@ function footer_(path, servicesNav) {
         <h4>Company</h4>
         <ul>
           <li><a href="${r}about.html">About us</a></li>
+          <li><a href="${r}deadlines.html">Deadline finder</a></li>
           <li><a href="${r}reviews.html">Client reviews</a></li>
           <li><a href="${r}services/index.html">All services</a></li>
           <li><a href="${r}contact.html">Contact &amp; booking</a></li>
@@ -294,6 +301,45 @@ export function ctaBanner(path, { title = 'Ready to hand your numbers to safe ha
     </div>
   </div>
 </section>`;
+}
+
+/* Deadline finder. Server-rendered with the rules written out so it is
+   useful without JavaScript; site.js replaces the rows with real dates. */
+export function deadlineFinder(path, { compact = false } = {}) {
+  const r = rel(path);
+  return `<div class="finder" data-finder>
+  <form class="finder-form">
+    <div class="field">
+      <label for="ye">Your company’s year end</label>
+      <input id="ye" name="ye" type="date">
+    </div>
+    <div class="field">
+      <label for="vat">VAT quarters end in <span class="opt">(optional)</span></label>
+      <select id="vat" name="vat">
+        <option value="">Not VAT registered</option>
+        <option value="3">Mar, Jun, Sep, Dec</option>
+        <option value="1">Jan, Apr, Jul, Oct</option>
+        <option value="2">Feb, May, Aug, Nov</option>
+      </select>
+    </div>
+    <button class="btn btn-navy" type="submit">${icon('clock')} Show my dates</button>
+  </form>
+  <div class="finder-out" aria-live="polite">
+    <table class="dates">
+      <caption class="sr-only">Standard filing and payment deadlines</caption>
+      <thead><tr><th scope="col">Deadline</th><th scope="col">What is due</th><th scope="col" class="dates-left"><span class="sr-only">Time left</span></th></tr></thead>
+      <tbody data-finder-rows>
+        <tr><td>Year end + 9 months</td><td>Company accounts filed at Companies House</td><td></td></tr>
+        <tr><td>Year end + 9 months + 1 day</td><td>Corporation tax paid to HMRC</td><td></td></tr>
+        <tr><td>Year end + 12 months</td><td>Company tax return (CT600) filed with HMRC</td><td></td></tr>
+        <tr><td>1 month + 7 days after each VAT quarter</td><td>VAT return filed and paid</td><td></td></tr>
+        <tr><td>31 January</td><td>Self assessment return filed and balance paid, plus first payment on account</td><td></td></tr>
+        <tr><td>31 July</td><td>Second self assessment payment on account</td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="finder-note">Standard deadlines for a private limited company filing its second or later accounts, and for personal self assessment. First accounts, changed year ends and some VAT schemes differ; we confirm every date at the consultation.${compact ? ` <a class="text-link inline" href="${r}deadlines.html">How each date is worked out</a>.` : ''}</p>
+</div>`;
 }
 
 /* Real Google reviews, quoted with the reviewers’ published names and
