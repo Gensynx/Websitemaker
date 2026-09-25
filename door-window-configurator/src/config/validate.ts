@@ -214,7 +214,10 @@ function validateDoor(
   if (leaf < MIN_DOOR_LEAF_WIDTH) {
     errors.push({
       field: 'width',
-      message: `This leaves a door leaf of ${formatMm(leaf)}. The narrowest manufacturable leaf is ${formatMm(MIN_DOOR_LEAF_WIDTH)} — reduce the side lights or increase the overall width.`,
+      message:
+        leaf <= 0
+          ? `The side lights take up the whole width, leaving no room for the door. Increase the overall width or reduce the side lights; the narrowest manufacturable leaf is ${formatMm(MIN_DOOR_LEAF_WIDTH)}.`
+          : `This leaves a door leaf of ${formatMm(leaf)}. The narrowest manufacturable leaf is ${formatMm(MIN_DOOR_LEAF_WIDTH)} — reduce the side lights or increase the overall width.`,
       blocks: 'render',
     });
   }

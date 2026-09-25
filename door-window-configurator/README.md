@@ -29,6 +29,12 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/ui/ColourPanel.tsx` | Colour section: swatches, finish, inside, explore |
 | `src/ui/SwatchGrid.tsx` | RAL swatch grid as a native radio group |
 | `src/ui/ExplorePicker.tsx` | Colour wheel (pointer) with hue, saturation, brightness sliders and hex field (keyboard) |
+| `src/config/doorEdits.ts` | Door option edits; the frame is never resized as a side effect |
+| `src/ui/DoorStylePanel.tsx` | Door style, panels, side and top lights, handing, threshold |
+| `src/ui/DoorHardwarePanel.tsx` | Handle, finish, letterplate, knocker, spyhole |
+| `src/ui/OptionTiles.tsx` | Radio tiles and checkbox toggles |
+| `src/ui/ElevationThumb.tsx` | Option thumbnails drawn from the same part list as the 3D model |
+| `src/config/colourHex.ts`, `src/viewer/keys.ts` | Pure helpers kept out of three.js modules so first paint stays light |
 | `src/ui/Section.tsx` | Collapsible panel section (disclosure pattern) and the read-only readout |
 | `src/ui/useSections.ts` | Which sections are open; sections with a problem start open |
 | `src/ui/useSheetGesture.ts` | Phone sheet handle: tap or drag, non-modal |
@@ -50,6 +56,7 @@ npm test          # 228 unit tests, including text contrast read from styles.css
 npm run dev -- --port 5180   # then, in another shell:
 npm run smoke                # browser render, controls, wall scene, sizing
 npm run a11y                 # keyboard-only walk, sheet by keys and drag, axe scans
+npm run build && npm run check:bundle   # fails if first paint would wait on the 3D bundle
 node scripts/lighting-metric.mjs   # relief on a dark finish: panelled vs flush, >= 2x
 node scripts/colour-metric.mjs     # rendered RAL shades vs reference, CIE76 dE <= 6
 
@@ -204,6 +211,38 @@ shape, size and style that were all perfectly drawable.
   shape and its materials on appearance, so dragging the wheel re-tints
   without rebuilding (`Product.test.ts`), and commits at most once a frame.
 
+## Door options (Step 6)
+
+- **Style (6.1):** solid panel, half glazed, fully glazed; side lights none,
+  left, right or both; a top light. Each tile shows the door as it would be
+  built, drawn from `buildProduct`.
+- **Panels (6.2):** flush, one to four raised panels (ovolo, chamfer, square),
+  or grooved (across or up and down, three to six grooves), wherever the leaf
+  has a solid area.
+- **Handles and finishes (6.3, 6.4):** lever on backplate, lever on rose, pull
+  bar, knob; polished chrome, satin chrome, black, brass, anthracite.
+- **Furniture (6.5):** letterplate, knocker and spyhole, each on its own. A
+  fully glazed leaf has nowhere to fix them: the toggles are disabled with the
+  reason, the choices are kept for when the style changes back, and the
+  description does not list them as fitted. House numerals are not offered
+  (below).
+- **Handing (6.6):** hinge side and opening direction, stated as viewed from
+  outside.
+- **The frame is the opening in the wall and is never resized as a side
+  effect.** Side lights narrow the leaf and a top light shortens it. Where
+  that leaves less door than before, or less than can be made, the panel says
+  so and offers the frame size that keeps the door as it was — as a button.
+
+## Performance budget
+
+`npm run check:bundle` reads the production build and fails if the entry
+chunk imports, or the HTML preloads, the three.js chunk. Found broken at
+Step 6 and fixed: React had been bundled inside the 3D chunk (Rollup pulls a
+manual chunk's dependencies into it), and the SVG elevation imported a helper
+from a three.js module, so first paint waited on 1 MB of WebGL code. Now the
+first paint loads 88 KB of app and 156 KB of React; with the 3D chunk held
+back four seconds, the elevation and controls are up in about 150 ms.
+
 ## Rendering
 
 Lighting is measured, not judged by eye, because the defects it has had were
@@ -235,8 +274,19 @@ the product.
 ## Outstanding
 
 - No favicon. It is a branding decision, so none has been invented.
-- Steps 6 to 8: the controls inside Style, Glazing and Hardware, then summary
-  and enquiry. The panel, its sections, sizing and colour are built.
+- Steps 7 and 8: window options and glazing, then summary and enquiry.
+- **The model carries door options the renderer does not draw**, so they are
+  not offered as controls: arched and circular leaf apertures, an arched top
+  light, doctor's and urn knockers (every knocker draws as a ring), and
+  trickle vents on doors. A link that sets one renders something different
+  from what it describes. Either draw them or drop them from the model.
+- **House numerals (6.5) are not offered.** Glyphs need a typeface, an art
+  asset under the core constraint; deferred at Step 1 (`types.ts`).
+- There is no minimum door-leaf HEIGHT: a top light can shorten a leaf to
+  any height. A limit is needed in `limits.ts`.
+- On a fully glazed door, furniture chosen earlier stays in the
+  configuration (and the link) while not being fitted. The Step 8 enquiry
+  must send what is fitted, not what is stored.
 - The RAL list and its sRGB values are placeholders (`ral.ts`), as is which
   shades each material offers (`material.ts`). Woodgrain foil is modelled as
   a woodgrain-embossed foil in a solid RAL colour; named timber-effect foils

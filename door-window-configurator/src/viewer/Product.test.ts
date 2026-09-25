@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { appearanceKey, shapeKey } from './Product';
+import { appearanceKey, shapeKey } from './keys';
 import { DEFAULT_DOOR } from '../config/defaults';
 import type { DoorConfigState } from '../config/types';
 import { withColour, withExternalFinish } from '../config/colourEdits';

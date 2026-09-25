@@ -11,7 +11,7 @@ import { useMemo } from 'react';
 import type { ConfigState } from '../config/types';
 import { formatMm } from '../config/units';
 import { buildProduct } from './geometry';
-import { colourToHex } from './materials';
+import { colourToHex } from '../config/colourHex';
 import { resolveInternalColour } from '../config/types';
 
 const FILLS: Record<string, string> = {

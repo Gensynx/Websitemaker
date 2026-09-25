@@ -23,16 +23,17 @@ import { formatMm, roundMmHalfUp } from '../config/units';
 import type { Mm } from '../config/units';
 import type { ValidationIssue } from '../config/validate';
 
-interface FieldProps {
+export interface FieldProps {
   label: string;
   value: Mm;
   min: Mm;
-  max: Mm;
+  /** Omitted where no upper limit is defined; the hint then states the minimum only. */
+  max?: Mm | undefined;
   errors: ValidationIssue[];
   onCommit: (value: Mm) => void;
 }
 
-function DimensionField({ label, value, min, max, errors, onCommit }: FieldProps): JSX.Element {
+export function DimensionField({ label, value, min, max, errors, onCommit }: FieldProps): JSX.Element {
   const id = useId();
   const [draft, setDraft] = useState<string | null>(null);
   const invalid = errors.length > 0;
@@ -51,7 +52,7 @@ function DimensionField({ label, value, min, max, errors, onCommit }: FieldProps
         // The permitted range is on the control itself as well as in the
         // message, so assistive technology announces it before a mistake.
         min={roundMmHalfUp(min)}
-        max={roundMmHalfUp(max)}
+        max={max === undefined ? undefined : roundMmHalfUp(max)}
         value={draft ?? String(roundMmHalfUp(value))}
         aria-invalid={invalid}
         aria-describedby={`${id}-range${invalid ? ` ${id}-error` : ''}`}
@@ -66,7 +67,7 @@ function DimensionField({ label, value, min, max, errors, onCommit }: FieldProps
         onBlur={() => setDraft(null)}
       />
       <p className="field__hint" id={`${id}-range`}>
-        {formatMm(min)} to {formatMm(max)}
+        {max === undefined ? `At least ${formatMm(min)}` : `${formatMm(min)} to ${formatMm(max)}`}
       </p>
       <div className="field__errors" aria-live="polite">
         {errors.map((error) => (

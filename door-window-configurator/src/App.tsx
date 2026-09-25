@@ -31,6 +31,8 @@ import { SizePanel } from './ui/SizePanel';
 import { Segmented } from './ui/Segmented';
 import { Readout, Section } from './ui/Section';
 import { ColourPanel } from './ui/ColourPanel';
+import { DoorStylePanel } from './ui/DoorStylePanel';
+import { DoorHardwarePanel } from './ui/DoorHardwarePanel';
 import { useInsets } from './ui/useInsets';
 import { useSections } from './ui/useSections';
 import { useSheetGesture } from './ui/useSheetGesture';
@@ -38,7 +40,7 @@ import type { SheetState } from './ui/useSheetGesture';
 import { renderBlockers } from './config/validate';
 import type { ValidationIssue } from './config/validate';
 import { formatSize } from './config/units';
-import { describeProduct, describeSection, HANDING_STATEMENT, productName as nameOf, sectionForField } from './config/describe';
+import { describeProduct, describeSection, productName as nameOf, sectionForField } from './config/describe';
 import type { SectionId } from './config/describe';
 import type { CameraPreset } from './config/view';
 
@@ -65,11 +67,11 @@ function hasWebGL(): boolean {
 }
 
 const SECTIONS: Array<{ id: SectionId; title: string; pending?: string }> = [
-  { id: 'style', title: 'Style', pending: 'Style options are not built yet. This is what is currently chosen.' },
+  { id: 'style', title: 'Style', pending: 'Window style options are not built yet. This is what is currently chosen.' },
   { id: 'size', title: 'Size' },
   { id: 'colour', title: 'Colour' },
   { id: 'glazing', title: 'Glazing', pending: 'Glazing options are not built yet. This is what is currently chosen.' },
-  { id: 'hardware', title: 'Hardware', pending: 'Hardware options are not built yet. This is what is currently chosen.' },
+  { id: 'hardware', title: 'Hardware', pending: 'Window hardware options are not built yet. This is what is currently chosen.' },
 ];
 
 /** Messages shown inside a section: errors stop an order, notes only inform. */
@@ -323,7 +325,13 @@ export function App(): JSX.Element {
                 title={section.title}
                 summary={description.summary}
                 issues={issuesIn(section.id)}
-                flag={(nonOrderable.get(section.id)?.length ?? 0) > 0 ? 'Not orderable' : undefined}
+                flag={
+                  (nonOrderable.get(section.id)?.length ?? 0) > 0
+                    ? 'Not orderable'
+                    : (sectionNotices.get(section.id)?.length ?? 0) > 0
+                      ? 'See note'
+                      : undefined
+                }
                 open={sections.isOpen(section.id)}
                 onToggle={() => sections.toggle(section.id)}
               >
@@ -340,14 +348,15 @@ export function App(): JSX.Element {
                   </>
                 ) : section.id === 'colour' ? (
                   <ColourPanel />
+                ) : section.id === 'style' && config.productType === 'door' ? (
+                  <DoorStylePanel config={config} />
+                ) : section.id === 'hardware' && config.productType === 'door' ? (
+                  <DoorHardwarePanel config={config} />
                 ) : (
                   <Readout
                     lines={description.lines}
                     {...(section.pending !== undefined ? { note: section.pending } : {})}
                   />
-                )}
-                {section.id === 'style' && config.productType === 'door' && (
-                  <p className="section__hint">{HANDING_STATEMENT}</p>
                 )}
               </Section>
             );

@@ -65,6 +65,23 @@ const problems = [];
  * belong to the picture.
  */
 const CHROME = ['.panel', '.title', '.viewbar'].map((selector) => page.locator(selector));
+
+/**
+ * The link is written on a short debounce, and under software rendering the
+ * main thread can be busy for a second or more after an edit. Link checks
+ * therefore wait for the expected value (up to 5 s) instead of sampling once.
+ */
+async function paramEventually(key, pattern, timeout = 5000) {
+  await page
+    .waitForFunction(
+      ([k, source]) => new RegExp(source).test(new URL(location.href).searchParams.get(k) ?? ''),
+      [key, pattern.source],
+      { timeout },
+    )
+    .catch(() => {});
+  return new URL(page.url()).searchParams.get(key);
+}
+
 page.on('console', (message) => {
   if (message.type() !== 'error') return;
   // The URL is on the location, not in the text: a bare "404 (Not Found)"
@@ -330,7 +347,7 @@ const heightField = page.getByLabel(/^Height/);
 
   // 5.1 An offered swatch goes into the configuration and the link.
   await page.getByRole('radio', { name: /^Wine Red/ }).first().check();
-  await page.waitForTimeout(700);
+  await paramEventually('ce', /^RAL3005$/);
   console.log(`colour: swatch -> ce=${param('ce')}`);
   if (param('ce') !== 'RAL3005') problems.push(`choosing a swatch did not set the colour: ${param('ce')}`);
 
@@ -339,14 +356,14 @@ const heightField = page.getByLabel(/^Height/);
 
   // 5.3 Finish is separate from colour.
   await page.getByRole('radio', { name: 'Woodgrain foil' }).first().check();
-  await page.waitForTimeout(700);
+  await paramEventually('fe', /^wg$/);
   console.log(`colour: finish -> fe=${param('fe')} ce still ${param('ce')}`);
   if (param('ce') !== 'RAL3005' || param('fe') === 'sm') problems.push('changing the finish did not behave as a separate choice');
 
   // Inside, separately.
   await page.getByRole('radio', { name: 'Different' }).check();
   await page.getByRole('radio', { name: /^Traffic White/ }).nth(1).check();
-  await page.waitForTimeout(700);
+  await paramEventually('ci', /^RAL9016$/);
   console.log(`colour: inside -> ci=${param('ci')}`);
   if (param('ci') !== 'RAL9016') problems.push(`the inside colour did not apply: ${param('ci')}`);
   await page.getByRole('radio', { name: 'Same as outside' }).check();
@@ -355,7 +372,7 @@ const heightField = page.getByLabel(/^Height/);
   // 5.2 Explore: shown, flagged, never orderable, and a way back.
   await page.getByRole('button', { name: /^Explore any colour/ }).click();
   await page.getByLabel('Hex value').fill('#8A2BE2');
-  await page.waitForTimeout(900);
+  await paramEventually('ce', /^x8a2be2$/);
   const flagged = await page.locator('.section[data-open] .section__flag').allTextContents();
   const warned = await page.locator('.messages').allTextContents();
   console.log(`colour: explore -> ce=${param('ce')} flag=${JSON.stringify(flagged)}`);
@@ -363,10 +380,77 @@ const heightField = page.getByLabel(/^Height/);
   if (!flagged.includes('Not orderable')) problems.push('an explore colour is not flagged as not orderable');
   if (!warned.some((text) => /cannot be ordered/.test(text))) problems.push('no statement that the explore colour cannot be ordered');
   await page.getByRole('button', { name: /^Use / }).click();
-  await page.waitForTimeout(700);
+  await paramEventually('ce', /^RAL\d{4}$/);
   console.log(`colour: nearest offered -> ce=${param('ce')}`);
   if (!/^RAL\d{4}$/.test(param('ce') ?? '')) problems.push(`"use the closest offered colour" did not return to an offered shade: ${param('ce')}`);
   await page.screenshot({ path: `${SHOTS}/shot-colour.png` });
+}
+
+/* ------------------------------------------------------------------ *
+ * Step 6 — door options
+ * ------------------------------------------------------------------ */
+
+{
+  const param = (key) => new URL(page.url()).searchParams.get(key);
+  const expect = async (label, key, pattern) => {
+    const value = await paramEventually(key, pattern);
+    console.log(`door: ${label} -> ${key}=${value}`);
+    if (!pattern.test(value ?? '')) problems.push(`door option "${label}" did not reach the link: ${key}=${value}`);
+  };
+  await page.goto(`${BASE}/?view=el`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('canvas');
+  await page.getByRole('radio', { name: 'Door', exact: true }).check();
+  await page.waitForTimeout(800);
+  for (const id of ['style', 'hardware']) {
+    const toggle = page.locator(`#section-${id}-toggle`);
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+  }
+  const settle = () => page.waitForTimeout(700);
+
+  await page.getByRole('radio', { name: /^Half glazed/ }).check();
+  await settle();
+  await expect('half glazed', 's', /^hg$/);
+  await page.getByRole('radio', { name: /^Grooved/ }).check();
+  await settle();
+  await expect('grooved panels', 'pd', /^g\./);
+
+  // Side lights on a single door: the frame is not resized behind the customer's back...
+  const widthBefore = param('w');
+  await page.getByRole('radio', { name: 'Both', exact: true }).check();
+  await page.waitForSelector('.keep--problem', { timeout: 5000 }).catch(() => {});
+  const alert = await page.locator('.keep--problem').allTextContents();
+  console.log(`door: both side lights on ${widthBefore} mm -> w=${param('w')}, problem=${alert.length > 0}`);
+  if (param('w') !== widthBefore) problems.push('adding side lights changed the overall width by itself');
+  if (alert.length === 0) problems.push('no reason given when side lights leave no room for the door');
+  // ...and the explicit fix restores a buildable door.
+  await page.getByRole('button', { name: /^Widen the frame/ }).click();
+  await settle();
+  await expect('widen to keep the door', 'w', /^1[5-9]\d\d$/);
+  if ((await page.locator('.keep--problem').count()) !== 0) problems.push('the door is still unbuildable after widening the frame');
+
+  await page.getByRole('checkbox', { name: /^Top light/ }).check();
+  await settle();
+  await expect('top light', 'tl', /^\d/);
+  // "Right" is both a side light and a hinge side: scoped to its own group.
+  await page.getByRole('group', { name: 'Hinged on the' }).getByRole('radio', { name: 'Right' }).check();
+  await settle();
+  await expect('hinged on the right', 'hg', /^r$/);
+
+  await page.getByRole('radio', { name: 'Pull bar' }).check();
+  await page.getByRole('radio', { name: 'Black' }).check();
+  await page.getByRole('checkbox', { name: /^Knocker/ }).check();
+  await settle();
+  await expect('pull bar', 'hw', /^pb$|^pull/);
+  await expect('black', 'hf', /^bk$/);
+  await expect('knocker', 'kn', /^rg$/);
+
+  // A fully glazed leaf takes no furniture, and says why.
+  await page.getByRole('radio', { name: /^Fully glazed/ }).check();
+  await settle();
+  const disabled = await page.getByRole('checkbox', { name: /^Letterplate/ }).isDisabled();
+  console.log(`door: fully glazed disables furniture=${disabled}`);
+  if (!disabled) problems.push('furniture can still be switched on for a fully glazed door');
+  await page.screenshot({ path: `${SHOTS}/shot-door-options.png` });
 }
 
 await page.setViewportSize({ width: 390, height: 844 });

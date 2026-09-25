@@ -243,7 +243,10 @@ function describeDoorStyle(config: DoorConfigState): SectionDescription {
   lines.push({ label: 'Threshold', value: config.threshold === 'standard' ? 'Standard' : 'Low-level access' });
   lines.push({ label: 'Frame', value: MATERIALS[config.material].label });
 
-  return { summary: `${doorStyleName(config)}, ${surroundSummary(config)}`, lines };
+  const surround = surroundSummary(config);
+  const summary =
+    surround === 'no side or top lights' ? `${doorStyleName(config)}, ${surround}` : `${doorStyleName(config)} with ${surround}`;
+  return { summary, lines };
 }
 
 function windowStyleName(config: WindowConfigState): string {
@@ -422,16 +425,23 @@ export function describeHardware(config: ConfigState): SectionDescription {
 
   const hardware = config.hardware;
   const handle = DOOR_HANDLE[hardware.handle];
+  // A fully glazed leaf has nowhere to fix furniture and none is built there.
+  // The choices are kept in the configuration — switch back to a style with a
+  // solid area and they return — but they are not described as fitted.
+  const fitted = config.style.id !== 'full-glazed';
   const furniture: string[] = [];
-  if (hardware.letterplate) furniture.push('letterplate');
-  if (hardware.knocker !== null) furniture.push(KNOCKER[hardware.knocker]);
-  if (hardware.spyhole) furniture.push('spyhole');
+  if (fitted && hardware.letterplate) furniture.push('letterplate');
+  if (fitted && hardware.knocker !== null) furniture.push(KNOCKER[hardware.knocker]);
+  if (fitted && hardware.spyhole) furniture.push('spyhole');
   return {
     summary: `${handle}, ${finish.toLowerCase()}`,
     lines: [
       { label: 'Handle', value: handle },
       { label: 'Finish', value: finish },
-      { label: 'Door furniture', value: furniture.length === 0 ? 'None' : sentence(list(furniture)) },
+      {
+        label: 'Door furniture',
+        value: !fitted ? 'None: a fully glazed door has nowhere to fix it' : furniture.length === 0 ? 'None' : sentence(list(furniture)),
+      },
       { label: 'Trickle vents', value: vents },
     ],
   };

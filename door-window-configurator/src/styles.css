@@ -864,6 +864,222 @@ h1 {
 }
 
 /* ------------------------------------------------------------------ *
+ * Option panels (Step 6): tiles, toggles, the keep-the-door offer
+ * ------------------------------------------------------------------ */
+
+.options,
+.options__group {
+  display: grid;
+  gap: 1.125rem;
+}
+
+.options__group {
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.tiles,
+.toggles {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.tiles__legend {
+  padding: 0;
+  margin-bottom: 0.625rem;
+  font-size: var(--step-small);
+  color: var(--ink-soft);
+}
+
+.tiles__hint {
+  margin: -0.25rem 0 0.75rem;
+  font-size: var(--step-small);
+  color: var(--ink-faint);
+}
+
+.tiles__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.tiles__grid[data-columns='2'] {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tiles__grid[data-columns='4'] {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.tile {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: start;
+  gap: 0.1875rem;
+  padding: 0.625rem 0.625rem 0.6875rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  transition: border-color var(--duration) var(--ease), box-shadow var(--duration) var(--ease);
+}
+
+.tile:hover {
+  border-color: rgba(22, 24, 26, 0.4);
+}
+
+.tile input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Chosen: an ink ring, the same language as the swatches. */
+.tile:has(input:checked) {
+  border-color: var(--ink);
+  box-shadow: 0 0 0 1px var(--ink);
+}
+
+.tile:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.tile__picture {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 4.25rem;
+  margin-bottom: 0.375rem;
+  color: var(--ink-soft);
+}
+
+.tile__label {
+  font-size: var(--step-small);
+  line-height: 1.25;
+  color: var(--ink);
+}
+
+.tile:has(input:checked) .tile__label {
+  font-weight: 600;
+}
+
+.tile__detail {
+  font-size: var(--step-micro);
+  line-height: 1.3;
+  color: var(--ink-faint);
+}
+
+.thumb {
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+}
+
+.glyph {
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+/* Hardware finishes, suggested with a brushed or polished gradient. */
+.metal {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(22, 24, 26, 0.18);
+}
+
+.metal[data-finish='chrome'] { background: linear-gradient(135deg, #fbfbfc 0%, #9aa1a8 45%, #f1f3f5 60%, #7f868d 100%); }
+.metal[data-finish='satin-chrome'] { background: linear-gradient(135deg, #dfe2e5, #aeb3b8); }
+.metal[data-finish='black'] { background: linear-gradient(135deg, #3a3c3f, #121314); }
+.metal[data-finish='brass'] { background: linear-gradient(135deg, #f2d48f 0%, #b5873a 50%, #e8c677 70%, #94691f 100%); }
+.metal[data-finish='anthracite'] { background: linear-gradient(135deg, #6a7075, #33373b); }
+
+.toggles {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.toggles:disabled .toggle {
+  opacity: 0.55;
+}
+
+.toggle {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.toggle input {
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0.125rem 0 0;
+  accent-color: var(--ink);
+  cursor: pointer;
+}
+
+.toggle input:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.toggle label {
+  display: grid;
+  gap: 0.0625rem;
+  cursor: pointer;
+}
+
+.toggle__label {
+  font-size: var(--step-small);
+  color: var(--ink);
+}
+
+.toggle__detail {
+  font-size: var(--step-micro);
+  color: var(--ink-faint);
+}
+
+/* "Keep the door as it was": a note, or a problem, with the explicit fix. */
+.keep {
+  display: grid;
+  gap: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: var(--radius);
+  background: rgba(22, 24, 26, 0.04);
+}
+
+.keep--problem {
+  background: rgba(138, 51, 36, 0.06);
+  border-left: 2px solid var(--warn);
+}
+
+.keep p {
+  margin: 0;
+  font-size: var(--step-small);
+  color: var(--ink);
+}
+
+.keep .button {
+  justify-self: start;
+}
+
+.button--quiet {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+.button--quiet:hover {
+  background: rgba(22, 24, 26, 0.05);
+}
+
+/* ------------------------------------------------------------------ *
  * Segmented control (radio group)
  * ------------------------------------------------------------------ */
 
@@ -1292,6 +1508,16 @@ h1 {
   .swatch input:checked ~ .swatch__chip {
     outline: 3px solid Highlight;
     outline-offset: 2px;
+  }
+
+  .tile:has(input:checked) {
+    outline: 3px solid Highlight;
+    outline-offset: 1px;
+  }
+
+  .metal,
+  .thumb {
+    forced-color-adjust: none;
   }
 }
 

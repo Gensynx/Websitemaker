@@ -197,6 +197,29 @@ async function tabUntil(page, predicate, limit = 60) {
     if (!back || !/^RAL/.test(param('ce') ?? '')) problems.push('the way back from explore is not reachable by keyboard');
   }
 
+  // 4c. Door options by keyboard alone: a style tile by arrow key, a toggle by Space.
+  {
+    const param = (key) => new URL(page.url()).searchParams.get(key);
+    await page.goto(`${BASE}/?view=el`, { waitUntil: 'networkidle' });
+    await page.evaluate(() => sessionStorage.clear());
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForSelector('.stage__canvas[data-ready="true"]', { timeout: 40000 });
+    const styleToggle = await tabUntil(page, (f) => /^Style /.test(f.name));
+    await page.keyboard.press('Enter');
+    const tile = await tabUntil(page, (f) => f.type === 'radio', 3);
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(700);
+    console.log(`door style by keyboard: toggle=${Boolean(styleToggle)} from "${tile?.name}" -> s=${param('s')}`);
+    if (!tile || param('s') === 'sp') problems.push('the door style tiles cannot be operated with the arrow keys');
+    const topLight = await tabUntil(page, (f) => f.type === 'checkbox' && /^Top light/.test(f.name), 30);
+    await page.keyboard.press(' ');
+    // The link is written on a short debounce; under software rendering the
+    // main thread can be busy for a while, so wait for it rather than sample.
+    await page.waitForFunction(() => /^\d/.test(new URL(location.href).searchParams.get('tl') ?? ''), null, { timeout: 5000 }).catch(() => {});
+    console.log(`top light by keyboard: reached=${Boolean(topLight)} tl=${param('tl')}`);
+    if (!topLight || !/^\d/.test(param('tl') ?? '')) problems.push('the top light cannot be switched on from the keyboard');
+  }
+
   // 5. The preview has a text alternative, in plain words.
   const alt = await page.locator('.stage__picture').getAttribute('aria-label');
   console.log(`preview text alternative: ${alt}`);

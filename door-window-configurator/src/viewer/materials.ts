@@ -21,12 +21,10 @@ import * as THREE from 'three';
 import type { ColourSelection, ConfigState, Glazing } from '../config/types';
 import { resolveInternalColour, resolveInternalFinish } from '../config/types';
 import type { Finish } from '../config/material';
-import { ralEntry } from '../config/ral';
+import { colourToHex } from '../config/colourHex';
 import type { Part, PartKind } from './geometry';
 
-export function colourToHex(colour: ColourSelection): string {
-  return colour.mode === 'ral' ? ralEntry(colour.code).hex : colour.hex;
-}
+export { colourToHex };
 
 /* ------------------------------------------------------------------ *
  * Procedural surface detail
