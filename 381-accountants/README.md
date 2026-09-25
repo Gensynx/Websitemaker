@@ -36,14 +36,69 @@ services/tax-planning.html          ┘
   reviewers' published names and lightly tidied for spelling only. Three are
   featured on the home page; reviews.html carries a wall of eighteen more.
 
+## Facts still to confirm before launch
+
+Some sections are built but waiting on facts only the firm can supply. Each
+gap renders as an outlined **[bracketed placeholder]** so none can go live
+unnoticed, and none of them reach the structured data. Fill them in one
+place and rebuild:
+
+| What | Where to set it | Shown on |
+|---|---|---|
+| Starting fee for each service (`fee.from`, in pounds) | `sitegen/content-services.mjs` | Services hub fees table, each service page |
+| Fee basis per service (per month, per return, per quarter, per year, one-off, quoted) | `sitegen/content-services.mjs` → `fee.basis` (currently assumed) | Same |
+| Team: name, role, qualification, two-line bio (add one entry per person clients deal with) | `sitegen/lib.mjs` → `SITE.team` | About → "Who you will work with", FAQ |
+| Professional body and membership number | `SITE.professionalBody` | About → "Regulation & protection", FAQ |
+| Anti-money-laundering supervisory body | `SITE.amlSupervisor` | Same |
+| Professional indemnity insurer and cover | `SITE.indemnity` | Same |
+| ICO registration number | `SITE.icoNumber` | Same |
+| Notice period for leaving | `SITE.noticePeriod` | FAQ |
+
+Check before launch: `grep -rl 'class="tbc"' --include=*.html .` should
+return nothing.
+
+## Conversion and trust decisions
+
+- **One primary action, one wording.** Every primary button reads
+  "Book a free consultation" and lands on the booking form
+  (`contact.html#book`, pre-selecting the service from service pages).
+  Every page hero carries it.
+- **Header button steps back while the page's own button is on screen.**
+  `assets/js/site.js` hides the header copy while the page's first primary
+  button is at least half visible and brings it back once that button
+  scrolls away, so exactly one "Book" is in view. On phones it shows as a
+  compact "Book". Without JavaScript it simply stays visible.
+- **Proof, not a mock-up, beside the headline.** The home hero shows a real
+  Google review, the rating linked to the public listing, and facts anyone
+  can check (established 2010, company number, office address).
+- **Prices published.** The services hub has a "What it costs" table
+  (`#fees`) linked from the home hero and services note.
+- **Service pages show the statutory deadlines** that apply to each service
+  (key dates), which demonstrates expertise and answers a common question.
+- **Who you deal with and who regulates the firm** is on the About page and
+  answered in the services FAQs, along with how leaving works
+  (professional clearance and records handover).
+
 ## Design system
 
 Trust & Authority pattern: navy ink (`#0d1f42`/`#1e3a8a`) + gold CTA
 (`#b45309`), light `#f7f9fc` surfaces, EB Garamond display over IBM Plex Sans
-body (Google Fonts, `font-display: swap`, system fallbacks). SVG icon set
-(1.5px stroke), scroll reveals that respect `prefers-reduced-motion` and
-degrade gracefully without JavaScript, JSON-LD `AccountingService` schema on
-home + contact.
+body (Google Fonts, `font-display: swap`). SVG icon set (1.5px stroke),
+scroll reveals that respect `prefers-reduced-motion` and degrade gracefully
+without JavaScript, JSON-LD `AccountingService` schema on home + contact
+(prices are added to it only once confirmed).
+
+- **Contrast-safe gold.** Buttons use `--grad-cta` (`#b45309` → `#92400e`),
+  where every stop keeps white text above 5:1. The brighter `--grad-gold`
+  is for decorative rules only. Eyebrows use `--gold-strong` on light grounds
+  and `--gold-on-dark-2` on navy; `--text-soft` is `#5f6b82` (at least
+  4.78:1 on every light ground).
+- **No layout jump when fonts load.** `main.css` declares metric-matched
+  fallback faces (`EB Garamond Fallback`, `IBM Plex Sans Fallback`) built on
+  Times New Roman / Arial with `size-adjust` and ascent/descent overrides
+  measured from the webfonts, so text keeps its size and line breaks while
+  the Google Fonts load.
+- Skip link, `role="img"` on star ratings, underlined inline links.
 
 ## Editing
 

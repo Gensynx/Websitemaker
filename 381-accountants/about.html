@@ -18,6 +18,7 @@
 
 </head>
 <body>
+<a class="skip-link" href="#main">Skip to content</a>
 <div class="top-strip">
   <div class="wrap">
     <span class="strip-hours"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2.5"/></svg> Mon–Fri 9:00–17:30 · Canary Wharf, London</span>
@@ -41,12 +42,12 @@
       <li><a href="reviews.html">Reviews</a></li>
       <li><a href="contact.html">Contact</a></li>
       <li class="nav-links-phone"><a class="btn btn-outline btn-block" href="tel:+442082141259"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg> Call 020 8214 1259</a></li>
-      <li class="nav-book-mobile"><a class="btn btn-gold btn-block" href="contact.html">Book a free consultation</a></li>
+      <li class="nav-book-mobile"><a class="btn btn-gold btn-block" href="contact.html#book">Book a free consultation</a></li>
       </ul>
     </nav>
     <div class="nav-cta">
       <a class="nav-phone" href="tel:+442082141259"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg> 020 8214 1259</a>
-      <a class="btn btn-gold nav-book" href="contact.html">Book a consultation</a>
+      <a class="btn btn-gold nav-book" href="contact.html#book"><span class="nb-long">Book a free consultation</span><span class="nb-short" aria-hidden="true">Book</span></a>
       <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
         <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
@@ -54,13 +55,17 @@
     </div>
   </div>
 </header>
-<main>
+<main id="main" tabindex="-1">
 
 <section class="page-hero">
   <div class="wrap">
     <nav class="crumbs" aria-label="Breadcrumb"><a href="index.html">Home</a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span class="here">About Us</span></nav>
     <h1>An independent firm you can build on</h1>
     <p class="lede">381 Accountancy & Bookkeeping Services Ltd has served London businesses and individuals since <strong>2010</strong>: 16+ years of bookkeeping, payroll, tax and accounts, delivered with the personal attention only an independent firm gives.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-gold" href="contact.html#book">Book a free consultation <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17m0 0-6-6m6 6-6 6"/></svg></a>
+      <a class="btn btn-outline" href="#team">Meet the team</a>
+    </div>
   </div>
 </section>
 
@@ -87,8 +92,8 @@
           <p>Clients come to us for a tax return or a tidy-up, and stay for years. Our Google reviews tell that story better than we can: five stars across the board, with reviewers citing professionalism, trustworthiness, responsiveness, accuracy and value for money.</p>
         </div>
         <div class="hero-ctas" style="margin-top:28px">
-          <a class="btn btn-navy" href="reviews.html">Read our reviews <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17m0 0-6-6m6 6-6 6"/></svg></a>
-          <a class="btn btn-outline" href="contact.html">Meet us: book a consultation</a>
+          <a class="btn btn-gold" href="contact.html#book">Book a free consultation <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17m0 0-6-6m6 6-6 6"/></svg></a>
+          <a class="btn btn-outline" href="reviews.html">Read our reviews</a>
         </div>
       </div>
       <div class="cred-stack rv rv-d1">
@@ -101,7 +106,45 @@
   </div>
 </section>
 
-<section class="section muted-section">
+<section class="section muted-section" id="team">
+  <div class="wrap">
+    <div class="split top">
+      <div>
+        <div class="section-head rv">
+          <span class="eyebrow">Who you will work with</span>
+          <h2>The people behind your accounts</h2>
+          <p>You deal with the people doing your work, not a call queue. These are the names you will see on your emails and hear on the phone.</p>
+        </div>
+        <div class="person-list">
+          <article class="person-card rv">
+    <span class="person-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8.5" r="3.2"/><path d="M3.5 20a5.5 5.5 0 0 1 11 0"/><path d="M15.5 5.6a3.2 3.2 0 0 1 0 5.8M17.4 15a5.5 5.5 0 0 1 3.1 5"/></svg></span>
+    <div>
+      <h3><span class="tbc">[Full name]</span></h3>
+      <p class="person-role"><span class="tbc">[Role]</span> · <span class="tbc">[Qualification, e.g. professional body membership]</span></p>
+      <p><span class="tbc">[Two lines on experience and the clients they look after]</span></p>
+    </div>
+  </article>
+        </div>
+      </div>
+      <div>
+        <div class="section-head rv">
+          <span class="eyebrow">Regulation &amp; protection</span>
+          <h2>Checks you can make before you call</h2>
+          <p>Handing over your records is a trust decision. Here is who we answer to.</p>
+        </div>
+        <dl class="reg-list rv">
+    <div><dt>Company</dt><dd>381 Accountancy & Bookkeeping Services Ltd, registered in England &amp; Wales, company no. 07327043</dd></div>
+    <div><dt>Professional body</dt><dd><span class="tbc">[Body and membership number]</span></dd></div>
+    <div><dt>Anti-money-laundering supervision</dt><dd><span class="tbc">[Supervisory body]</span></dd></div>
+    <div><dt>Professional indemnity insurance</dt><dd><span class="tbc">[Insurer and level of cover]</span></dd></div>
+    <div><dt>Data protection</dt><dd>ICO registration <span class="tbc">[number]</span></dd></div>
+  </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
   <div class="wrap">
     <div class="section-head center rv">
       <span class="eyebrow">How we work</span>
@@ -116,7 +159,7 @@
   </div>
 </section>
 
-<section class="section">
+<section class="section muted-section">
   <div class="wrap">
     <div class="section-head center rv">
       <span class="eyebrow">Where we work</span>
@@ -146,7 +189,7 @@
         <p>Book a free, no-obligation consultation and find out exactly what 381 Accountants can take off your plate. We usually reply within one working day.</p>
       </div>
       <div class="cta-actions">
-        <a class="btn btn-gold" href="contact.html">Book a free consultation <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17m0 0-6-6m6 6-6 6"/></svg></a>
+        <a class="btn btn-gold" href="contact.html#book">Book a free consultation <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h17m0 0-6-6m6 6-6 6"/></svg></a>
         <a class="cta-phone" href="tel:+442082141259"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2Z"/></svg> 020 8214 1259</a>
       </div>
     </div>

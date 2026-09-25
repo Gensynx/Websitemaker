@@ -1,14 +1,13 @@
-/* Generates the static HTML pages. Run from the 381-accountants folder:
+/* Generates the static HTML pages. Run from the 381-accountants-ledger folder:
      node sitegen/build.mjs
    The generated files are committed; nothing runs at deploy time. */
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { page, SITE } from './lib.mjs';
-import { services, servicesNav } from './content-services.mjs';
+import { page, SITE, services } from './lib.mjs';
 import {
-  homeBody, servicesHubBody, servicePage,
+  homeBody, servicesHubBody, servicePage, deadlinesBody,
   aboutBody, reviewsBody, contactBody,
 } from './content-pages.mjs';
 
@@ -38,8 +37,7 @@ const BUSINESS_LD = {
     closes: '17:30',
   },
   areaServed: SITE.areas.map((name) => ({ '@type': 'Place', name })),
-  /* Prices are only published in structured data once the firm has
-     confirmed them; placeholders never reach search engines. */
+  /* Prices reach structured data only once the firm has confirmed them. */
   makesOffer: services.map((s) => ({
     '@type': 'Offer',
     itemOffered: { '@type': 'Service', name: s.name },
@@ -57,44 +55,51 @@ const BUSINESS_LD = {
 const pages = [
   {
     path: 'index.html',
-    title: '381 Accountants · Certified Accountants & Bookkeeping in Canary Wharf, London',
-    desc: 'Independent certified accountants at 30 Churchill Place, Canary Wharf, serving all of London since 2010. Bookkeeping, payroll, self assessment, VAT, annual accounts, company formation and tax planning. Rated 5.0 from 42 Google reviews. Free consultation.',
+    title: '381 Accountants · Certified Accountants in Canary Wharf, London',
+    desc: `Independent certified accountants at 30 Churchill Place, Canary Wharf, since ${SITE.established}. Bookkeeping, payroll, self assessment, VAT, annual accounts, company formation and tax planning, on fixed fees. Rated 5.0 from ${SITE.reviewCount} Google reviews.`,
     active: 'home',
     body: homeBody,
     jsonld: BUSINESS_LD,
   },
   {
     path: 'services/index.html',
-    title: 'Our Services · 381 Accountants, Canary Wharf & London',
-    desc: 'All accounting services under one roof: bookkeeping, payroll, self assessment tax returns, VAT returns, annual accounts, company formation and tax planning. Starting fees for each, fixed and agreed up front, and a free consultation.',
+    title: 'Services & Fees · 381 Accountants, Canary Wharf',
+    desc: 'Seven accounting services from one team, each on a fixed fee agreed in writing: bookkeeping, payroll, self assessment, VAT returns, annual accounts, company formation and tax planning.',
     active: 'services',
     body: servicesHubBody,
   },
   {
+    path: 'deadlines.html',
+    title: 'Deadline Finder: Accounts, Corporation Tax & VAT Dates · 381 Accountants',
+    desc: 'Enter your company year end and VAT quarters to see your Companies House accounts, corporation tax, CT600 and VAT deadlines, worked out using the standard rules.',
+    active: 'deadlines',
+    body: deadlinesBody,
+  },
+  {
     path: 'about.html',
-    title: 'About Us · 381 Accountants · Independent Certified Accountants Since 2010',
-    desc: 'The story of 381 Accountancy & Bookkeeping Services Ltd: an independent firm of certified accountants in Canary Wharf with 16+ years serving London, cloud accounting on Sage & QuickBooks, and a five-star Google rating.',
+    title: `About & Regulation · 381 Accountants · Independent Since ${SITE.established}`,
+    desc: `The people behind 381 Accountants, who regulates the firm, and how we work. An independent firm of certified accountants in Canary Wharf since ${SITE.established}.`,
     active: 'about',
     body: aboutBody,
   },
   {
     path: 'reviews.html',
-    title: 'Client Reviews · 381 Accountants · Rated 5.0 on Google',
-    desc: 'Real Google reviews of 381 Accountants: 42 reviews, 5.0 rating, five stars across the board, from clients of up to 25 years. Fast response, professional team and value for money.',
+    title: `Client Reviews · 381 Accountants · 5.0 from ${SITE.reviewCount} Google Reviews`,
+    desc: `Real Google reviews of 381 Accountants: ${SITE.reviewCount} reviews, all five stars, from clients of up to 25 years.`,
     active: 'reviews',
     body: reviewsBody,
   },
   {
     path: 'contact.html',
-    title: 'Contact & Book a Free Consultation · 381 Accountants, Canary Wharf',
-    desc: 'Contact 381 Accountants: 020 8214 1259 · info@381abs.com · 30 Churchill Place, Canary Wharf, London E14 5RE. Open Mon–Fri 9:00–17:30. Book your free consultation online.',
+    title: 'Contact & Book a Free Consultation · 381 Accountants',
+    desc: `Call ${SITE.phone1}, email ${SITE.email} or book a free consultation online. 30 Churchill Place, Canary Wharf, London ${SITE.postcode}. ${SITE.hours}.`,
     active: 'contact',
     body: contactBody,
     jsonld: BUSINESS_LD,
   },
   ...services.map((svc) => ({
     path: `services/${svc.slug}.html`,
-    title: `${svc.name} · 381 Accountants, Canary Wharf & London`,
+    title: `${svc.name} · 381 Accountants, Canary Wharf`,
     desc: svc.short.replace(/<[^>]+>/g, ''),
     active: 'services',
     body: (path) => servicePage(svc, path),
@@ -108,7 +113,6 @@ for (const p of pages) {
     desc: p.desc,
     active: p.active,
     body: p.body(p.path),
-    servicesNav,
     jsonld: p.jsonld,
   });
   const out = join(root, p.path);

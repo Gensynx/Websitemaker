@@ -1,6 +1,13 @@
 /* Service definitions for 381 Accountants. Each entry drives a card on the
    services hub, a footer link, a line in the booking panel (mini) and a full
-   detail page (intro, included, steps, callout, faqs). */
+   detail page (intro, included, steps, callout, key dates, faqs).
+
+   fee.from is the published starting price in pounds. It is null until the
+   firm confirms it, and renders as a visible placeholder until then. The
+   basis (per month, per return…) also needs the firm's confirmation.
+
+   keyDates are the standard HMRC / Companies House deadlines for the
+   service, not client-specific dates. */
 
 export const services = [
   {
@@ -29,6 +36,7 @@ export const services = [
       ['You get the picture every month', 'A clear monthly report shows income, spending, who owes you and how the business is tracking. Your books stay permanently year-end ready.'],
     ],
     callout: 'Behind on your books? We regularly take on backlogs, sometimes months or years behind, and bring them fully up to date before switching you to a simple monthly routine.',
+    fee: { from: null, basis: 'per month' },
     faqs: [
       ['Which software do you work with?', 'We work with cloud-based accounting software including Sage One, Sage 50 and QuickBooks. If you are not on software yet, we will recommend the best fit for your business and set everything up for you.'],
       ['Can you take over from our previous bookkeeper?', 'Yes. We handle the switch-over, review the state of your existing records, tidy anything that needs it and carry on without disruption to your business.'],
@@ -61,6 +69,13 @@ export const services = [
       ['We close the loops', 'Pension contributions are submitted to your provider, P45s are issued when people leave, and P60s plus end-of-year reporting are handled every April.'],
     ],
     callout: 'Directors’ payroll: running a limited company? We will set the most tax-efficient mix of salary and dividends alongside your payroll, so you keep more of what you earn.',
+    fee: { from: null, basis: 'per month' },
+    keyDates: [
+      ['On or before every payday', 'Full Payment Submission (FPS) reported to HMRC'],
+      ['22nd of each month', 'PAYE and National Insurance paid to HMRC by monthly payers (electronic payment)'],
+      ['31 May', 'P60s issued to everyone employed on 5 April'],
+      ['6 July', 'P11D and P11D(b) forms for benefits in kind'],
+    ],
     faqs: [
       ['How much notice do you need for each pay run?', 'Send us hours and any changes a couple of working days before payday and everything will be ready on time. For fixed salaries with no changes, it runs automatically.'],
       ['Can you handle pension auto-enrolment?', 'Yes: assessment of your workforce, letters to staff, enrolment with your pension provider and the ongoing contribution submissions each pay period.'],
@@ -93,6 +108,13 @@ export const services = [
       ['We file and confirm', 'Your return is filed electronically with HMRC, you receive the submission confirmation the moment it lands, and we tell you exactly what to pay and when.'],
     ],
     callout: 'Left it late? We regularly turn returns around close to the deadline. Get in touch even if January is already upon you.',
+    fee: { from: null, basis: 'per return' },
+    keyDates: [
+      ['5 October', 'Register for self assessment if you are newly required to file'],
+      ['31 October', 'Deadline for paper returns'],
+      ['31 January', 'Online return filed and the balance of tax paid, plus any first payment on account'],
+      ['31 July', 'Second payment on account'],
+    ],
     faqs: [
       ['Do I need to file a self assessment return?', 'Usually yes if you are self-employed, a company director with untaxed income, a landlord, a higher earner with investment income, or you have capital gains. If you are not sure, ask us. It takes five minutes to check.'],
       ['What do you need from me?', 'A record of your income for the year: invoices, statements, P60/P45, rental income and expenses. Send what you have; we will tell you if anything is missing.'],
@@ -125,6 +147,11 @@ export const services = [
       ['We file and defend', 'The return is filed digitally before the deadline. If HMRC ever queries or inspects, we handle the correspondence and paperwork from start to finish.'],
     ],
     callout: 'On the wrong scheme, many businesses quietly overpay VAT for years. We review your position when we take you on; switching schemes has saved clients thousands.',
+    fee: { from: null, basis: 'per quarter' },
+    keyDates: [
+      ['1 month and 7 days after each VAT period', 'Return filed and VAT paid'],
+      ['30 days after the month you pass the threshold', 'Register for VAT once taxable turnover over the last 12 months goes over it'],
+    ],
     faqs: [
       ['When do I have to register for VAT?', 'When your taxable turnover for the last 12 months passes the registration threshold, or you expect it to in the next 30 days. Register late and HMRC can backdate what you owe, so talk to us before you reach the line.'],
       ['What is Making Tax Digital?', 'HMRC requires VAT records to be kept digitally and returns to be filed through compatible software. Our bookkeeping and filing are fully MTD-compliant, so you are covered automatically.'],
@@ -157,6 +184,12 @@ export const services = [
       ['We file everything', 'Accounts go to Companies House, the CT600 goes to HMRC, and you get confirmation of both plus a clear note of exactly what tax to pay and by when.'],
     ],
     callout: 'Deadline pressure? Late filing penalties start the day after your accounts are due and escalate from there. If your year end has been and gone, contact us today. Rescue jobs are our specialty.',
+    fee: { from: null, basis: 'per year' },
+    keyDates: [
+      ['9 months after your year end', 'Private company accounts filed at Companies House'],
+      ['9 months and 1 day after your year end', 'Corporation tax paid (most small companies)'],
+      ['12 months after your year end', 'Company tax return (CT600) filed with HMRC'],
+    ],
     faqs: [
       ['When are my company accounts due?', 'Normally nine months after your accounting year end for Companies House, with corporation tax payable at the same nine-month mark. We diarise every deadline the day you join us.'],
       ['My records are a mess. Can you still help?', 'Yes. We rebuild records from bank statements, invoices and whatever else exists. It happens more often than you would think, and it is always fixable.'],
@@ -189,6 +222,12 @@ export const services = [
       ['We keep it compliant', 'Confirmation statements, director changes, share transfers and statutory registers are maintained year after year. The paperwork simply stops being your problem.'],
     ],
     callout: 'Not sure whether to go limited? We will run the numbers for your situation, sole trader versus limited company, before you commit either way. The consultation is free.',
+    fee: { from: null, basis: 'one-off' },
+    keyDates: [
+      ['Within 3 months of starting to trade', 'Register the company for corporation tax'],
+      ['Within 14 days of each review date', 'Confirmation statement filed, at least once every 12 months'],
+      ['21 months after incorporation', 'First accounts due at Companies House'],
+    ],
     faqs: [
       ['How long does incorporation take?', 'Usually one working day once we have your details. We prepare everything, you approve it, and your company number arrives from Companies House shortly after.'],
       ['What is a confirmation statement?', 'An annual filing confirming Companies House holds the correct details about your company: directors, shareholders, registered office. Miss it and the company can be struck off. We file it for you every year.'],
@@ -221,6 +260,11 @@ export const services = [
       ['We stand between you and HMRC', 'As your registered agent, letters come to us first. If an enquiry opens, we manage the response, the paperwork and the resolution from the first letter to the last.'],
     ],
     callout: 'HMRC letter arrived? Do not reply on your own. Send it to us the day it lands; early, well-handled responses shorten enquiries dramatically.',
+    fee: { from: null, basis: 'quoted per engagement' },
+    keyDates: [
+      ['5 April', 'Tax year ends: the last day to use that year’s allowances'],
+      ['31 January and 31 July', 'Payments on account for self assessment'],
+    ],
     faqs: [
       ['When should tax planning happen?', 'Before your year end. That is when options are still open. We review each client’s position in good time so decisions can actually be made, not just regretted.'],
       ['What triggers an HMRC investigation?', 'Some enquiries are random; others follow late filings, unusual figures or industry campaigns. Clean, consistent, well-filed records (our default) are the best protection there is.'],

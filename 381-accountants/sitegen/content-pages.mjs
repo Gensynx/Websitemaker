@@ -2,13 +2,61 @@
 import {
   SITE, icon, stars5, breadcrumbs, bookingForm, ctaBanner,
   quoteCards, ratingBanner, REVIEWS, REVIEWS_ALL,
+  rel, tbc, fact, CTA, bookHref,
 } from './lib.mjs';
 import { services } from './content-services.mjs';
-
-const rel = (path) => (path.includes('/') ? '../' : '');
 const yearsExp = new Date().getFullYear() - SITE.established;
 
 /* ---------------- Shared fragments ---------------- */
+
+const feeText = (svc) => (svc.fee.from == null
+  ? `From ${tbc('£ to confirm')} ${svc.fee.basis}`
+  : `From £${svc.fee.from.toLocaleString('en-GB')} ${svc.fee.basis}`);
+
+function feesTable(path) {
+  const r = rel(path);
+  return `<div class="fee-table rv">
+  <table>
+    <caption class="sr-only">Starting fees by service</caption>
+    <thead><tr><th scope="col">Service</th><th scope="col">Starting fee</th></tr></thead>
+    <tbody>
+${services.map((s) => `      <tr><th scope="row"><a href="${r}services/${s.slug}.html">${s.name}</a><span>${s.mini}</span></th><td>${feeText(s)}</td></tr>`).join('\n')}
+    </tbody>
+  </table>
+  <p class="fee-note">${icon('info')} Every fee is fixed and agreed in writing before work starts. Your quote depends on transaction volume and the state of your records; the consultation that produces it is free.</p>
+</div>`;
+}
+
+function teamCards() {
+  return SITE.team.map((m) => `<article class="person-card rv">
+    <span class="person-mark" aria-hidden="true">${icon('users')}</span>
+    <div>
+      <h3>${fact(m.name, 'Full name')}</h3>
+      <p class="person-role">${fact(m.role, 'Role')} · ${fact(m.quals, 'Qualification, e.g. professional body membership')}</p>
+      <p>${fact(m.bio, 'Two lines on experience and the clients they look after')}</p>
+    </div>
+  </article>`).join('\n');
+}
+
+function regulationList() {
+  return `<dl class="reg-list rv">
+    <div><dt>Company</dt><dd>${SITE.legal}, registered in England &amp; Wales, company no. ${SITE.companyNo}</dd></div>
+    <div><dt>Professional body</dt><dd>${fact(SITE.professionalBody, 'Body and membership number')}</dd></div>
+    <div><dt>Anti-money-laundering supervision</dt><dd>${fact(SITE.amlSupervisor, 'Supervisory body')}</dd></div>
+    <div><dt>Professional indemnity insurance</dt><dd>${fact(SITE.indemnity, 'Insurer and level of cover')}</dd></div>
+    <div><dt>Data protection</dt><dd>${SITE.icoNumber == null ? `ICO registration ${tbc('number')}` : `ICO registration ${SITE.icoNumber}`}</dd></div>
+  </dl>`;
+}
+
+/* FAQs every page type can reuse: the questions people ask before trusting
+   an accountant with their records. */
+function trustFaqs(path) {
+  const r = rel(path);
+  const lead = SITE.team[0];
+  return `<details class="rv"><summary>Who will I actually deal with?${icon('plus')}</summary><p>The people doing your work, directly, by phone or email during office hours: ${fact(lead.name, 'name')}, ${fact(lead.quals, 'qualification')}, and the team on the <a class="text-link inline" href="${r}about.html#team">About page</a>.</p></details>
+      <details class="rv"><summary>Who regulates you?${icon('plus')}</summary><p>${SITE.legal} is registered in England &amp; Wales (company no. ${SITE.companyNo}). Professional body: ${fact(SITE.professionalBody, 'to confirm')}. Anti-money-laundering supervision: ${fact(SITE.amlSupervisor, 'to confirm')}. Professional indemnity insurance: ${fact(SITE.indemnity, 'to confirm')}.</p></details>
+      <details class="rv"><summary>What if I want to move to another accountant later?${icon('plus')}</summary><p>Give us ${fact(SITE.noticePeriod, 'notice period')} notice. Your new accountant will write to us for professional clearance, and we hand over your records and the information they need to carry on.</p></details>`;
+}
 
 function servicesGrid(path) {
   const r = rel(path);
@@ -64,37 +112,28 @@ export function homeBody(path = 'index.html') {
         <h1>Accounting &amp; bookkeeping in <em>safe hands</em> for ${yearsExp}+ years.</h1>
         <p class="hero-sub">${SITE.name} is an independent firm of certified accountants trusted by London businesses since <strong>${SITE.established}</strong>. From daily bookkeeping to year-end accounts and tax, we keep you compliant, informed and ahead, <strong>whatever your size</strong>.</p>
         <div class="hero-ctas">
-          <a class="btn btn-gold" href="${r}contact.html">Book a free consultation ${icon('arrow')}</a>
-          <a class="btn btn-outline" href="${r}services/index.html">Explore our services</a>
+          <a class="btn btn-gold" href="${bookHref(path)}">${CTA} ${icon('arrow')}</a>
+          <a class="btn btn-outline" href="${r}services/index.html#fees">Services &amp; fees</a>
         </div>
         <ul class="hero-points">
-          <li>${icon('star')} 5.0 rating on Google</li>
+          <li><a href="${SITE.google}" target="_blank" rel="noopener">${icon('star')} 5.0 rating on Google</a></li>
           <li>${icon('shield')} HMRC &amp; Companies House compliant</li>
           <li>${icon('cloud')} Sage &amp; QuickBooks certified</li>
         </ul>
       </div>
-      <div class="hero-visual" aria-hidden="true">
-        <div class="hv-card hv-main">
-          <div class="hv-title"><b>Your year, handled</b><span class="hv-badge">381 · Est. ${SITE.established}</span></div>
-          <div class="hv-rows">
-            <div class="hv-row"><span>Bookkeeping</span><b class="pos">Up to date</b></div>
-            <div class="hv-row"><span>VAT return · Q2</span><b class="pos">Filed early</b></div>
-            <div class="hv-row"><span>Payroll · June</span><b class="pos">Paid on time</b></div>
-            <div class="hv-row"><span>Corporation tax saved</span><b>£4,820</b></div>
-          </div>
-          <div class="hv-bars">
-            <i style="height:34%"></i><i style="height:52%"></i><i style="height:41%"></i><i style="height:66%"></i><i style="height:58%"></i><i style="height:82%"></i><i style="height:74%"></i><i style="height:96%"></i>
-          </div>
+      <figure class="proof-card">
+        <div class="proof-top">
+          <span class="stars" role="img" aria-label="5 out of 5 stars">${stars5}</span>
+          <a href="${SITE.google}" target="_blank" rel="noopener"><b>5.0 on Google</b> · ${SITE.reviewCount} reviews</a>
         </div>
-        <div class="hv-card hv-chip c1">
-          ${icon('star')}
-          <span><b>5.0 on Google</b><span class="hv-stars">★★★★★</span></span>
-        </div>
-        <div class="hv-card hv-chip c2">
-          ${icon('shield')}
-          <span><b>Deadline never missed</b><span>Self assessment · 31 Jan</span></span>
-        </div>
-      </div>
+        <blockquote>${REVIEWS[0].text}</blockquote>
+        <figcaption><b>${REVIEWS[0].name}</b> · ${REVIEWS[0].meta}</figcaption>
+        <dl class="proof-facts">
+          <div><dt>Established</dt><dd>${SITE.established}</dd></div>
+          <div><dt>Company no.</dt><dd>${SITE.companyNo}</dd></div>
+          <div><dt>Office</dt><dd>30 Churchill Place, ${SITE.postcode}</dd></div>
+        </dl>
+      </figure>
     </div>
   </div>
 </section>
@@ -109,7 +148,7 @@ ${statsBar()}
       <p>Bookkeeping to tax investigations: one team that knows your numbers end to end, so nothing falls between the gaps. Every service links to a full breakdown of exactly what we do and how.</p>
     </div>
     ${servicesGrid(path)}
-    <p class="divider-note rv">${icon('info')} Not sure which service you need? <a class="text-link" href="${r}contact.html">Book a free consultation${icon('arrow')}</a> and we will point you the right way, no obligation.</p>
+    <p class="divider-note rv">${icon('pound')} Fixed fees, agreed before any work starts. <a class="text-link" href="${r}services/index.html#fees">See starting fees${icon('arrow')}</a></p>
   </div>
 </section>
 
@@ -199,12 +238,27 @@ export function servicesHubBody(path = 'services/index.html') {
     ${breadcrumbs(path, [['Home', 'index.html'], ['Services', '']])}
     <h1>Accounting services, end to end</h1>
     <p class="lede">Seven core services, one team, zero gaps. Every engagement starts with a <strong>free consultation</strong> and a clear, agreed fee, so you always know exactly what you are getting and what it costs. Open any service for the full breakdown.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-gold" href="${bookHref(path)}">${CTA} ${icon('arrow')}</a>
+      <a class="btn btn-outline" href="#fees">See starting fees</a>
+    </div>
   </div>
 </section>
 
 <section class="section">
   <div class="wrap">
     ${servicesGrid(path)}
+  </div>
+</section>
+
+<section class="section muted-section" id="fees">
+  <div class="wrap">
+    <div class="section-head center rv">
+      <span class="eyebrow">Fees</span>
+      <h2>What it costs</h2>
+      <p>Starting prices for each service. The fee you pay is fixed and agreed before we start, so there is never an hourly meter running.</p>
+    </div>
+    ${feesTable(path)}
   </div>
 </section>
 
@@ -221,10 +275,11 @@ export function servicesHubBody(path = 'services/index.html') {
       <h2>Common questions before booking</h2>
     </div>
     <div class="faq" style="margin-inline:auto">
-      <details class="rv"><summary>How do your fees work?${icon('plus')}</summary><p>We agree a fixed fee before any work starts, based on the services you need and the state of your records. No surprise invoices, no hourly meters running.</p></details>
+      <details class="rv"><summary>How do your fees work?${icon('plus')}</summary><p>We agree a fixed fee before any work starts, based on the services you need and the state of your records. No surprise invoices, no hourly meters running. Starting prices for every service are in the <a class="text-link inline" href="#fees">fees table</a> above.</p></details>
       <details class="rv"><summary>Can you take over from my current accountant?${icon('plus')}</summary><p>Yes. Switching is easier than most people expect. With your permission we write to your current accountant for professional clearance and your records, and we handle the whole handover.</p></details>
       <details class="rv"><summary>Do you only work with businesses near Canary Wharf?${icon('plus')}</summary><p>No. We are based at 30 Churchill Place in ${SITE.town} and work with clients across ${SITE.areas.slice(1, 8).join(', ')} and beyond. Cloud accounting means we can serve you wherever you are.</p></details>
       <details class="rv"><summary>My books are months behind. Is that a problem?${icon('plus')}</summary><p>It is a Tuesday. Backlogs, missed returns and HMRC letters are routine rescue work for us. The sooner you get in touch, the cheaper they are to fix.</p></details>
+      ${trustFaqs(path)}
     </div>
   </div>
 </section>
@@ -245,7 +300,7 @@ export function servicePage(svc, path) {
     <h1>${svc.name}</h1>
     <p class="lede">${svc.heroLede}</p>
     <div class="hero-ctas">
-      <a class="btn btn-gold" href="${r}contact.html?service=${encodeURIComponent(svc.name)}">Book this service ${icon('arrow')}</a>
+      <a class="btn btn-gold" href="${bookHref(path, svc.name)}">${CTA} ${icon('arrow')}</a>
       <a class="btn btn-outline" href="tel:${SITE.phone1tel}">${icon('phone')} ${SITE.phone1}</a>
     </div>
   </div>
@@ -265,6 +320,11 @@ export function servicePage(svc, path) {
           ${svc.steps.map(([t, d], i) => `<li class="rv${i % 2 ? ' rv-d1' : ''}"><div class="how-num">${i + 1}</div><div><h3>${t}</h3><p>${d}</p></div></li>`).join('\n          ')}
         </ol>
         <div class="info-callout rv">${icon('info')} <p><b>Worth knowing:</b> ${svc.callout}</p></div>
+        ${svc.keyDates ? `<h2 class="rv">Key dates</h2>
+        <dl class="key-dates rv">
+          ${svc.keyDates.map(([d, what]) => `<div><dt>${d}</dt><dd>${what}</dd></div>`).join('\n          ')}
+        </dl>
+        <p class="key-dates-note rv">Standard HMRC and Companies House deadlines. Yours depend on your year end and circumstances; we diarise every one when you join.</p>` : ''}
         <h2 class="rv">Frequently asked</h2>
         <div class="faq">
           ${svc.faqs.map(([q, a]) => `<details class="rv"><summary>${q}${icon('plus')}</summary><p>${a}</p></details>`).join('\n          ')}
@@ -272,9 +332,10 @@ export function servicePage(svc, path) {
       </div>
       <aside class="svc-aside">
         <div class="aside-card dark-card rv">
-          <h3>Book ${svc.name.toLowerCase().startsWith('tax') || svc.name.toLowerCase().startsWith('self') ? 'this service' : svc.name.toLowerCase()}</h3>
+          <h3>${svc.name}</h3>
+          <p class="aside-fee">${feeText(svc)}</p>
           <p>Free consultation, fixed fee agreed up front, reply within one working day.</p>
-          <a class="btn btn-gold" href="${r}contact.html?service=${encodeURIComponent(svc.name)}">Book a free consultation</a>
+          <a class="btn btn-gold" href="${bookHref(path, svc.name)}">${CTA}</a>
           <a class="btn btn-outline" href="tel:${SITE.phone1tel}">${icon('phone')} Call ${SITE.phone1}</a>
         </div>
         <div class="aside-card rv">
@@ -310,6 +371,10 @@ export function aboutBody(path = 'about.html') {
     ${breadcrumbs(path, [['Home', 'index.html'], ['About Us', '']])}
     <h1>An independent firm you can build on</h1>
     <p class="lede">${SITE.legal} has served London businesses and individuals since <strong>${SITE.established}</strong>: ${yearsExp}+ years of bookkeeping, payroll, tax and accounts, delivered with the personal attention only an independent firm gives.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-gold" href="${bookHref(path)}">${CTA} ${icon('arrow')}</a>
+      <a class="btn btn-outline" href="#team">Meet the team</a>
+    </div>
   </div>
 </section>
 
@@ -327,8 +392,8 @@ ${statsBar()}
           <p>Clients come to us for a tax return or a tidy-up, and stay for years. Our Google reviews tell that story better than we can: five stars across the board, with reviewers citing professionalism, trustworthiness, responsiveness, accuracy and value for money.</p>
         </div>
         <div class="hero-ctas" style="margin-top:28px">
-          <a class="btn btn-navy" href="${r}reviews.html">Read our reviews ${icon('arrow')}</a>
-          <a class="btn btn-outline" href="${r}contact.html">Meet us: book a consultation</a>
+          <a class="btn btn-gold" href="${bookHref(path)}">${CTA} ${icon('arrow')}</a>
+          <a class="btn btn-outline" href="${r}reviews.html">Read our reviews</a>
         </div>
       </div>
       <div class="cred-stack rv rv-d1">
@@ -341,7 +406,32 @@ ${statsBar()}
   </div>
 </section>
 
-<section class="section muted-section">
+<section class="section muted-section" id="team">
+  <div class="wrap">
+    <div class="split top">
+      <div>
+        <div class="section-head rv">
+          <span class="eyebrow">Who you will work with</span>
+          <h2>The people behind your accounts</h2>
+          <p>You deal with the people doing your work, not a call queue. These are the names you will see on your emails and hear on the phone.</p>
+        </div>
+        <div class="person-list">
+          ${teamCards()}
+        </div>
+      </div>
+      <div>
+        <div class="section-head rv">
+          <span class="eyebrow">Regulation &amp; protection</span>
+          <h2>Checks you can make before you call</h2>
+          <p>Handing over your records is a trust decision. Here is who we answer to.</p>
+        </div>
+        ${regulationList()}
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
   <div class="wrap">
     <div class="section-head center rv">
       <span class="eyebrow">How we work</span>
@@ -356,7 +446,7 @@ ${statsBar()}
   </div>
 </section>
 
-<section class="section">
+<section class="section muted-section">
   <div class="wrap">
     <div class="section-head center rv">
       <span class="eyebrow">Where we work</span>
@@ -384,7 +474,8 @@ export function reviewsBody(path = 'reviews.html') {
     <h1>Five stars, ${SITE.reviewCount} times over</h1>
     <p class="lede">We could tell you we are professional, responsive and worth the money, but our clients already did, in public, on Google. <strong>${SITE.reviewCount} reviews, a 5.0 rating, and every single one five stars.</strong></p>
     <div class="hero-ctas">
-      <a class="btn btn-gold" href="${SITE.google}" target="_blank" rel="noopener">See our reviews on Google ${icon('arrow')}</a>
+      <a class="btn btn-gold" href="${bookHref(path)}">${CTA} ${icon('arrow')}</a>
+      <a class="btn btn-outline" href="${SITE.google}" target="_blank" rel="noopener">Check them on Google</a>
     </div>
   </div>
 </section>
@@ -444,7 +535,7 @@ export function reviewsBody(path = 'reviews.html') {
     </div>
     <div class="hero-ctas rv" style="justify-content:center">
       <a class="btn btn-navy" href="${SITE.google}" target="_blank" rel="noopener">${icon('google')} Review us on Google</a>
-      <a class="btn btn-outline" href="${r}contact.html" style="color:var(--ink);border-color:var(--border-strong)">Become a client first ${icon('arrow')}</a>
+      <a class="btn btn-gold" href="${bookHref(path)}">${CTA}</a>
     </div>
   </div>
 </section>
@@ -462,6 +553,10 @@ export function contactBody(path = 'contact.html') {
     ${breadcrumbs(path, [['Home', 'index.html'], ['Contact', '']])}
     <h1>Talk to an accountant today</h1>
     <p class="lede">Call, email, or book below. A real person replies within <strong>one working day</strong>, and the first consultation is always free and always without obligation.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-gold" href="#book">${CTA} ${icon('arrow')}</a>
+      <a class="btn btn-outline" href="tel:${SITE.phone1tel}">${icon('phone')} ${SITE.phone1}</a>
+    </div>
   </div>
 </section>
 
@@ -491,7 +586,7 @@ export function contactBody(path = 'contact.html') {
   </div>
 </section>
 
-<section class="section tight">
+<section class="section tight" id="book">
   <div class="wrap">
     <div class="book-panel rv">
       <div class="book-info">
@@ -502,7 +597,7 @@ export function contactBody(path = 'contact.html') {
           <tr class="closed"><td>Saturday</td><td>Closed</td></tr>
           <tr class="closed"><td>Sunday</td><td>Closed</td></tr>
         </table>
-        <p style="margin-top:26px">Outside these hours, email <a href="mailto:${SITE.email}" style="color:var(--gold-on-dark-2)">${SITE.email}</a> or send the form. It lands in our inbox for the next working morning.</p>
+        <p style="margin-top:26px">Outside these hours, email <a class="inline-link" href="mailto:${SITE.email}">${SITE.email}</a> or send the form. It lands in our inbox for the next working morning.</p>
         <h3 style="color:var(--d-text);margin-top:30px;font-size:1.15rem">Areas we serve</h3>
         <ul class="area-cloud" style="margin-top:14px">
           ${SITE.areas.slice(0, 8).map((a) => `<li>${a}</li>`).join('\n          ')}

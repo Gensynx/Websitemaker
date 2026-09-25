@@ -2,6 +2,8 @@
    Run `node sitegen/build.mjs` from the 381-accountants folder to
    regenerate the static HTML pages. No runtime build step. */
 
+export const rel = (path) => (path.includes('/') ? '../' : '');
+
 export const SITE = {
   name: '381 Accountants',
   legal: '381 Accountancy & Bookkeeping Services Ltd',
@@ -21,7 +23,29 @@ export const SITE = {
   maps: 'https://www.google.com/maps/search/?api=1&query=' +
     encodeURIComponent('381 Accountancy & Bookkeeping Services Ltd, 30 Churchill Pl, Canary Wharf, London E14 5RE'),
   areas: ['Canary Wharf', 'Barking', 'Ilford', 'Dagenham', 'Woodford', 'Bexley', 'Romford', 'East London', 'Greater London', 'Essex'],
+  /* Facts still to be confirmed by the firm. Anything left null renders as a
+     visible [placeholder] so it cannot go live unnoticed; see the README. */
+  team: [
+    { name: null, role: null, quals: null, bio: null },
+  ],
+  professionalBody: null,
+  amlSupervisor: null,
+  indemnity: null,
+  icoNumber: null,
+  noticePeriod: null,
 };
+
+/* A fact the firm has not confirmed yet: shown in brackets and outlined. */
+export function tbc(label) {
+  return `<span class="tbc">[${label}]</span>`;
+}
+
+export const fact = (value, label) => (value == null ? tbc(label) : value);
+
+/* The single primary action, worded the same everywhere. */
+export const CTA = 'Book a free consultation';
+export const bookHref = (path, service = '') =>
+  `${rel(path)}contact.html${service ? `?service=${encodeURIComponent(service)}` : ''}#book`;
 
 /* ---------------- Icons (1.5px stroke, 24 grid) ---------------- */
 const paths = {
@@ -77,8 +101,6 @@ export const NAV = [
   ['contact.html', 'Contact', 'contact'],
 ];
 
-const rel = (path) => (path.includes('/') ? '../' : '');
-
 function head({ path, title, desc, jsonld }) {
   const r = rel(path);
   return `<!DOCTYPE html>
@@ -129,12 +151,12 @@ function header_({ path, active }) {
       <ul class="nav-links">
       ${links}
       <li class="nav-links-phone"><a class="btn btn-outline btn-block" href="tel:${SITE.phone1tel}">${icon('phone')} Call ${SITE.phone1}</a></li>
-      <li class="nav-book-mobile"><a class="btn btn-gold btn-block" href="${r}contact.html">Book a free consultation</a></li>
+      <li class="nav-book-mobile"><a class="btn btn-gold btn-block" href="${bookHref(path)}">${CTA}</a></li>
       </ul>
     </nav>
     <div class="nav-cta">
       <a class="nav-phone" href="tel:${SITE.phone1tel}">${icon('phone')} ${SITE.phone1}</a>
-      <a class="btn btn-gold nav-book" href="${r}contact.html">Book a consultation</a>
+      <a class="btn btn-gold nav-book" href="${bookHref(path)}"><span class="nb-long">${CTA}</span><span class="nb-short" aria-hidden="true">Book</span></a>
       <button class="nav-toggle" aria-label="Menu" aria-expanded="false">
         <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
@@ -198,9 +220,10 @@ export function page({ path, title, desc, active, body, servicesNav, jsonld }) {
   return [
     head({ path, title, desc, jsonld }),
     '<body>',
+    '<a class="skip-link" href="#main">Skip to content</a>',
     topStrip(),
     header_({ path, active }),
-    '<main>',
+    '<main id="main" tabindex="-1">',
     body,
     '</main>',
     footer_(path, servicesNav),
@@ -265,7 +288,7 @@ export function ctaBanner(path, { title = 'Ready to hand your numbers to safe ha
         <p>${text || `Book a free, no-obligation consultation and find out exactly what ${SITE.name} can take off your plate. We usually reply within one working day.`}</p>
       </div>
       <div class="cta-actions">
-        <a class="btn btn-gold" href="${r}contact.html">Book a free consultation ${icon('arrow')}</a>
+        <a class="btn btn-gold" href="${bookHref(path)}">${CTA} ${icon('arrow')}</a>
         <a class="cta-phone" href="tel:${SITE.phone1tel}">${icon('phone')} ${SITE.phone1}</a>
       </div>
     </div>
@@ -389,7 +412,7 @@ export const REVIEWS_ALL = [
 
 export function quoteCards(revs = REVIEWS, stagger = true) {
   return revs.map((q, i) => `<figure class="quote-card rv${stagger && i % 3 ? ` rv-d${i % 3}` : ''}">
-  <span class="q-stars" aria-label="5 out of 5 stars">${stars5}</span>
+  <span class="q-stars" role="img" aria-label="5 out of 5 stars">${stars5}</span>
   <blockquote>${q.text}</blockquote>
   <figcaption>${icon('google')} <span><b>${q.name}</b> · ${q.meta} · Google review</span></figcaption>
 </figure>`).join('\n');
@@ -400,5 +423,6 @@ export function ratingBanner() {
   <span class="stars" aria-hidden="true">${stars5}</span>
   <b>5.0 on Google</b>
   <span>${SITE.reviewCount} reviews, every one of them five stars</span>
+  <a class="text-link" href="${SITE.google}" target="_blank" rel="noopener">Check them on Google ${icon('arrow')}</a>
 </div>`;
 }
