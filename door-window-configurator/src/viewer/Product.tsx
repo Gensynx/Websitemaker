@@ -17,9 +17,28 @@ import { buildProduct } from './geometry';
 import { buildMaterials, materialForPart } from './materials';
 import { geometryForPart } from './shapes';
 
+/**
+ * What the geometry depends on: everything except appearance. A colour, a
+ * finish or a hardware finish changes materials only, so dragging the explore
+ * colour wheel re-tints the product without rebuilding and re-uploading every
+ * part's geometry on each frame (performance budget: throttle continuous input).
+ */
+export function shapeKey(config: ConfigState): string {
+  const { colour: _colour, finish: _finish, ...shape } = config;
+  return JSON.stringify({ ...shape, hardware: { ...shape.hardware, finish: null } });
+}
+
+export function appearanceKey(config: ConfigState): string {
+  return JSON.stringify([config.colour, config.finish, config.glazing, config.hardware.finish]);
+}
+
 export function Product({ config }: { config: ConfigState }): JSX.Element {
-  const model = useMemo(() => buildProduct(config), [config]);
-  const materials = useMemo(() => buildMaterials(config), [config]);
+  const shape = shapeKey(config);
+  const appearance = appearanceKey(config);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const model = useMemo(() => buildProduct(config), [shape]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const materials = useMemo(() => buildMaterials(config), [appearance]);
   const meshes = useMemo(
     () => model.parts.map((part) => ({ part, geometry: geometryForPart(part) })),
     [model],

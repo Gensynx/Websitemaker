@@ -42,6 +42,13 @@ export function isMaterialOffered(material: FrameMaterial): boolean {
 
 export type Finish = 'smooth' | 'textured' | 'woodgrain-foil';
 
+/** The words for a finish, wherever one is shown to a customer. */
+export const FINISH_LABEL: Record<Finish, string> = {
+  smooth: 'Smooth',
+  textured: 'Textured',
+  'woodgrain-foil': 'Woodgrain foil',
+};
+
 /**
  * Visible face widths of frame members. Consumed by the parametric geometry in
  * Step 2 — a uPVC frame reads as chunky and an aluminium one as slim because

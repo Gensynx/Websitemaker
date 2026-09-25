@@ -2,26 +2,35 @@
  * The bottom sheet's handle: tap to open or close, or drag it (Step 4.3).
  *
  * Behaviour from the snap-point drawer on 21st.dev, reduced to what a
- * NON-modal sheet needs: two resting states — the peek, which shows what is
- * configured, and open — and a drag on the handle that settles into
- * whichever the gesture points at. Non-modal because the preview must stay
+ * NON-modal sheet needs: three resting states — closed (a peek that shows
+ * what is configured), half (the product stays in view above it) and full
+ * (room for a swatch grid) — and a drag on the handle that moves one state
+ * in the direction of the gesture. Non-modal because the preview must stay
  * usable with the sheet up: no backdrop, no focus trap, no scroll lock.
  *
  * The handle stays a real <button>. Keyboard and screen-reader users get
- * Enter and Space from the element itself, and Escape from the panel; the
- * pointer code below only adds the drag, and swallows the click that follows
- * a drag so a drag is never also read as a tap.
+ * Enter and Space from the element itself (closed and half; the panel
+ * scrolls, so full height is a pointer convenience, not a requirement), and
+ * Escape from the panel. The pointer code only adds the drag, and swallows
+ * the click that follows a drag so a drag is never also read as a tap.
  */
 
 import { useRef } from 'react';
 import type { MouseEvent, PointerEvent } from 'react';
 
+export type SheetState = 'closed' | 'half' | 'full';
+
 /** Travel, in CSS pixels, before a press counts as a drag. */
 const DRAG_THRESHOLD = 24;
 
+export function nextSheetState(state: SheetState, direction: 'up' | 'down'): SheetState {
+  if (direction === 'up') return state === 'closed' ? 'half' : 'full';
+  return state === 'full' ? 'half' : 'closed';
+}
+
 export function useSheetGesture(
-  open: boolean,
-  setOpen: (open: boolean) => void,
+  state: SheetState,
+  setState: (state: SheetState) => void,
 ): {
   onPointerDown: (event: PointerEvent<HTMLButtonElement>) => void;
   onPointerUp: (event: PointerEvent<HTMLButtonElement>) => void;
@@ -45,8 +54,7 @@ export function useSheetGesture(
       start.current = null;
       if (Math.abs(travel) < DRAG_THRESHOLD) return;
       dragged.current = true;
-      // Up opens, down closes, whatever state it started in.
-      setOpen(travel < 0);
+      setState(nextSheetState(state, travel < 0 ? 'up' : 'down'));
     },
     onPointerCancel: () => {
       start.current = null;
@@ -57,7 +65,7 @@ export function useSheetGesture(
         event.preventDefault();
         return;
       }
-      setOpen(!open);
+      setState(state === 'closed' ? 'half' : 'closed');
     },
   };
 }

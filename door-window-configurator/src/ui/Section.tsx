@@ -24,6 +24,7 @@ export function Section({
   title,
   summary,
   issues = 0,
+  flag,
   open,
   onToggle,
   children,
@@ -33,6 +34,8 @@ export function Section({
   summary: string;
   /** Problems that stop an order, counted for the collapsed header. */
   issues?: number;
+  /** A neutral marker for a deliberate state that still matters, e.g. "Not orderable". */
+  flag?: string | undefined;
   open: boolean;
   onToggle: () => void;
   children: ReactNode;
@@ -54,8 +57,11 @@ export function Section({
             {title}
           </span>
           <span className="section__summary">{summary}</span>
-          {issues > 0 && (
-            <span className="section__issues">{issues === 1 ? '1 issue' : `${issues} issues`}</span>
+          {(issues > 0 || flag !== undefined) && (
+            <span className="section__badges">
+              {issues > 0 && <span className="section__issues">{issues === 1 ? '1 issue' : `${issues} issues`}</span>}
+              {flag !== undefined && <span className="section__flag">{flag}</span>}
+            </span>
           )}
           <span className="section__chevron" aria-hidden="true" />
         </button>

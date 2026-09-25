@@ -34,6 +34,7 @@ import {
 import {
   fallbackColour,
   fallbackFinish,
+  FINISH_LABEL,
   isColourAvailable,
   isFinishAvailable,
   isMaterialOffered,
@@ -41,9 +42,17 @@ import {
   OFFERED_MATERIALS,
 } from './material';
 import { doorLayout } from './layout';
+import { ralEntry } from './ral';
+import type { RalCode } from './ral';
 import { assessCriticalLocations } from './safety';
 import { formatMm } from './units';
 import type { Mm } from './units';
+
+/** "Wine Red (RAL 3005)": names in messages, never bare codes. */
+function colourLabel(code: RalCode): string {
+  const entry = ralEntry(code);
+  return `${entry.name} (${entry.code.replace(/^RAL/, 'RAL ')})`;
+}
 
 /**
  * What an error stops.
@@ -123,13 +132,14 @@ export function validateConfig(config: ConfigState): ValidationResult {
   if (external.mode === 'explore') {
     nonOrderable.push({
       field: 'colour.external',
-      message: 'The external colour was picked in explore mode and is not available to order.',
+      message:
+        'The outside colour was picked in explore mode. It is shown for ideas only and cannot be ordered; choose an offered colour to get a quote.',
       blocks: 'order',
     });
   } else if (!isColourAvailable(config.material, external.code)) {
     errors.push({
       field: 'colour.external',
-      message: `${external.code} is not offered in ${material}.`,
+      message: `${colourLabel(external.code)} is not offered in ${material}.`,
       blocks: 'order',
     });
   }
@@ -137,13 +147,14 @@ export function validateConfig(config: ConfigState): ValidationResult {
   if (internal.mode === 'explore') {
     nonOrderable.push({
       field: 'colour.internal',
-      message: 'The internal colour was picked in explore mode and is not available to order.',
+      message:
+        'The inside colour was picked in explore mode. It is shown for ideas only and cannot be ordered; choose an offered colour to get a quote.',
       blocks: 'order',
     });
   } else if (internal.mode === 'ral' && !isColourAvailable(config.material, internal.code)) {
     errors.push({
       field: 'colour.internal',
-      message: `${internal.code} is not offered in ${material}.`,
+      message: `${colourLabel(internal.code)} is not offered in ${material}.`,
       blocks: 'order',
     });
   }
@@ -151,14 +162,14 @@ export function validateConfig(config: ConfigState): ValidationResult {
   if (!isFinishAvailable(config.material, config.finish.external)) {
     errors.push({
       field: 'finish.external',
-      message: `A ${config.finish.external} external finish is not offered in ${material}.`,
+      message: `A ${FINISH_LABEL[config.finish.external].toLowerCase()} finish outside is not offered in ${material}.`,
       blocks: 'order',
     });
   }
   if (config.finish.internal !== 'match' && !isFinishAvailable(config.material, config.finish.internal)) {
     errors.push({
       field: 'finish.internal',
-      message: `A ${config.finish.internal} internal finish is not offered in ${material}.`,
+      message: `A ${FINISH_LABEL[config.finish.internal].toLowerCase()} finish inside is not offered in ${material}.`,
       blocks: 'order',
     });
   }
@@ -381,7 +392,7 @@ export function reconcileWithMaterial(config: ConfigState): {
     const replacement = fallbackFinish(next.material);
     issues.push({
       field: 'finish.external',
-      message: `A ${next.finish.external} finish is not offered in ${MATERIALS[next.material].label}; changed to ${replacement}.`,
+      message: `A ${FINISH_LABEL[next.finish.external].toLowerCase()} finish is not offered in ${MATERIALS[next.material].label}; changed to ${FINISH_LABEL[replacement].toLowerCase()}.`,
       blocks: 'order',
     });
     next = { ...next, finish: { ...next.finish, external: replacement } };
@@ -390,7 +401,7 @@ export function reconcileWithMaterial(config: ConfigState): {
   if (next.finish.internal !== 'match' && !isFinishAvailable(next.material, next.finish.internal)) {
     issues.push({
       field: 'finish.internal',
-      message: `A ${next.finish.internal} finish is not offered in ${MATERIALS[next.material].label}; the inside now matches the outside.`,
+      message: `A ${FINISH_LABEL[next.finish.internal].toLowerCase()} finish is not offered in ${MATERIALS[next.material].label}; the inside now matches the outside.`,
       blocks: 'order',
     });
     next = { ...next, finish: { ...next.finish, internal: 'match' } };
@@ -401,7 +412,7 @@ export function reconcileWithMaterial(config: ConfigState): {
     const replacement = fallbackColour(next.material);
     issues.push({
       field: 'colour.external',
-      message: `${external.code} is not offered in ${MATERIALS[next.material].label}; changed to ${replacement}.`,
+      message: `${colourLabel(external.code)} is not offered in ${MATERIALS[next.material].label}; changed to ${colourLabel(replacement)}.`,
       blocks: 'order',
     });
     next = { ...next, colour: { ...next.colour, external: { mode: 'ral', code: replacement } } };
@@ -411,7 +422,7 @@ export function reconcileWithMaterial(config: ConfigState): {
   if (internal.mode === 'ral' && !isColourAvailable(next.material, internal.code)) {
     issues.push({
       field: 'colour.internal',
-      message: `${internal.code} is not offered in ${MATERIALS[next.material].label}; the inside now matches the outside.`,
+      message: `${colourLabel(internal.code)} is not offered in ${MATERIALS[next.material].label}; the inside now matches the outside.`,
       blocks: 'order',
     });
     next = { ...next, colour: { ...next.colour, internal: { mode: 'match' } } };

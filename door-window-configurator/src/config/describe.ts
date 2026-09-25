@@ -35,7 +35,7 @@ import type {
 } from './types';
 import { assertNever, HANDING_CONVENTION, hasGlazedSurround, resolveInternalColour, resolveInternalFinish } from './types';
 import type { Finish } from './material';
-import { MATERIALS } from './material';
+import { FINISH_LABEL, MATERIALS } from './material';
 import { ralEntry } from './ral';
 import { formatMm, formatSize, roundMmHalfUp } from './units';
 import { safetyControlState } from './safety';
@@ -62,11 +62,7 @@ export function productName(config: ConfigState): string {
   return config.productType === 'door' ? 'External door' : 'Window';
 }
 
-const FINISH: Record<Finish, string> = {
-  smooth: 'Smooth',
-  textured: 'Textured',
-  'woodgrain-foil': 'Woodgrain foil',
-};
+const FINISH: Record<Finish, string> = FINISH_LABEL;
 
 const HARDWARE_FINISH: Record<HardwareFinish, string> = {
   chrome: 'Polished chrome',
@@ -160,7 +156,7 @@ export function colourName(colour: ColourSelection): string {
 }
 
 function shortColourName(colour: ColourSelection): string {
-  return colour.mode === 'explore' ? 'Explore colour' : ralEntry(colour.code).name;
+  return colour.mode === 'explore' ? 'Explore colour (not orderable)' : ralEntry(colour.code).name;
 }
 
 export function barsDescription(bars: BarLayout): string {

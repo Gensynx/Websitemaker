@@ -317,6 +317,58 @@ const heightField = page.getByLabel(/^Height/);
   if (stepped !== start + 1) problems.push(`the width field did not step by 1 mm from the keyboard: ${start} -> ${stepped}`);
 }
 
+/* ------------------------------------------------------------------ *
+ * Step 5 — colour
+ * ------------------------------------------------------------------ */
+
+{
+  const param = (key) => new URL(page.url()).searchParams.get(key);
+  await page.goto(`${BASE}/?view=el`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('canvas');
+  const colourToggle = page.locator('#section-colour-toggle');
+  if ((await colourToggle.getAttribute('aria-expanded')) !== 'true') await colourToggle.click();
+
+  // 5.1 An offered swatch goes into the configuration and the link.
+  await page.getByRole('radio', { name: /^Wine Red/ }).first().check();
+  await page.waitForTimeout(700);
+  console.log(`colour: swatch -> ce=${param('ce')}`);
+  if (param('ce') !== 'RAL3005') problems.push(`choosing a swatch did not set the colour: ${param('ce')}`);
+
+  // Only offered shades are on offer: Purple Red is RAL but not sold in uPVC.
+  if ((await page.getByRole('radio', { name: /^Purple Red/ }).count()) !== 0) problems.push('a colour not offered in the material is in the grid');
+
+  // 5.3 Finish is separate from colour.
+  await page.getByRole('radio', { name: 'Woodgrain foil' }).first().check();
+  await page.waitForTimeout(700);
+  console.log(`colour: finish -> fe=${param('fe')} ce still ${param('ce')}`);
+  if (param('ce') !== 'RAL3005' || param('fe') === 'sm') problems.push('changing the finish did not behave as a separate choice');
+
+  // Inside, separately.
+  await page.getByRole('radio', { name: 'Different' }).check();
+  await page.getByRole('radio', { name: /^Traffic White/ }).nth(1).check();
+  await page.waitForTimeout(700);
+  console.log(`colour: inside -> ci=${param('ci')}`);
+  if (param('ci') !== 'RAL9016') problems.push(`the inside colour did not apply: ${param('ci')}`);
+  await page.getByRole('radio', { name: 'Same as outside' }).check();
+  await page.waitForTimeout(500);
+
+  // 5.2 Explore: shown, flagged, never orderable, and a way back.
+  await page.getByRole('button', { name: /^Explore any colour/ }).click();
+  await page.getByLabel('Hex value').fill('#8A2BE2');
+  await page.waitForTimeout(900);
+  const flagged = await page.locator('.section[data-open] .section__flag').allTextContents();
+  const warned = await page.locator('.messages').allTextContents();
+  console.log(`colour: explore -> ce=${param('ce')} flag=${JSON.stringify(flagged)}`);
+  if (param('ce') !== 'x8a2be2') problems.push(`an explore colour did not apply: ${param('ce')}`);
+  if (!flagged.includes('Not orderable')) problems.push('an explore colour is not flagged as not orderable');
+  if (!warned.some((text) => /cannot be ordered/.test(text))) problems.push('no statement that the explore colour cannot be ordered');
+  await page.getByRole('button', { name: /^Use / }).click();
+  await page.waitForTimeout(700);
+  console.log(`colour: nearest offered -> ce=${param('ce')}`);
+  if (!/^RAL\d{4}$/.test(param('ce') ?? '')) problems.push(`"use the closest offered colour" did not return to an offered shade: ${param('ce')}`);
+  await page.screenshot({ path: `${SHOTS}/shot-colour.png` });
+}
+
 await page.setViewportSize({ width: 390, height: 844 });
 await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
 await page.waitForSelector('canvas');

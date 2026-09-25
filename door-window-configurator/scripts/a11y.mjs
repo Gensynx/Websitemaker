@@ -165,6 +165,38 @@ async function tabUntil(page, predicate, limit = 60) {
   await page.keyboard.press('ArrowLeft');
   await page.waitForTimeout(800);
 
+  // 4b. Colour by keyboard alone: a swatch by arrow key, explore by slider, and back.
+  {
+    const param = (key) => new URL(page.url()).searchParams.get(key);
+    await page.goto(`${BASE}/?view=el`, { waitUntil: 'networkidle' });
+    await page.waitForSelector('.stage__canvas[data-ready="true"]', { timeout: 40000 });
+    const toggle = await tabUntil(page, (f) => /^Colour /.test(f.name));
+    if (toggle?.expanded !== 'true') await page.keyboard.press('Enter');
+    const swatch = await tabUntil(page, (f) => f.type === 'radio', 5);
+    await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(700);
+    const moved = await focused(page);
+    console.log(`colour by keyboard: from "${swatch?.name}" to "${moved?.name}", ce=${param('ce')}`);
+    if (!swatch || !moved || swatch.name === moved.name || !/^RAL/.test(param('ce') ?? '')) {
+      problems.push('the colour swatches cannot be operated with the arrow keys');
+    }
+    const explore = await tabUntil(page, (f) => /^Explore any colour/.test(f.name), 15);
+    await page.keyboard.press('Enter');
+    const hue = await tabUntil(page, (f) => f.name === 'Hue', 5);
+    for (let i = 0; i < 20; i += 1) await page.keyboard.press('ArrowRight');
+    await page.waitForTimeout(700);
+    const valuetext = await page.evaluate(() => document.activeElement?.getAttribute('aria-valuetext'));
+    console.log(`explore by keyboard: toggle=${Boolean(explore)} hue=${Boolean(hue)} valuetext="${valuetext}" ce=${param('ce')}`);
+    if (!explore || !hue || !/^x[0-9a-f]{6}$/.test(param('ce') ?? '')) problems.push('explore mode cannot be operated from the keyboard');
+    if (!valuetext || !/degrees, [a-z]+/.test(valuetext)) problems.push('the hue slider does not say its value in words');
+    await axe(page, 'desktop, explore open');
+    const back = await tabUntil(page, (f) => /^Use /.test(f.name), 10);
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(700);
+    console.log(`back to an offered colour by keyboard: ${back?.name} -> ce=${param('ce')}`);
+    if (!back || !/^RAL/.test(param('ce') ?? '')) problems.push('the way back from explore is not reachable by keyboard');
+  }
+
   // 5. The preview has a text alternative, in plain words.
   const alt = await page.locator('.stage__picture').getAttribute('aria-label');
   console.log(`preview text alternative: ${alt}`);
@@ -209,25 +241,22 @@ async function tabUntil(page, predicate, limit = 60) {
     problems.push('the sheet is not fully operable from the keyboard (open, reach, Escape, focus return)');
   }
 
-  // Pointer: drag the handle up to open and down to close; a drag is not also a tap.
-  const box = await toggle.boundingBox();
-  const x = box.x + box.width / 2;
-  const y = box.y + 20;
-  await page.mouse.move(x, y);
-  await page.mouse.down();
-  await page.mouse.move(x, y - 120, { steps: 8 });
-  await page.mouse.up();
-  await page.waitForTimeout(400);
-  const draggedOpen = await toggle.getAttribute('aria-expanded');
-  const top = await toggle.boundingBox();
-  await page.mouse.move(x, top.y + 20);
-  await page.mouse.down();
-  await page.mouse.move(x, top.y + 160, { steps: 8 });
-  await page.mouse.up();
-  await page.waitForTimeout(400);
-  const draggedClosed = await toggle.getAttribute('aria-expanded');
-  console.log(`sheet by drag: up=${draggedOpen} down=${draggedClosed}`);
-  if (draggedOpen !== 'true' || draggedClosed !== 'false') problems.push('dragging the sheet handle does not open and close it');
+  // Pointer: each drag moves one resting state — closed, half, full — and a drag is not also a tap.
+  const panel = page.locator('.panel');
+  const drag = async (dy) => {
+    const box = await toggle.boundingBox();
+    const x = box.x + box.width / 2;
+    const y = box.y + 20;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x, y + dy, { steps: 8 });
+    await page.mouse.up();
+    await page.waitForTimeout(450);
+    return panel.getAttribute('data-sheet');
+  };
+  const states = [await drag(-120), await drag(-120), await drag(160), await drag(160)];
+  console.log(`sheet by drag: ${states.join(' -> ')}`);
+  if (states.join(',') !== 'half,full,half,closed') problems.push(`dragging the sheet handle did not step through its states: ${states.join(',')}`);
 
   await toggle.click();
   await page.waitForTimeout(600);

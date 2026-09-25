@@ -30,9 +30,11 @@ import { StaticElevation } from './viewer/StaticElevation';
 import { SizePanel } from './ui/SizePanel';
 import { Segmented } from './ui/Segmented';
 import { Readout, Section } from './ui/Section';
+import { ColourPanel } from './ui/ColourPanel';
 import { useInsets } from './ui/useInsets';
 import { useSections } from './ui/useSections';
 import { useSheetGesture } from './ui/useSheetGesture';
+import type { SheetState } from './ui/useSheetGesture';
 import { renderBlockers } from './config/validate';
 import type { ValidationIssue } from './config/validate';
 import { formatSize } from './config/units';
@@ -65,7 +67,7 @@ function hasWebGL(): boolean {
 const SECTIONS: Array<{ id: SectionId; title: string; pending?: string }> = [
   { id: 'style', title: 'Style', pending: 'Style options are not built yet. This is what is currently chosen.' },
   { id: 'size', title: 'Size' },
-  { id: 'colour', title: 'Colour', pending: 'Colour options are not built yet. This is what is currently chosen.' },
+  { id: 'colour', title: 'Colour' },
   { id: 'glazing', title: 'Glazing', pending: 'Glazing options are not built yet. This is what is currently chosen.' },
   { id: 'hardware', title: 'Hardware', pending: 'Hardware options are not built yet. This is what is currently chosen.' },
 ];
@@ -133,9 +135,10 @@ export function App(): JSX.Element {
 
   const [presetToken, setPresetToken] = useState(0);
   const [ready, setReady] = useState(false);
-  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheet, setSheet] = useState<SheetState>('closed');
+  const sheetOpen = sheet !== 'closed';
   const sheetToggleRef = useRef<HTMLButtonElement>(null);
-  const sheetGesture = useSheetGesture(sheetOpen, setSheetOpen);
+  const sheetGesture = useSheetGesture(sheet, setSheet);
   const webgl = useMemo(hasWebGL, []);
   const narrow = useIsNarrow();
 
@@ -154,7 +157,7 @@ export function App(): JSX.Element {
   const panelRef = useRef<HTMLFormElement>(null);
   const insets = useInsets(
     { stage: stageRef, title: titleRef, viewbar: viewbarRef, panel: panelRef },
-    `${narrow}-${sheetOpen}-${validation.errors.length}-${notices.length}`,
+    `${narrow}-${sheet}-${validation.errors.length}-${notices.length}`,
   );
 
   const panelOpen = !narrow || sheetOpen;
@@ -263,6 +266,7 @@ export function App(): JSX.Element {
         ref={panelRef}
         aria-label="Configure"
         data-open={panelOpen}
+        data-sheet={narrow ? sheet : undefined}
         tabIndex={-1}
         noValidate
         // Nothing submits from here: Enter in a size field must not reload the page.
@@ -270,7 +274,7 @@ export function App(): JSX.Element {
         onKeyDown={(event) => {
           // Escape folds the bottom sheet away and returns focus to its handle.
           if (event.key === 'Escape' && narrow && sheetOpen) {
-            setSheetOpen(false);
+            setSheet('closed');
             sheetToggleRef.current?.focus();
           }
         }}
@@ -319,6 +323,7 @@ export function App(): JSX.Element {
                 title={section.title}
                 summary={description.summary}
                 issues={issuesIn(section.id)}
+                flag={(nonOrderable.get(section.id)?.length ?? 0) > 0 ? 'Not orderable' : undefined}
                 open={sections.isOpen(section.id)}
                 onToggle={() => sections.toggle(section.id)}
               >
@@ -333,6 +338,8 @@ export function App(): JSX.Element {
                       </p>
                     )}
                   </>
+                ) : section.id === 'colour' ? (
+                  <ColourPanel />
                 ) : (
                   <Readout
                     lines={description.lines}

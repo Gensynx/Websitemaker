@@ -24,6 +24,11 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/config/layout.ts` | Door layout maths — one source of truth for the leaf |
 | `src/state/store.ts` | The single commit pipeline: reconcile, enforce, validate, persist |
 | `src/config/describe.ts` | The configuration in plain language: section summaries, the preview's text alternative, the Step 8 summary to come |
+| `src/config/colourMath.ts` | HSV and hex conversion, CIE76 ΔE, nearest offered RAL shade |
+| `src/config/colourEdits.ts` | Colour and finish edits as pure functions; explore never reaches a quote |
+| `src/ui/ColourPanel.tsx` | Colour section: swatches, finish, inside, explore |
+| `src/ui/SwatchGrid.tsx` | RAL swatch grid as a native radio group |
+| `src/ui/ExplorePicker.tsx` | Colour wheel (pointer) with hue, saturation, brightness sliders and hex field (keyboard) |
 | `src/ui/Section.tsx` | Collapsible panel section (disclosure pattern) and the read-only readout |
 | `src/ui/useSections.ts` | Which sections are open; sections with a problem start open |
 | `src/ui/useSheetGesture.ts` | Phone sheet handle: tap or drag, non-modal |
@@ -41,7 +46,7 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 ```
 npm install
 npm run typecheck
-npm test          # 200 unit tests, including text contrast read from styles.css
+npm test          # 228 unit tests, including text contrast read from styles.css
 npm run dev -- --port 5180   # then, in another shell:
 npm run smoke                # browser render, controls, wall scene, sizing
 npm run a11y                 # keyboard-only walk, sheet by keys and drag, axe scans
@@ -178,6 +183,27 @@ shape, size and style that were all perfectly drawable.
   21st.dev (a Base UI accordion and a snap-point drawer) and reimplemented,
   not installed.
 
+## The colour system (Step 5)
+
+- **Offered first (5.1).** A swatch grid of the RAL shades offered in the frame
+  material, and only those — a native radio group, named and coded, with the
+  chip as decoration.
+- **Explore (5.2).** "Explore any colour" is marked "Not available to order"
+  before it is opened and says why once it is. It sets an `ExploreColour`,
+  which validation reports as non-orderable and `mintQuotable` refuses, so it
+  cannot reach a quote however the page is driven (`colourEdits.test.ts`,
+  including through a shared link). The Colour section is flagged "Not
+  orderable", no swatch shows as chosen, and the closest offered shade is
+  offered as the way back. The wheel is for pointers; three sliders and a hex
+  field are the keyboard and screen-reader path.
+- **Finish is separate (5.3)**, outside and inside, from the material's list.
+- **Inside** follows the outside unless set to "Different"; switching changes
+  nothing visible until something is picked.
+- **Indicative only (5.4)**: the note is fixed to the foot of the panel.
+- Colour edits change materials only. The 3D product keys its geometry on
+  shape and its materials on appearance, so dragging the wheel re-tints
+  without rebuilding (`Product.test.ts`), and commits at most once a frame.
+
 ## Rendering
 
 Lighting is measured, not judged by eye, because the defects it has had were
@@ -209,8 +235,12 @@ the product.
 ## Outstanding
 
 - No favicon. It is a branding decision, so none has been invented.
-- Steps 5 to 8: the controls inside Style, Colour, Glazing and Hardware,
-  then summary and enquiry. The panel, its sections and sizing are built.
+- Steps 6 to 8: the controls inside Style, Glazing and Hardware, then summary
+  and enquiry. The panel, its sections, sizing and colour are built.
+- The RAL list and its sRGB values are placeholders (`ral.ts`), as is which
+  shades each material offers (`material.ts`). Woodgrain foil is modelled as
+  a woodgrain-embossed foil in a solid RAL colour; named timber-effect foils
+  (Golden Oak, Rosewood) are not in the model.
 - There is no control for frame material in any step of the brief. A link
   carrying a material that is not offered shows the issue in Style, but the
   customer cannot fix it there — only by switching product, which resets.
