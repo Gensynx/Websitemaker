@@ -22,7 +22,7 @@
  * never a tab stop.
  */
 
-import { lazy, Suspense, useDeferredValue, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import { lazy, Suspense, useDeferredValue, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { ReactNode } from 'react';
 import { useConfigurator } from './state/store';
 import { StaticElevation } from './viewer/StaticElevation';
@@ -35,6 +35,9 @@ import { DoorHardwarePanel } from './ui/DoorHardwarePanel';
 import { WindowStylePanel } from './ui/WindowStylePanel';
 import { WindowHardwarePanel } from './ui/WindowHardwarePanel';
 import { GlazingPanel } from './ui/GlazingPanel';
+import { ReviewDialog } from './ui/ReviewDialog';
+import type { ReviewDialogHandle } from './ui/ReviewDialog';
+import { copyText, shareUrl } from './output/share';
 import { useInsets } from './ui/useInsets';
 import { useSections } from './ui/useSections';
 import { useSheetGesture } from './ui/useSheetGesture';
@@ -138,6 +141,11 @@ export function App(): JSX.Element {
   const setWallFinish = useConfigurator((state) => state.setWallFinish);
 
   const [presetToken, setPresetToken] = useState(0);
+  const review = useRef<ReviewDialogHandle>(null);
+  const [linkStatus, setLinkStatus] = useState('');
+  // A copied link describes the configuration as it was; once it changes,
+  // "Link copied" would be stale.
+  useEffect(() => setLinkStatus(''), [config]);
   const [ready, setReady] = useState(false);
   const [sheet, setSheet] = useState<SheetState>('closed');
   const sheetOpen = sheet !== 'closed';
@@ -396,11 +404,33 @@ export function App(): JSX.Element {
           </section>
         </div>
 
+        <div className="panel__actions">
+          <button
+            type="button"
+            className="button button--quiet"
+            onClick={async () => {
+              const ok = await copyText(shareUrl(config, window.location));
+              setLinkStatus(ok ? 'Link copied.' : 'Could not copy the link. Use Review and enquire to see it.');
+            }}
+          >
+            Copy link
+          </button>
+          <button type="button" className="button" onClick={(event) => review.current?.open(event.currentTarget)}>
+            Review and enquire
+          </button>
+          <p className="panel__actions-status" role="status">
+            {linkStatus}
+          </p>
+        </div>
+
         <p className="panel__note">
           On-screen colours, finishes and obscure glass patterns are indicative only. Confirm against a physical
           sample before ordering.
         </p>
       </form>
+
+      {/* Outside the panel: the dialog has its own form, and forms cannot nest. */}
+      <ReviewDialog ref={review} config={config} />
     </main>
   );
 }

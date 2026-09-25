@@ -13,6 +13,7 @@
 
 import { useId } from 'react';
 import type { SashGrid, SashOpening } from '../config/types';
+import { lightPosition } from '../config/describe';
 
 const OPENING_WORDS: Record<SashOpening, string> = {
   fixed: 'fixed',
@@ -38,14 +39,6 @@ export function OpeningLines({ opening }: { opening: SashOpening }): JSX.Element
       <path d={d} fill="none" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" strokeDasharray="4 3" />
     </svg>
   );
-}
-
-function position(index: number, columns: number, rows: number): string {
-  const row = Math.floor(index / columns);
-  const column = index % columns;
-  const rowWord = rows === 1 ? '' : row === 0 ? 'top row' : row === rows - 1 ? 'bottom row' : `row ${row + 1}`;
-  const columnWord = columns === 1 ? '' : column === 0 ? 'left' : column === columns - 1 ? 'right' : columns === 3 ? 'centre' : `column ${column + 1}`;
-  return [rowWord, columnWord].filter(Boolean).join(', ');
 }
 
 export function LightPicker({
@@ -77,7 +70,7 @@ export function LightPicker({
         }}
       >
         {grid.cells.map((cell, index) => {
-          const where = position(index, columns, rows);
+          const where = lightPosition(index, columns, rows);
           return (
             <label key={index} className="light" data-opening={cell.opening}>
               <input

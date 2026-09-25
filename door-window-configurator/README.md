@@ -1,8 +1,9 @@
 # 3D Door and Window Configurator
 
-Phase 1, Steps 1 to 3: the state model, its URL serialisation, the 3D viewer,
-and sizing. **Steps 4 to 8 are not built** — there is no configuration panel
-yet, so the Size section sits below the stage rather than in one.
+Phase 1, Steps 1 to 8: the state model and its URL serialisation, the 3D
+viewer, sizing, the configuration panel, colour, door and window options,
+glazing, and the summary, share link and enquiry. **The enquiry is not
+connected to anything** — see "Summary, share link and enquiry (Step 8)".
 
 React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 
@@ -23,7 +24,7 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/config/storage.ts` | localStorage persistence; the URL takes precedence |
 | `src/config/layout.ts` | Door layout maths — one source of truth for the leaf |
 | `src/state/store.ts` | The single commit pipeline: reconcile, enforce, validate, persist |
-| `src/config/describe.ts` | The configuration in plain language: section summaries, the preview's text alternative, the Step 8 summary to come |
+| `src/config/describe.ts` | The configuration in plain language: section summaries, the preview's text alternative, the lines of the Step 8 summary |
 | `src/config/colourMath.ts` | HSV and hex conversion, CIE76 ΔE, nearest offered RAL shade |
 | `src/config/colourEdits.ts` | Colour and finish edits as pure functions; explore never reaches a quote |
 | `src/ui/ColourPanel.tsx` | Colour section: swatches, finish, inside, explore |
@@ -54,11 +55,16 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/viewer/CameraRig.tsx` | Clamped orbit, the three camera presets, framing clear of the UI |
 | `src/viewer/StaticElevation.tsx` | SVG elevation where WebGL is unavailable |
 | `src/config/windowPresets.ts` | Named window configurations — data over the grid model |
+| `src/output/fitted.ts` | What is fitted, as distinct from what is stored (furniture on a fully glazed door) |
+| `src/output/summary.ts` | The Step 8 summary: every option in plain language, its status, and the notes an order needs |
+| `src/output/share.ts` | The configuration link (configuration only, no camera) and copying it |
+| `src/output/enquiry.ts` | Contact validation, the enquiry request, and the **stubbed** submission |
+| `src/ui/ReviewDialog.tsx` | Review and enquire: summary, drawing, link, and the enquiry form |
 
 ```
 npm install
 npm run typecheck
-npm test          # 228 unit tests, including text contrast read from styles.css
+npm test          # 272 unit tests, including text contrast read from styles.css
 npm run dev -- --port 5180   # then, in another shell:
 npm run smoke                # browser render, controls, wall scene, sizing
 npm run a11y                 # keyboard-only walk, sheet by keys and drag, axe scans
@@ -265,6 +271,58 @@ shape, size and style that were all perfectly drawable.
   partly diffusing — pale, as it looks in daylight — rather than clear glass
   with a texture over a dark room.
 
+## Summary, share link and enquiry (Step 8)
+
+"Review and enquire", at the foot of the panel, opens a modal dialog (native
+`<dialog>`: focus is held inside, Escape closes it, focus returns to the
+button).
+
+- **Summary (8.1):** every option in the words the panel uses, grouped Size,
+  Style, Colour and finish, Glazing, Hardware, with a drawing from the same
+  part list as the 3D model. It states whether the configuration can be
+  quoted, and if not, why. It lists what an order needs to know: which panes
+  must be safety glass and why (or that a window's depends on its cill
+  height), how handing is described, that trickle vents are a starting point
+  for the survey rather than a ventilation calculation, and that colours are
+  indicative. A divided window is listed light by light.
+- **What is fitted, not what is stored.** On a fully glazed door, a
+  letterplate, knocker or spyhole chosen earlier stays in the link (so
+  switching back restores it) but is not fitted, and the summary and
+  enquiry say so by leaving it out (`fitted.ts`). This closes the Step 6
+  item in Outstanding.
+- **Share link (8.2):** "Copy link" in the panel footer and in the dialog.
+  The link carries the whole configuration and nothing else: the camera
+  preset and the wall scene are viewing choices and are left out. Opening it
+  reproduces the configuration exactly (unit test and smoke test).
+- **Enquiry (8.3):** name and email (required), phone, postcode (UK format)
+  and a message (optional), and consent. For a window, an optional cill
+  height above the floor: without it the safety glass a window needs cannot
+  be decided, and the summary says so rather than guessing. Errors are listed in a summary
+  that takes focus, each linked to its field. A configuration that cannot be
+  made has no form, only the reasons. An explore colour (not a RAL shade) can
+  be enquired about but is marked not orderable in the request.
+
+**The enquiry is a stub.** `ENQUIRY_ENDPOINT` in `src/output/enquiry.ts` is
+`null`, so "Send enquiry" builds the complete request and then says plainly
+that it has not been sent and nothing was stored, and offers to copy it. No
+network request is made. To connect it:
+
+1. Set `ENQUIRY_ENDPOINT` to an HTTPS URL that accepts a JSON `POST` of
+   `EnquiryRequest` (the type in `enquiry.ts`, `schemaVersion` 1). It is sent
+   with `credentials: 'omit'`, so CORS needs no cookies.
+2. **The server must re-validate everything.** The browser's validation is
+   for the customer's benefit only; the payload can be forged. Re-decode the
+   `shareUrl` with the same `url.ts` and `validate.ts` rather than trusting
+   `payload`.
+3. **Privacy.** The request holds personal data. The consent wording in the
+   form ("We use your details only to reply to this enquiry") is a
+   placeholder the business must be able to honour, and there is no privacy
+   notice link: both need the business's own text and a lawful basis before
+   launch.
+4. **Spam.** There is deliberately no honeypot field: browser autofill fills
+   hidden fields and silently loses real enquiries. Rate limiting or a
+   challenge belongs on the server.
+
 ## Performance budget
 
 `npm run check:bundle` reads the production build and fails if the entry
@@ -309,7 +367,9 @@ the product.
 ## Outstanding
 
 - No favicon. It is a branding decision, so none has been invented.
-- Step 8: summary, share link and enquiry.
+- **The enquiry is not connected** (see Step 8): an endpoint, the consent
+  and privacy wording, and server-side validation and rate limiting are
+  needed before it can go live.
 - **Tilt and turn holds its hinge side twice**: per light (what is drawn) and
   as a style-level `turnHingeSide`. The panel keeps the second in step with
   the first opening light; the model should drop one.
@@ -328,9 +388,6 @@ the product.
   asset under the core constraint; deferred at Step 1 (`types.ts`).
 - There is no minimum door-leaf HEIGHT: a top light can shorten a leaf to
   any height. A limit is needed in `limits.ts`.
-- On a fully glazed door, furniture chosen earlier stays in the
-  configuration (and the link) while not being fitted. The Step 8 enquiry
-  must send what is fitted, not what is stored.
 - The RAL list and its sRGB values are placeholders (`ral.ts`), as is which
   shades each material offers (`material.ts`). Woodgrain foil is modelled as
   a woodgrain-embossed foil in a solid RAL colour; named timber-effect foils

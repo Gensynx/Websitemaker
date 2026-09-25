@@ -281,6 +281,41 @@ function openingsSummary(cells: SashCell[], style: 'casement' | 'tilt-and-turn')
   return list([...tally].map(([opening, n]) => `${NUMBER_WORDS[n] ?? n} ${words[opening]}`));
 }
 
+/**
+ * Where a light is, in words: "top row, left". Shared with the light picker,
+ * so the summary and a screen reader name a light the same way.
+ */
+export function lightPosition(index: number, columns: number, rows: number): string {
+  const row = Math.floor(index / columns);
+  const column = index % columns;
+  const rowWord = rows === 1 ? '' : row === 0 ? 'top row' : row === rows - 1 ? 'bottom row' : `row ${row + 1}`;
+  const columnWord =
+    columns === 1 ? '' : column === 0 ? 'left' : column === columns - 1 ? 'right' : columns === 3 ? 'centre' : `column ${column + 1}`;
+  return [rowWord, columnWord].filter(Boolean).join(', ');
+}
+
+/**
+ * Every light of a casement or tilt-and-turn window, one line each: how it
+ * opens and its bars. The collapsed summary tallies them; the order needs
+ * each one (Step 8.1, "every selected option").
+ */
+export function describeLights(config: WindowConfigState): Line[] {
+  const style = config.style;
+  if (style.id !== 'casement' && style.id !== 'tilt-and-turn') return [];
+  const { grid } = style.options;
+  const columns = grid.columnWeights.length;
+  const rows = grid.rowWeights.length;
+  const words = style.id === 'tilt-and-turn' ? TILT_TURN_OPENING : OPENING;
+  return grid.cells.map((cell, index) => {
+    const where = lightPosition(index, columns, rows);
+    const bars = cell.bars.style === 'none' ? 'no bars' : barsDescription(cell.bars);
+    return {
+      label: `Light ${index + 1}${where ? ` (${where})` : ''}`,
+      value: `${sentence(words[cell.opening])}; ${bars}`,
+    };
+  });
+}
+
 function describeWindowStyle(config: WindowConfigState): SectionDescription {
   const lines: Line[] = [{ label: 'Style', value: windowStyleName(config) }];
   let summary = windowStyleName(config);

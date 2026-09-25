@@ -17,11 +17,12 @@
 
 import { chromium } from 'playwright';
 import { createRequire } from 'node:module';
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 
 const BASE = process.env.SMOKE_URL ?? 'http://localhost:5180';
 const EXECUTABLE = process.env.CHROMIUM_PATH ?? '/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
 const OUT = process.env.SHOTS ?? '/tmp';
+mkdirSync(OUT, { recursive: true });
 const AXE = createRequire(import.meta.url).resolve('axe-core/axe.min.js');
 
 const browser = await chromium.launch({
@@ -246,6 +247,38 @@ async function tabUntil(page, predicate, limit = 60) {
     }
     await page.waitForTimeout(500);
     await axe(page, 'desktop, window, all sections open');
+  }
+
+  // 4e. The review dialog: focus stays inside it, and axe finds nothing.
+  {
+    await page.goto(`${BASE}/?view=el`, { waitUntil: 'networkidle' });
+    await page.waitForSelector('.stage__canvas[data-ready="true"]', { timeout: 40000 });
+    await page.getByRole('button', { name: 'Review and enquire' }).click();
+    await page.waitForSelector('dialog.review[open]');
+    // A native modal dialog makes the page inert; past the last control, Tab
+    // goes to the browser's own UI (the document body, from the page's point
+    // of view) and then back into the dialog. Escaping means focus reaching
+    // an element of the page behind.
+    const leaks = new Set();
+    let visitedChrome = false;
+    for (let i = 0; i < 40; i += 1) {
+      await page.keyboard.press('Tab');
+      const where = await page.evaluate(() => {
+        const active = document.activeElement;
+        if (active === null || active === document.body) return 'chrome';
+        if (active.closest('dialog.review') !== null) return 'inside';
+        return `${active.tagName.toLowerCase()} "${(active.textContent ?? '').trim().slice(0, 30)}"`;
+      });
+      if (where === 'chrome') visitedChrome = true;
+      else if (where !== 'inside') leaks.add(where);
+    }
+    const escaped = leaks.size > 0;
+    console.log(`review dialog: focus stayed inside over 40 tabs=${!escaped}, via browser UI=${visitedChrome}${escaped ? `, reached ${[...leaks].join(', ')}` : ''}`);
+    if (escaped) problems.push('keyboard focus escapes the review dialog');
+    await page.getByRole('button', { name: 'Send enquiry' }).click();
+    await page.waitForSelector('.error-summary');
+    await axe(page, 'desktop, review dialog with errors');
+    await page.keyboard.press('Escape');
   }
 
   // 5. The preview has a text alternative, in plain words.

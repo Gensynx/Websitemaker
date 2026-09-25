@@ -522,6 +522,106 @@ const heightField = page.getByLabel(/^Height/);
   if (!standardDisabled || reason.length === 0) problems.push('standard glass can be chosen at a critical location, or no reason is given');
 }
 
+/* ------------------------------------------------------------------ *
+ * Step 8 — summary, share link, enquiry
+ * ------------------------------------------------------------------ */
+
+{
+  const context = await browser.newContext({
+    viewport: { width: 1280, height: 900 },
+    permissions: ['clipboard-read', 'clipboard-write'],
+  });
+  const tab = await context.newPage();
+  tab.on('pageerror', (error) => problems.push(`pageerror: ${error.message}`));
+  const setBase = `${BASE}/?view=el&v=3&m=u&p=d&w=1800&h=2200&ce=RAL7016&ci=m&fe=sm&fi=m&g=c.2&sg=t&tv=n&s=hg&pd=r.2.ov&gf=0.5&ap=r.120.i&ab=aa_2_3_22&sl=400.aa_1_4_22.i&sr=400.aa_1_4_22.i&tl=350.r.n.i&hw=lb&hf=br&lp=1&sh=1&kn=rg&tr=lo&hg=l&od=i`;
+  await tab.goto(setBase, { waitUntil: 'networkidle' });
+  await tab.waitForSelector('canvas');
+
+  // 8.2 The copied link reopens exactly this configuration.
+  await tab.getByRole('button', { name: 'Copy link', exact: true }).click();
+  await tab.waitForTimeout(400);
+  const copied = await tab.evaluate(() => navigator.clipboard.readText());
+  const status = await tab.locator('.panel__actions-status').textContent();
+  const configKeys = (url) => {
+    const params = new URL(url).searchParams;
+    params.delete('view');
+    return [...params].sort().map((p) => p.join('=')).join('&');
+  };
+  const same = configKeys(copied) === configKeys(tab.url());
+  console.log(`share: copied=${copied.length} chars, status="${status}", same configuration=${same}`);
+  if (!same) problems.push('the copied link does not encode the configuration on screen');
+  const opened = await context.newPage();
+  await opened.goto(copied, { waitUntil: 'networkidle' });
+  await opened.waitForSelector('.panel');
+  const openedTitle = await opened.locator('.lede').textContent();
+  console.log(`share: the link opens "${openedTitle}"`);
+  if (!/1800 × 2200/.test(openedTitle ?? '')) problems.push('opening the shared link did not restore the configuration');
+  await opened.close();
+
+  // 8.1 The summary: open, focused, every group.
+  const reviewButton = tab.getByRole('button', { name: 'Review and enquire' });
+  await reviewButton.click();
+  await tab.waitForSelector('dialog.review[open]');
+  const focusedTitle = await tab.evaluate(() => document.activeElement?.textContent);
+  const groups = await tab.locator('.review__group-title').allTextContents();
+  const linkInDialog = await tab.locator('.review__share input').inputValue();
+  console.log(`summary: focus on "${focusedTitle}", groups=${JSON.stringify(groups)}`);
+  if (groups.length !== 5) problems.push(`the summary does not list every section: ${groups.join(', ')}`);
+  if (configKeys(linkInDialog) !== configKeys(tab.url())) problems.push('the summary link differs from the configuration');
+  const lightsListed = await tab.locator('.review__summary').textContent();
+  if (!/Left side light/.test(lightsListed ?? '') || !/Hinge side and opening direction are stated/.test(lightsListed ?? '')) {
+    problems.push('the summary is missing options or the handing statement');
+  }
+
+  // 8.3 An empty form: an error summary, focused, one entry per problem.
+  await tab.getByRole('button', { name: 'Send enquiry' }).click();
+  await tab.waitForSelector('.error-summary');
+  await tab.waitForTimeout(200);
+  const summaryFocused = await tab.evaluate(() => document.activeElement?.classList.contains('error-summary'));
+  const entries = await tab.locator('.error-summary li').count();
+  console.log(`enquiry: empty submit -> error summary focused=${summaryFocused}, entries=${entries}`);
+  if (!summaryFocused || entries !== 3) problems.push('an empty enquiry does not produce a focused error summary of name, email and consent');
+
+  // A complete form: sent nowhere, and it says so.
+  await tab.getByLabel('Name', { exact: true }).fill('Ada Lovelace');
+  await tab.getByLabel('Email address').fill('ada@example.com');
+  await tab.getByLabel(/You may contact me/).check();
+  await tab.getByRole('button', { name: 'Send enquiry' }).click();
+  await tab.waitForSelector('.review__result .review__status');
+  const outcome = await tab.locator('.review__result').textContent();
+  console.log(`enquiry: valid submit -> "${outcome?.slice(0, 80)}…"`);
+  if (!/has not been sent/.test(outcome ?? '')) problems.push('the stubbed enquiry does not say that nothing was sent');
+  await tab.screenshot({ path: `${SHOTS}/shot-review.png` });
+
+  // Escape closes it and returns focus to the button that opened it.
+  await tab.keyboard.press('Escape');
+  await tab.waitForTimeout(300);
+  const closed = (await tab.locator('dialog.review[open]').count()) === 0;
+  const back = await tab.evaluate(() => document.activeElement?.textContent);
+  console.log(`review: Escape closes=${closed}, focus back on "${back}"`);
+  if (!closed || back !== 'Review and enquire') problems.push('closing the review does not return focus to its trigger');
+
+  // Not orderable: an explore colour can still be enquired about, and says so.
+  await tab.goto(setBase.replace('ce=RAL7016', 'ce=x8a2be2'), { waitUntil: 'networkidle' });
+  await tab.getByRole('button', { name: 'Review and enquire' }).click();
+  const note = await tab.locator('.review__summary .review__status').first().textContent();
+  const formThere = (await tab.getByRole('button', { name: 'Send enquiry' }).count()) === 1;
+  console.log(`review: explore colour -> "${note?.slice(0, 40)}…", form=${formThere}`);
+  if (!/Not orderable/.test(note ?? '') || !formThere) problems.push('an explore colour is not reviewed as enquire-only');
+  await tab.keyboard.press('Escape');
+
+  // Cannot be made: no form, the reasons instead.
+  await tab.goto(setBase.replace('w=1800', 'w=900'), { waitUntil: 'networkidle' });
+  await tab.getByRole('button', { name: 'Review and enquire' }).click();
+  const blocked = await tab.locator('.review__summary .review__status').first().textContent();
+  const noForm = (await tab.getByRole('button', { name: 'Send enquiry' }).count()) === 0;
+  const noPicture = (await tab.locator('.review__picture').count()) === 0;
+  console.log(`review: unbuildable -> "${blocked?.slice(0, 40)}…", form hidden=${noForm}, drawing hidden=${noPicture}`);
+  if (!/cannot be made/.test(blocked ?? '') || !noForm) problems.push('an unbuildable configuration can still be enquired about');
+  if (!noPicture) problems.push('an unbuildable configuration is drawn in the review');
+  await context.close();
+}
+
 await page.setViewportSize({ width: 390, height: 844 });
 await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
 await page.waitForSelector('canvas');
