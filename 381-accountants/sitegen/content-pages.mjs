@@ -2,7 +2,7 @@
 import {
   SITE, icon, stars5, breadcrumbs, bookingForm, ctaBanner,
   quoteCards, ratingBanner, REVIEWS, REVIEWS_ALL,
-  rel, tbc, fact, CTA, bookHref,
+  rel, tbc, fact, CTA, bookHref, deadlineFinder,
 } from './lib.mjs';
 import { services } from './content-services.mjs';
 const yearsExp = new Date().getFullYear() - SITE.established;
@@ -149,6 +149,17 @@ ${statsBar()}
     </div>
     ${servicesGrid(path)}
     <p class="divider-note rv">${icon('pound')} Fixed fees, agreed before any work starts. <a class="text-link" href="${r}services/index.html#fees">See starting fees${icon('arrow')}</a></p>
+  </div>
+</section>
+
+<section class="section muted-section" id="deadlines">
+  <div class="wrap">
+    <div class="section-head center rv">
+      <span class="eyebrow">Deadline finder</span>
+      <h2>When is everything due?</h2>
+      <p>Enter your company’s year end, and your VAT quarters if you have them, to see your filing and payment dates worked out the way Companies House and HMRC work them out.</p>
+    </div>
+    ${deadlineFinder(path, { compact: true })}
   </div>
 </section>
 
@@ -324,7 +335,7 @@ export function servicePage(svc, path) {
         <dl class="key-dates rv">
           ${svc.keyDates.map(([d, what]) => `<div><dt>${d}</dt><dd>${what}</dd></div>`).join('\n          ')}
         </dl>
-        <p class="key-dates-note rv">Standard HMRC and Companies House deadlines. Yours depend on your year end and circumstances; we diarise every one when you join.</p>` : ''}
+        <p class="key-dates-note rv">Standard HMRC and Companies House deadlines. Yours depend on your year end and circumstances: the <a class="text-link inline" href="${r}deadlines.html">deadline finder</a> works out company dates, and we diarise every one when you join.</p>` : ''}
         <h2 class="rv">Frequently asked</h2>
         <div class="faq">
           ${svc.faqs.map(([q, a]) => `<details class="rv"><summary>${q}${icon('plus')}</summary><p>${a}</p></details>`).join('\n          ')}
@@ -358,6 +369,55 @@ export function servicePage(svc, path) {
 </section>
 
 ${ctaBanner(path, { title: `Ready to hand over your ${svc.name.toLowerCase()}?` })}
+`;
+}
+
+/* ---------------- Deadlines ---------------- */
+
+export function deadlinesBody(path = 'deadlines.html') {
+  return `
+<section class="page-hero">
+  <div class="wrap">
+    ${breadcrumbs(path, [['Home', 'index.html'], ['Deadlines', '']])}
+    <h1>Your filing and payment dates, worked out</h1>
+    <p class="lede">Enter your company’s year end, and your VAT quarters if you have them. The dates follow the standard Companies House and HMRC rules, soonest first.</p>
+    <div class="hero-ctas">
+      <a class="btn btn-gold" href="${bookHref(path)}">${CTA} ${icon('arrow')}</a>
+      <a class="btn btn-outline" href="#rules">How the dates are worked out</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    ${deadlineFinder(path)}
+  </div>
+</section>
+
+<section class="section muted-section" id="rules">
+  <div class="wrap">
+    <div class="section-head center rv">
+      <span class="eyebrow">The rules</span>
+      <h2>How each date is worked out</h2>
+    </div>
+    <div class="rules rv">
+      <table>
+        <caption class="sr-only">Deadline rules</caption>
+        <thead><tr><th scope="col">Deadline</th><th scope="col">Rule</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Accounts to Companies House</th><td>9 months after the year end for a private company. If the year end is the last day of a month, the deadline is the last day of the month 9 months later. First accounts are due 21 months after incorporation.</td></tr>
+          <tr><th scope="row">Corporation tax payment</th><td>9 months and 1 day after the end of the accounting period, for companies that are not large. A 31 March year end pays on 1 January.</td></tr>
+          <tr><th scope="row">Company tax return (CT600)</th><td>12 months after the end of the accounting period.</td></tr>
+          <tr><th scope="row">VAT return and payment</th><td>1 calendar month and 7 days after the end of each VAT period.</td></tr>
+          <tr><th scope="row">Self assessment</th><td>Register by 5 October after the tax year you first need to file for. Paper returns by 31 October; online returns and the balance of tax by 31 January; payments on account on 31 January and 31 July.</td></tr>
+          <tr><th scope="row">Payroll</th><td>Full Payment Submission on or before each payday; PAYE paid by the 22nd of the following month when paying electronically; P60s by 31 May; P11Ds by 6 July.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+${ctaBanner(path, { title: 'Rather we kept the diary?', text: 'Every client’s deadlines are diarised the day they join, and returns go in early. The first consultation is free.' })}
 `;
 }
 
