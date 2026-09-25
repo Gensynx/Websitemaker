@@ -65,7 +65,7 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 ```
 npm install
 npm run typecheck
-npm test          # 389 unit tests, including text contrast read from styles.css
+npm test          # 391 unit tests, including text contrast read from styles.css
 npm run dev -- --port 5180   # then, in another shell:
 npm run smoke                # browser render, controls, wall scene, sizing
 npm run a11y                 # keyboard-only walk, sheet by keys and drag, axe scans
@@ -179,6 +179,18 @@ order — the product still draws as specified, because its shape is not what is
 wrong with it. Treating the two the same made every link naming an
 unsold material render the default product instead, silently discarding a
 shape, size and style that were all perfectly drawable.
+
+While the render is blocked, the notice is also beside the picture, not only
+in the section at fault: "Not drawn: this cannot be made yet", the reason,
+which size the picture actually shows, and "Show what to change", which opens
+that section (Surround, for a leaf squeezed by side lights). The held picture
+is dimmed. Reported as "it gets stuck": every later choice — a panel style,
+say — changed nothing on screen, and nothing on screen said why. On a phone
+the notice is one line under the view bar.
+
+Style and panel tiles draw the leaf alone (`leafAlone`), at its real size: in
+a thumbnail of a whole door set the leaf was a sliver between the side
+lights, and every panel style looked the same.
 
 ## The configuration panel (Step 4)
 

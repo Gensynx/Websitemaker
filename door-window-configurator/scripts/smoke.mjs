@@ -261,13 +261,18 @@ const heightField = page.getByLabel(/^Height/);
 
 // An unmanufacturable size states the range inline and never reaches the model.
 {
-  const before = await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' });
   await widthField.fill('9000');
   await page.waitForTimeout(1500);
   const reason = (await page.locator('.field__error').allTextContents()).join(' ');
-  const held = Buffer.compare(before, await page.locator('canvas').screenshot({ mask: CHROME, maskColor: '#000' })) === 0;
-  console.log(`sizing: oversize held=${held} statesRange=${/between .* and .*/.test(reason)}`);
+  // The drawing's own dimension labels say what the model is. Comparing
+  // canvas pixels no longer can: the "not drawn" notice now appears beside
+  // the title, and the camera re-frames to keep the door clear of it.
+  const stale = await page.locator('.stage__picture').getAttribute('data-stale');
+  const drawn = await page.locator('.annotation').allTextContents();
+  const held = drawn.includes('1000 mm') && !drawn.some((label) => label.startsWith('9000'));
+  console.log(`sizing: oversize held=${held} (drawn ${JSON.stringify(drawn)}) marked stale=${stale} statesRange=${/between .* and .*/.test(reason)}`);
   if (!held) problems.push('an unmanufacturable size was rendered');
+  if (stale !== 'true') problems.push('the held picture is not marked as not current');
   if (!/between .* and .*/.test(reason) || !reason.includes('mm')) {
     problems.push(`the inline reason does not state the permitted range: ${JSON.stringify(reason)}`);
   }
@@ -636,6 +641,48 @@ const heightField = page.getByLabel(/^Height/);
   if (!/cannot be made/.test(blocked ?? '') || !noForm) problems.push('an unbuildable configuration can still be enquired about');
   if (!noPicture) problems.push('an unbuildable configuration is drawn in the review');
   await context.close();
+}
+
+/* ------------------------------------------------------------------ *
+ * A configuration that cannot be drawn says so where the customer looks
+ * ------------------------------------------------------------------ */
+
+{
+  // Reported as "it gets stuck": 875 mm side lights on a 2600 mm frame leave
+  // a 530 mm leaf, so the drawing holds the last door that can be made and
+  // every later choice seemed to do nothing. The reason was only in Size.
+  await page.goto(
+    `${BASE}/?view=el&v=3&m=u&p=d&w=2600&h=1981&ce=RAL7016&ci=m&fe=sm&fi=m&g=c.2&sg=t&tv=n&s=sp&pd=r.1.ov&sl=875.n.i&sr=875.n.i&tl=n&hw=lr&hf=sc&lp=0&sh=0&kn=n&tr=st&hg=l&od=i`,
+    { waitUntil: 'networkidle' },
+  );
+  await page.evaluate(() => sessionStorage.clear());
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForSelector('canvas');
+  const notice = (await page.locator('.stage__stale').textContent()) ?? '';
+  const dimmed = await page.locator('.stage__picture').getAttribute('data-stale');
+  console.log(`stale: notice="${notice.slice(0, 70)}…" dimmed=${dimmed}`);
+  if (!/Not drawn/.test(notice) || !/530 mm/.test(notice)) problems.push('an undrawable configuration is not explained beside the picture');
+  if (dimmed !== 'true') problems.push('the held drawing is not marked as stale');
+
+  // The way to the fix: the section that has it opens and takes focus.
+  await page.getByRole('button', { name: 'Show what to change' }).click();
+  await page.waitForTimeout(600);
+  const surround = await page.locator('#section-surround-toggle').getAttribute('aria-expanded');
+  const focusedId = await page.evaluate(() => document.activeElement?.id);
+  console.log(`stale: show what to change -> surround open=${surround}, focus=${focusedId}`);
+  if (surround !== 'true' || focusedId !== 'section-surround-toggle') problems.push('"Show what to change" does not open the section with the fix');
+
+  // Fixed as the panel advises — widening would pass the 2800 mm maximum, so
+  // it says to narrow the side lights — the notice goes and the drawing is
+  // current again. 775 mm each leaves a 730 mm leaf.
+  const sideWidth = page.getByLabel(/^Side light width/);
+  await sideWidth.fill('775');
+  await sideWidth.press('Tab');
+  await page.waitForTimeout(1500);
+  const after = await page.locator('.stage__stale p').count();
+  const dimmedAfter = await page.locator('.stage__picture').getAttribute('data-stale');
+  console.log(`stale: after narrowing the side lights -> notice=${after > 0} dimmed=${dimmedAfter}`);
+  if (after !== 0 || dimmedAfter !== 'false') problems.push('the stale notice stays after the configuration is fixed');
 }
 
 await page.setViewportSize({ width: 390, height: 844 });

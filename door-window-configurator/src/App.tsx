@@ -39,6 +39,7 @@ import { SurroundPanel } from './ui/SurroundPanel';
 import { ReviewDialog } from './ui/ReviewDialog';
 import type { ReviewDialogHandle } from './ui/ReviewDialog';
 import { copyText, shareUrl } from './output/share';
+import { sideLightsOf } from './config/doorEdits';
 import { useInsets } from './ui/useInsets';
 import { useSections } from './ui/useSections';
 import { useSheetGesture } from './ui/useSheetGesture';
@@ -169,8 +170,9 @@ export function App(): JSX.Element {
   const titleRef = useRef<HTMLElement>(null);
   const viewbarRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLFormElement>(null);
+  const noticeRef = useRef<HTMLDivElement>(null);
   const insets = useInsets(
-    { stage: stageRef, title: titleRef, viewbar: viewbarRef, panel: panelRef },
+    { stage: stageRef, title: titleRef, viewbar: viewbarRef, panel: panelRef, notice: noticeRef },
     `${narrow}-${sheet}-${validation.errors.length}-${notices.length}`,
   );
 
@@ -191,6 +193,30 @@ export function App(): JSX.Element {
     const notes = [...(nonOrderable.get(id) ?? []), ...(sectionNotices.get(id) ?? [])].map((issue) => issue.message);
     return <Messages errors={blocking} notes={notes} />;
   };
+  // Opens the section that holds the first thing stopping the drawing, and
+  // takes the customer to it: the sheet opens first on a phone.
+  const showBlocker = () => {
+    // A leaf left too narrow or too wide by side lights is reported against the
+    // width, but its one-press fix (and the side light width) is in Surround.
+    const field = blockers[0]?.field ?? '';
+    const bySideLights = field === 'width' && config.productType === 'door' && sideLightsOf(config) !== 'none';
+    const section = bySideLights ? 'surround' : (sectionForField(field) ?? 'size');
+    if (narrow && sheet === 'closed') setSheet('half');
+    sections.open(section);
+    requestAnimationFrame(() => {
+      const toggle = document.getElementById(`section-${section}-toggle`);
+      if (!toggle) return;
+      // Scroll the panel, not the page: scrollIntoView also moved the whole
+      // document on a phone and left the sheet floating mid-screen.
+      let scroller = toggle.parentElement;
+      while (scroller && !/(auto|scroll)/.test(getComputedStyle(scroller).overflowY)) scroller = scroller.parentElement;
+      if (scroller) {
+        const offset = toggle.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+        scroller.scrollTo({ top: scroller.scrollTop + offset - 8, behavior: 'smooth' });
+      }
+      toggle.focus({ preventScroll: true });
+    });
+  };
   const generalErrors = (errors.get(null) ?? []).map((issue) => issue.message);
   const generalNotes = [...(nonOrderable.get(null) ?? []), ...(sectionNotices.get(null) ?? [])].map((issue) => issue.message);
 
@@ -207,7 +233,7 @@ export function App(): JSX.Element {
           — is presentational to assistive technology; the description says
           what they show, in the same words as the panel.
         */}
-        <div className="stage__picture" role="img" aria-label={description}>
+        <div className="stage__picture" role="img" aria-label={description} data-stale={blockers.length > 0}>
         <div
           className="stage__poster"
           data-hidden={webgl && ready}
@@ -239,6 +265,30 @@ export function App(): JSX.Element {
           <h1>{productName}</h1>
           {/* Not a live region: it changes on every keystroke in the size fields, which already say the value. */}
           <p className="lede">{formatSize(config.dimensions.width, config.dimensions.height)}</p>
+          {/*
+            While the configuration cannot be made, the picture holds the last
+            one that can (Step 3.4). That was explained only inside the section
+            at fault, so an edit made anywhere else — a panel style, say —
+            seemed to do nothing. Said here, beside the size that the picture
+            no longer matches, with a way to the fix.
+          */}
+          <div className="stage__stale" role="status" ref={noticeRef}>
+            {blockers.length > 0 && (
+              <>
+                <p>
+                  <strong>Not drawn: this cannot be made yet.</strong>{' '}
+                  <span className="stage__stale-detail">{blockers[0]?.message}</span>
+                </p>
+                <p className="stage__stale-detail">
+                  The picture shows the last version that can be made,{' '}
+                  {formatSize(lastValid.dimensions.width, lastValid.dimensions.height)}.
+                </p>
+                <button type="button" className="button button--quiet" onClick={showBlocker}>
+                  Show what to change
+                </button>
+              </>
+            )}
+          </div>
         </header>
 
         <div className="viewbar" ref={viewbarRef} role="group" aria-label="View">

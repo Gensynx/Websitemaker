@@ -1977,3 +1977,62 @@ h1 {
     transition-duration: 1ms !important;
   }
 }
+
+/* ------------------------------------------------------------------ *
+ * The drawing cannot show the configuration
+ * ------------------------------------------------------------------ */
+
+/* The picture is the last configuration that can be made, not this one:
+   dimmed so it is not mistaken for it. */
+.stage__picture[data-stale='true'] {
+  opacity: 0.45;
+  filter: grayscale(0.6);
+  transition: opacity var(--duration) var(--ease), filter var(--duration) var(--ease);
+}
+
+.stage__stale:empty {
+  display: none;
+}
+
+.stage__stale {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+  margin-top: 0.875rem;
+  padding: 0.75rem 0.875rem;
+  border-left: 3px solid var(--warn);
+  background: var(--surface);
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  max-width: 26rem;
+  /* The title ignores the pointer so the canvas can be dragged beneath it. */
+  pointer-events: auto;
+}
+
+.stage__stale p {
+  margin: 0;
+}
+
+@media (max-width: 899px) {
+  /* A phone has no room for the full reason above the sheet, and the view
+     bar sits under the title: the notice goes under the view bar, in one
+     line and a button. The reason is in the section the button opens. */
+  .stage__stale {
+    position: absolute;
+    top: calc(6.25rem + 4rem);
+    left: 1.25rem;
+    /* The title shrinks to its heading; the notice spans the screen, as the
+       view bar above it does. */
+    width: calc(100vw - var(--edge) * 2);
+    max-width: none;
+    margin: 0;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    padding: 0.5rem 0.625rem 0.5rem 0.75rem;
+  }
+
+  .stage__stale-detail {
+    display: none;
+  }
+}

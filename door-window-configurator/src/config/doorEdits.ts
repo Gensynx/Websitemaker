@@ -169,6 +169,21 @@ export function plainLeaf(config: DoorConfigState): { width: Mm; height: Mm } {
   return { width: leaf.width, height: leaf.height };
 }
 
+/**
+ * The same door without its side or top lights, sized so the leaf is exactly
+ * this door's leaf. What the leaf's own options — style, panels — are drawn
+ * on: in a thumbnail of a whole door set, the leaf is a sliver between two
+ * side lights and every panel style looks the same.
+ */
+export function leafAlone(config: DoorConfigState): DoorConfigState {
+  const leaf = doorLayout(config).leaf;
+  const bare: DoorConfigState = { ...config, surround: { leftSideLight: null, rightSideLight: null, topLight: null } };
+  return {
+    ...bare,
+    dimensions: { width: widthToKeepLeaf(bare, leaf.width), height: heightToKeepLeaf(bare, leaf.height) },
+  };
+}
+
 /* ------------------------------------------------------------------ *
  * Handing, threshold, hardware
  * ------------------------------------------------------------------ */

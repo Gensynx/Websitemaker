@@ -28,7 +28,7 @@ export function useSections<T extends string>(
   all: readonly T[],
   defaults: readonly T[],
   hasProblem: (id: T) => boolean,
-): { isOpen: (id: T) => boolean; toggle: (id: T) => void } {
+): { isOpen: (id: T) => boolean; toggle: (id: T) => void; open: (id: T) => void } {
   const [open, setOpen] = useState<Set<T>>(() => {
     const stored = readStored();
     const initial = new Set<T>(stored === null ? defaults : all.filter((id) => stored.includes(id)));
@@ -53,5 +53,9 @@ export function useSections<T extends string>(
     });
   }, []);
 
-  return { isOpen: (id: T) => open.has(id), toggle };
+  const openOne = useCallback((id: T) => {
+    setOpen((current) => (current.has(id) ? current : new Set(current).add(id)));
+  }, []);
+
+  return { isOpen: (id: T) => open.has(id), toggle, open: openOne };
 }

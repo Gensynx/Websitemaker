@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   heightToKeepLeaf,
+  leafAlone,
   panelChoices,
   panelDetailOf,
   plainLeaf,
@@ -99,5 +100,21 @@ describe('hardware', () => {
     for (const handle of ['lever-backplate', 'lever-rose', 'pull-bar', 'knob'] as const) {
       expect(validateConfig(withHandle(DEFAULT_DOOR, handle)).errors, handle).toEqual([]);
     }
+  });
+});
+
+describe("the leaf alone, for the leaf's own option tiles", () => {
+  it('drops the side and top lights and keeps the leaf exactly', () => {
+    const set = withTopLight(withSideLights({ ...DEFAULT_DOOR, dimensions: { width: 2100, height: 2400 } }, 'both'), true);
+    const alone = leafAlone(set);
+    expect(alone.surround).toEqual({ leftSideLight: null, rightSideLight: null, topLight: null });
+    expect(doorLayout(alone).leaf.width).toBeCloseTo(doorLayout(set).leaf.width, 9);
+    expect(doorLayout(alone).leaf.height).toBeCloseTo(doorLayout(set).leaf.height, 9);
+    expect(alone.style).toEqual(set.style);
+  });
+
+  it('leaves a door with no side or top lights as it is', () => {
+    expect(leafAlone(DEFAULT_DOOR).dimensions.width).toBeCloseTo(DEFAULT_DOOR.dimensions.width, 9);
+    expect(leafAlone(DEFAULT_DOOR).dimensions.height).toBeCloseTo(DEFAULT_DOOR.dimensions.height, 9);
   });
 });

@@ -34,8 +34,13 @@ if (OUT) mkdirSync(OUT, { recursive: true });
 
 /** A difference a customer can see: a quarter of the channel range... */
 const MIN_DELTA = 64;
-/** ...over more than a speck: roughly a panel edge's length at tile size. */
-const MIN_PIXELS = 20;
+/**
+ * ...over more than a speck. First set at 20 px, "roughly a panel edge at
+ * tile size". Raised to 40 after the owner reported door-set tiles that look
+ * the same: those measured 23 px here and passed. Calibrated on that report,
+ * after seeing results — recorded in TEST-AUDIT.md (A20).
+ */
+const MIN_PIXELS = 40;
 
 // The catalogue's seven panel styles, as the configurator link encodes them.
 const PANELS = [
@@ -153,20 +158,30 @@ for (const [colourName, colour] of [
   ['RAL 7016', 'RAL7016'],
   ['RAL 9016', 'RAL9016'],
 ]) {
-  // The Panels tiles: each is a thumbnail of the current door with that panel.
-  await page.goto(`${BASE}/?p=d&ce=${colour}&view=el`, { waitUntil: 'networkidle' });
-  await page.evaluate(() => sessionStorage.clear());
-  const toggle = page.locator('#section-style-toggle');
-  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
-  const group = page.getByRole('group', { name: 'Panels' });
-  await group.waitFor();
-  const thumbs = {};
-  for (const label of await group.locator('.tile__label').allTextContents()) {
-    const tile = group.locator('label.tile').filter({ has: page.locator('.tile__label', { hasText: new RegExp(`^${label}$`) }) });
-    thumbs[label] = await pixels(tile.locator('.tile__picture svg'), `thumb-${colour}-${label}`);
+  // The Panels tiles: each is a thumbnail of the current door with that
+  // panel. On a single door, and on a door set with two wide side lights,
+  // where the leaf is a small part of the frame — the case found failing
+  // after this check passed: it had only ever looked at a single door.
+  for (const [doorName, query] of [
+    ['single door', `p=d&ce=${colour}`],
+    ['door set', `v=3&m=u&p=d&w=2300&h=2100&ce=${colour}&ci=m&fe=sm&fi=m&g=c.2&sg=t&tv=n&s=sp&pd=r.2.ov&sl=600.n.i&sr=600.n.i&tl=n&hw=lr&hf=sc&lp=1&sh=0&kn=n&tr=st&hg=l&od=i`],
+  ]) {
+    await page.goto(`${BASE}/?${query}&view=el`, { waitUntil: 'networkidle' });
+    await page.evaluate(() => sessionStorage.clear());
+    // The fixture must be a buildable door, or the tiles show another one.
+    if ((await page.locator('.stage__stale p').count()) > 0) problems.push(`thumbnail fixture "${doorName}" cannot be built`);
+    const toggle = page.locator('#section-style-toggle');
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+    const group = page.getByRole('group', { name: 'Panels' });
+    await group.waitFor();
+    const thumbs = {};
+    for (const label of await group.locator('.tile__label').allTextContents()) {
+      const tile = group.locator('label.tile').filter({ has: page.locator('.tile__label', { hasText: new RegExp(`^${label}$`) }) });
+      thumbs[label] = await pixels(tile.locator('.tile__picture svg'), `thumb-${colour}-${doorName}-${label}`);
+    }
+    await control('thumbnail', group.locator('.tile__picture svg').first());
+    checkAll(`thumbnail, ${doorName}, ${colourName}`, thumbs);
   }
-  await control('thumbnail', group.locator('.tile__picture svg').first());
-  checkAll(`thumbnail, ${colourName}`, thumbs);
 
   // The elevation, as the review dialog shows it.
   const drawings = {};

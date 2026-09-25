@@ -19,6 +19,8 @@ export function useInsets(
     title: RefObject<HTMLElement>;
     viewbar: RefObject<HTMLElement>;
     panel: RefObject<HTMLElement>;
+    /** The "not drawn" notice, placed under the view bar on a phone. */
+    notice?: RefObject<HTMLElement>;
   },
   revision: unknown,
 ): Insets {
@@ -31,6 +33,7 @@ export function useInsets(
       const title = refs.title.current?.getBoundingClientRect();
       const viewbar = refs.viewbar.current?.getBoundingClientRect();
       const panel = refs.panel.current?.getBoundingClientRect();
+      const notice = refs.notice?.current?.getBoundingClientRect();
 
       const panelOnRight = panel !== undefined && panel.left > stage.left + stage.width / 2;
       const panelBelow = panel !== undefined && !panelOnRight && panel.top > stage.top + stage.height / 3;
@@ -42,6 +45,7 @@ export function useInsets(
         top: Math.max(
           title ? title.bottom - stage.top + GAP : 0,
           viewbarOnTop && viewbar ? viewbar.bottom - stage.top + GAP : 0,
+          notice && notice.height > 0 ? notice.bottom - stage.top + GAP : 0,
         ),
         right: panelOnRight && panel ? Math.max(0, stage.right - panel.left + GAP) : 0,
         bottom: Math.max(

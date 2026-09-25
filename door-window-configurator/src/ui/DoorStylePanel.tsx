@@ -15,6 +15,7 @@ import { useConfigurator } from '../state/store';
 import type { DoorConfigState, DoorStyleId, MouldingProfile, PanelDetail } from '../config/types';
 import { HANDING_STATEMENT } from '../config/describe';
 import {
+  leafAlone,
   panelChoiceId,
   panelChoices,
   panelDetailOf,
@@ -58,6 +59,8 @@ export function DoorStylePanel({ config }: { config: DoorConfigState }): JSX.Ele
   const update = (mutate: (door: DoorConfigState) => DoorConfigState) =>
     edit((current) => (current.productType === 'door' ? mutate(current) : current));
 
+  // Style and panels belong to the leaf, so their tiles draw the leaf alone.
+  const leaf = leafAlone(shown);
   const panels = panelDetailOf(config);
   return (
     <div className="options">
@@ -68,7 +71,7 @@ export function DoorStylePanel({ config }: { config: DoorConfigState }): JSX.Ele
           value: style.id,
           label: style.label,
           detail: style.detail,
-          picture: <ElevationThumb config={withDoorStyle(shown, style.id)} />,
+          picture: <ElevationThumb config={withDoorStyle(leaf, style.id)} />,
         }))}
         onChange={(id) => update((door) => withDoorStyle(door, id))}
       />
@@ -81,7 +84,7 @@ export function DoorStylePanel({ config }: { config: DoorConfigState }): JSX.Ele
             tiles={panelChoices(panels).map((detail) => ({
               value: panelChoiceId(detail),
               ...panelLabel(detail),
-              picture: <ElevationThumb config={withPanelDetail(shown, detail)} />,
+              picture: <ElevationThumb config={withPanelDetail(leaf, detail)} />,
             }))}
             onChange={(id) => {
               const detail = panelChoices(panels).find((choice) => panelChoiceId(choice) === id);
