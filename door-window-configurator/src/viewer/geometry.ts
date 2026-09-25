@@ -781,10 +781,17 @@ function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
           parts.push(...frameMembers(`sash-${index}`, 'sash', inset(cellRect, SASH_CLEARANCE), frame.sash - SASH_CLEARANCE, z + 12, frame.sashDepth));
           parts.push(...frameMembers(`sash-${index}-seal`, 'seal', cellRect, SASH_CLEARANCE, sashFront - 3 - 6, 12));
           parts.push(...glazedArea(`cell-${index}`, inset(cellRect, frame.sash), cell.bars, z + 12, frame, cavities));
-          // Handles are fitted on the INSIDE of the sash; from outside they are
-          // seen through the glass, if at all.
+          // Handles are fitted on the INSIDE of the sash, on the sash member
+          // itself; from outside they are seen through the glass, if at all.
           parts.push(
-            ...buildWindowHandle(config, cell.opening, inset(cellRect, frame.sash), index, z + 12 - frame.sashDepth / 2),
+            ...buildWindowHandle(
+              config,
+              cell.opening,
+              inset(cellRect, SASH_CLEARANCE),
+              frame.sash - SASH_CLEARANCE,
+              index,
+              z + 12 - frame.sashDepth / 2,
+            ),
           );
         }
       });
@@ -848,73 +855,83 @@ function buildWindow(config: WindowConfigState, frame: Sightlines): Part[] {
 function buildWindowHandle(
   config: WindowConfigState,
   opening: SashOpening,
-  cell: Rect,
+  sash: Rect,
+  member: Mm,
   index: number,
   z: Mm,
 ): Part[] {
-  // The handle goes opposite the hinge, and the lever arm points back TOWARDS
-  // the hinge — which is to say, into the sash. Pointing it outwards ran it
-  // across the mullion and into the neighbouring light.
+  // A window handle is screwed to the sash MEMBER — the stile opposite the
+  // hinge, or the rail opposite a top or bottom hinge — never to the glass.
+  // It was once placed against the glazed aperture, which put every handle
+  // centre inside the pane. `sash` is the sash's outer edge and `member` its
+  // face width, so the member's centreline is half a member in from the edge.
+  //
+  // The lever rests along the member, as a closed espagnolette handle does:
+  // down the stile on a side-hung light, along the rail on a top- or
+  // bottom-hung one. Lying across the sash, it crossed the glass.
   const plate = 50;
   const lever = 80;
-  const margin = 20;
+  const long = config.hardware.handle === 'lever-backplate' ? plate * 2.4 : plate;
 
-  let plateX: Mm;
-  let leverX: Mm;
-  let y: Mm;
-
+  let cx: Mm;
+  let cy: Mm;
+  let along: 'x' | 'y';
   switch (opening) {
     case 'side-hung-left':
-      // Hinged left, handled on the right stile; lever points left.
-      plateX = cell.x + cell.width - margin - plate;
-      leverX = plateX - lever + plate / 2;
-      y = cell.y + cell.height / 2;
+      // Hinged left: the handle is on the right stile.
+      cx = sash.x + sash.width - member / 2;
+      cy = sash.y + sash.height / 2;
+      along = 'y';
       break;
     case 'side-hung-right':
-      // Hinged right, handled on the left stile; lever points right.
-      plateX = cell.x + margin;
-      leverX = plateX + plate / 2;
-      y = cell.y + cell.height / 2;
+      cx = sash.x + member / 2;
+      cy = sash.y + sash.height / 2;
+      along = 'y';
       break;
     case 'top-hung':
-      plateX = cell.x + cell.width / 2 - plate / 2;
-      leverX = plateX + plate / 2 - lever / 2;
-      y = cell.y + margin + plate / 2;
+      // Hinged at the top: the handle is on the bottom rail.
+      cx = sash.x + sash.width / 2;
+      cy = sash.y + member / 2;
+      along = 'x';
       break;
     case 'bottom-hung':
-      plateX = cell.x + cell.width / 2 - plate / 2;
-      leverX = plateX + plate / 2 - lever / 2;
-      y = cell.y + cell.height - margin - plate / 2;
+      // Tilt only, hinged at the bottom: the handle is on the top rail.
+      cx = sash.x + sash.width / 2;
+      cy = sash.y + sash.height - member / 2;
+      along = 'x';
       break;
     case 'fixed':
       return [];
   }
 
-  // Nothing may leave its own light, in either axis. A narrow sash shortens
-  // its furniture rather than lending it to the neighbour, and a shallow one
-  // shrinks it rather than hanging it below the rail.
+  // Nothing may leave its own sash. A small sash shortens its furniture
+  // rather than lending it to the neighbour.
   const fit = (rect: Rect): Rect => {
-    const width = Math.min(rect.width, cell.width);
-    const height = Math.min(rect.height, cell.height);
+    const width = Math.min(rect.width, sash.width);
+    const height = Math.min(rect.height, sash.height);
     return {
       width,
       height,
-      x: Math.max(cell.x, Math.min(rect.x, cell.x + cell.width - width)),
-      y: Math.max(cell.y, Math.min(rect.y, cell.y + cell.height - height)),
+      x: Math.max(sash.x, Math.min(rect.x, sash.x + sash.width - width)),
+      y: Math.max(sash.y, Math.min(rect.y, sash.y + sash.height - height)),
     };
   };
+  // A rectangle `length` long along the member and `across` wide, centred.
+  const onMember = (length: Mm, across: Mm, offset = 0): Rect =>
+    along === 'y'
+      ? { x: cx - across / 2, y: cy - length / 2 + offset, width: across, height: length }
+      : { x: cx - length / 2 + offset, y: cy - across / 2, width: length, height: across };
 
   // Mirrors the door set (Step 7.4): a backplate is a tall plate, a rose is
   // round. Both were drawn as the same square, so the two lever choices
   // looked identical on a window.
   const backplate = config.hardware.handle === 'lever-backplate';
-  const plateHeight = backplate ? plate * 2.4 : plate;
   const parts: Part[] = [
     {
       ...box(
         `handle-${index}-plate`,
         'hardware',
-        fit({ x: plateX, y: y - plateHeight / 2, width: plate, height: plateHeight }),
+        fit(onMember(long, plate)),
         // `z` is the sash's internal face; the plate sits on it, facing in.
         z - 5,
         10,
@@ -925,13 +942,14 @@ function buildWindowHandle(
   ];
   if (config.hardware.handle !== 'knob') {
     parts.push({
-      ...box(`handle-${index}-lever`, 'hardware', fit({ x: leverX, y: y - 9, width: lever, height: 18 }), z - 28, 18),
-      shape: { kind: 'cylinder', axis: 'x' },
+      // From the spindle, down the stile or along the rail.
+      ...box(`handle-${index}-lever`, 'hardware', fit(onMember(lever, 18, along === 'y' ? -lever / 2 + 9 : lever / 2 - 9)), z - 28, 18),
+      shape: { kind: 'cylinder', axis: along },
       facing: 'internal',
     });
   } else {
     parts.push({
-      ...box(`handle-${index}-knob`, 'hardware', fit({ x: plateX + plate / 2 - 20, y: y - 20, width: 40, height: 40 }), z - 26, 36),
+      ...box(`handle-${index}-knob`, 'hardware', fit(onMember(40, 40)), z - 26, 36),
       shape: { kind: 'sphere' },
       facing: 'internal',
     });

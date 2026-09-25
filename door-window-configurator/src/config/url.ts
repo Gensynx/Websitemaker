@@ -64,6 +64,7 @@ import type {
 } from './types';
 import { CONFIG_SCHEMA_VERSION, NO_BARS } from './types';
 import type { Finish, FrameMaterial } from './material';
+import { isMaterialOffered, MATERIALS } from './material';
 import { isRalCode } from './ral';
 import {
   DEFAULT_DOOR,
@@ -351,8 +352,9 @@ function encodeWindow(config: WindowConfigState, params: URLSearchParams): void 
       params.set('gd', encodeGrid(config.style.options.grid));
       break;
     case 'tilt-and-turn':
+      // The turn hinge is each light's opening, in `gd`. Links made before
+      // it had one source also carry `th`; the decoder ignores it.
       params.set('gd', encodeGrid(config.style.options.grid));
-      params.set('th', config.style.options.turnHingeSide === 'left' ? 'l' : 'r');
       break;
     case 'sash':
       params.set('op', config.style.options.operation === 'double-hung' ? 'dh' : 'sh');
@@ -732,7 +734,15 @@ export function decodeConfig(input: URLSearchParams | string): DecodeResult {
   for (const issue of migrationIssues) issues.add(issue.key, issue.reason);
 
   const productType = readCode(params, 'p', PRODUCT, 'door', issues);
-  const material = readCode(params, 'm', MATERIAL, DEFAULT_MATERIAL, issues);
+  // Only a material that is sold can come out of a link or stored state
+  // (decided 2026-09-25 for the demo: uPVC only, and no link may decode to a
+  // material that cannot be ordered). An older link for another material is
+  // shown in the default, and says so.
+  const requested = readCode(params, 'm', MATERIAL, DEFAULT_MATERIAL, issues);
+  const material = isMaterialOffered(requested) ? requested : DEFAULT_MATERIAL;
+  if (material !== requested) {
+    issues.add('m', `made for ${MATERIALS[requested].label} frames, which are not offered; shown in ${MATERIALS[material].label}`);
+  }
   const base = productType === 'door' ? DEFAULT_DOOR : DEFAULT_WINDOW;
   const limits = sizeLimits(material, productType);
 
@@ -838,7 +848,16 @@ function decodeWindow(params: URLSearchParams, issues: Issues): WindowSpecific {
     case 'casement':
       style = {
         id: 'casement',
-        options: { grid: decodeGrid(params.get('gd'), DEFAULT_WINDOW_STYLE_OPTIONS.casement.grid, 'gd', issues) },
+        // Absent, the grid is the default window's own, not the style's: the
+        // default window is a preset, and `p=w` must open as it.
+        options: {
+          grid: decodeGrid(
+            params.get('gd'),
+            DEFAULT_WINDOW.style.id === 'casement' ? DEFAULT_WINDOW.style.options.grid : DEFAULT_WINDOW_STYLE_OPTIONS.casement.grid,
+            'gd',
+            issues,
+          ),
+        },
       };
       break;
     case 'tilt-and-turn':
@@ -846,7 +865,6 @@ function decodeWindow(params: URLSearchParams, issues: Issues): WindowSpecific {
         id: 'tilt-and-turn',
         options: {
           grid: decodeGrid(params.get('gd'), DEFAULT_WINDOW_STYLE_OPTIONS['tilt-and-turn'].grid, 'gd', issues),
-          turnHingeSide: params.get('th') === 'r' ? 'right' : 'left',
         },
       };
       break;

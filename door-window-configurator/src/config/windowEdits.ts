@@ -72,11 +72,9 @@ export function withWindowStyle(config: WindowConfigState, id: WindowStyleId): W
     case 'casement':
       style = { id, options: { grid: grid ? translateOpenings(grid, 'casement') : DEFAULT_WINDOW_STYLE_OPTIONS.casement.grid } };
       break;
-    case 'tilt-and-turn': {
-      const next = grid ? translateOpenings(grid, 'tilt-and-turn') : DEFAULT_WINDOW_STYLE_OPTIONS['tilt-and-turn'].grid;
-      style = { id, options: { grid: next, turnHingeSide: turnHingeSideOf(next) } };
+    case 'tilt-and-turn':
+      style = { id, options: { grid: grid ? translateOpenings(grid, 'tilt-and-turn') : DEFAULT_WINDOW_STYLE_OPTIONS['tilt-and-turn'].grid } };
       break;
-    }
     case 'sash':
       style = { id, options: { ...DEFAULT_WINDOW_STYLE_OPTIONS.sash } };
       break;
@@ -89,22 +87,10 @@ export function withWindowStyle(config: WindowConfigState, id: WindowStyleId): W
   return { ...config, style };
 }
 
-/**
- * The style-level turn hinge side of a tilt-and-turn window, kept in step
- * with the lights: the side the first opening light is hinged on. The model
- * holds both (see the note in the README); the lights are what is drawn.
- */
-function turnHingeSideOf(grid: SashGrid): 'left' | 'right' {
-  const first = grid.cells.find((cell) => cell.opening === 'side-hung-left' || cell.opening === 'side-hung-right');
-  return first?.opening === 'side-hung-right' ? 'right' : 'left';
-}
-
 function withGrid(config: WindowConfigState, grid: SashGrid): WindowConfigState {
   const style = config.style;
   if (style.id === 'casement') return { ...config, style: { id: 'casement', options: { grid } } };
-  if (style.id === 'tilt-and-turn') {
-    return { ...config, style: { id: 'tilt-and-turn', options: { grid, turnHingeSide: turnHingeSideOf(grid) } } };
-  }
+  if (style.id === 'tilt-and-turn') return { ...config, style: { id: 'tilt-and-turn', options: { grid } } };
   return config;
 }
 

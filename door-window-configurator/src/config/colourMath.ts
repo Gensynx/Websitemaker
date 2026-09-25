@@ -119,3 +119,18 @@ export function hueName(h: number): string {
   if (hue < 290) return 'purple';
   return 'pink';
 }
+
+/** WCAG relative luminance of an sRGB colour, 0 (black) to 1 (white). */
+export function relativeLuminance(hex: string): number {
+  const linear = hexToRgb(hex).map((c) => {
+    const v = c / 255;
+    return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  }) as Rgb;
+  return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+}
+
+/** WCAG contrast ratio between two colours, 1 to 21. */
+export function contrastRatio(a: string, b: string): number {
+  const [hi, lo] = [relativeLuminance(a), relativeLuminance(b)].sort((x, y) => y - x) as [number, number];
+  return (hi + 0.05) / (lo + 0.05);
+}

@@ -167,7 +167,7 @@ export const WINDOW_PRESETS: readonly WindowPreset[] = [
     suggestedSize: { width: 900, height: 1300 },
     expand: () => ({
       id: 'tilt-and-turn',
-      options: { grid: grid([1], [1], [cell('side-hung-left')]), turnHingeSide: 'left' },
+      options: { grid: grid([1], [1], [cell('side-hung-left')]) },
     }),
   },
   {

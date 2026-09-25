@@ -39,12 +39,12 @@ const CASES = [
     query:
       // Bars in EVERY light, and an opener in each outer column, so bar
       // registration across mullions and handle placement are both visible.
-      '?view=el&v=3&m=a&p=w&w=2400&h=1400&ce=RAL9005&ci=m&fe=sm&fi=m&g=c.3&sg=n&tv=hf.2&s=cs&gd=1-2-1*1-1*shl.aa_2_2_22.i-f.aa_3_2_22.i-shr.aa_2_2_22.i-f.aa_2_2_22.i-f.aa_3_2_22.i-f.aa_2_2_22.i&hw=lr&hf=bk',
+      '?view=el&v=3&m=u&p=w&w=2400&h=1400&ce=RAL7016&ci=m&fe=sm&fi=m&g=c.3&sg=n&tv=hf.2&s=cs&gd=1-2-1*1-1*shl.aa_2_2_22.i-f.aa_3_2_22.i-shr.aa_2_2_22.i-f.aa_2_2_22.i-f.aa_3_2_22.i-f.aa_2_2_22.i&hw=lr&hf=bk',
   },
   {
     name: 'window-sash',
     query:
-      '?view=el&v=3&m=t&p=w&w=900&h=1600&ce=RAL9010&ci=m&fe=sm&fi=m&g=c.2&sg=n&tv=n&s=sa&op=dh&mr=0.55&ho=1&ub=aa_3_2_22&lb=aa_3_2_22&hw=lr&hf=sc',
+      '?view=el&v=3&m=u&p=w&w=900&h=1600&ce=RAL9010&ci=m&fe=sm&fi=m&g=c.2&sg=n&tv=n&s=sa&op=dh&mr=0.55&ho=1&ub=aa_3_2_22&lb=aa_3_2_22&hw=lr&hf=sc',
   },
 ];
 
@@ -467,6 +467,19 @@ const heightField = page.getByLabel(/^Height/);
   await page.waitForSelector('canvas');
   await page.getByRole('radio', { name: 'Window', exact: true }).check();
   await paramEventually('p', /^w$/);
+  // A new window is the three-pane preset with top-hung vents over fixed lights.
+  await expect('the default window', 'gd', /^1-2-1\*1-3\*th\.n\.i-th\.n\.i-th\.n\.i-f\.n\.i-f\.n\.i-f\.n\.i$/);
+  await expect('the default size', 'w', /^1800$/);
+  // The steps below re-divide a window, so they start from two fixed lights,
+  // stated here rather than assumed to be the default.
+  {
+    const url = new URL(page.url());
+    url.searchParams.set('gd', '1-1*1*f.n.i-f.n.i');
+    url.searchParams.set('w', '1200');
+    url.searchParams.set('h', '1050');
+    await page.goto(url.toString(), { waitUntil: 'networkidle' });
+    await page.waitForSelector('canvas');
+  }
   for (const id of ['style', 'glazing', 'hardware']) {
     const toggle = page.locator(`#section-${id}-toggle`);
     if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
@@ -484,7 +497,10 @@ const heightField = page.getByLabel(/^Height/);
   // 7.2: astragal bars, then the same in every light.
   await page.getByRole('group', { name: 'Light 3 glazing bars' }).getByRole('radio', { name: 'Astragal' }).check();
   await page.getByRole('button', { name: 'Use these bars in every light' }).click();
-  await expect('astragal bars everywhere', 'gd', /^1-1-1\*[\d.-]+\*(?:[a-z]+\.aa_2_2_22\.i-?)+$/);
+  // Exact: every light barred, and nothing else changed — the weights, the
+  // one row, and light 3 still hinged right. (Loosened once, before it had
+  // ever run, to a pattern that checked none of those; see TEST-AUDIT.md.)
+  await expect('astragal bars everywhere', 'gd', /^1-1-1\*1\*f\.aa_2_2_22\.i-f\.aa_2_2_22\.i-shr\.aa_2_2_22\.i$/);
   await page.getByRole('radio', { name: /^Tilt and turn/ }).check();
   await expect('tilt and turn', 's', /^tt$/);
   await page.getByRole('radio', { name: /^Sliding sash/ }).check();

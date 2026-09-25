@@ -981,6 +981,13 @@ h1 {
   max-width: 100%;
 }
 
+/* A drawing of the product is the whole choice on these tiles: at 4.25rem a
+   door was 32 px wide, and one raised panel could not be told from two
+   (scripts/panel-contrast.mjs). */
+.tile__picture:has(.thumb) {
+  height: 6.5rem;
+}
+
 .glyph {
   width: 2.75rem;
   height: 2.75rem;

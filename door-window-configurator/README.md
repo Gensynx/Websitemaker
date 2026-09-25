@@ -65,13 +65,14 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 ```
 npm install
 npm run typecheck
-npm test          # 274 unit tests, including text contrast read from styles.css
+npm test          # 389 unit tests, including text contrast read from styles.css
 npm run dev -- --port 5180   # then, in another shell:
 npm run smoke                # browser render, controls, wall scene, sizing
 npm run a11y                 # keyboard-only walk, sheet by keys and drag, axe scans
 npm run build && npm run check:bundle   # fails if first paint would wait on the 3D bundle
 node scripts/lighting-metric.mjs   # relief on a dark finish: panelled vs flush, >= 2x
 node scripts/colour-metric.mjs     # rendered RAL shades vs reference, CIE76 dE <= 6
+npm run build:share && node scripts/panel-contrast.mjs  # every pair of panel styles visibly different at tile size
 
 npm run build:share   # two shareable files in dist-singlefile/
 ```
@@ -359,6 +360,20 @@ invisible in a single screenshot:
   triple). In the studio a graded card behind the product, seen only through
   the glazing, gives the panes something to show; in the wall scene the room
   behind does the same job.
+- **Flat drawings** (option thumbnails, the review drawing and no-WebGL
+  fallback, the catalogue) share one style (`viewer/elevationStyle.ts`). A
+  door's panels are the leaf's colour, so their outlines are all that tells
+  one panel style from another: outline colour is derived from each fill's
+  luminance to 4.5:1 (light on dark, dark on light), 1 px at any scale,
+  snapped to pixels. It had been black at 16–22% and about 0.2 px at tile
+  size, and seven of eleven door tiles rasterised identically.
+  `panel-contrast.mjs` renders every pair of panel styles at the size each
+  drawing is shown and requires 20+ pixels differing by 64/255 or more. The
+  3D viewer draws no outlines: its panels are separate geometry, lit, and
+  their relief is what `lighting-metric.mjs` measures.
+- **Window handles sit on the sash member** — the stile opposite the hinge,
+  or the rail opposite a top or bottom hinge — with the lever resting along
+  it, never on the glass (`handles.test.ts`, every catalogue configuration).
 - **In a wall** is view-only: never in the link, never in the order. The wall
   and floor fade into the page. The wall does not take part in shadow
   mapping at all — see Outstanding.
@@ -376,15 +391,16 @@ the product.
 - **The enquiry is not connected** (see Step 8): an endpoint, the consent
   and privacy wording, and server-side validation and rate limiting are
   needed before it can go live.
-- **Tilt and turn holds its hinge side twice**: per light (what is drawn) and
-  as a style-level `turnHingeSide`. The panel keeps the second in step with
-  the first opening light; the model should drop one.
 - **Trickle vents** can be modelled in the sash or through the glazing, but
   only the frame-head position is drawn, so only it is offered.
 - **No minimum light size.** A 600 mm window can be divided into six lights
   of under 100 mm. A limit is needed in `limits.ts`.
-- Safety glass is set for the whole product. Per-pane overrides exist in the
-  model (`SafetyOverride`) but have no control yet.
+- **Safety glass has one control, at product level.** Enforcement raises
+  each short pane at the value it takes its glass from: its own override
+  where it has one (only a link can set one), otherwise the product value.
+  So a critical side light on a door whose top light is not critical makes
+  the whole door toughened — over-specified, never under — until per-pane
+  safety has a control. See `enforceSafetyGlazing` in `safety.ts`.
 - **The model carries door options the renderer does not draw**, so they are
   not offered as controls: arched and circular leaf apertures, an arched top
   light, doctor's and urn knockers (every knocker draws as a ring), and
@@ -398,11 +414,15 @@ the product.
   shades each material offers (`material.ts`). Woodgrain foil is modelled as
   a woodgrain-embossed foil in a solid RAL colour; named timber-effect foils
   (Golden Oak, Rosewood) are not in the model.
-- There is no control for frame material in any step of the brief. A link
-  carrying a material that is not offered shows the issue in Style, but the
-  customer cannot fix it there — only by switching product, which resets.
-- The default window is a casement in which no light opens (two fixed
-  lights). Step 7 data, flagged rather than changed.
+- **Frame material is uPVC only, with no control.** I narrowed the offered
+  range to uPVC on 2026-09-12 without it being decided by the owner, and
+  recorded it as "answered", which it was not. The owner confirmed it for
+  the demo on 2026-09-25 and asked that no other material be reachable. A
+  link or stored configuration naming aluminium, timber or composite now
+  opens in uPVC and says so; the store refuses them. The three definitions
+  remain in `material.ts`, unreachable, so adding one back is one line —
+  that retention is my decision, and deleting them is a small change if
+  preferred.
 - Screen-reader behaviour is verified structurally (accessibility tree, axe),
   not by listening. NVDA and VoiceOver passes are outstanding.
 - Shadows on the wall face are disabled. With the wall casting or receiving,
@@ -415,7 +435,7 @@ the product.
 ## Placeholders requiring replacement before launch
 
 - `material.ts` — the sightlines and the colour and finish restrictions.
-  (Which materials are sold is answered: uPVC only, `OFFERED_MATERIALS`.)
+  (uPVC only for the demo, confirmed 2026-09-25: `OFFERED_MATERIALS`.)
 - `limits.ts` — every size limit, grid cap and preset.
 - `ral.ts` — the offered shade list and its approximate sRGB values.
 - `safety.ts` — a simplified reading of Approved Document K (England and

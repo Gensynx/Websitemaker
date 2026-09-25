@@ -396,9 +396,13 @@ export interface WindowStyleOptions {
     grid: SashGrid;
   };
   'tilt-and-turn': {
+    /**
+     * Each light's opening says which side it turns on (side-hung left or
+     * right, viewed from outside) or that it only tilts (bottom-hung). That
+     * is the only record of the turn hinge: a separate style-level
+     * `turnHingeSide` was removed because it could disagree with the lights.
+     */
     grid: SashGrid;
-    /** Side the turn hinge sits on, viewed from outside; tilt is at the head. */
-    turnHingeSide: HingeSideViewedFromOutside;
   };
   sash: {
     operation: 'single-hung' | 'double-hung';

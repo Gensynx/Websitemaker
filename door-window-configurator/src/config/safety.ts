@@ -201,6 +201,11 @@ export interface SafetyControl {
   value: SafetyGlazing;
   /** Displayed beside the locked control, verbatim. */
   reason: string;
+  /**
+   * True where the pane takes its glass from the product-level control, so
+   * a locked pane locks that control. A pane with its own override does not.
+   */
+  inherits: boolean;
 }
 
 /**
@@ -215,6 +220,7 @@ export function safetyControlState(config: ConfigState): SafetyControl[] {
     locked: pane.status === 'required',
     value: pane.status === 'required' && pane.resolved === 'none' ? MINIMUM_SAFETY_GLASS : pane.resolved,
     reason: pane.reason,
+    inherits: pane.override === null,
   }));
 }
 
@@ -224,12 +230,58 @@ export interface SafetyNotice {
 }
 
 /**
+ * Set one pane's own safety override. Door panes carry theirs on the aperture
+ * or the side or top light; window lights on their grid cell. A pane that
+ * does not exist is left alone.
+ */
+export function withPaneSafety<T extends ConfigState>(config: T, id: PaneId, safety: SafetyOverride): T {
+  if (config.productType === 'door') {
+    const door = config as DoorConfigState;
+    if (id === 'leaf' && door.style.id !== 'solid-panel') {
+      const style = door.style;
+      const aperture = { ...style.options.aperture, safety };
+      return (style.id === 'half-glazed'
+        ? { ...door, style: { id: 'half-glazed', options: { ...style.options, aperture } } }
+        : { ...door, style: { id: 'full-glazed', options: { ...style.options, aperture } } }) as T;
+    }
+    const key = id === 'side-light-left' ? 'leftSideLight' : id === 'side-light-right' ? 'rightSideLight' : id === 'top-light' ? 'topLight' : null;
+    const light = key === null ? null : door.surround[key];
+    if (key === null || light === null) return config;
+    return { ...door, surround: { ...door.surround, [key]: { ...light, safety } } } as T;
+  }
+  const window = config as WindowConfigState;
+  const match = /^cell-(\d+)$/.exec(id);
+  if (match === null || (window.style.id !== 'casement' && window.style.id !== 'tilt-and-turn')) return config;
+  const index = Number(match[1]);
+  const grid = window.style.options.grid;
+  if (index >= grid.cells.length) return config;
+  const cells = grid.cells.map((cell, i) => (i === index ? { ...cell, safety } : cell));
+  return { ...window, style: { ...window.style, options: { ...window.style.options, grid: { ...grid, cells } } } } as T;
+}
+
+/**
  * Raises any pane glazed below its required minimum and reports every change.
  *
  * Runs whenever a configuration arrives or changes shape — a decoded link, or
  * an edit that makes a location critical, such as adding a side light. The
  * customer is told; nothing is corrected silently. Validation still errors on
  * a shortfall, as a backstop for any path that skips this.
+ *
+ * Each short pane is raised at the value it actually takes its glass from
+ * (types.ts, resolveSafety: the pane's own override, else the product value):
+ *
+ *   - A pane with its own override has that override raised, and nothing
+ *     else changes. Raising the product value instead left the pane short —
+ *     its override still won — while changing every other pane, and the
+ *     backstop error that followed had no control the customer could use.
+ *   - A pane that inherits has the PRODUCT value raised. This is deliberate
+ *     in Phase 1: the panel offers one Safety glass control, at product
+ *     level, and locks it while any inheriting pane is critical. Setting a
+ *     hidden per-pane override instead would leave that control showing
+ *     "Standard" for glass that is not, and give the customer nothing to see
+ *     or change it with. The cost is that non-critical panes on the same
+ *     product are raised too — over-specified, never under — until per-pane
+ *     safety has a control (README, Outstanding).
  */
 export function enforceSafetyGlazing(config: ConfigState): {
   config: ConfigState;
@@ -243,11 +295,12 @@ export function enforceSafetyGlazing(config: ConfigState): {
     message: `${pane.label}: ${MINIMUM_SAFETY_GLASS} safety glass has been specified because this is a critical location. ${pane.reason}`,
   }));
 
-  // Phase 1 sets safety at product level, so the product-level value is raised
-  // rather than each pane being overridden individually. Per-pane overrides
-  // survive untouched, and a pane that already specifies laminated keeps it.
-  return {
-    config: { ...config, glazing: { ...config.glazing, safety: MINIMUM_SAFETY_GLASS } },
-    notices,
-  };
+  let next = config;
+  for (const pane of assessment.shortfalls) {
+    if (pane.override !== null) next = withPaneSafety(next, pane.id, MINIMUM_SAFETY_GLASS);
+  }
+  if (assessment.shortfalls.some((pane) => pane.override === null)) {
+    next = { ...next, glazing: { ...next.glazing, safety: MINIMUM_SAFETY_GLASS } };
+  }
+  return { config: next, notices };
 }

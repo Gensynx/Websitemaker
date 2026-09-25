@@ -289,6 +289,22 @@ describe('furniture stands on the face it is fixed to', () => {
   });
 });
 
+/**
+ * The outer edge of light `index`'s sash, from the sash members actually
+ * emitted: where its handle must stay. Not windowLightRects — for an opening
+ * light that is the GLAZED aperture, and holding handles inside it required
+ * them to be on the glass.
+ */
+function sashRect(parts: Part[], index: number): { x: number; y: number; width: number; height: number } {
+  const members = parts.filter((p) => p.kind === 'sash' && p.id.startsWith(`sash-${index}-`));
+  if (members.length === 0) throw new Error(`light ${index} has no sash`);
+  const x0 = Math.min(...members.map((p) => p.position[0] - p.size[0] / 2));
+  const x1 = Math.max(...members.map((p) => p.position[0] + p.size[0] / 2));
+  const y0 = Math.min(...members.map((p) => p.position[1] - p.size[1] / 2));
+  const y1 = Math.max(...members.map((p) => p.position[1] + p.size[1] / 2));
+  return { x: x0, y: y0, width: x1 - x0, height: y1 - y0 };
+}
+
 describe('nothing leaves its own light', () => {
   /** Every cell saturated: an opener, the maximum bars, uneven weights. */
   function saturated(): WindowConfigState {
@@ -336,18 +352,18 @@ describe('nothing leaves its own light', () => {
     }
   });
 
-  it('keeps every handle inside the cell it belongs to', () => {
+  it('keeps every handle on the sash it belongs to', () => {
     // Regression: a side-hung-right lever pointed away from its own sash and
     // crossed the mullion into the neighbouring light, where the mullion then
     // occluded it — which read as a missing handle, not a stray one.
     const config = saturated();
-    const rects = windowLightRects(config);
-    const handles = buildProduct(config).parts.filter((p) => p.id.startsWith('handle-'));
+    const parts = buildProduct(config).parts;
+    const handles = parts.filter((p) => p.id.startsWith('handle-'));
+    expect(handles.length).toBeGreaterThan(20);
 
     for (const handle of handles) {
       const index = Number(/^handle-(\d+)-/.exec(handle.id)?.[1]);
-      const cell = rects[index];
-      if (cell === undefined) throw new Error(`handle ${handle.id} belongs to no cell`);
+      const cell = sashRect(parts, index);
       expect(handle.position[0] - handle.size[0] / 2, `${handle.id} left`).toBeGreaterThanOrEqual(cell.x - 1e-6);
       expect(handle.position[0] + handle.size[0] / 2, `${handle.id} right`).toBeLessThanOrEqual(cell.x + cell.width + 1e-6);
       expect(handle.position[1] - handle.size[1] / 2, `${handle.id} bottom`).toBeGreaterThanOrEqual(cell.y - 1e-6);
@@ -382,13 +398,15 @@ describe('nothing leaves its own light', () => {
       dimensions: { width: 2000, height: 1200 },
       style: { id: 'casement', options: { grid } },
     };
-    const rects = windowLightRects(config);
-    const narrow = rects[1];
-    if (narrow === undefined) throw new Error('fixture');
+    const parts = buildProduct(config).parts;
+    const narrow = sashRect(parts, 1);
+    const handles = parts.filter((p) => p.id.startsWith('handle-1-'));
+    expect(handles.length).toBeGreaterThan(0);
 
-    for (const handle of buildProduct(config).parts.filter((p) => p.id.startsWith('handle-1-'))) {
+    for (const handle of handles) {
       expect(handle.size[0], handle.id).toBeLessThanOrEqual(narrow.width + 1e-6);
       expect(handle.position[0] - handle.size[0] / 2, handle.id).toBeGreaterThanOrEqual(narrow.x - 1e-6);
+      expect(handle.position[0] + handle.size[0] / 2, handle.id).toBeLessThanOrEqual(narrow.x + narrow.width + 1e-6);
     }
   });
 });
@@ -399,7 +417,7 @@ describe('handle direction', () => {
    * light also quietly corrects a lever pointing the wrong way, so a
    * bounds-only test passes against a handle that opens into its own hinge.
    */
-  function leverAndPlate(opening: 'side-hung-left' | 'side-hung-right') {
+  function leverAndPlate(opening: 'side-hung-left' | 'side-hung-right' | 'top-hung') {
     const grid = makeGrid(1, 1);
     grid.cells[0] = { opening, bars: NO_BARS, safety: null };
     const parts = buildProduct({
@@ -411,18 +429,34 @@ describe('handle direction', () => {
     const plate = parts.find((p) => p.id === 'handle-0-plate');
     const lever = parts.find((p) => p.id === 'handle-0-lever');
     if (plate === undefined || lever === undefined) throw new Error('no handle emitted');
-    return { plate, lever };
+    return { plate, lever, sash: sashRect(parts, 0) };
   }
 
-  it('points the lever away from the handle stile on a left-hung sash', () => {
-    const { plate, lever } = leverAndPlate('side-hung-left');
-    // Hinged left, handled on the right stile, so the lever reaches leftwards.
-    expect(lever.position[0]).toBeLessThan(plate.position[0]);
+  // The lever rests along the member it is fitted to, as a closed handle
+  // does: down the stile opposite the hinge, or along the bottom rail of a
+  // top-hung vent. Lying across the sash towards the hinge, it crossed the
+  // glass, which a handle on the member must not.
+  it('keeps the lever on the right stile, pointing down, on a left-hung sash', () => {
+    const { plate, lever, sash } = leverAndPlate('side-hung-left');
+    expect(plate.position[0]).toBeGreaterThan(sash.x + sash.width / 2);
+    expect(lever.position[0]).toBeCloseTo(plate.position[0]);
+    expect(lever.size[1]).toBeGreaterThan(lever.size[0]);
+    expect(lever.position[1]).toBeLessThan(plate.position[1]);
   });
 
-  it('points the lever away from the handle stile on a right-hung sash', () => {
-    const { plate, lever } = leverAndPlate('side-hung-right');
-    expect(lever.position[0]).toBeGreaterThan(plate.position[0]);
+  it('keeps the lever on the left stile, pointing down, on a right-hung sash', () => {
+    const { plate, lever, sash } = leverAndPlate('side-hung-right');
+    expect(plate.position[0]).toBeLessThan(sash.x + sash.width / 2);
+    expect(lever.position[0]).toBeCloseTo(plate.position[0]);
+    expect(lever.size[1]).toBeGreaterThan(lever.size[0]);
+    expect(lever.position[1]).toBeLessThan(plate.position[1]);
+  });
+
+  it('lays the lever along the bottom rail of a top-hung vent', () => {
+    const { plate, lever, sash } = leverAndPlate('top-hung');
+    expect(plate.position[1]).toBeLessThan(sash.y + sash.height / 2);
+    expect(lever.position[1]).toBeCloseTo(plate.position[1]);
+    expect(lever.size[0]).toBeGreaterThan(lever.size[1]);
   });
 });
 

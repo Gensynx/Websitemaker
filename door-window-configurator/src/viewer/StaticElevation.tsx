@@ -13,13 +13,7 @@ import { formatMm } from '../config/units';
 import { buildProduct } from './geometry';
 import { colourToHex } from '../config/colourHex';
 import { resolveInternalColour } from '../config/types';
-
-const FILLS: Record<string, string> = {
-  glazing: '#cfd8dc',
-  hardware: '#9aa0a6',
-  seal: '#141516',
-  spacer: '#3a3c3e',
-};
+import { fillFor, OUTLINE_WIDTH_PX, outlineFor, SHAPE_RENDERING } from './elevationStyle';
 
 export function StaticElevation({ config, caption = true }: { config: ConfigState; caption?: boolean }): JSX.Element {
   const model = useMemo(() => buildProduct(config), [config]);
@@ -38,22 +32,27 @@ export function StaticElevation({ config, caption = true }: { config: ConfigStat
       <svg
         viewBox={`${-width / 2 - margin} ${-margin} ${width + margin * 2} ${height + margin * 2}`}
         role="img"
+        shapeRendering={SHAPE_RENDERING}
         aria-label={`Elevation of the configured ${config.productType}, ${formatMm(width)} wide by ${formatMm(height)} high.`}
       >
         {/* Y is up in the model and down in SVG. */}
         <g transform={`translate(0 ${height}) scale(1 -1)`}>
-          {ordered.map((part) => (
-            <rect
-              key={part.id}
-              x={part.position[0] - part.size[0] / 2}
-              y={part.position[1] - part.size[1] / 2}
-              width={part.size[0]}
-              height={part.size[1]}
-              fill={FILLS[part.kind] ?? frameFill}
-              stroke="rgba(0,0,0,0.16)"
-              strokeWidth={Math.max(2, width / 900)}
-            />
-          ))}
+          {ordered.map((part) => {
+            const fill = fillFor(part.kind, frameFill);
+            return (
+              <rect
+                key={part.id}
+                x={part.position[0] - part.size[0] / 2}
+                y={part.position[1] - part.size[1] / 2}
+                width={part.size[0]}
+                height={part.size[1]}
+                fill={fill}
+                stroke={outlineFor(fill)}
+                strokeWidth={OUTLINE_WIDTH_PX}
+                vectorEffect="non-scaling-stroke"
+              />
+            );
+          })}
         </g>
       </svg>
       {caption && (

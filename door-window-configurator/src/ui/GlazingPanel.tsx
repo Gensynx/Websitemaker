@@ -108,7 +108,9 @@ export function GlazingPanel({ config }: { config: ConfigState }): JSX.Element {
           legend="Safety glass"
           value={glazing.safety}
           options={[
-            { value: 'none', label: 'Standard', disabled: locked.length > 0 },
+            // Locked only while a critical pane takes its glass from this
+            // control; a pane specified on its own is not changed by it.
+            { value: 'none', label: 'Standard', disabled: locked.some((pane) => pane.inherits) },
             { value: 'toughened', label: 'Toughened' },
             { value: 'laminated', label: 'Laminated' },
           ]}

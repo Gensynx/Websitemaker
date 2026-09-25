@@ -67,16 +67,22 @@ describe('the commit pipeline', () => {
     // A material change can invalidate a size that was legal a moment ago.
     // Reconciliation fixes colour and finish, but never the dimensions: the
     // customer chose those and is owed the reason, not a silent correction.
-    useConfigurator.getState().setDimensions(3000, 2400);
-    useConfigurator.getState().setMaterial('timber');
-
-    const state = useConfigurator.getState();
-    expect(state.config.dimensions.width).toBe(3000);
+    // Only uPVC can be set in the store now, so this is held at the pipeline,
+    // which every configuration passes through, for when the range grows.
+    const result = commit({ ...DEFAULT_DOOR, material: 'timber', dimensions: { width: 3000, height: 2400 } });
+    expect(result.config.dimensions.width).toBe(3000);
     // Found by field rather than by index: relying on errors[0] broke the
     // moment another rule started reporting first.
-    const width = state.validation.errors.find((e) => e.field === 'width');
+    const width = result.validation.errors.find((e) => e.field === 'width');
     expect(width?.message).toContain('Timber');
     expect(width?.message).toMatch(/between .* and .*/);
+  });
+
+  it('will not set a material that is not offered', () => {
+    const before = useConfigurator.getState().config;
+    for (const material of ['aluminium', 'timber', 'composite'] as const) useConfigurator.getState().setMaterial(material);
+    expect(useConfigurator.getState().config).toBe(before);
+    expect(useConfigurator.getState().config.material).toBe('upvc');
   });
 
   it('starts a fresh configuration when the product type changes', () => {

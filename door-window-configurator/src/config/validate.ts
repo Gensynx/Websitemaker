@@ -383,13 +383,10 @@ export function reconcileWithMaterial(config: ConfigState): {
   const issues: ValidationIssue[] = [];
   let next = config;
 
-  // Material is deliberately NOT reconciled.
-  //
-  // It is a customer choice, and silently rewriting a deliberate choice is the
-  // mistake already made once with dimension clamping. A material that has
-  // left the range is reported by validateConfig, which blocks the quote and
-  // states what is available, exactly as an unmakeable size does. The picker
-  // only ever offers OFFERED_MATERIALS, so this arises only from an old link.
+  // Material is not reconciled here. A material outside the range cannot
+  // reach this point from a link or stored state: the decoder shows it in the
+  // default and says so (url.ts, the owner's decision of 2026-09-25). The
+  // material error in validateConfig remains as a backstop for any other path.
 
   if (!isFinishAvailable(next.material, next.finish.external)) {
     const replacement = fallbackFinish(next.material);

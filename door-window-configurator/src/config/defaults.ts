@@ -15,8 +15,9 @@ import type {
 } from './types';
 import { CONFIG_SCHEMA_VERSION, NO_BARS } from './types';
 import type { FrameMaterial } from './material';
+import { windowPreset } from './windowPresets';
 
-/** ANSWERED 2026-09-12: uPVC, the only material currently offered. */
+/** uPVC, the only material offered: the developer's narrowing of 2026-09-12, confirmed by the owner for the demo on 2026-09-25. */
 export const DEFAULT_MATERIAL: FrameMaterial = 'upvc';
 
 export function makeGrid(columns: number, rows: number): SashGrid {
@@ -47,7 +48,7 @@ export const DEFAULT_DOOR_STYLE_OPTIONS: { [K in DoorStyleId]: DoorStyleOptions[
 
 export const DEFAULT_WINDOW_STYLE_OPTIONS: { [K in WindowStyleId]: WindowStyleOptions[K] } = {
   casement: { grid: makeGrid(2, 1) },
-  'tilt-and-turn': { grid: makeGrid(1, 1), turnHingeSide: 'left' },
+  'tilt-and-turn': { grid: makeGrid(1, 1) },
   sash: {
     operation: 'double-hung',
     meetingRailPosition: 0.5,
@@ -81,15 +82,29 @@ export const DEFAULT_DOOR: DoorConfigState = {
   openingDirection: 'inward',
 };
 
+/**
+ * The window a customer first sees: the "Three-pane with top openers" preset
+ * at its suggested size, so the product demonstrates itself — openers,
+ * handles, unequal lights — rather than two fixed panes (the owner's decision
+ * of 2026-09-25). Switching an existing window to casement still starts from
+ * DEFAULT_WINDOW_STYLE_OPTIONS.casement.
+ */
+const DEFAULT_WINDOW_PRESET = (() => {
+  const preset = windowPreset('casement-three-top-openers');
+  // A renamed or withdrawn preset must fail loudly, not ship a blank window.
+  if (preset === undefined) throw new Error('The default window preset "casement-three-top-openers" is missing.');
+  return preset;
+})();
+
 export const DEFAULT_WINDOW: WindowConfigState = {
   schemaVersion: CONFIG_SCHEMA_VERSION,
   productType: 'window',
   material: DEFAULT_MATERIAL,
-  dimensions: { width: 1200, height: 1050 },
+  dimensions: { ...DEFAULT_WINDOW_PRESET.suggestedSize },
   colour: { external: { mode: 'ral', code: 'RAL9016' }, internal: { mode: 'match' } },
   finish: { external: 'smooth', internal: 'match' },
   glazing: { appearance: 'clear', unit: 'double', safety: 'none' },
-  style: { id: 'casement', options: DEFAULT_WINDOW_STYLE_OPTIONS.casement },
+  style: DEFAULT_WINDOW_PRESET.expand(),
   hardware: { handle: 'lever-rose', finish: 'satin-chrome' },
   trickleVents: { position: 'head-of-frame', count: 1 },
 };

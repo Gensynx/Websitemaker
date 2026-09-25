@@ -3,7 +3,7 @@ import { FRAME_MATERIALS, isMaterialOffered, MATERIALS, OFFERED_MATERIALS } from
 import { DEFAULT_MATERIAL } from './defaults';
 
 describe('offered materials', () => {
-  it('is uPVC only, as answered', () => {
+  it('is uPVC only, as confirmed for the demo on 2026-09-25', () => {
     expect([...OFFERED_MATERIALS]).toEqual(['upvc']);
   });
 

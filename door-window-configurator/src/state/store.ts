@@ -15,6 +15,7 @@
 import { create } from 'zustand';
 import type { ConfigState, ProductType } from '../config/types';
 import type { FrameMaterial } from '../config/material';
+import { isMaterialOffered } from '../config/material';
 import type { Mm } from '../config/units';
 import { defaultFor } from '../config/defaults';
 import { encodeConfig, decodeConfig } from '../config/url';
@@ -173,7 +174,11 @@ export const useConfigurator = create<ConfiguratorState>((set, get) => {
       apply(defaultFor(productType));
     },
 
-    setMaterial: (material) => apply({ ...get().config, material }),
+    // Only a sold material can be set; there is no control for it, and no
+    // path may produce a configuration that cannot be ordered.
+    setMaterial: (material) => {
+      if (isMaterialOffered(material)) apply({ ...get().config, material });
+    },
 
     setDimensions: (width, height) =>
       apply({ ...get().config, dimensions: { width, height } }),

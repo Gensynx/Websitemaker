@@ -20,10 +20,20 @@ describe('round trip', () => {
     expect(roundTrip(DEFAULT_WINDOW)).toEqual(DEFAULT_WINDOW);
   });
 
+  it('opens a link naming only the product as that product\'s default', () => {
+    // Absence means default. With the default window changed to a preset, a
+    // bare p=w opened a two-light casement at the preset's size: the grid
+    // fell back to the style options, not to the default window.
+    expect(decodeConfig('p=w').config).toEqual(DEFAULT_WINDOW);
+    expect(decodeConfig('p=w&s=cs').config).toEqual(DEFAULT_WINDOW);
+    expect(decodeConfig('p=d').config).toEqual(DEFAULT_DOOR);
+  });
+
   it('preserves a fully loaded door', () => {
+    // uPVC: the only material a link can carry (see "only an offered material").
     const door: DoorConfigState = {
       ...DEFAULT_DOOR,
-      material: 'aluminium',
+      material: 'upvc',
       dimensions: { width: 1802.5, height: 2100 },
       colour: {
         external: { mode: 'ral', code: 'RAL7016' },
@@ -80,7 +90,7 @@ describe('round trip', () => {
 
     const styles: Array<WindowConfigState['style']> = [
       { id: 'casement', options: { grid } },
-      { id: 'tilt-and-turn', options: { grid: makeGrid(1, 1), turnHingeSide: 'right' } },
+      { id: 'tilt-and-turn', options: { grid: makeGrid(1, 1) } },
       {
         id: 'sash',
         options: {
@@ -440,10 +450,11 @@ export function worstCaseByStyle(): Array<{ label: string; length: number; url: 
     barWidth: 25,
   };
 
+  // The largest sizes a link can carry: uPVC's, the only material offered.
   const door: DoorConfigState = {
     ...DEFAULT_DOOR,
-    material: 'aluminium',
-    dimensions: { width: 2999.9, height: 2699.9 },
+    material: 'upvc',
+    dimensions: { width: 2799.9, height: 2499.9 },
     colour: explore,
     finish: { external: 'woodgrain-foil', internal: 'match' },
     glazing: { appearance: 'obscure', pattern: 'sandblast', unit: 'triple', safety: 'laminated' },
@@ -469,8 +480,8 @@ export function worstCaseByStyle(): Array<{ label: string; length: number; url: 
 
   const windowBase: WindowConfigState = {
     ...DEFAULT_WINDOW,
-    material: 'aluminium',
-    dimensions: { width: 3999.9, height: 2599.9 },
+    material: 'upvc',
+    dimensions: { width: 3499.9, height: 2199.9 },
     colour: explore,
     glazing: { appearance: 'obscure', pattern: 'sandblast', unit: 'triple', safety: 'laminated' },
     trickleVents: { position: 'through-glazing', count: 6 },
@@ -481,7 +492,7 @@ export function worstCaseByStyle(): Array<{ label: string; length: number; url: 
     { label: 'window / casement 6x6 saturated', config: { ...windowBase, style: { id: 'casement', options: { grid: saturatedGrid() } } } },
     {
       label: 'window / tilt-and-turn 6x6 saturated',
-      config: { ...windowBase, style: { id: 'tilt-and-turn', options: { grid: saturatedGrid(), turnHingeSide: 'right' } } },
+      config: { ...windowBase, style: { id: 'tilt-and-turn', options: { grid: saturatedGrid() } } },
     },
     {
       label: 'window / sash',
@@ -522,10 +533,23 @@ describe('link length', () => {
     const grid = saturatedGrid();
     const config: WindowConfigState = {
       ...DEFAULT_WINDOW,
-      material: 'aluminium',
+      material: 'upvc',
       style: { id: 'casement', options: { grid } },
     };
     expect(roundTrip(config)).toEqual(config);
+  });
+});
+
+describe('only an offered material comes out of a link', () => {
+  it.each(['aluminium', 'timber', 'composite'] as const)('a link made for %s opens in uPVC, and says so', (material) => {
+    const params = encodeConfig({ ...DEFAULT_DOOR, dimensions: { width: 900, height: 2100 } });
+    params.set('m', { aluminium: 'a', timber: 't', composite: 'c' }[material]);
+    const { config, issues } = decodeConfig(params);
+    expect(config.material).toBe('upvc');
+    expect(issues.some((issue) => issue.key === 'm' && /not offered/.test(issue.reason))).toBe(true);
+    // The rest of the link is kept.
+    expect(config.dimensions).toEqual({ width: 900, height: 2100 });
+    expect(validateConfig(config).errors.filter((e) => e.field === 'material')).toEqual([]);
   });
 });
 

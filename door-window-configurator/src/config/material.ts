@@ -7,14 +7,19 @@
  * can invalidate selections that were legal a moment ago (see `reconcile` in
  * validate.ts).
  *
- * ANSWERED 2026-09-12: uPVC only. `OFFERED_MATERIALS` is the list actually
- * sold and is what the picker and the size limits key off.
+ * uPVC only. Narrowed to uPVC on 2026-09-12 by the developer, WITHOUT the
+ * owner's decision, which it should have waited for; confirmed by the owner
+ * for the demo on 2026-09-25, with the instruction that no other material be
+ * reachable. `OFFERED_MATERIALS` is the list actually sold and is what the
+ * size limits and the quote gate key off. There is no material control: with
+ * one material there is nothing to choose.
  *
- * The other three definitions are kept rather than deleted. They are dormant,
- * not dead: adding aluminium to the range is one entry in OFFERED_MATERIALS,
- * and deleting them now would mean rebuilding the sightlines, colour lists and
- * limits from scratch when the range grows. Nothing reaches a customer that is
- * not in OFFERED_MATERIALS.
+ * The other three definitions are kept in the code, unreachable, rather than
+ * deleted (a developer's decision, stated in the README): adding aluminium
+ * back is one entry in OFFERED_MATERIALS, where deleting them would mean
+ * rebuilding sightlines, colour lists and limits. Unreachable means: a link
+ * or stored configuration naming one decodes to the default (url.ts), and
+ * the store will not set one (store.ts).
  *
  * !! The NUMBERS are still placeholders. !! Every sightline, colour
  * restriction and finish restriction below is a plausible industry figure, not

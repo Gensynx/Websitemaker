@@ -15,7 +15,7 @@ import {
   withTrickleVents,
   withWindowStyle,
 } from './windowEdits';
-import { DEFAULT_DOOR, DEFAULT_WINDOW } from './defaults';
+import { DEFAULT_DOOR, DEFAULT_WINDOW, makeGrid } from './defaults';
 import { WINDOW_PRESETS } from './windowPresets';
 import { validateConfig } from './validate';
 import { enforceSafetyGlazing } from './safety';
@@ -24,6 +24,11 @@ import type { ConfigState, WindowConfigState } from './types';
 import { withDoorGlassBars, doorGlassAreas, withSideLights, withTopLight } from './doorEdits';
 
 const valid = (config: ConfigState) => validateConfig(enforceSafetyGlazing(config).config).errors;
+
+// Two fixed lights side by side: stated here rather than borrowed from
+// DEFAULT_WINDOW, which is now the three-pane preset and says nothing about
+// what these tests need.
+const TWO_FIXED: WindowConfigState = { ...DEFAULT_WINDOW, style: { id: 'casement', options: { grid: makeGrid(2, 1) } } };
 const roundTrip = <T extends ConfigState>(config: T): T => decodeConfig(`?${encodeConfig(config).toString()}`).config as T;
 
 describe('Step 7.1: every offered style is valid and survives a link', () => {
@@ -66,7 +71,7 @@ describe('Step 7.1: every offered style is valid and survives a link', () => {
 
 describe('Step 7.2: pane divisions', () => {
   it('re-dividing keeps the surviving lights and starts new ones fixed and plain', () => {
-    const opened = withCellOpening(DEFAULT_WINDOW, 0, 'side-hung-left');
+    const opened = withCellOpening(TWO_FIXED, 0, 'side-hung-left');
     const wider = withGridSize(opened, 3, 2);
     const grid = gridOf(wider)!;
     expect(grid.cells).toHaveLength(6);
@@ -101,14 +106,35 @@ describe('Step 7.2: pane divisions', () => {
 
 describe('Step 7.3: opening per light', () => {
   it('sets one light without touching the others', () => {
-    const grid = gridOf(withCellOpening(withGridSize(DEFAULT_WINDOW, 3, 1), 2, 'side-hung-right'))!;
+    const grid = gridOf(withCellOpening(withGridSize(TWO_FIXED, 3, 1), 2, 'side-hung-right'))!;
     expect(grid.cells.map((cell) => cell.opening)).toEqual(['fixed', 'fixed', 'side-hung-right']);
   });
 
-  it("keeps a tilt-and-turn window's hinge side in step with its lights", () => {
+  it("records a tilt-and-turn window's turn hinge once, on the light", () => {
+    // It was held twice — per light, and as a style-level turnHingeSide kept
+    // in step by the panel — so a link could carry two that disagreed.
     const turned = withWindowStyle(DEFAULT_WINDOW, 'tilt-and-turn');
     const right = withCellOpening(turned, 0, 'side-hung-right') as WindowConfigState;
-    expect(right.style.id === 'tilt-and-turn' && right.style.options.turnHingeSide).toBe('right');
+    const sources = [
+      right,
+      decodeConfig(encodeConfig(right)).config,
+      ...WINDOW_PRESETS.map((preset) => ({ ...DEFAULT_WINDOW, style: preset.expand() })),
+    ].filter((config): config is WindowConfigState => config.productType === 'window' && config.style.id === 'tilt-and-turn');
+    expect(sources.length).toBeGreaterThan(1);
+    for (const config of sources) expect(Object.keys(config.style.options)).toEqual(['grid']);
+    expect(gridOf(right)?.cells[0]?.opening).toBe('side-hung-right');
+  });
+
+  it('reads an older link that carried both, and the light decides', () => {
+    // th=r said "right"; the light said left. The light is what was drawn.
+    const hingedLeft = withCellOpening(withWindowStyle(DEFAULT_WINDOW, 'tilt-and-turn'), 0, 'side-hung-left');
+    const params = encodeConfig(hingedLeft);
+    expect(params.has('th')).toBe(false);
+    params.set('th', 'r');
+    const { config, issues } = decodeConfig(params);
+    expect(issues).toEqual([]);
+    expect(gridOf(config as WindowConfigState)?.cells[0]?.opening).toBe('side-hung-left');
+    expect(encodeConfig(config).has('th')).toBe(false);
   });
 });
 
