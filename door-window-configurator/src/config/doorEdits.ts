@@ -15,6 +15,7 @@
  */
 
 import type {
+  BarLayout,
   DoorConfigState,
   DoorHandleStyle,
   DoorStyleId,
@@ -212,4 +213,41 @@ export function withFurniture(config: DoorConfigState, item: Furniture, on: bool
     return { ...config, hardware: { ...config.hardware, knocker: on ? config.hardware.knocker ?? 'ring' : null } };
   }
   return { ...config, hardware: { ...config.hardware, [item]: on } };
+}
+
+/* ------------------------------------------------------------------ *
+ * Glazing bars in door glass (the bar editor of Step 7.2, reused)
+ * ------------------------------------------------------------------ */
+
+export type DoorGlass = 'leaf' | 'left' | 'right' | 'top';
+
+/** The glazed areas this door has, in reading order, with their bars. */
+export function doorGlassAreas(config: DoorConfigState): Array<{ area: DoorGlass; label: string; bars: BarLayout }> {
+  const areas: Array<{ area: DoorGlass; label: string; bars: BarLayout }> = [];
+  if (config.surround.topLight) areas.push({ area: 'top', label: 'Top light', bars: config.surround.topLight.bars });
+  if (config.surround.leftSideLight) areas.push({ area: 'left', label: 'Left side light', bars: config.surround.leftSideLight.bars });
+  if (config.style.id !== 'solid-panel') areas.push({ area: 'leaf', label: 'Door glass', bars: config.style.options.aperture.bars });
+  if (config.surround.rightSideLight) areas.push({ area: 'right', label: 'Right side light', bars: config.surround.rightSideLight.bars });
+  return areas;
+}
+
+export function withDoorGlassBars(config: DoorConfigState, area: DoorGlass, bars: BarLayout): DoorConfigState {
+  const { surround } = config;
+  switch (area) {
+    case 'top':
+      return surround.topLight ? { ...config, surround: { ...surround, topLight: { ...surround.topLight, bars } } } : config;
+    case 'left':
+      return surround.leftSideLight
+        ? { ...config, surround: { ...surround, leftSideLight: { ...surround.leftSideLight, bars } } }
+        : config;
+    case 'right':
+      return surround.rightSideLight
+        ? { ...config, surround: { ...surround, rightSideLight: { ...surround.rightSideLight, bars } } }
+        : config;
+    case 'leaf': {
+      const style = config.style;
+      if (style.id === 'solid-panel') return config;
+      return { ...config, style: { ...style, options: { ...style.options, aperture: { ...style.options.aperture, bars } } } } as DoorConfigState;
+    }
+  }
 }

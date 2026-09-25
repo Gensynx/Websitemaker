@@ -264,11 +264,21 @@ function windowStyleName(config: WindowConfigState): string {
   }
 }
 
+/** Tilt-and-turn lights use the side and bottom hinge codes for tilt-turn and tilt only. */
+const TILT_TURN_OPENING: Record<SashOpening, string> = {
+  fixed: 'fixed',
+  'side-hung-left': 'tilt and turn (hinged left)',
+  'side-hung-right': 'tilt and turn (hinged right)',
+  'top-hung': 'top-hung',
+  'bottom-hung': 'tilt only',
+};
+
 /** "two side-hung (hinged left) and one fixed", in the order they first appear. */
-function openingsSummary(cells: SashCell[]): string {
+function openingsSummary(cells: SashCell[], style: 'casement' | 'tilt-and-turn'): string {
+  const words = style === 'tilt-and-turn' ? TILT_TURN_OPENING : OPENING;
   const tally = new Map<SashOpening, number>();
   for (const cell of cells) tally.set(cell.opening, (tally.get(cell.opening) ?? 0) + 1);
-  return list([...tally].map(([opening, n]) => `${NUMBER_WORDS[n] ?? n} ${OPENING[opening]}`));
+  return list([...tally].map(([opening, n]) => `${NUMBER_WORDS[n] ?? n} ${words[opening]}`));
 }
 
 function describeWindowStyle(config: WindowConfigState): SectionDescription {
@@ -282,12 +292,9 @@ function describeWindowStyle(config: WindowConfigState): SectionDescription {
       const across = grid.columnWeights.length;
       const high = grid.rowWeights.length;
       lines.push({ label: 'Lights', value: `${across} across, ${high} high` });
-      lines.push({ label: 'Openings', value: sentence(openingsSummary(grid.cells)) });
+      lines.push({ label: 'Openings', value: sentence(openingsSummary(grid.cells, style.id)) });
       const barred = grid.cells.filter((cell) => cell.bars.style !== 'none').length;
       lines.push({ label: 'Glazing bars', value: barred === 0 ? 'None' : `In ${count(barred, 'light')}` });
-      if (style.id === 'tilt-and-turn') {
-        lines.push({ label: 'Turn hinge', value: `On the ${style.options.turnHingeSide}` });
-      }
       summary = `${summary}, ${across} × ${high} lights`;
       break;
     }

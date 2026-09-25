@@ -12,10 +12,9 @@
  * fades in over it once its first real frame is ready. Where WebGL is
  * unavailable, the elevation simply stays.
  *
- * The panel has its five collapsible sections (Step 4.2). Size has its
- * controls; Style, Colour, Glazing and Hardware state what is currently chosen,
- * read-only, until Steps 5-7 give them controls. The panel does not pretend
- * otherwise.
+ * The panel has its five collapsible sections (Step 4.2), each with its
+ * controls: Style and Hardware per product (Steps 6 and 7), Size (3), Colour
+ * (5) and Glazing (7.5) shared.
  *
  * Operable without the canvas (Step 4.4): every control is a native form
  * control; a skip link leads straight to them; the preview carries a text
@@ -29,10 +28,13 @@ import { useConfigurator } from './state/store';
 import { StaticElevation } from './viewer/StaticElevation';
 import { SizePanel } from './ui/SizePanel';
 import { Segmented } from './ui/Segmented';
-import { Readout, Section } from './ui/Section';
+import { Section } from './ui/Section';
 import { ColourPanel } from './ui/ColourPanel';
 import { DoorStylePanel } from './ui/DoorStylePanel';
 import { DoorHardwarePanel } from './ui/DoorHardwarePanel';
+import { WindowStylePanel } from './ui/WindowStylePanel';
+import { WindowHardwarePanel } from './ui/WindowHardwarePanel';
+import { GlazingPanel } from './ui/GlazingPanel';
 import { useInsets } from './ui/useInsets';
 import { useSections } from './ui/useSections';
 import { useSheetGesture } from './ui/useSheetGesture';
@@ -66,12 +68,12 @@ function hasWebGL(): boolean {
   }
 }
 
-const SECTIONS: Array<{ id: SectionId; title: string; pending?: string }> = [
-  { id: 'style', title: 'Style', pending: 'Window style options are not built yet. This is what is currently chosen.' },
+const SECTIONS: Array<{ id: SectionId; title: string }> = [
+  { id: 'style', title: 'Style' },
   { id: 'size', title: 'Size' },
   { id: 'colour', title: 'Colour' },
-  { id: 'glazing', title: 'Glazing', pending: 'Glazing options are not built yet. This is what is currently chosen.' },
-  { id: 'hardware', title: 'Hardware', pending: 'Window hardware options are not built yet. This is what is currently chosen.' },
+  { id: 'glazing', title: 'Glazing' },
+  { id: 'hardware', title: 'Hardware' },
 ];
 
 /** Messages shown inside a section: errors stop an order, notes only inform. */
@@ -348,15 +350,14 @@ export function App(): JSX.Element {
                   </>
                 ) : section.id === 'colour' ? (
                   <ColourPanel />
-                ) : section.id === 'style' && config.productType === 'door' ? (
-                  <DoorStylePanel config={config} />
-                ) : section.id === 'hardware' && config.productType === 'door' ? (
+                ) : section.id === 'glazing' ? (
+                  <GlazingPanel config={config} />
+                ) : section.id === 'style' ? (
+                  config.productType === 'door' ? <DoorStylePanel config={config} /> : <WindowStylePanel config={config} />
+                ) : config.productType === 'door' ? (
                   <DoorHardwarePanel config={config} />
                 ) : (
-                  <Readout
-                    lines={description.lines}
-                    {...(section.pending !== undefined ? { note: section.pending } : {})}
-                  />
+                  <WindowHardwarePanel config={config} />
                 )}
               </Section>
             );

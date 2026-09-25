@@ -35,6 +35,12 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/ui/OptionTiles.tsx` | Radio tiles and checkbox toggles |
 | `src/ui/ElevationThumb.tsx` | Option thumbnails drawn from the same part list as the 3D model |
 | `src/config/colourHex.ts`, `src/viewer/keys.ts` | Pure helpers kept out of three.js modules so first paint stays light |
+| `src/config/windowEdits.ts` | Window style, divisions, per-light opening and bars, sash, vents; glazing edits |
+| `src/ui/WindowStylePanel.tsx` | Layouts, window style, lights across and high, per-light opening and bars |
+| `src/ui/LightPicker.tsx` | The window as choosable lights, with the elevation opening convention |
+| `src/ui/BarEditor.tsx` | Glazing bars for any glazed area, window or door |
+| `src/ui/WindowHardwarePanel.tsx` | Window handle, finish, trickle vents |
+| `src/ui/GlazingPanel.tsx` | Unit, clear/obscure/tinted, safety glass with locked critical locations; door glass bars |
 | `src/ui/Section.tsx` | Collapsible panel section (disclosure pattern) and the read-only readout |
 | `src/ui/useSections.ts` | Which sections are open; sections with a problem start open |
 | `src/ui/useSheetGesture.ts` | Phone sheet handle: tap or drag, non-modal |
@@ -233,6 +239,32 @@ shape, size and style that were all perfectly drawable.
   that leaves less door than before, or less than can be made, the panel says
   so and offers the frame size that keeps the door as it was — as a button.
 
+## Window options and glazing (Step 7)
+
+- **Styles (7.1):** casement, tilt and turn, sliding sash, fixed, and the named
+  layouts in `windowPresets.ts` as a starting point. A layout sets the style
+  and lights, never the size. **Bay is not offered** (deferred at Step 1: a
+  bay is facets, a corner angle and a projection, which width × height cannot
+  describe).
+- **Divisions and bars (7.2):** one to six lights across and high; unequal
+  proportions from a layout are kept until "Make them equal". Bars per light
+  — Georgian (inside the unit), applied astragal, or true bars — with panes
+  across and high, and "Use these bars in every light". The same bar editor
+  serves door glass, in the Glazing section.
+- **Openings (7.3):** per light, chosen on a drawing of the window that uses
+  the elevation convention (lines meeting at the hinge). Casement: fixed,
+  side-hung left or right, top-hung vent. Tilt and turn: fixed, tilt and turn
+  left or right, tilt only.
+- **Hardware (7.4):** lever on backplate, lever on rose, knob; the five
+  finishes. Backplate and rose were drawn identically on windows and now
+  differ (tall plate, round rose). Trickle vents in the frame head, 1 to 6.
+- **Glazing (7.5), doors and windows:** double or triple; clear, obscure
+  (stippled, reeded, cathedral, sandblast) or tinted (grey, bronze, blue);
+  standard, toughened or laminated. At a critical location standard glass is
+  disabled and the panes and the reason are stated. Obscure glass now renders
+  partly diffusing — pale, as it looks in daylight — rather than clear glass
+  with a texture over a dark room.
+
 ## Performance budget
 
 `npm run check:bundle` reads the production build and fails if the entry
@@ -252,7 +284,10 @@ invisible in a single screenshot:
   RAL 7016 is still RAL 7016. The studio environment is built from uneven
   Lightformers so bevels facing different ways reflect different things.
   `lighting-metric.mjs` holds panelled against flush at 2x edge energy or more
-  (currently 3.1x raised, 2.6x grooved).
+  (currently 2.8x raised, 2.4x grooved; 3.1x and 2.6x before Step 7 added a
+  soft light on the room side so that metal facing inside — window handle
+  plates — reflects something other than black. A larger, brighter room-side
+  light lifted the plates further but cost a fifth of the relief.)
 - **Colour fidelity** uses Khronos PBR Neutral tone mapping, not ACES, which
   shifts saturated colours. `colour-metric.mjs` holds four RAL shades within
   dE 6 (currently 4.1 worst, on white).
@@ -274,7 +309,16 @@ the product.
 ## Outstanding
 
 - No favicon. It is a branding decision, so none has been invented.
-- Steps 7 and 8: window options and glazing, then summary and enquiry.
+- Step 8: summary, share link and enquiry.
+- **Tilt and turn holds its hinge side twice**: per light (what is drawn) and
+  as a style-level `turnHingeSide`. The panel keeps the second in step with
+  the first opening light; the model should drop one.
+- **Trickle vents** can be modelled in the sash or through the glazing, but
+  only the frame-head position is drawn, so only it is offered.
+- **No minimum light size.** A 600 mm window can be divided into six lights
+  of under 100 mm. A limit is needed in `limits.ts`.
+- Safety glass is set for the whole product. Per-pane overrides exist in the
+  model (`SafetyOverride`) but have no control yet.
 - **The model carries door options the renderer does not draw**, so they are
   not offered as controls: arched and circular leaf apertures, an arched top
   light, doctor's and urn knockers (every knocker draws as a ring), and

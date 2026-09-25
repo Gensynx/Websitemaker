@@ -12,6 +12,8 @@ import { useId } from 'react';
 export interface SegmentedOption<T extends string> {
   value: T;
   label: string;
+  /** Not available here; the reason belongs in text beside the control. */
+  disabled?: boolean;
 }
 
 export function Segmented<T extends string>({
@@ -39,6 +41,7 @@ export function Segmented<T extends string>({
               name={name}
               value={option.value}
               checked={value === option.value}
+              disabled={option.disabled === true}
               onChange={() => onChange(option.value)}
             />
             <span>{option.label}</span>

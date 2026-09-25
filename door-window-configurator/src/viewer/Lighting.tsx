@@ -16,6 +16,7 @@
  *   - a strong strip on the left and a weaker one on the right: left- and
  *     right-facing bevels read differently from each other
  *   - a dim bounce from the floor: downward-facing bevels stay dark
+ *   - a soft box on the room side, for everything that faces inside
  *   - a soft box behind the camera: flat front faces carry a gentle sheen
  *     rather than going dead, and two diagonal strips there that glass
  *     reflects as a streak
@@ -56,6 +57,15 @@ export function StudioEnvironment(): JSX.Element {
       */}
       <Lightformer form="rect" intensity={1.6} color="#ffffff" position={[-0.9, 1.4, 7.5]} rotation={[0, Math.PI, Math.PI / 5]} scale={[0.55, 9, 1]} />
       <Lightformer form="rect" intensity={1.0} color="#ffffff" position={[0.35, 1.4, 7.5]} rotation={[0, Math.PI, Math.PI / 5]} scale={[0.22, 9, 1]} />
+
+      {/*
+        The room side: a soft box behind the product. Handles and plates face
+        into the room, and polished metal only reflects what it faces — with
+        nothing there, a satin chrome window backplate rendered black. Outside
+        views never face this way, so the relief and colour metrics are
+        untouched by it.
+      */}
+      <Lightformer form="rect" intensity={0.7} color="#fbf8f2" position={[0, 1.2, -9]} scale={[13, 2.2, 1]} />
 
       {/* Floor bounce, warm and dim. */}
       <Lightformer form="rect" intensity={0.25} color="#efe9df" position={[0, -3, 1]} rotation-x={-Math.PI / 2} scale={[12, 12, 1]} />

@@ -904,16 +904,22 @@ function buildWindowHandle(
     };
   };
 
+  // Mirrors the door set (Step 7.4): a backplate is a tall plate, a rose is
+  // round. Both were drawn as the same square, so the two lever choices
+  // looked identical on a window.
+  const backplate = config.hardware.handle === 'lever-backplate';
+  const plateHeight = backplate ? plate * 2.4 : plate;
   const parts: Part[] = [
     {
       ...box(
         `handle-${index}-plate`,
         'hardware',
-        fit({ x: plateX, y: y - plate / 2, width: plate, height: plate }),
+        fit({ x: plateX, y: y - plateHeight / 2, width: plate, height: plateHeight }),
         // `z` is the sash's internal face; the plate sits on it, facing in.
         z - 5,
         10,
       ),
+      ...(backplate ? {} : { shape: { kind: 'cylinder' as const, axis: 'z' as const } }),
       facing: 'internal',
     },
   ];

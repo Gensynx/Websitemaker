@@ -223,8 +223,14 @@ function glassMaterial(glazing: Glazing): THREE.MeshPhysicalMaterial {
       material.transmission = 0.92;
       break;
     case 'obscure': {
+      // Obscure glass scatters what passes through it: from outside in
+      // daylight it reads pale and diffuse, not as clear glass with a texture
+      // over a dark room. Partly transmissive, rough through its thickness,
+      // with the pattern still carried by the surface relief.
       const effect = OBSCURE[glazing.pattern];
-      material.roughness = glazing.pattern === 'sandblast' ? 0.55 : 0.12;
+      material.transmission = glazing.pattern === 'sandblast' ? 0.45 : 0.6;
+      material.roughness = glazing.pattern === 'sandblast' ? 0.6 : 0.32;
+      material.color = new THREE.Color('#e9eeee');
       if (effect) applyProcedural(material, effect);
       break;
     }

@@ -220,6 +220,34 @@ async function tabUntil(page, predicate, limit = 60) {
     if (!topLight || !/^\d/.test(param('tl') ?? '')) problems.push('the top light cannot be switched on from the keyboard');
   }
 
+  // 4d. Window lights by keyboard: arrow between lights, each named by position and opening.
+  {
+    const param = (key) => new URL(page.url()).searchParams.get(key);
+    await page.goto(`${BASE}/?view=el&v=3&m=u&p=w&w=2400&h=1400&ce=RAL9016&ci=m&fe=sm&fi=m&g=c.2&sg=n&tv=hf.1&s=cs&gd=1-2-1*1*shl.n-f.n-shr.n&hw=lr&hf=sc`, { waitUntil: 'networkidle' });
+    await page.evaluate(() => sessionStorage.clear());
+    await page.reload({ waitUntil: 'networkidle' });
+    await page.waitForSelector('.stage__canvas[data-ready="true"]', { timeout: 40000 });
+    await tabUntil(page, (f) => /^Style /.test(f.name));
+    await page.keyboard.press('Enter');
+    const first = await tabUntil(page, (f) => /^Light 1 of 3/.test(f.name), 40);
+    await page.keyboard.press('ArrowRight');
+    const second = await focused(page);
+    console.log(`lights by keyboard: "${first?.name}" -> "${second?.name}"`);
+    if (!first || !second || !/^Light 2 of 3, centre: fixed/.test(second.name)) problems.push('the window lights cannot be chosen and heard by keyboard');
+    const opens = await tabUntil(page, (f) => f.type === 'radio' && /^Fixed/.test(f.name), 5);
+    await page.keyboard.press('ArrowRight');
+    const expected = /^1-2-1\*1\*shl\.n\.i-shl\.n\.i-shr\.n\.i$/;
+    await page.waitForFunction((source) => new RegExp(source).test(new URL(location.href).searchParams.get('gd') ?? ''), expected.source, { timeout: 5000 }).catch(() => {});
+    console.log(`opening by keyboard: reached=${Boolean(opens)} gd=${param('gd')}`);
+    if (!opens || !expected.test(param('gd') ?? '')) problems.push("a light's opening cannot be set from the keyboard");
+    for (const id of ['colour', 'glazing', 'hardware']) {
+      const toggle = page.locator(`#section-${id}-toggle`);
+      if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+    }
+    await page.waitForTimeout(500);
+    await axe(page, 'desktop, window, all sections open');
+  }
+
   // 5. The preview has a text alternative, in plain words.
   const alt = await page.locator('.stage__picture').getAttribute('aria-label');
   console.log(`preview text alternative: ${alt}`);

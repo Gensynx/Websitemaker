@@ -453,6 +453,75 @@ const heightField = page.getByLabel(/^Height/);
   await page.screenshot({ path: `${SHOTS}/shot-door-options.png` });
 }
 
+/* ------------------------------------------------------------------ *
+ * Step 7 — window options and glazing
+ * ------------------------------------------------------------------ */
+
+{
+  const expect = async (label, key, pattern) => {
+    const value = await paramEventually(key, pattern);
+    console.log(`window: ${label} -> ${key}=${value}`);
+    if (!pattern.test(value ?? '')) problems.push(`window option "${label}" did not reach the link: ${key}=${value}`);
+  };
+  await page.goto(`${BASE}/?view=el`, { waitUntil: 'networkidle' });
+  await page.waitForSelector('canvas');
+  await page.getByRole('radio', { name: 'Window', exact: true }).check();
+  await paramEventually('p', /^w$/);
+  for (const id of ['style', 'glazing', 'hardware']) {
+    const toggle = page.locator(`#section-${id}-toggle`);
+    if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
+  }
+  const widthBefore = new URL(page.url()).searchParams.get('w');
+
+  // 7.1 and 7.2: style and divisions, never the size.
+  await page.getByRole('radio', { name: /^Casement/ }).check();
+  await page.getByRole('group', { name: 'Lights across' }).getByRole('radio', { name: '3' }).check();
+  await expect('three lights across', 'gd', /^1-1-1\*/);
+  // 7.3: the third light opens, hinged on the right.
+  await page.getByRole('radio', { name: /^Light 3 of 3/ }).check();
+  await page.getByRole('radio', { name: 'Side-hung, hinged right' }).check();
+  await expect('light 3 hinged right', 'gd', /-shr\./);
+  // 7.2: astragal bars, then the same in every light.
+  await page.getByRole('group', { name: 'Light 3 glazing bars' }).getByRole('radio', { name: 'Astragal' }).check();
+  await page.getByRole('button', { name: 'Use these bars in every light' }).click();
+  await expect('astragal bars everywhere', 'gd', /^1-1-1\*[\d.-]+\*(?:[a-z]+\.aa_2_2_22\.i-?)+$/);
+  await page.getByRole('radio', { name: /^Tilt and turn/ }).check();
+  await expect('tilt and turn', 's', /^tt$/);
+  await page.getByRole('radio', { name: /^Sliding sash/ }).check();
+  await expect('sliding sash', 's', /^sa$/);
+  if (new URL(page.url()).searchParams.get('w') !== widthBefore) problems.push('choosing a window style changed the overall width');
+
+  // 7.4: handle, finish, vents.
+  await page.getByRole('radio', { name: 'Knob' }).check();
+  await page.getByRole('radio', { name: 'Brass' }).check();
+  await expect('knob', 'hw', /^kb$/);
+  await expect('brass', 'hf', /^br$/);
+  await page.getByLabel('Vents fitted').fill('3');
+  await expect('three vents', 'tv', /^hf\.3$/);
+
+  // 7.5: unit, obscure pattern, laminated.
+  await page.getByRole('radio', { name: 'Triple glazed' }).check();
+  await page.getByRole('radio', { name: 'Obscure' }).check();
+  await page.getByRole('radio', { name: /^Reeded/ }).check();
+  await expect('triple, reeded', 'g', /^o\.3\.rd$/);
+  await page.getByRole('radio', { name: 'Laminated' }).check();
+  await expect('laminated', 'sg', /^l$/);
+  await page.screenshot({ path: `${SHOTS}/shot-window-options.png` });
+
+  // A door with glass low down: standard glass cannot be chosen, and the panel says why.
+  await page.goto(`${BASE}/?view=el&v=3&m=u&p=d&w=926&h=2040&ce=RAL7016&ci=m&fe=sm&fi=m&g=c.2&sg=t&tv=n&s=fg&sl=n&sr=n&tl=n&hw=lr&hf=sc&lp=0&sh=0&kn=n&tr=st&hg=l&od=i`, { waitUntil: 'networkidle' });
+  const glazing = page.locator('#section-glazing-toggle');
+  if ((await glazing.getAttribute('aria-expanded')) !== 'true') await glazing.click();
+  // "Standard" is also a threshold: scoped to the Glazing section.
+  const standardDisabled = await page
+    .getByRole('region', { name: 'Glazing' })
+    .getByRole('radio', { name: 'Standard', exact: true })
+    .isDisabled();
+  const reason = await page.locator('#section-glazing-panel .keep').allTextContents();
+  console.log(`glazing: critical location -> standard disabled=${standardDisabled}, reason=${reason.length > 0}`);
+  if (!standardDisabled || reason.length === 0) problems.push('standard glass can be chosen at a critical location, or no reason is given');
+}
+
 await page.setViewportSize({ width: 390, height: 844 });
 await page.goto(`${BASE}/`, { waitUntil: 'networkidle' });
 await page.waitForSelector('canvas');

@@ -1080,6 +1080,170 @@ h1 {
 }
 
 /* ------------------------------------------------------------------ *
+ * Window options and glazing (Step 7)
+ * ------------------------------------------------------------------ */
+
+.bars {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.fields--pair {
+  grid-template-columns: 1fr 1fr;
+}
+
+.field--count .field__input {
+  max-width: 8rem;
+}
+
+.options__apply {
+  justify-self: start;
+}
+
+/* The window as its lights, in its real proportions. */
+.lights {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.lights__frame {
+  display: grid;
+  gap: 5px;
+  /* The window's own shape: as wide as 11rem of height allows, never wider
+     than the panel. Height follows from the aspect ratio, so nothing stretches. */
+  width: min(100%, calc(11rem * var(--aspect, 1.333)));
+  aspect-ratio: var(--aspect, 1.333);
+  padding: 7px;
+  border-radius: var(--radius);
+  background: var(--ink-soft);
+}
+
+.light {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  background: #d9e1e3;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background var(--duration) var(--ease);
+}
+
+.light:hover {
+  background: #e8eef0;
+}
+
+.light input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.light:has(input:checked) {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 2px var(--ink);
+  color: var(--ink);
+}
+
+.light:has(input:focus-visible) {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+.light__lines {
+  position: absolute;
+  inset: 12%;
+  width: 76%;
+  height: 76%;
+  pointer-events: none;
+}
+
+.light__number {
+  position: relative;
+  /* Drawn over the radio; clicks must reach the radio underneath. */
+  pointer-events: none;
+  font-size: var(--step-micro);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.opening-glyph {
+  position: relative;
+  display: block;
+  width: 2.5rem;
+  height: 3rem;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+}
+
+.opening-glyph .light__lines {
+  inset: 10%;
+  width: 80%;
+  height: 80%;
+}
+
+/* Glass samples: obscure patterns and tints, drawn with CSS gradients. */
+.glass-sample {
+  display: block;
+  width: 3.5rem;
+  height: 3rem;
+  border-radius: 2px;
+  background-color: #cdd7da;
+  box-shadow: inset 0 0 0 1px rgba(22, 24, 26, 0.16);
+}
+
+.glass-sample[data-pattern='reeded'] {
+  background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.75) 0 2px, rgba(120, 138, 144, 0.35) 3px 5px, rgba(255, 255, 255, 0.2) 6px 7px);
+}
+
+.glass-sample[data-pattern='stippled'] {
+  background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.85) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 5px 5px, rgba(110, 128, 134, 0.35) 0 1px, transparent 1.6px);
+  background-size: 6px 6px, 7px 7px;
+}
+
+.glass-sample[data-pattern='cathedral'] {
+  background-image: radial-gradient(ellipse 60% 40% at 30% 30%, rgba(255, 255, 255, 0.7), transparent 70%),
+    radial-gradient(ellipse 50% 60% at 75% 70%, rgba(255, 255, 255, 0.55), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 70% 20%, rgba(110, 128, 134, 0.3), transparent 70%);
+}
+
+.glass-sample[data-pattern='sandblast'] {
+  background-color: #e3e8e9;
+  background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.1));
+}
+
+.glass-sample[data-tint='grey'] { background-color: #8e979b; }
+.glass-sample[data-tint='bronze'] { background-color: #a6896b; }
+.glass-sample[data-tint='blue'] { background-color: #7f9bb0; }
+
+.range__input--plain {
+  background: rgba(22, 24, 26, 0.12);
+}
+
+.segmented__option input:disabled + span {
+  color: var(--ink-faint);
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+/* Every control drawn as an invisible radio over its own picture sits above
+   that picture. A positioned decoration inside a tile (an opening glyph, a
+   light number) otherwise paints over the radio and swallows the click. */
+.tile input,
+.light input,
+.swatch input,
+.segmented__option input {
+  z-index: 1;
+}
+
+/* ------------------------------------------------------------------ *
  * Segmented control (radio group)
  * ------------------------------------------------------------------ */
 
@@ -1516,8 +1680,14 @@ h1 {
   }
 
   .metal,
-  .thumb {
+  .thumb,
+  .glass-sample {
     forced-color-adjust: none;
+  }
+
+  .light:has(input:checked) {
+    outline: 3px solid Highlight;
+    outline-offset: -3px;
   }
 }
 
