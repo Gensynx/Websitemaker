@@ -18,6 +18,7 @@ import {
   describeLights,
   describeSize,
   describeStyle,
+  describeSurround,
   HANDING_STATEMENT,
   hasGlass,
   productName,
@@ -70,6 +71,7 @@ export function buildSummary(stored: ConfigState): Summary {
   const groups: SummaryGroup[] = [
     { title: 'Size', lines: describeSize(config).lines },
     { title: 'Style', lines: styleLines },
+    ...(config.productType === 'door' ? [{ title: 'Surround', lines: describeSurround(config).lines }] : []),
     { title: 'Colour and finish', lines: describeColour(config).lines },
     { title: 'Glazing', lines: describeGlazing(config).lines },
     { title: 'Hardware', lines: describeHardware(config).lines },

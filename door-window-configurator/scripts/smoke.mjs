@@ -401,7 +401,7 @@ const heightField = page.getByLabel(/^Height/);
   await page.waitForSelector('canvas');
   await page.getByRole('radio', { name: 'Door', exact: true }).check();
   await page.waitForTimeout(800);
-  for (const id of ['style', 'hardware']) {
+  for (const id of ['style', 'surround', 'hardware']) {
     const toggle = page.locator(`#section-${id}-toggle`);
     if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click();
   }
@@ -416,7 +416,7 @@ const heightField = page.getByLabel(/^Height/);
 
   // Side lights on a single door: the frame is not resized behind the customer's back...
   const widthBefore = param('w');
-  await page.getByRole('radio', { name: 'Both', exact: true }).check();
+  await page.getByRole('group', { name: /^Side lights/ }).getByRole('radio', { name: 'Both', exact: true }).check();
   await page.waitForSelector('.keep--problem', { timeout: 5000 }).catch(() => {});
   const alert = await page.locator('.keep--problem').allTextContents();
   console.log(`door: both side lights on ${widthBefore} mm -> w=${param('w')}, problem=${alert.length > 0}`);
@@ -428,7 +428,7 @@ const heightField = page.getByLabel(/^Height/);
   await expect('widen to keep the door', 'w', /^1[5-9]\d\d$/);
   if ((await page.locator('.keep--problem').count()) !== 0) problems.push('the door is still unbuildable after widening the frame');
 
-  await page.getByRole('checkbox', { name: /^Top light/ }).check();
+  await page.getByRole('group', { name: /^Top light/ }).getByRole('radio', { name: 'Top light', exact: true }).check();
   await settle();
   await expect('top light', 'tl', /^\d/);
   // "Right" is both a side light and a hinge side: scoped to its own group.
@@ -566,7 +566,7 @@ const heightField = page.getByLabel(/^Height/);
   const groups = await tab.locator('.review__group-title').allTextContents();
   const linkInDialog = await tab.locator('.review__share input').inputValue();
   console.log(`summary: focus on "${focusedTitle}", groups=${JSON.stringify(groups)}`);
-  if (groups.length !== 5) problems.push(`the summary does not list every section: ${groups.join(', ')}`);
+  if (groups.length !== 6 || !groups.includes('Surround')) problems.push(`the summary does not list every section: ${groups.join(', ')}`);
   if (configKeys(linkInDialog) !== configKeys(tab.url())) problems.push('the summary link differs from the configuration');
   const lightsListed = await tab.locator('.review__summary').textContent();
   if (!/Left side light/.test(lightsListed ?? '') || !/Hinge side and opening direction are stated/.test(lightsListed ?? '')) {

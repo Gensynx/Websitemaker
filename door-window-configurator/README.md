@@ -31,7 +31,8 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/ui/SwatchGrid.tsx` | RAL swatch grid as a native radio group |
 | `src/ui/ExplorePicker.tsx` | Colour wheel (pointer) with hue, saturation, brightness sliders and hex field (keyboard) |
 | `src/config/doorEdits.ts` | Door option edits; the frame is never resized as a side effect |
-| `src/ui/DoorStylePanel.tsx` | Door style, panels, side and top lights, handing, threshold |
+| `src/ui/DoorStylePanel.tsx` | Door style, panels, handing, threshold |
+| `src/ui/SurroundPanel.tsx` | Door surround: side lights and top light, with the keep-the-door offer |
 | `src/ui/DoorHardwarePanel.tsx` | Handle, finish, letterplate, knocker, spyhole |
 | `src/ui/OptionTiles.tsx` | Radio tiles and checkbox toggles |
 | `src/ui/ElevationThumb.tsx` | Option thumbnails drawn from the same part list as the 3D model |
@@ -64,7 +65,7 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 ```
 npm install
 npm run typecheck
-npm test          # 272 unit tests, including text contrast read from styles.css
+npm test          # 274 unit tests, including text contrast read from styles.css
 npm run dev -- --port 5180   # then, in another shell:
 npm run smoke                # browser render, controls, wall scene, sizing
 npm run a11y                 # keyboard-only walk, sheet by keys and drag, axe scans
@@ -225,9 +226,14 @@ shape, size and style that were all perfectly drawable.
 
 ## Door options (Step 6)
 
-- **Style (6.1):** solid panel, half glazed, fully glazed; side lights none,
-  left, right or both; a top light. Each tile shows the door as it would be
-  built, drawn from `buildProduct`.
+- **Style (6.1):** solid panel, half glazed, fully glazed. Each tile shows
+  the door as it would be built, drawn from `buildProduct`.
+- **Surround (6.1):** a section of its own, doors only: side lights none,
+  left, right or both, and a top light or none, as picture tiles, with the
+  side light width and top light height. It was first built inside Style as
+  plain switches, where it could not be found by the name the catalogue
+  uses; it now has the catalogue's name and pictures. The review summary
+  has a Surround group to match.
 - **Panels (6.2):** flush, one to four raised panels (ovolo, chamfer, square),
   or grooved (across or up and down, three to six grooves), wherever the leaf
   has a solid area.

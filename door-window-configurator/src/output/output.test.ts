@@ -18,7 +18,9 @@ const CONTACT: ContactDetails = { ...EMPTY_CONTACT, name: ' Ada Lovelace ', emai
 describe('Step 8.1: the summary lists every selected option', () => {
   it('has a group for every section, and the statements an order carries', () => {
     const summary = buildSummary(DEFAULT_DOOR);
-    expect(summary.groups.map((g) => g.title)).toEqual(['Size', 'Style', 'Colour and finish', 'Glazing', 'Hardware']);
+    expect(summary.groups.map((g) => g.title)).toEqual(['Size', 'Style', 'Surround', 'Colour and finish', 'Glazing', 'Hardware']);
+    // A window has no surround.
+    expect(buildSummary(DEFAULT_WINDOW).groups.map((g) => g.title)).not.toContain('Surround');
     expect(summary.notes).toContain(HANDING_STATEMENT);
     expect(summary.notes).toContain(INDICATIVE_NOTE);
     expect(summary.status.kind).toBe('quotable');

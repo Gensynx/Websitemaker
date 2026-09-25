@@ -35,6 +35,7 @@ import { DoorHardwarePanel } from './ui/DoorHardwarePanel';
 import { WindowStylePanel } from './ui/WindowStylePanel';
 import { WindowHardwarePanel } from './ui/WindowHardwarePanel';
 import { GlazingPanel } from './ui/GlazingPanel';
+import { SurroundPanel } from './ui/SurroundPanel';
 import { ReviewDialog } from './ui/ReviewDialog';
 import type { ReviewDialogHandle } from './ui/ReviewDialog';
 import { copyText, shareUrl } from './output/share';
@@ -45,7 +46,7 @@ import type { SheetState } from './ui/useSheetGesture';
 import { renderBlockers } from './config/validate';
 import type { ValidationIssue } from './config/validate';
 import { formatSize } from './config/units';
-import { describeProduct, describeSection, productName as nameOf, sectionForField } from './config/describe';
+import { describeProduct, describeSection, productName as nameOf, sectionForField, sectionsFor } from './config/describe';
 import type { SectionId } from './config/describe';
 import type { CameraPreset } from './config/view';
 
@@ -73,6 +74,7 @@ function hasWebGL(): boolean {
 
 const SECTIONS: Array<{ id: SectionId; title: string }> = [
   { id: 'style', title: 'Style' },
+  { id: 'surround', title: 'Surround' },
   { id: 'size', title: 'Size' },
   { id: 'colour', title: 'Colour' },
   { id: 'glazing', title: 'Glazing' },
@@ -326,7 +328,7 @@ export function App(): JSX.Element {
 
           <Messages errors={generalErrors} notes={generalNotes} />
 
-          {SECTIONS.map((section) => {
+          {SECTIONS.filter((section) => sectionsFor(config.productType).includes(section.id)).map((section) => {
             const description = describeSection(section.id, config);
             return (
               <Section
@@ -360,6 +362,8 @@ export function App(): JSX.Element {
                   <ColourPanel />
                 ) : section.id === 'glazing' ? (
                   <GlazingPanel config={config} />
+                ) : section.id === 'surround' ? (
+                  config.productType === 'door' && <SurroundPanel config={config} />
                 ) : section.id === 'style' ? (
                   config.productType === 'door' ? <DoorStylePanel config={config} /> : <WindowStylePanel config={config} />
                 ) : config.productType === 'door' ? (

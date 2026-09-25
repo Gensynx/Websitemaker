@@ -212,13 +212,18 @@ async function tabUntil(page, predicate, limit = 60) {
     await page.waitForTimeout(700);
     console.log(`door style by keyboard: toggle=${Boolean(styleToggle)} from "${tile?.name}" -> s=${param('s')}`);
     if (!tile || param('s') === 'sp') problems.push('the door style tiles cannot be operated with the arrow keys');
-    const topLight = await tabUntil(page, (f) => f.type === 'checkbox' && /^Top light/.test(f.name), 30);
-    await page.keyboard.press(' ');
+    // The surround is its own section: open it by keyboard, then arrow from
+    // "No top light" to "Top light".
+    const surroundToggle = await tabUntil(page, (f) => /^Surround /.test(f.name), 60);
+    await page.keyboard.press('Enter');
+    const topLight = await tabUntil(page, (f) => f.type === 'radio' && f.name === 'No top light', 20);
+    await page.keyboard.press('ArrowRight');
     // The link is written on a short debounce; under software rendering the
     // main thread can be busy for a while, so wait for it rather than sample.
     await page.waitForFunction(() => /^\d/.test(new URL(location.href).searchParams.get('tl') ?? ''), null, { timeout: 5000 }).catch(() => {});
-    console.log(`top light by keyboard: reached=${Boolean(topLight)} tl=${param('tl')}`);
-    if (!topLight || !/^\d/.test(param('tl') ?? '')) problems.push('the top light cannot be switched on from the keyboard');
+    console.log(`top light by keyboard: surround toggle=${Boolean(surroundToggle)} reached=${Boolean(topLight)} tl=${param('tl')}`);
+    if (!surroundToggle || !topLight || !/^\d/.test(param('tl') ?? '')) problems.push('the top light cannot be switched on from the keyboard');
+    await axe(page, 'desktop, door surround open');
   }
 
   // 4d. Window lights by keyboard: arrow between lights, each named by position and opening.
@@ -288,8 +293,10 @@ async function tabUntil(page, predicate, limit = 60) {
 
   // 6. axe, with every section open and then with the defaults.
   await axe(page, 'desktop, defaults');
-  for (const title of ['Style', 'Colour', 'Glazing', 'Hardware']) {
-    await page.locator(`#section-${title.toLowerCase()}-toggle`).click();
+  // Surround is a door's only; this page shows whatever was last configured.
+  for (const title of ['Style', 'Surround', 'Colour', 'Glazing', 'Hardware']) {
+    const toggle = page.locator(`#section-${title.toLowerCase()}-toggle`);
+    if ((await toggle.count()) > 0) await toggle.click();
   }
   await page.waitForTimeout(500);
   await axe(page, 'desktop, all sections open');

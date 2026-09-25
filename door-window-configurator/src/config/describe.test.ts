@@ -3,14 +3,12 @@ import {
   describeProduct,
   describeSection,
   sectionForField,
+  sectionsFor,
 } from './describe';
-import type { SectionId } from './describe';
 import { DEFAULT_DOOR, DEFAULT_DOOR_STYLE_OPTIONS, DEFAULT_WINDOW, DEFAULT_WINDOW_STYLE_OPTIONS } from './defaults';
 import { WINDOW_PRESETS } from './windowPresets';
 import type { ConfigState, DoorConfigState, PanelDetail, WindowConfigState } from './types';
 import { validateConfig } from './validate';
-
-const SECTIONS: SectionId[] = ['style', 'size', 'colour', 'glazing', 'hardware'];
 
 // Hyphenated words a customer would recognise. Anything else hyphenated and
 // lower-case is an internal identifier leaking into the interface.
@@ -66,7 +64,7 @@ const ALL: ConfigState[] = [...doors, ...windows];
 describe('every configuration is described in plain language', () => {
   ALL.forEach((config, index) => {
     it(`${config.productType} #${index}: every section has a summary and lines, with no internal codes`, () => {
-      for (const section of SECTIONS) {
+      for (const section of sectionsFor(config.productType)) {
         const { summary, lines } = describeSection(section, config);
         expect(summary.trim(), section).not.toBe('');
         expect(lines.length, section).toBeGreaterThan(0);
@@ -116,6 +114,21 @@ describe('validation issues land in a section', () => {
       'style.bars', 'threshold',
     ];
     for (const field of fields) expect(sectionForField(field), field).not.toBeNull();
+  });
+
+  it('sends side and top light problems to the Surround section, which only a door has', () => {
+    for (const field of ['surround.leftSideLight', 'surround.rightSideLight', 'surround.topLight']) {
+      expect(sectionForField(field)).toBe('surround');
+    }
+    expect(sectionsFor('door')).toContain('surround');
+    expect(sectionsFor('window')).not.toContain('surround');
+  });
+
+  it('names the surround in the door summary and the preview text', () => {
+    const door = doors.find((d) => d.surround.topLight !== null)!;
+    expect(describeSection('surround', door).summary).toBe('Two side lights and a top light');
+    expect(describeSection('surround', DEFAULT_DOOR).summary).toBe('No side or top lights');
+    expect(describeProduct(door)).toContain('Two side lights and a top light');
   });
 
   it('maps the fields actually raised by a broken configuration', () => {

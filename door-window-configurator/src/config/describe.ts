@@ -40,7 +40,18 @@ import { ralEntry } from './ral';
 import { formatMm, formatSize, roundMmHalfUp } from './units';
 import { safetyControlState } from './safety';
 
-export type SectionId = 'style' | 'size' | 'colour' | 'glazing' | 'hardware';
+export type SectionId = 'style' | 'surround' | 'size' | 'colour' | 'glazing' | 'hardware';
+
+/**
+ * The panel's sections, in order, for a product. A door has a surround — side
+ * and top lights around the leaf (Step 6.1) — as a section of its own, so it
+ * can be found by name; a window has none.
+ */
+export function sectionsFor(productType: ConfigState['productType']): SectionId[] {
+  return productType === 'door'
+    ? ['style', 'surround', 'size', 'colour', 'glazing', 'hardware']
+    : ['style', 'size', 'colour', 'glazing', 'hardware'];
+}
 
 export interface Line {
   label: string;
@@ -219,7 +230,20 @@ function describeDoorStyle(config: DoorConfigState): SectionDescription {
   }
   if (style.id !== 'full-glazed') lines.push({ label: 'Panels', value: panelDescription(style.options.panelDetail) });
 
+  lines.push({
+    label: 'Opening',
+    value: `Hinged on the ${config.hingeSide}, opens ${config.openingDirection}, as viewed from outside`,
+  });
+  lines.push({ label: 'Threshold', value: config.threshold === 'standard' ? 'Standard' : 'Low-level access' });
+  lines.push({ label: 'Frame', value: MATERIALS[config.material].label });
+
+  return { summary: doorStyleName(config), lines };
+}
+
+/** The door's surround: side lights and a top light (Step 6.1). */
+export function describeSurround(config: DoorConfigState): SectionDescription {
   const { leftSideLight, rightSideLight, topLight } = config.surround;
+  const lines: Line[] = [];
   for (const [label, light] of [
     ['Left side light', leftSideLight],
     ['Right side light', rightSideLight],
@@ -232,21 +256,8 @@ function describeDoorStyle(config: DoorConfigState): SectionDescription {
       value: `${formatMm(topLight.height)} high, ${topLight.shape}, ${barsDescription(topLight.bars).toLowerCase()}`,
     });
   }
-  if (leftSideLight === null && rightSideLight === null && topLight === null) {
-    lines.push({ label: 'Side and top lights', value: 'None' });
-  }
-
-  lines.push({
-    label: 'Opening',
-    value: `Hinged on the ${config.hingeSide}, opens ${config.openingDirection}, as viewed from outside`,
-  });
-  lines.push({ label: 'Threshold', value: config.threshold === 'standard' ? 'Standard' : 'Low-level access' });
-  lines.push({ label: 'Frame', value: MATERIALS[config.material].label });
-
-  const surround = surroundSummary(config);
-  const summary =
-    surround === 'no side or top lights' ? `${doorStyleName(config)}, ${surround}` : `${doorStyleName(config)} with ${surround}`;
-  return { summary, lines };
+  if (lines.length === 0) lines.push({ label: 'Side and top lights', value: 'None' });
+  return { summary: sentence(surroundSummary(config)), lines };
 }
 
 function windowStyleName(config: WindowConfigState): string {
@@ -493,6 +504,9 @@ export function describeSection(section: SectionId, config: ConfigState): Sectio
   switch (section) {
     case 'style':
       return describeStyle(config);
+    case 'surround':
+      // Only doors have one; sectionsFor never offers it for a window.
+      return config.productType === 'door' ? describeSurround(config) : { summary: 'None', lines: [] };
     case 'size':
       return describeSize(config);
     case 'colour':
@@ -515,6 +529,7 @@ export function describeProduct(config: ConfigState): string {
   const parts = [
     `${productName(config)}, ${roundMmHalfUp(config.dimensions.width)} mm wide by ${roundMmHalfUp(config.dimensions.height)} mm high`,
     describeStyle(config).summary,
+    ...(config.productType === 'door' ? [describeSurround(config).summary] : []),
     describeColour(config).summary,
     ...(hasGlass(config) ? [describeGlazing(config).summary] : []),
     describeHardware(config).summary,
@@ -554,8 +569,9 @@ export function sectionForField(field: string): SectionId | null {
     case 'trickleVents':
       return 'hardware';
     case 'material':
-    case 'style':
     case 'surround':
+      return 'surround';
+    case 'style':
     case 'threshold':
     case 'hingeSide':
     case 'openingDirection':
