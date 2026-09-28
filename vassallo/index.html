@@ -233,8 +233,17 @@ section{position:relative;z-index:2}
 .trade .frame{position:relative;aspect-ratio:4/3;overflow:hidden;background:var(--surface);border:1px solid var(--line);
   display:grid;place-items:center;transition:border-color .5s var(--e-out)}
 .trade .frame svg{width:58%;height:auto;color:var(--ink);opacity:.62;transition:opacity .5s, transform .7s var(--e-out)}
+/* the photograph covers the frame; the line drawing stays beneath it as a fallback
+   for the case where the image cannot load, so a card is never an empty box */
+.trade .frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;
+  transition:transform .9s var(--e-out), opacity .5s}
+/* a veil over the photograph, never opacity on the photograph itself: the fallback
+   line drawing sits behind the image and would otherwise ghost through it */
+.trade.soon .frame::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
+  background:var(--paper);opacity:.3;transition:opacity .5s}
+a.trade.soon:hover .frame::after,a.trade.soon:focus-visible .frame::after{opacity:.1}
 .trade .frame svg .hl{stroke:var(--brass)}
-.trade .badge{position:absolute;top:1rem;left:1rem;z-index:3;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
+.trade .badge{position:absolute;top:1rem;left:1rem;z-index:4;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
   background:var(--paper);color:var(--ink);padding:.5em .9em;border:1px solid var(--line)}
 .trade .badge.live{color:var(--brass);border-color:var(--brass)}
 .trade .meta{padding-top:1.05rem}
@@ -242,10 +251,11 @@ section{position:relative;z-index:2}
 .trade .scope{color:var(--ink-faint);font-size:.88rem;margin-top:.4rem}
 a.trade:hover .frame,a.trade:focus-visible .frame{border-color:var(--brass)}
 a.trade:hover .frame svg,a.trade:focus-visible .frame svg{opacity:1;transform:scale(1.05)}
+a.trade:hover .frame img,a.trade:focus-visible .frame img{transform:scale(1.045);opacity:1}
 /* .soon stays visually muted but is a real link, so interest can be registered early */
 .trade.soon .frame svg{opacity:.46}
 .trade.soon .meta h3,.trade.soon .scope{opacity:.74}
-@media (prefers-reduced-motion: reduce){a.trade:hover .frame svg{transform:none}}
+@media (prefers-reduced-motion: reduce){a.trade:hover .frame svg,a.trade:hover .frame img{transform:none}}
 
 /* ============================================================
    NUMBERS
@@ -504,6 +514,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
     <div class="trade-grid">
       <a class="trade reveal" href="#enquire" data-service="Full refurbs">
         <div class="frame">
+          <img src="images/full-refurbs.webp" alt="A London terraced house stripped back for a full refurbishment, with new timber studwork and bare brick lit by a tall sash window" width="1100" height="811" loading="lazy" decoding="async">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M20 44 60 18l40 26"/><path d="M28 44v32h64V44"/>
             <path d="M54 76V58h12v18"/><rect x="36" y="52" width="13" height="11"/>
@@ -516,6 +527,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       </a>
       <a class="trade reveal d1" href="#enquire" data-service="Minor works">
         <div class="frame">
+          <img src="images/minor-works.webp" alt="A trowel smoothing fresh plaster beside crisply repointed London stock brickwork" width="1100" height="811" loading="lazy" decoding="async">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M22 76h76M22 62h76M22 48h76"/>
             <path d="M46 76V62M74 76V62M34 62V48M62 62V48M90 62V48"/>
@@ -530,6 +542,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       </a>
       <a class="trade reveal d2" href="#enquire" data-service="Window and door replacements">
         <div class="frame">
+          <img src="images/windows-doors.webp" alt="A newly fitted window and freshly painted timber entrance door in a period brick facade" width="1100" height="811" loading="lazy" decoding="async">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M22 78V22h32v56"/><path d="M16 78h46"/>
             <circle cx="47" cy="52" r="2.6"/>
@@ -543,6 +556,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       </a>
       <a class="trade reveal" href="#enquire" data-service="Roofing works">
         <div class="frame">
+          <img src="images/roofing.webp" alt="A re-roofed terrace with new slate courses, lead flashing and a brick chimney stack" width="1100" height="811" loading="lazy" decoding="async">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M12 68h96"/><path d="M16 68 60 26l44 42"/>
             <path class="hl" d="M26 68 60 36l34 32"/>
@@ -557,6 +571,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       </a>
       <a class="trade soon reveal d1" href="#enquire" data-service="Bathrooms">
         <div class="frame">
+          <img src="images/bathrooms.webp" alt="A finished bathroom in warm stone tile with aged brass brassware and a frameless glass shower" width="1100" height="811" loading="lazy" decoding="async">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M20 50h80v10a14 14 0 0 1-14 14H34a14 14 0 0 1-14-14z"/>
             <path d="M34 74v6M86 74v6"/><path d="M20 50h80"/>
@@ -569,6 +584,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       </a>
       <a class="trade soon reveal d2" href="#enquire" data-service="Kitchens">
         <div class="frame">
+          <img src="images/kitchens.webp" alt="A finished kitchen with handleless cabinetry, a pale stone worktop and an aged brass tap" width="1100" height="811" loading="lazy" decoding="async">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M18 48h84"/><path d="M20 48v30h80V48"/>
             <path d="M48 48v30M76 48v30"/>

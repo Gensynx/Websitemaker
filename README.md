@@ -31,6 +31,10 @@ vassallo/
 ```
 
 ### Notes
+- The six trade cards carry **AI generated placeholder imagery** (Higgsfield, Recraft V4.1), not photographs of real
+  Vassallo projects. The section is headed "Projects we've worked on", so replace these with genuine project
+  photography before the site is promoted. Drop a 4:3 image in at the same filename in `vassallo/images/` and the
+  card picks it up with no code change. See `vassallo/images/README.txt`.
 - On desktop the film is **scrubbed by scroll**. Touch devices cannot seek a video reliably frame by frame, so
   phones and tablets autoplay the film straight through instead and time the copy beats to it. Upright phones show
   the whole wide frame (`object-fit:contain`) rather than a zoom-crop, so it stays sharp.
