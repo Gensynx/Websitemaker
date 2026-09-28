@@ -237,11 +237,6 @@ section{position:relative;z-index:2}
    for the case where the image cannot load, so a card is never an empty box */
 .trade .frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:2;
   transition:transform .9s var(--e-out), opacity .5s}
-/* a veil over the photograph, never opacity on the photograph itself: the fallback
-   line drawing sits behind the image and would otherwise ghost through it */
-.trade.soon .frame::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;
-  background:var(--paper);opacity:.3;transition:opacity .5s}
-a.trade.soon:hover .frame::after,a.trade.soon:focus-visible .frame::after{opacity:.1}
 .trade .frame svg .hl{stroke:var(--brass)}
 .trade .badge{position:absolute;top:1rem;left:1rem;z-index:4;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;
   background:var(--paper);color:var(--ink);padding:.5em .9em;border:1px solid var(--line)}
@@ -252,9 +247,6 @@ a.trade.soon:hover .frame::after,a.trade.soon:focus-visible .frame::after{opacit
 a.trade:hover .frame,a.trade:focus-visible .frame{border-color:var(--brass)}
 a.trade:hover .frame svg,a.trade:focus-visible .frame svg{opacity:1;transform:scale(1.05)}
 a.trade:hover .frame img,a.trade:focus-visible .frame img{transform:scale(1.045);opacity:1}
-/* .soon stays visually muted but is a real link, so interest can be registered early */
-.trade.soon .frame svg{opacity:.46}
-.trade.soon .meta h3,.trade.soon .scope{opacity:.74}
 @media (prefers-reduced-motion: reduce){a.trade:hover .frame svg,a.trade:hover .frame img{transform:none}}
 
 /* ============================================================
@@ -527,7 +519,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       </a>
       <a class="trade reveal d1" href="#enquire" data-service="Minor works">
         <div class="frame">
-          <img src="images/minor-works.webp" alt="A trowel smoothing fresh plaster beside crisply repointed London stock brickwork" width="1100" height="811" loading="lazy" decoding="async">
+          <img src="images/minor-works.webp" alt="An oak shelf being fitted into an alcove, sitting level on its brackets with a spirit level on top and a drill on the floor below" width="1100" height="811" loading="lazy" decoding="async">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <path d="M22 76h76M22 62h76M22 48h76"/>
             <path d="M46 76V62M74 76V62M34 62V48M62 62V48M90 62V48"/>
@@ -538,7 +530,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
           <span class="badge live">Enquire</span>
         </div>
         <div class="meta"><h3>Minor works</h3></div>
-        <p class="scope">Smaller jobs done properly: repairs, making good, brickwork, plastering and remedial work.</p>
+        <p class="scope">Smaller jobs done properly: shelving and joinery, repairs, making good, plastering and remedial work.</p>
       </a>
       <a class="trade reveal d2" href="#enquire" data-service="Window and door replacements">
         <div class="frame">
@@ -569,7 +561,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
         <div class="meta"><h3>Roofing works</h3></div>
         <p class="scope">Re-roofs, recovers and repairs, with flashing, guttering and rainwater goods put right at the same time.</p>
       </a>
-      <a class="trade soon reveal d1" href="#enquire" data-service="Bathrooms">
+      <a class="trade reveal d1" href="#enquire" data-service="Bathrooms">
         <div class="frame">
           <img src="images/bathrooms.webp" alt="A finished bathroom in warm stone tile with aged brass brassware and a frameless glass shower" width="1100" height="811" loading="lazy" decoding="async">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -577,12 +569,12 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
             <path d="M34 74v6M86 74v6"/><path d="M20 50h80"/>
             <path class="hl" d="M82 50V32a8 8 0 0 0-8-8h-8"/><path class="hl" d="M62 18v12"/>
           </svg>
-          <span class="badge">Coming soon</span>
+          <span class="badge live">Enquire</span>
         </div>
         <div class="meta"><h3>Bathrooms</h3></div>
         <p class="scope">Full bathroom design and installation, from first fix plumbing to tiling and finish.</p>
       </a>
-      <a class="trade soon reveal d2" href="#enquire" data-service="Kitchens">
+      <a class="trade reveal d2" href="#enquire" data-service="Kitchens">
         <div class="frame">
           <img src="images/kitchens.webp" alt="A finished kitchen with handleless cabinetry, a pale stone worktop and an aged brass tap" width="1100" height="811" loading="lazy" decoding="async">
           <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -591,7 +583,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
             <path d="M28 58h10M56 58h10M84 58h10"/>
             <path class="hl" d="M52 16h30l8 16H44z"/><path class="hl" d="M60 40h14"/>
           </svg>
-          <span class="badge">Coming soon</span>
+          <span class="badge live">Enquire</span>
         </div>
         <div class="meta"><h3>Kitchens</h3></div>
         <p class="scope">Kitchen design, supply and installation, coordinated with the electrics and plumbing behind it.</p>

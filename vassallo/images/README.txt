@@ -15,7 +15,7 @@ it up with no code change. Exported at 1100x811 WebP, quality 82, which is
 about 2.6x the rendered card width of roughly 420px:
 
   full-refurbs.webp    interior stripped back, studwork and bare brick
-  minor-works.webp     trowel on fresh plaster beside repointed brickwork
+  minor-works.webp     an oak shelf being fitted level into an alcove
   windows-doors.webp   new window and painted timber door in a brick facade
   roofing.webp         new slate courses, chimney stack and flashing
   bathrooms.webp       finished bathroom, stone tile and brass brassware
