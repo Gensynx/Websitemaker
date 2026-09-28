@@ -435,6 +435,11 @@ export const ReviewDialog = forwardRef<ReviewDialogHandle, { config: ConfigState
                         <p>
                           <strong>Your enquiry has not been sent.</strong> {result.reason}
                         </p>
+                        {result.status === 'failed' && (
+                          <button type="button" className="button button--quiet" onClick={() => void copy('enquiry')}>
+                            Copy the enquiry
+                          </button>
+                        )}
                       </Status>
                     )}
                   </div>

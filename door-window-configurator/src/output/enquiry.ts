@@ -1,20 +1,22 @@
 /**
- * The enquiry (Step 8.3): the configuration and the customer's contact
- * details, as one request.
+ * The enquiry: contact details validated, the request built, and sent.
  *
- * ================================ STUB ================================
- * The brief leaves the destination unstated, so NOTHING IS SENT. With
- * ENQUIRY_ENDPOINT null, submitEnquiry() returns { status: 'not-sent' } and
- * the page tells the customer, in so many words, that their enquiry has not
- * been sent. It never shows a false confirmation.
+ * =====================================================================
+ * WHERE IT GOES
  *
- * To connect it: set ENQUIRY_ENDPOINT to an HTTPS URL that accepts a JSON
- * POST of EnquiryRequest and answers 2xx. The server must re-validate
- * everything — the configuration by decoding `shareUrl` or `payload.config`
- * with url.ts / validate.ts, and the contact details — because anything that
- * arrives from a browser can be forged. Rate limiting and spam filtering
- * belong there too. There is deliberately no client-side honeypot: browsers
- * autofill hidden fields, and a false positive would silently discard a real
+ * The website build (`npm run build`, mode "production") sends it to
+ * `enquiry.php` beside the page (public/enquiry.php): a JSON POST that the
+ * server re-validates, rate-limits and emails. The endpoint comes from
+ * VITE_ENQUIRY_ENDPOINT in `.env.production`.
+ *
+ * Everywhere else — the dev server, the single shareable file, the tests —
+ * there is no server, ENQUIRY_ENDPOINT is null, and submitEnquiry() returns
+ * { status: 'not-sent' }: the page says in so many words that nothing was
+ * sent. It never shows a false confirmation.
+ *
+ * The server must not trust any of this: anything from a browser can be
+ * forged. There is deliberately no client-side honeypot: browsers autofill
+ * hidden fields, and a false positive would silently discard a real
  * customer's enquiry — worse than the spam it stops.
  * =====================================================================
  */
@@ -26,8 +28,8 @@ import { CONFIG_SCHEMA_VERSION } from '../config/types';
 import { buildSummary, summaryText } from './summary';
 import { fittedConfig } from './fitted';
 
-/** STUB: no destination configured. See the note at the top of this file. */
-export const ENQUIRY_ENDPOINT: string | null = null;
+/** Set by the website build; null (not connected) everywhere else. See above. */
+export const ENQUIRY_ENDPOINT: string | null = (import.meta.env.VITE_ENQUIRY_ENDPOINT as string | undefined) || null;
 
 export interface ContactDetails {
   name: string;
@@ -147,7 +149,17 @@ export async function submitEnquiry(
       body: JSON.stringify(request),
       credentials: 'omit',
     });
-    return response.ok ? { status: 'sent' } : { status: 'failed', reason: `The server answered ${response.status}.` };
+    if (response.ok) return { status: 'sent' };
+    // The server's own words where it gives them ("too many enquiries from
+    // this connection…"); a status code means nothing to a customer.
+    const message = await response
+      .json()
+      .then((body: unknown) => (typeof body === 'object' && body !== null && 'error' in body ? String((body as { error: unknown }).error) : null))
+      .catch(() => null);
+    return {
+      status: 'failed',
+      reason: message ?? 'Something went wrong on our side. Please try again, or copy the enquiry and email it to us.',
+    };
   } catch {
     return { status: 'failed', reason: 'The enquiry could not reach the server. Check your connection and try again.' };
   }

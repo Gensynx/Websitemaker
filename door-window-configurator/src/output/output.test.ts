@@ -141,6 +141,28 @@ describe('Step 8.3: the enquiry', () => {
     expect(failed.status).toBe('failed');
   });
 
+  it("shows the server's own reason when it refuses, and a plain one when it gives none", async () => {
+    const request = buildEnquiryRequest(DEFAULT_DOOR, CONTACT, {}, 'https://example.test/?x');
+    const limited = await submitEnquiry(request, 'enquiry.php', async () =>
+      new Response(JSON.stringify({ ok: false, error: 'Too many enquiries have been sent from this connection.' }), { status: 429 }),
+    );
+    expect(limited).toEqual({ status: 'failed', reason: 'Too many enquiries have been sent from this connection.' });
+    const bare = await submitEnquiry(request, 'enquiry.php', async () => new Response('<html>502</html>', { status: 502 }));
+    expect(bare.status).toBe('failed');
+    expect(bare.status === 'failed' && bare.reason).not.toMatch(/502|server answered/);
+    const offline = await submitEnquiry(request, 'enquiry.php', async () => {
+      throw new TypeError('network');
+    });
+    expect(offline.status === 'failed' && offline.reason).toMatch(/could not reach/);
+  });
+
+  it('is not connected outside the website build', async () => {
+    // Tests, the dev server and the single shareable file load no
+    // .env.production, so nothing is sent and the page says so.
+    const request = buildEnquiryRequest(DEFAULT_DOOR, CONTACT, {}, 'https://example.test/?x');
+    expect((await submitEnquiry(request)).status).toBe('not-sent');
+  });
+
   it('never submits a configuration that cannot be made', async () => {
     const request = buildEnquiryRequest({ ...DEFAULT_DOOR, dimensions: { width: 5000, height: 2100 } }, CONTACT, {}, 'x');
     expect((await submitEnquiry(request, 'https://api.example.test/enquiry')).status).toBe('blocked');

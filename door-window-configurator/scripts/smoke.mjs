@@ -54,6 +54,10 @@ const browser = await chromium.launch({
   args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader'],
 });
 const page = await browser.newPage({ viewport: { width: 1280, height: 900 }, deviceScaleFactor: 2, hasTouch: true });
+// Software rendering (no GPU in CI or this sandbox) draws a window in a wall at
+// under one frame a second, and a screenshot waits on frames to judge the
+// canvas "stable". 30 s ran out on 2026-09-28; the assertions are unchanged.
+page.setDefaultTimeout(90000);
 
 const problems = [];
 

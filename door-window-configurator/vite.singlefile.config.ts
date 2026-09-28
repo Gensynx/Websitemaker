@@ -10,6 +10,12 @@ import react from '@vitejs/plugin-react';
  */
 export default defineConfig({
   plugins: [react()],
+  // Not "production": that mode connects the enquiry to enquiry.php, and a
+  // file opened from disk has no server behind it. This mode loads no .env
+  // file, so the enquiry stays unconnected and says so.
+  mode: 'singlefile',
+  // The PHP enquiry script and .htaccess belong to the website build only.
+  publicDir: false,
   build: {
     outDir: 'dist-singlefile',
     assetsInlineLimit: 100_000_000,

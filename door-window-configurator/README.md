@@ -2,8 +2,9 @@
 
 Phase 1, Steps 1 to 8: the state model and its URL serialisation, the 3D
 viewer, sizing, the configuration panel, colour, door and window options,
-glazing, and the summary, share link and enquiry. **The enquiry is not
-connected to anything** — see "Summary, share link and enquiry (Step 8)".
+glazing, and the summary, share link and enquiry. The website build emails
+enquiries through `enquiry.php`; **to put it on a website, see
+[DEPLOY.md](DEPLOY.md)**.
 
 React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 
@@ -59,13 +60,14 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/output/fitted.ts` | What is fitted, as distinct from what is stored (furniture on a fully glazed door) |
 | `src/output/summary.ts` | The Step 8 summary: every option in plain language, its status, and the notes an order needs |
 | `src/output/share.ts` | The configuration link (configuration only, no camera) and copying it |
-| `src/output/enquiry.ts` | Contact validation, the enquiry request, and the **stubbed** submission |
+| `src/output/enquiry.ts` | Contact validation, the enquiry request, and sending it (to `enquiry.php` in the website build) |
+| `public/enquiry.php` | Server side: re-checks, same-site and rate limits, emails the enquiry; settings in `enquiry-config.php` |
 | `src/ui/ReviewDialog.tsx` | Review and enquire: summary, drawing, link, and the enquiry form |
 
 ```
 npm install
 npm run typecheck
-npm test          # 391 unit tests, including text contrast read from styles.css
+npm test          # 393 unit tests, including text contrast read from styles.css
 npm run dev -- --port 5180   # then, in another shell:
 npm run smoke                # browser render, controls, wall scene, sizing
 npm run a11y                 # keyboard-only walk, sheet by keys and drag, axe scans
@@ -321,26 +323,26 @@ button).
   made has no form, only the reasons. An explore colour (not a RAL shade) can
   be enquired about but is marked not orderable in the request.
 
-**The enquiry is a stub.** `ENQUIRY_ENDPOINT` in `src/output/enquiry.ts` is
-`null`, so "Send enquiry" builds the complete request and then says plainly
-that it has not been sent and nothing was stored, and offers to copy it. No
-network request is made. To connect it:
+**Where the enquiry goes.** The website build (`npm run build`) posts it as
+JSON to `enquiry.php` beside the page (`public/enquiry.php`, copied into
+`dist/`), which re-checks every field on the server, refuses requests from
+anywhere but the site's own page, rate-limits each connection, and emails
+the business with the customer as reply-to. Nothing is stored. Setting it up
+on IONOS, and its limits, are in [DEPLOY.md](DEPLOY.md). The endpoint comes
+from `VITE_ENQUIRY_ENDPOINT` in `.env.production`; the dev server, the tests
+and the single shareable file load no such file, so there the enquiry is
+unconnected and says so plainly, as before.
 
-1. Set `ENQUIRY_ENDPOINT` to an HTTPS URL that accepts a JSON `POST` of
-   `EnquiryRequest` (the type in `enquiry.ts`, `schemaVersion` 1). It is sent
-   with `credentials: 'omit'`, so CORS needs no cookies.
-2. **The server must re-validate everything.** The browser's validation is
-   for the customer's benefit only; the payload can be forged. Re-decode the
-   `shareUrl` with the same `url.ts` and `validate.ts` rather than trusting
-   `payload`.
-3. **Privacy.** The request holds personal data. The consent wording in the
-   form ("We use your details only to reply to this enquiry") is a
-   placeholder the business must be able to honour, and there is no privacy
-   notice link: both need the business's own text and a lawful basis before
-   launch.
-4. **Spam.** There is deliberately no honeypot field: browser autofill fills
-   hidden fields and silently loses real enquiries. Rate limiting or a
-   challenge belongs on the server.
+- **The server does not re-check the door itself.** The rules are TypeScript
+  and the server is PHP; it checks only that the page marked the
+  configuration as makeable. A person prices every enquiry from its link,
+  which reopens the configuration under the configurator's own rules.
+- **Privacy.** The consent wording ("We use your details only to reply to
+  this enquiry") is a placeholder the business must be able to honour, and
+  there is no privacy notice link yet.
+- **Spam.** No honeypot, deliberately (browser autofill fills hidden fields
+  and silently loses real enquiries): rate limiting and the same-site check
+  are on the server.
 
 ## Performance budget
 
@@ -400,9 +402,17 @@ the product.
 ## Outstanding
 
 - No favicon. It is a branding decision, so none has been invented.
-- **The enquiry is not connected** (see Step 8): an endpoint, the consent
-  and privacy wording, and server-side validation and rate limiting are
-  needed before it can go live.
+- **The 3D view redraws continuously** (React Three Fiber's default), about
+  60 times a second on real hardware even when nothing moves: steady GPU work
+  and battery drain on a phone left open. Redrawing only on change
+  (`frameloop="demand"`) is the usual remedy, but camera moves and a few
+  effects must then request their own redraws; worth doing and checking on a
+  real phone before launch. Under software rendering the three-pane window in
+  a wall draws at under one frame a second (door in the studio: 3.7).
+- **The enquiry needs its settings and wording before launch**: the two
+  addresses in `enquiry-config.php` on the server (DEPLOY.md), the consent
+  wording and a privacy notice link. Whether IONOS's PHP `mail()` delivers
+  on the chosen package is verified only by the test enquiry in DEPLOY.md.
 - **Trickle vents** can be modelled in the sash or through the glazing, but
   only the frame-head position is drawn, so only it is offered.
 - **No minimum light size.** A 600 mm window can be divided into six lights

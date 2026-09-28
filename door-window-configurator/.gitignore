@@ -3,3 +3,6 @@ dist
 .vite
 dist-singlefile
 *.tsbuildinfo
+
+# Real enquiry settings (addresses) live only on the server.
+public/enquiry-config.php

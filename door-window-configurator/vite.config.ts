@@ -3,6 +3,9 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  // Relative asset paths, so the built site works from any folder of any
+  // domain (e.g. /configurator/), not only from a domain's root.
+  base: './',
   test: {
     // Vitest stubs every stylesheet to an empty string unless told otherwise —
     // even with ?raw — which silently left the contrast test with no tokens to
