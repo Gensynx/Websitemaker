@@ -28,3 +28,27 @@ rather than by lowering the photograph's opacity: lowering it let the icon
 behind ghost through.
 
 Total weight of all six: about 430KB.
+
+
+Logo
+----
+The official wordmark, supplied by the client as a JPEG on white and cut
+here to transparent PNG so it sits on any ground:
+
+  logo.png            full lockup, wordmark over the Acquisition | Design |
+                      Development line. Used in the footer.
+  logo-wordmark.png   wordmark only. Used in the nav, where the tagline would
+                      be illegible and repeats the hero eyebrow anyway.
+  favicon-32.png      the V of the wordmark, taken from the artwork itself
+  favicon-180.png     same, for apple-touch-icon
+
+The artwork is black on transparency and is inverted by CSS wherever it sits
+on a dark ground: either theme's dark mode, and the nav while it is over the
+intro film. Both cases want the same invert(1), so there is no cancelling.
+
+The V was isolated by hand: the V and A of VASSALLO interlock with no gap
+between them, so a plain bounding box picks up "VA". The crop follows the
+V's right stroke down to its apex.
+
+If a vector version of the logo exists, an SVG would be better than these
+PNGs: sharper at every size, and it could take the brass accent on hover.

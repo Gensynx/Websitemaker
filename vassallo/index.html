@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Acquisition, design and development from Vassallo Developments. Full refurbs, minor works, window and door replacements and roofing across London. We rebuild properties floor by floor and make the impossible possible.">
 <title>Vassallo Developments · Acquisition, Design, Development</title>
+<link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+<link rel="icon" type="image/png" sizes="180x180" href="images/favicon-180.png">
+<link rel="apple-touch-icon" href="images/favicon-180.png">
 
 <style>
 /* ============================================================
@@ -118,9 +121,10 @@ p{margin:0}
   border-bottom:1px solid transparent}
 .nav.scrolled{padding-top:.85rem;padding-bottom:.85rem;background:color-mix(in srgb, var(--paper) 82%, transparent);
   backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
-.brand{display:flex;flex-direction:column;line-height:.9;letter-spacing:.02em}
-.brand b{font-family:var(--display);font-weight:400;font-size:clamp(1.15rem,1.4vw,1.5rem);letter-spacing:.14em}
-.brand span{font-size:.54rem;letter-spacing:.42em;text-transform:uppercase;color:var(--ink-soft);margin-top:.35em;padding-left:.1em}
+.brand{display:flex;align-items:center}
+/* the official mark is black artwork on transparency, so it is inverted wherever it
+   sits on a dark ground: either theme's dark mode, or the nav over the intro film */
+.brand img{display:block;height:clamp(30px,3.1vw,40px);width:auto}
 .nav-links{display:flex;align-items:center;gap:clamp(1.5rem,2.6vw,2.8rem)}
 .nav-links a{font-size:.8rem;letter-spacing:.06em;color:var(--ink-soft);position:relative;padding:.3em 0;transition:color .3s}
 .nav-links a::after{content:"";position:absolute;left:0;bottom:0;height:1px;width:100%;background:currentColor;transform:scaleX(0);transform-origin:0 50%;transition:transform .4s var(--e-out)}
@@ -337,8 +341,14 @@ form{display:flex;flex-direction:column;gap:2.2rem}
    ============================================================ */
 footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);position:relative;z-index:2}
 .foot-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2.5rem;align-items:flex-start}
-.foot-brand b{font-family:var(--display);font-size:clamp(2rem,5vw,3.4rem);letter-spacing:.06em;display:block}
-.foot-brand span{font-size:.62rem;letter-spacing:.4em;text-transform:uppercase;color:var(--ink-soft)}
+.foot-brand{display:block}
+.foot-brand img{display:block;width:min(330px,76vw);height:auto}
+:root[data-theme="dark"] .brand img,
+:root[data-theme="dark"] .foot-brand img{filter:invert(1)}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .brand img,
+  :root:not([data-theme="light"]) .foot-brand img{filter:invert(1)}
+}
 .foot-cols{display:flex;gap:clamp(2.5rem,6vw,5rem);flex-wrap:wrap}
 .foot-col h4{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);font-family:var(--sans);font-weight:500;margin:0 0 1.1rem}
 .foot-col a,.foot-col p{display:block;color:var(--ink-soft);font-size:.9rem;margin-bottom:.6rem;transition:color .3s}
@@ -383,9 +393,8 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 .intro.collapsed{display:none}
 /* transparent, light-on-dark nav while the intro film is on screen */
 .nav.over-intro{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom-color:transparent}
-.nav.over-intro .brand b,
-.nav.over-intro .brand span,
 .nav.over-intro .theme-toggle{color:#F3EDE2}
+.nav.over-intro .brand img{filter:invert(1)}
 .nav.over-intro .nav-links a{color:rgba(243,237,226,.82)}
 .nav.over-intro .nav-links a:hover{color:#F3EDE2}
 .nav.over-intro .nav-cta{color:#F3EDE2;border-color:rgba(243,237,226,.45)}
@@ -402,7 +411,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 <!-- NAV -->
 <nav class="nav" id="nav">
   <a class="brand" href="#top" aria-label="Vassallo Developments home">
-    <b>VASSALLO</b><span>Developments</span>
+    <img src="images/logo-wordmark.png" alt="" width="656" height="162">
   </a>
   <div class="nav-links">
     <a class="desk" href="#approach">Approach</a>
@@ -684,7 +693,9 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 <footer>
   <div class="wrap">
     <div class="foot-top">
-      <a class="foot-brand" href="#top"><b>VASSALLO</b><span>Developments · Acquisition · Design · Development</span></a>
+      <a class="foot-brand" href="#top">
+        <img src="images/logo.png" alt="Vassallo Developments. Acquisition, design and development." width="656" height="247">
+      </a>
       <div class="foot-cols">
         <div class="foot-col">
           <h4>Explore</h4>
