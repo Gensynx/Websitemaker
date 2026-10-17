@@ -254,6 +254,20 @@ a.trade:hover .frame,a.trade:focus-visible .frame{border-color:var(--brass)}
 a.trade:hover .frame svg,a.trade:focus-visible .frame svg{opacity:1;transform:scale(1.05)}
 a.trade:hover .frame img,a.trade:focus-visible .frame img{transform:scale(1.045);opacity:1}
 @media (prefers-reduced-motion: reduce){a.trade:hover .frame svg,a.trade:hover .frame img{transform:none}}
+/* the configurator sits inside this site rather than beside it, so the card that
+   opens it is part of the trades band, not a separate advert */
+.tool-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:clamp(1.5rem,4vw,3rem);
+  margin-top:clamp(2.5rem,6vw,4.5rem);padding:clamp(1.8rem,4vw,2.8rem);
+  background:var(--surface);border:1px solid var(--line)}
+.tool-cta h3{font-size:clamp(1.3rem,2.2vw,1.9rem);margin:.5rem 0 .6rem;line-height:1.15}
+.tool-cta p{color:var(--ink-soft);font-size:.92rem;max-width:56ch;margin:0}
+.tool-cta-btn{display:inline-flex;align-items:center;gap:.7em;flex:none;text-decoration:none;
+  background:var(--ink);color:var(--paper);padding:1em 1.6em;font-size:.84rem;letter-spacing:.08em;
+  text-transform:uppercase;border:1px solid var(--ink);transition:background .4s var(--e-out),color .4s var(--e-out)}
+.tool-cta-btn svg{width:17px;height:17px;transition:transform .4s var(--e-out)}
+.tool-cta-btn:hover{background:transparent;color:var(--ink)}
+.tool-cta-btn:hover svg{transform:translateX(4px)}
+@media (prefers-reduced-motion: reduce){.tool-cta-btn:hover svg{transform:none}}
 
 /* ============================================================
    NUMBERS
@@ -600,6 +614,19 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
         <p class="scope">Kitchen design, supply and installation, coordinated with the electrics and plumbing behind it.</p>
       </a>
     </div>
+
+    <aside class="tool-cta reveal">
+      <div>
+        <span class="eyebrow">Windows and doors</span>
+        <h3>Design yours in 3D, then send us the specification.</h3>
+        <p>Set the size, style, colour, hardware and glazing and watch it change as you go. When you are happy,
+          the enquiry form below opens with the whole specification already written out.</p>
+      </div>
+      <a class="tool-cta-btn" href="configurator/">
+        Open the configurator
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </aside>
   </div>
 </section>
 
@@ -821,6 +848,30 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 
   /* a trade card carries its own service into the form, so the enquiry arrives
      already saying which trade it is about */
+  /* ---- a configuration handed back by the configurator ----
+     It returns to ../?spec=…&cfg=…#enquire. Fill the message, tick the matching
+     trade, and say where it came from, so one enquiry carries the whole thing. */
+  (function(){
+    var qs = new URLSearchParams(window.location.search);
+    var spec = qs.get('spec'), cfg = qs.get('cfg');
+    if(!spec && !cfg) return;
+    var msg = document.getElementById('message');
+    if(msg){
+      var text = spec || '';
+      if(cfg) text += (text ? '\n\n' : '') + 'Configuration link: ' + cfg;
+      msg.value = text;
+      msg.classList.add('has');
+      msg.style.height = 'auto';
+      msg.style.height = msg.scrollHeight + 'px';
+    }
+    var want = 'Window and door replacements';
+    document.querySelectorAll('#services .chip').forEach(function(c){
+      if(c.dataset.v === want && c.getAttribute('aria-pressed') !== 'true') setChip(c, true);
+    });
+    /* drop the parameters so a refresh or a shared link is not stuck with them */
+    history.replaceState(null, '', window.location.pathname + '#enquire');
+  })();
+
   document.querySelectorAll(".trade[data-service]").forEach(function(card){
     card.addEventListener("click", function(){
       var want = card.getAttribute("data-service");

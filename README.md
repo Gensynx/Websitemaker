@@ -35,6 +35,10 @@ vassallo/
   Vassallo projects. The section is headed "Projects we've worked on", so replace these with genuine project
   photography before the site is promoted. Drop a 4:3 image in at the same filename in `vassallo/images/` and the
   card picks it up with no code change. See `vassallo/images/README.txt`.
+- The **3D door and window configurator** lives at `vassallo/configurator/` and is reached from the button under the
+  trades. It is a build of the `door-window-configurator` project (branch `claude/stoic-knuth-ymog8j`); its PHP enquiry
+  backend is deliberately not published, and its enquiry hands the specification back to this site's own form instead.
+  See `vassallo/configurator/README.txt` before using it for real quoting.
 - On desktop the film is **scrubbed by scroll**. Touch devices cannot seek a video reliably frame by frame, so
   phones and tablets autoplay the film straight through instead and time the copy beats to it. Upright phones show
   the whole wide frame (`object-fit:contain`) rather than a zoom-crop, so it stays sharp.

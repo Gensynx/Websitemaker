@@ -1,0 +1,38 @@
+--- /tmp/claude-0/-home-user-Websitemaker/93e0aa22-0cb6-5f9a-b16e-75520695d4a1/scratchpad/ReviewDialog.orig.tsx	2026-10-17 11:32:42.226773148 +0000
++++ /tmp/claude-0/-home-user-Websitemaker/93e0aa22-0cb6-5f9a-b16e-75520695d4a1/scratchpad/cfg/src/ui/ReviewDialog.tsx	2026-10-17 11:32:42.305281181 +0000
+@@ -147,6 +147,14 @@
+     );
+   };
+ 
++  /** Hand the configuration back to the Vassallo enquiry form, one funnel not two. */
++  const handoffUrl = (): string => {
++    const params = new URLSearchParams();
++    if (summary !== null) params.set('spec', summaryText(summary, link));
++    if (link !== '') params.set('cfg', link);
++    return `../?${params.toString()}#enquire`;
++  };
++
+   const submit = async () => {
+     const problems = validateContact(contact, cill);
+     setErrors(problems);
+@@ -424,10 +432,16 @@
+                           <strong>Your enquiry has not been sent.</strong> {result.reason} Your details have not been
+                           stored.
+                         </p>
+-                        <p>You can copy the enquiry, with the configuration link, to send it another way.</p>
+-                        <button type="button" className="button button--quiet" onClick={() => void copy('enquiry')}>
+-                          Copy the enquiry
+-                        </button>
++                        <p>Send it straight to Vassallo Developments, and the enquiry form there opens with this
++                          specification already filled in.</p>
++                        <p className="review__handoff">
++                          <a className="button" href={handoffUrl()}>
++                            Send it to Vassallo Developments
++                          </a>
++                          <button type="button" className="button button--quiet" onClick={() => void copy('enquiry')}>
++                            Copy the enquiry
++                          </button>
++                        </p>
+                       </Status>
+                     )}
+                     {(result?.status === 'failed' || result?.status === 'blocked') && (
