@@ -38,7 +38,15 @@ The Vassallo page reads those on load, fills the message field, ticks the
 Window and door replacements chip, and strips the parameters from the URL so a
 refresh or a shared link is not stuck with them. One enquiry funnel, not two.
 
-handoff.patch is that change against ReviewDialog.tsx at 63333b4. It is
+Getting back
+------------
+The title block carries "Vassallo Developments" with a left arrow, returning to
+../ . The title is click-through so the canvas can be dragged beneath it, so
+that link sets pointer-events: auto on itself; nothing else in the block takes
+a pointer.
+
+handoff.patch covers three files at 63333b4: ReviewDialog.tsx (the handoff),
+App.tsx and styles.css (the back link). It is
 additive and sits entirely inside the null-endpoint branch, so restoring
 VITE_ENQUIRY_ENDPOINT=enquiry.php gives the original PHP behaviour untouched.
 It should be merged into the configurator's own branch so the two do not drift.

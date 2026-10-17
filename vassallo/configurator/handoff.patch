@@ -1,5 +1,64 @@
---- /tmp/claude-0/-home-user-Websitemaker/93e0aa22-0cb6-5f9a-b16e-75520695d4a1/scratchpad/ReviewDialog.orig.tsx	2026-10-17 11:32:42.226773148 +0000
-+++ /tmp/claude-0/-home-user-Websitemaker/93e0aa22-0cb6-5f9a-b16e-75520695d4a1/scratchpad/cfg/src/ui/ReviewDialog.tsx	2026-10-17 11:32:42.305281181 +0000
+--- App.orig.tsx	2026-10-17 11:43:43.575790581 +0000
++++ cfg/src/App.tsx	2026-10-17 11:42:47.709777247 +0000
+@@ -261,6 +261,14 @@
+         </div>
+ 
+         <header className="title" ref={titleRef}>
++          {/* The configurator is part of the Vassallo site, not a destination of
++              its own, so it always offers the way back. */}
++          <a className="title__back" href="../">
++            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
++              <path d="M19 12H5M11 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
++            </svg>
++            Vassallo Developments
++          </a>
+           <p className="eyebrow">Configurator</p>
+           <h1>{productName}</h1>
+           {/* Not a live region: it changes on every keystroke in the size fields, which already say the value. */}
+--- styles.orig.css	2026-10-17 11:43:43.579790581 +0000
++++ cfg/src/styles.css	2026-10-17 11:42:47.710874570 +0000
+@@ -187,6 +187,39 @@
+   pointer-events: none;
+ }
+ 
++/* The title block is click-through so the canvas can be dragged beneath it;
++   the back link is the one thing in it that must take a pointer. */
++.title__back {
++  pointer-events: auto;
++  display: inline-flex;
++  align-items: center;
++  gap: 0.45em;
++  margin: 0 0 0.9rem;
++  font-size: var(--step-micro);
++  font-weight: 500;
++  letter-spacing: 0.04em;
++  color: var(--ink-soft);
++  text-decoration: none;
++  border-bottom: 1px solid transparent;
++  transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
++}
++.title__back svg {
++  width: 1.05em;
++  height: 1.05em;
++  transition: transform var(--duration) var(--ease);
++}
++.title__back:hover,
++.title__back:focus-visible {
++  color: var(--ink);
++  border-bottom-color: currentColor;
++}
++.title__back:hover svg {
++  transform: translateX(-3px);
++}
++@media (prefers-reduced-motion: reduce) {
++  .title__back:hover svg { transform: none; }
++}
++
+ .eyebrow {
+   margin: 0 0 0.625rem;
+   font-size: var(--step-micro);
+--- ReviewDialog.orig.tsx	2026-10-17 11:32:42.226773148 +0000
++++ cfg/src/ui/ReviewDialog.tsx	2026-10-17 11:32:42.305281181 +0000
 @@ -147,6 +147,14 @@
      );
    };
