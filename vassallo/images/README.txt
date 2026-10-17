@@ -36,9 +36,10 @@ The official wordmark, supplied by the client as a JPEG on white and cut
 here to transparent PNG so it sits on any ground:
 
   logo.png            full lockup, wordmark over the Acquisition | Design |
-                      Development line. Used in the footer.
-  logo-wordmark.png   wordmark only. Used in the nav, where the tagline would
-                      be illegible and repeats the hero eyebrow anyway.
+                      Development line. Used in the nav and the footer.
+  logo-wordmark.png   wordmark only. Not currently used: the nav carries the
+                      full lockup by request. Kept in case a compact mark is
+                      wanted somewhere later.
   favicon-32.png      the V of the wordmark, taken from the artwork itself
   favicon-180.png     same, for apple-touch-icon
 
