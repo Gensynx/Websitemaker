@@ -147,6 +147,14 @@ export const ReviewDialog = forwardRef<ReviewDialogHandle, { config: ConfigState
     );
   };
 
+  /** Hand the configuration back to the Vassallo enquiry form, one funnel not two. */
+  const handoffUrl = (): string => {
+    const params = new URLSearchParams();
+    if (summary !== null) params.set('spec', summaryText(summary, link));
+    if (link !== '') params.set('cfg', link);
+    return `../?${params.toString()}#enquire`;
+  };
+
   const submit = async () => {
     const problems = validateContact(contact, cill);
     setErrors(problems);
@@ -424,10 +432,16 @@ export const ReviewDialog = forwardRef<ReviewDialogHandle, { config: ConfigState
                           <strong>Your enquiry has not been sent.</strong> {result.reason} Your details have not been
                           stored.
                         </p>
-                        <p>You can copy the enquiry, with the configuration link, to send it another way.</p>
-                        <button type="button" className="button button--quiet" onClick={() => void copy('enquiry')}>
-                          Copy the enquiry
-                        </button>
+                        <p>Send it straight to Vassallo Developments, and the enquiry form there opens with this
+                          specification already filled in.</p>
+                        <p className="review__handoff">
+                          <a className="button" href={handoffUrl()}>
+                            Send it to Vassallo Developments
+                          </a>
+                          <button type="button" className="button button--quiet" onClick={() => void copy('enquiry')}>
+                            Copy the enquiry
+                          </button>
+                        </p>
                       </Status>
                     )}
                     {(result?.status === 'failed' || result?.status === 'blocked') && (

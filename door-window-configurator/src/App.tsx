@@ -261,6 +261,14 @@ export function App(): JSX.Element {
         </div>
 
         <header className="title" ref={titleRef}>
+          {/* The configurator is part of the Vassallo site, not a destination of
+              its own, so it always offers the way back. */}
+          <a className="title__back" href="../">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
+              <path d="M19 12H5M11 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+            Vassallo Developments
+          </a>
           <p className="eyebrow">Configurator</p>
           <h1>{productName}</h1>
           {/* Not a live region: it changes on every keystroke in the size fields, which already say the value. */}

@@ -187,6 +187,39 @@ body {
   pointer-events: none;
 }
 
+/* The title block is click-through so the canvas can be dragged beneath it;
+   the back link is the one thing in it that must take a pointer. */
+.title__back {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+  margin: 0 0 0.9rem;
+  font-size: var(--step-micro);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: color var(--duration) var(--ease), border-color var(--duration) var(--ease);
+}
+.title__back svg {
+  width: 1.05em;
+  height: 1.05em;
+  transition: transform var(--duration) var(--ease);
+}
+.title__back:hover,
+.title__back:focus-visible {
+  color: var(--ink);
+  border-bottom-color: currentColor;
+}
+.title__back:hover svg {
+  transform: translateX(-3px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .title__back:hover svg { transform: none; }
+}
+
 .eyebrow {
   margin: 0 0 0.625rem;
   font-size: var(--step-micro);
