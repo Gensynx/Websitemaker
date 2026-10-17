@@ -46,10 +46,13 @@ that link sets pointer-events: auto on itself; nothing else in the block takes
 a pointer.
 
 handoff.patch covers three files at 63333b4: ReviewDialog.tsx (the handoff),
-App.tsx and styles.css (the back link). It is
+App.tsx and styles.css (the back link). It has since been PORTED to the
+configurator's own branch as d216733, so that branch is now the source of
+truth and a rebuild from it keeps both the back link and the handoff. The
+patch is kept here only as the record of what this build added. It is
 additive and sits entirely inside the null-endpoint branch, so restoring
 VITE_ENQUIRY_ENDPOINT=enquiry.php gives the original PHP behaviour untouched.
-It should be merged into the configurator's own branch so the two do not drift.
+Done: merged as d216733.
 
 Worth knowing before this is used for real quoting
 --------------------------------------------------
