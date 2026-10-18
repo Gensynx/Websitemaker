@@ -256,11 +256,19 @@ a.trade:hover .frame img,a.trade:focus-visible .frame img{transform:scale(1.045)
 @media (prefers-reduced-motion: reduce){a.trade:hover .frame svg,a.trade:hover .frame img{transform:none}}
 /* the configurator sits inside this site rather than beside it, so the card that
    opens it is part of the trades band, not a separate advert */
+/* the configurator gets its own band, on the surface tone so it reads as a
+   section of its own rather than more of the trades above it */
+.configure{background:var(--surface);border-block:1px solid var(--line)}
+.configure .pillars{background:var(--line)}
+.configure .pillar{background:var(--surface)}
+.configure .pillar:hover{background:var(--paper)}
+.configure .tool-cta{background:var(--paper)}
 .tool-cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:clamp(1.5rem,4vw,3rem);
   margin-top:clamp(2.5rem,6vw,4.5rem);padding:clamp(1.8rem,4vw,2.8rem);
   background:var(--surface);border:1px solid var(--line)}
-.tool-cta h3{font-size:clamp(1.3rem,2.2vw,1.9rem);margin:.5rem 0 .6rem;line-height:1.15}
-.tool-cta p{color:var(--ink-soft);font-size:.92rem;max-width:56ch;margin:0}
+.tool-cta h3{font-size:clamp(1.3rem,2.2vw,1.9rem);margin:0 0 .6rem;line-height:1.15}
+.tool-cta p{color:var(--ink-soft);font-size:.92rem;max-width:60ch;margin:0}
+.tool-cta p strong{color:var(--ink);font-weight:500}
 .tool-cta-btn{display:inline-flex;align-items:center;gap:.7em;flex:none;text-decoration:none;
   background:var(--ink);color:var(--paper);padding:1em 1.6em;font-size:.84rem;letter-spacing:.08em;
   text-transform:uppercase;border:1px solid var(--ink);transition:background .4s var(--e-out),color .4s var(--e-out)}
@@ -616,12 +624,53 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       </a>
     </div>
 
+  </div>
+</section>
+
+<!-- CONFIGURATOR -->
+<section class="band configure" id="configure">
+  <div class="wrap">
+    <div class="band-head reveal">
+      <span class="eyebrow">Windows and doors</span>
+      <h2>Draw it before we build it.</h2>
+      <p>Replacing a window or a door is hard to picture from a brochure, and easy to get wrong in an email.
+        Our configurator lets you build the thing on screen, see it from every side, and send us exactly what
+        you meant, so the first conversation starts from a drawing rather than a description.</p>
+    </div>
+
+    <div class="pillars">
+      <article class="pillar reveal">
+        <span class="num">01 / Set it</span>
+        <h3>Every choice, in one place.</h3>
+        <p>Start with a door or a window, then work through style, surround, size, colour and finish, glazing
+          and hardware. Side and top lights are part of the drawing, not an afterthought, and the size you type
+          is checked as you go.</p>
+        <div class="tags"><i>Style</i><i>Surround</i><i>Size</i><i>Colour</i><i>Glazing</i><i>Hardware</i></div>
+      </article>
+      <article class="pillar reveal d1">
+        <span class="num">02 / See it</span>
+        <h3>Drawn to the millimetre.</h3>
+        <p>A true elevation with its dimensions, a three-quarter view to judge depth and reveal, and a close
+          look at the hardware. Drop a figure in beside it when you want to know how it will actually feel
+          at the opening.</p>
+        <div class="tags"><i>Elevation</i><i>Three-quarter</i><i>Hardware close-up</i><i>Scale figure</i></div>
+      </article>
+      <article class="pillar reveal d2">
+        <span class="num">03 / Send it</span>
+        <h3>Nothing retyped, nothing lost.</h3>
+        <p>Every configuration has its own link, so you can save it, sleep on it or send it to whoever else
+          decides. When you are ready, it comes straight back here with the whole specification written out
+          in the enquiry form.</p>
+        <div class="tags"><i>Shareable link</i><i>Written summary</i><i>Straight to enquiry</i></div>
+      </article>
+    </div>
+
     <aside class="tool-cta reveal">
       <div>
-        <span class="eyebrow">Windows and doors</span>
-        <h3>Design yours in 3D, then send us the specification.</h3>
-        <p>Set the size, style, colour, hardware and glazing and watch it change as you go. When you are happy,
-          the enquiry form below opens with the whole specification already written out.</p>
+        <h3>Build yours now.</h3>
+        <p>It takes a couple of minutes and costs nothing. <strong>Sizes, finishes and colours on screen are
+          indicative</strong>, so treat what you send as the start of a conversation rather than an order:
+          we will confirm everything against a physical sample and a survey before anything is made.</p>
       </div>
       <a class="tool-cta-btn" href="configurator/">
         Open the configurator
