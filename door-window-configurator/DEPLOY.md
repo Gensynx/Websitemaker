@@ -12,7 +12,7 @@ PHP settings), and a mailbox on the same domain to send from.
 On a computer with Node.js installed, in `door-window-configurator/`:
 
 ```
-npm install
+npm ci
 npm run build
 ```
 

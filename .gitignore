@@ -1,6 +1,9 @@
 # Node / tooling (only used locally for headless preview checks)
 node_modules/
 package-lock.json
+# ...except the configurator's: it ships to visitors, so its exact dependency
+# versions are pinned and audited (npm ci installs exactly these).
+!door-window-configurator/package-lock.json
 
 # Python bytecode from .claude skill scripts
 __pycache__/
@@ -9,3 +12,7 @@ __pycache__/
 # OS / editor cruft
 .DS_Store
 Thumbs.db
+
+# Secrets: never commit environment files with keys in them
+.env.local
+.env.*.local

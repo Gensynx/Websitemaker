@@ -65,7 +65,7 @@ React + Vite + TypeScript, React Three Fiber and drei for 3D, Zustand for state.
 | `src/ui/ReviewDialog.tsx` | Review and enquire: summary, drawing, link, and the enquiry form |
 
 ```
-npm install
+npm ci
 npm run typecheck
 npm test          # 393 unit tests, including text contrast read from styles.css
 npm run dev -- --port 5180   # then, in another shell:
