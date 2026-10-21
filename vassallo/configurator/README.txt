@@ -3,15 +3,24 @@
 
 This folder is a BUILD, not source. The source is the door-window-configurator
 project on branch claude/stoic-knuth-ymog8j (React, Vite, TypeScript, React
-Three Fiber). Built 2026-10-17 from that branch's head, 63333b4.
+Three Fiber). Built 2026-10-21 from that branch's head, with Vite 6.4 and
+Vitest 4.1 (the earlier Vite 5 and Vitest 2 had known vulnerabilities in the
+development server and test runner; nothing that shipped to visitors).
 
 Rebuild:
   git archive origin/claude/stoic-knuth-ymog8j door-window-configurator | tar -x
   cd door-window-configurator
-  patch -p0 < path/to/handoff.patch        # see "The handoff" below
   # blank VITE_ENQUIRY_ENDPOINT in .env.production (see "No PHP here")
-  npm install && npm run build
+  npm ci && npm run build
   # copy dist/index.html and dist/assets into this folder; leave the PHP out
+
+Security policy
+---------------
+The build writes a Content-Security-Policy <meta> tag into index.html (see
+contentSecurityPolicy() in vite.config.ts): scripts from this site only, and
+network requests to this site plus the enquiry endpoint's origin when it is on
+another domain. A <meta> policy cannot stop the page being framed; that needs
+a frame-ancestors response header from the host.
 
 No PHP here
 -----------
@@ -45,14 +54,10 @@ The title block carries "Vassallo Developments" with a left arrow, returning to
 that link sets pointer-events: auto on itself; nothing else in the block takes
 a pointer.
 
-handoff.patch covers three files at 63333b4: ReviewDialog.tsx (the handoff),
-App.tsx and styles.css (the back link). It has since been PORTED to the
-configurator's own branch as d216733, so that branch is now the source of
-truth and a rebuild from it keeps both the back link and the handoff. The
-patch is kept here only as the record of what this build added. It is
-additive and sits entirely inside the null-endpoint branch, so restoring
-VITE_ENQUIRY_ENDPOINT=enquiry.php gives the original PHP behaviour untouched.
-Done: merged as d216733.
+Both live in the configurator's own branch (d216733), so a rebuild from it
+keeps the back link and the handoff. They sit entirely inside the
+null-endpoint branch, so restoring VITE_ENQUIRY_ENDPOINT=enquiry.php gives the
+original PHP behaviour untouched.
 
 Worth knowing before this is used for real quoting
 --------------------------------------------------
