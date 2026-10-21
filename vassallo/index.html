@@ -357,8 +357,16 @@ form{display:flex;flex-direction:column;gap:2.2rem}
 .success .tick{width:46px;height:46px;border-radius:50%;border:1px solid var(--brass);display:grid;place-items:center;color:var(--brass)}
 .success h3{font-size:clamp(1.8rem,3vw,2.6rem)}
 .success p{color:var(--ink-soft);max-width:44ch}
-.success button{color:var(--brass);letter-spacing:.06em;font-size:.85rem;align-self:flex-start;border-bottom:1px solid transparent;transition:border-color .3s}
+.success button{padding:0;color:var(--brass);letter-spacing:.06em;font-size:.85rem;align-self:flex-start;border-bottom:1px solid transparent;transition:border-color .3s}
 .success button:hover{border-color:var(--brass)}
+#mail-help:not([hidden]){display:grid;gap:.9rem}
+.success .again{display:flex;flex-wrap:wrap;gap:.6rem 1.4rem;align-items:center}
+.success .again a{color:var(--brass);letter-spacing:.06em;font-size:.85rem}
+.success details{font-size:.9rem;color:var(--ink-soft)}
+.success summary{cursor:pointer;color:var(--ink);letter-spacing:.02em}
+.success details p{margin:.7rem 0}
+.success textarea{width:100%;min-height:9rem;font:inherit;font-size:.85rem;color:var(--ink);background:transparent;border:1px solid var(--line);padding:.8rem;resize:vertical}
+.hp{position:absolute!important;left:-10000px!important;width:1px;height:1px;overflow:hidden}
 
 /* ============================================================
    FOOTER
@@ -708,7 +716,10 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       </div>
 
       <div class="enq-form-wrap reveal d1">
-        <form id="enquiry" novalidate>
+        <!-- data-endpoint stays empty until a server is ready to receive enquiries.
+             Empty: the enquiry is written out in the visitor's own email app.
+             Set: it is posted there as JSON, and the email app is the fallback. -->
+        <form id="enquiry" novalidate data-endpoint="" data-to="hello@vassallodevelopments.com">
           <div>
             <span class="field-label">What do you need help with? <b>*</b></span>
             <div class="chips" id="services" role="group" aria-label="Services required">
@@ -751,17 +762,26 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
             </div>
           </div>
           <div class="inp"><textarea id="message" name="message" rows="1"></textarea><label for="message">Tell us a little about the project</label></div>
+          <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input type="text" id="website" name="website" tabindex="-1" autocomplete="off"></div>
 
           <button type="submit" class="submit" id="submit"><span>Send enquiry</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 12h15M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
           <p class="form-status" id="status" role="status" aria-live="polite"></p>
-          <p class="form-note">This is a demo form. Submissions aren't sent anywhere yet. Wire it to your inbox or CRM before launch.</p>
+          <p class="form-note" id="form-note">Pressing Send opens your email app with your enquiry written out, ready to send from your own address. We only use your details to reply to you.</p>
         </form>
 
         <div class="success" id="success">
           <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 13 4 4 10-11" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <h3>Thank you<span class="accent" style="color:var(--brass)">.</span></h3>
+          <h3 id="success-title">Thank you<span class="accent" style="color:var(--brass)">.</span></h3>
           <p id="success-msg">We've got your enquiry and we'll be in touch within two working days.</p>
-          <button type="button" id="reset">Send another enquiry</button>
+          <div id="mail-help" hidden>
+            <div class="again"><a id="mail-again" href="#">Open the email again</a><button type="button" id="copy-enq">Copy the enquiry</button></div>
+            <details>
+              <summary>Email app didn't open?</summary>
+              <p>Copy the enquiry below and send it to <strong>hello@vassallodevelopments.com</strong> from any email account.</p>
+              <textarea id="enq-text" readonly aria-label="Your enquiry"></textarea>
+            </details>
+          </div>
+          <button type="button" id="reset">Start a new enquiry</button>
         </div>
       </div>
     </div>
@@ -948,25 +968,127 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
   var ta = document.getElementById("message");
   ta.addEventListener("input", function(){ ta.style.height="auto"; ta.style.height=ta.scrollHeight+"px"; });
 
-  /* ---- submit ---- */
+  /* ---- submit ----
+     Nothing here may claim an enquiry has reached us unless it has. With no
+     endpoint the enquiry is handed to the visitor's email app, and the
+     confirmation says it still has to be sent from there. */
   var form = document.getElementById("enquiry");
   var statusEl = document.getElementById("status");
+  var submitBtn = document.getElementById("submit");
+  var TO = form.getAttribute("data-to");
+  var ENDPOINT = form.getAttribute("data-endpoint");
+  var busy = false;
+
+  function field(id){ var el = document.getElementById(id); return el ? el.value.trim() : ""; }
+  function collect(){
+    var pt = form.querySelector('input[name="ptype"]:checked');
+    return {
+      services: Array.from(chosen),
+      propertyType: pt ? pt.value : "",
+      stage: field("stage"),
+      name: field("name"),
+      email: field("email"),
+      phone: field("phone"),
+      message: field("message")
+    };
+  }
+  function asText(d){
+    return [
+      "Enquiry from the Vassallo Developments website",
+      "",
+      "Services: " + d.services.join(", "),
+      "Property type: " + (d.propertyType || "Not given"),
+      "Project stage: " + d.stage,
+      "",
+      "Name: " + d.name,
+      "Email: " + d.email,
+      "Phone: " + (d.phone || "Not given"),
+      "",
+      "About the project:",
+      d.message || "Nothing added yet."
+    ].join("\n");
+  }
+  function mailtoFor(d){
+    return "mailto:" + TO +
+      "?subject=" + encodeURIComponent("Website enquiry: " + d.services.join(", ")) +
+      "&body=" + encodeURIComponent(asText(d));
+  }
+  function showDone(d, sent){
+    var first = d.name.split(" ")[0];
+    var title = document.getElementById("success-title");
+    var help = document.getElementById("mail-help");
+    if(sent){
+      title.firstChild.nodeValue = "Thank you";
+      document.getElementById("success-msg").textContent =
+        "Thanks " + first + ", we've got your enquiry about " + d.services.join(", ") + ". We'll be in touch within two working days.";
+      help.hidden = true;
+    } else {
+      title.firstChild.nodeValue = "Nearly there";
+      document.getElementById("success-msg").textContent =
+        "Thanks " + first + ". Your email app should now be open with the enquiry written out. It reaches us once you press Send there.";
+      document.getElementById("mail-again").href = mailtoFor(d);
+      document.getElementById("enq-text").value = "To: " + TO + "\n\n" + asText(d);
+      help.hidden = false;
+    }
+    form.style.display = "none";
+    var s = document.getElementById("success");
+    s.classList.add("show");
+    s.scrollIntoView({behavior:reduce?"auto":"smooth", block:"center"});
+  }
+  function handToEmail(d){
+    window.location.href = mailtoFor(d);
+    showDone(d, false);
+  }
+  function post(d){
+    var ctl = ("AbortController" in window) ? new AbortController() : null;
+    var timer = ctl ? setTimeout(function(){ ctl.abort(); }, 15000) : null;
+    var payload = Object.assign({ website: document.getElementById("website").value }, d);
+    return fetch(ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: ctl ? ctl.signal : undefined
+    }).then(function(r){
+      if(timer) clearTimeout(timer);
+      if(!r.ok) throw new Error("HTTP " + r.status);
+    });
+  }
+
   form.addEventListener("submit", function(ev){
     ev.preventDefault();
+    if(busy) return;
     var name = document.getElementById("name");
     var email = document.getElementById("email");
     statusEl.textContent = "";
     if(chosen.size===0){ statusEl.textContent = "Please choose at least one service."; document.getElementById("services").scrollIntoView({behavior:reduce?"auto":"smooth",block:"center"}); return; }
     if(!name.value.trim()){ statusEl.textContent = "Please add your name."; name.focus(); return; }
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value)){ statusEl.textContent = "Please enter a valid email."; email.focus(); return; }
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.value.trim())){ statusEl.textContent = "Please enter a valid email."; email.focus(); return; }
 
-    var svc = Array.from(chosen).join(", ");
-    document.getElementById("success-msg").textContent =
-      "Thanks " + name.value.trim().split(" ")[0] + ", we've noted your interest in " + svc + ". We'll be in touch within two working days.";
-    form.style.display="none";
-    var s = document.getElementById("success");
-    s.classList.add("show");
-    s.scrollIntoView({behavior:reduce?"auto":"smooth", block:"center"});
+    var d = collect();
+    if(!ENDPOINT){ handToEmail(d); return; }
+
+    busy = true;
+    submitBtn.disabled = true;
+    statusEl.textContent = "Sending…";
+    post(d).then(function(){
+      statusEl.textContent = "";
+      showDone(d, true);
+    }).catch(function(){
+      statusEl.textContent = "We couldn't send that just now, so we've opened your email app instead.";
+      handToEmail(d);
+    }).then(function(){
+      busy = false;
+      submitBtn.disabled = false;
+    });
+  });
+
+  document.getElementById("copy-enq").addEventListener("click", function(){
+    var t = document.getElementById("enq-text");
+    var btn = this;
+    function done(){ btn.textContent = "Copied"; setTimeout(function(){ btn.textContent = "Copy the enquiry"; }, 2000); }
+    if(navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(t.value).then(done, function(){ t.parentNode.open = true; t.select(); });
+    } else { t.parentNode.open = true; t.select(); }
   });
   document.getElementById("reset").addEventListener("click", function(){
     document.getElementById("success").classList.remove("show");
@@ -975,6 +1097,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
     document.querySelectorAll("#ptype .radio").forEach(function(x){ x.classList.remove("sel"); });
     document.querySelectorAll(".inp .has").forEach(function(x){ x.classList.remove("has"); });
     statusEl.textContent="";
+    document.getElementById("mail-help").hidden = true;
     form.scrollIntoView({behavior:reduce?"auto":"smooth", block:"center"});
   });
 
