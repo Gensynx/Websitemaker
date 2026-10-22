@@ -1,0 +1,153 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >-
+  DNS for vassallodevelopments.com in Route 53, for when the domain's
+  nameservers move from Squarespace. It carries the Google Workspace email
+  records across first, so mail keeps arriving through the switch, and adds
+  the DMARC and CAA records the snag list asks for (S-10, D-05).
+
+Parameters:
+  DomainName:
+    Type: String
+    Default: vassallodevelopments.com
+  DistributionDomainName:
+    Type: String
+    Description: The DistributionDomainName output of site.yaml (dxxxx.cloudfront.net).
+    AllowedPattern: '^[a-z0-9]+\.cloudfront\.net$'
+  CertificateValidationName:
+    Type: String
+    Description: The certificate's DNS validation CNAME name, from ACM, so it keeps renewing.
+  CertificateValidationValue:
+    Type: String
+    Description: The certificate's DNS validation CNAME value, from ACM.
+  DmarcPolicy:
+    Type: String
+    Default: none
+    AllowedValues: [none, quarantine, reject]
+    Description: Start at none, read the reports for a few weeks, then tighten.
+
+Mappings:
+  CloudFront:
+    Zone:
+      # The fixed hosted zone id AWS uses for every CloudFront alias.
+      Id: Z2FDTNDATAQYW2
+
+Resources:
+  Zone:
+    Type: AWS::Route53::HostedZone
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Name: !Ref DomainName
+
+  ApexIPv4:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Zone
+      Name: !Ref DomainName
+      Type: A
+      AliasTarget:
+        DNSName: !Ref DistributionDomainName
+        HostedZoneId: !FindInMap [CloudFront, Zone, Id]
+
+  ApexIPv6:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Zone
+      Name: !Ref DomainName
+      Type: AAAA
+      AliasTarget:
+        DNSName: !Ref DistributionDomainName
+        HostedZoneId: !FindInMap [CloudFront, Zone, Id]
+
+  WwwIPv4:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Zone
+      Name: !Sub 'www.${DomainName}'
+      Type: A
+      AliasTarget:
+        DNSName: !Ref DistributionDomainName
+        HostedZoneId: !FindInMap [CloudFront, Zone, Id]
+
+  WwwIPv6:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Zone
+      Name: !Sub 'www.${DomainName}'
+      Type: AAAA
+      AliasTarget:
+        DNSName: !Ref DistributionDomainName
+        HostedZoneId: !FindInMap [CloudFront, Zone, Id]
+
+  CertificateValidation:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Zone
+      Name: !Ref CertificateValidationName
+      Type: CNAME
+      TTL: '300'
+      ResourceRecords:
+        - !Ref CertificateValidationValue
+
+  # Google Workspace email, copied from the live records on 22 October 2026.
+  # Check them against Squarespace's DNS page once more before the switch.
+  Mail:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Zone
+      Name: !Ref DomainName
+      Type: MX
+      TTL: '3600'
+      ResourceRecords:
+        - 1 smtp.google.com.
+
+  Spf:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Zone
+      Name: !Ref DomainName
+      Type: TXT
+      TTL: '3600'
+      ResourceRecords:
+        - '"v=spf1 include:_spf.google.com ~all"'
+
+  # Google's DKIM key is longer than one DNS string allows (255 characters),
+  # so it is split in two; receivers join them back together.
+  Dkim:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Zone
+      Name: !Sub 'google._domainkey.${DomainName}'
+      Type: TXT
+      TTL: '3600'
+      ResourceRecords:
+        - '"v=DKIM1; k=rsa; p=MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAht91x0Xx1NTladx0Ibfp4BInC1tcKbFEkU3OKjfmH8UzFOD+y66Nh5+N6N+SLpkuaVbdHl2kHGrYdginTK1/c9O3EZVAi6v0pRu9lqG2aKC6BFwedgsXs7dr5sFthwL36smJXSHOqu/Ia986szWz7kGVYy6n2W7TTOnRIxlWBeLVnxjjp6d0T2PWhp0DNWK9W" "9MnyzkkmNKN/rTSQ+sAlF0cq3xMqkUBx0Gog935iUpaa4WqFiLjlFP0NfpswfZ/8SfWbtxq5ySCJYW+OEACVhi2EE1jWiWryKe+LRQVNoiXV4VKTDZs6iMyRXfFknz8NTsQ/NF45aqE7DT/u3nsnwIDAQAB"'
+
+  Dmarc:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Zone
+      Name: !Sub '_dmarc.${DomainName}'
+      Type: TXT
+      TTL: '3600'
+      ResourceRecords:
+        - !Sub '"v=DMARC1; p=${DmarcPolicy}; rua=mailto:hello@${DomainName}"'
+
+  # Only Amazon may issue certificates for the domain, which stops anyone
+  # else obtaining one in its name. iodef is where a refused attempt is reported.
+  Caa:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref Zone
+      Name: !Ref DomainName
+      Type: CAA
+      TTL: '3600'
+      ResourceRecords:
+        - 0 issue "amazon.com"
+        - 0 issuewild ";"
+        - !Sub '0 iodef "mailto:hello@${DomainName}"'
+
+Outputs:
+  NameServers:
+    Description: Set these as the domain's nameservers in Squarespace, last of all.
+    Value: !Join [', ', !GetAtt Zone.NameServers]
