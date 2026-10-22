@@ -1,5 +1,19 @@
 /* Vassallo Developments site script. Kept out of the page so the
    Content-Security-Policy can refuse every inline script. */
+/* Clickjacking guard. GitHub Pages cannot send the frame-ancestors header,
+   so if another site shows this page inside a frame, cover it with a link
+   that opens the real page in its own tab. Clicks meant for a hidden copy of
+   the form land on that link instead. CloudFront's header replaces this. */
+(function(){
+  if(window.top === window.self) return;
+  var a = document.createElement("a");
+  a.href = window.location.href;
+  a.target = "_blank";
+  a.rel = "noopener";
+  a.className = "framed-cover";
+  a.textContent = "Open Vassallo Developments in its own window";
+  document.body.appendChild(a);
+})();
 (function(){
   "use strict";
   var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
