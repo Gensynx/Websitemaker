@@ -288,7 +288,11 @@
       var id = a.getAttribute("href");
       if(id.length<2) return;
       var t = document.querySelector(id);
-      if(t){ e.preventDefault(); t.scrollIntoView({behavior:reduce?"auto":"smooth", block:"start"}); }
+      if(t){
+        e.preventDefault(); t.scrollIntoView({behavior:reduce?"auto":"smooth", block:"start"});
+        /* move keyboard and screen reader focus too, not just the view (the skip link) */
+        if(t.getAttribute("tabindex") === "-1") t.focus({preventScroll:true});
+      }
     });
   });
 })();

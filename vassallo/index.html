@@ -92,6 +92,9 @@ a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;cursor:pointer;background:none;border:none}
 img{max-width:100%;display:block}
 :focus-visible{outline:2px solid var(--brass);outline-offset:3px;border-radius:2px}
+[tabindex="-1"]:focus{outline:none}
+.skip{position:fixed;left:1rem;top:-4rem;z-index:1000;background:var(--ink);color:var(--paper);padding:.8em 1.2em;border-radius:100px;font-size:.9rem;letter-spacing:.04em;transition:top .2s}
+.skip:focus{top:1rem}
 
 .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--pad)}
 
@@ -340,6 +343,7 @@ form{display:flex;flex-direction:column;gap:2.2rem}
 .inp label{position:absolute;left:0;top:.7em;color:var(--ink-faint);font-size:1rem;pointer-events:none;transition:all .3s var(--e-out);transform-origin:0 50%}
 .inp input:focus~label,.inp textarea:focus~label,.inp input.has~label,.inp textarea.has~label{transform:translateY(-1.55em) scale(.72);color:var(--brass);letter-spacing:.05em}
 .inp input:focus,.inp textarea:focus,.inp select:focus{outline:none;border-color:var(--brass)}
+.inp input:focus-visible,.inp textarea:focus-visible,.inp select:focus-visible{box-shadow:0 2px 0 0 var(--brass)}
 .inp.selp label{transform:translateY(-1.55em) scale(.72);color:var(--ink-soft);letter-spacing:.05em}
 
 .submit{align-self:flex-start;display:inline-flex;align-items:center;gap:1em;background:var(--ink);color:var(--paper);
@@ -438,12 +442,13 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 </style>
 </head>
 <body>
+<a class="skip" href="#top">Skip to content</a>
 
 <div class="progress" id="progress"></div>
 <div class="grain" aria-hidden="true"></div>
 
 <!-- NAV -->
-<nav class="nav" id="nav">
+<nav class="nav" id="nav" aria-label="Main">
   <a class="brand" href="#top" aria-label="Vassallo Developments home">
     <img src="images/logo.png" alt="" width="656" height="247">
   </a>
@@ -460,6 +465,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 </nav>
 
 <!-- INTRO: scroll-scrubbed transformation film -->
+<main>
 <section class="intro" id="intro" aria-label="A walk into a derelict house, and back out as every room is renovated around you">
   <div class="intro-sticky">
     <video class="intro-video" id="introVideo" muted playsinline preload="auto" disablepictureinpicture>
@@ -479,7 +485,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 
 
 <!-- HERO -->
-<header class="hero" id="top">
+<header class="hero" id="top" tabindex="-1">
   <div class="hero-ghost" aria-hidden="true" data-parallax="-.12">VD</div>
   <div class="wrap" style="width:100%">
     <span class="eyebrow">Acquisition · Design · Development</span>
@@ -789,6 +795,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
     </div>
   </div>
 </section>
+</main>
 
 <!-- FOOTER -->
 <footer>
