@@ -14,3 +14,6 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+# Cloudflare Pages build output (infra/cloudflare/build.sh)
+/dist/

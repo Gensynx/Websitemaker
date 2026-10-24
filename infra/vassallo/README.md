@@ -10,6 +10,10 @@ account. Nothing here holds a secret.
 | `dns.yaml` | A Route 53 zone with the website records, the Google Workspace email records copied across, DMARC, and a CAA record |
 | `deploy.sh` | Scans the files for keys, uploads them with sensible cache lifetimes, adds `security.txt`, refreshes CloudFront |
 
+If the domain's DNS is already on Cloudflare (see `infra/cloudflare/`), skip
+`dns.yaml` and steps 6 and 7: point the domain at the CloudFront address in
+Cloudflare instead, as a DNS-only record.
+
 ## The order matters
 
 Email keeps working throughout only if the steps run in this order.
