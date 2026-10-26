@@ -13,6 +13,7 @@ violations.
 | `build.sh` | Cloudflare's build step: copies `vassallo/`, drops notes, adds `_headers` and `security.txt` |
 | `_headers` | The security headers, and noindex on the `workers.dev` and `pages.dev` copies |
 | `../../wrangler.jsonc` | Worker settings: serve only `dist/`, never the repository |
+| `worker.js` | Answers byte-range requests for the intro film, which Cloudflare's asset layer ignores and iPhones need to play video |
 
 ## Set-up, in this order
 
