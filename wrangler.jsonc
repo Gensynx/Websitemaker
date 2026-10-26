@@ -5,8 +5,13 @@
 {
   "name": "vassallo-developments",
   "compatibility_date": "2026-10-23",
+  // A small Worker answers byte-range requests for the videos, which Safari
+  // needs to play them; everything else is served straight from dist/.
+  "main": "infra/cloudflare/worker.js",
   "assets": {
     "directory": "./dist/",
+    "binding": "ASSETS",
+    "run_worker_first": ["/assets/*.mp4"],
     // Unknown addresses get vassallo/404.html with a real 404 status.
     "not_found_handling": "404-page",
     "html_handling": "auto-trailing-slash"
