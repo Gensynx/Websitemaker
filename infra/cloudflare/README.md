@@ -53,7 +53,7 @@ Email keeps working only if step 2 is checked before step 3.
 
 - `curl -sI https://vassallodevelopments.com/` shows `x-frame-options: DENY`
   and `content-security-policy: frame-ancestors 'none'…`
-- An enquiry from your phone still reaches hello@
+- An enquiry from your phone still reaches info@
 - A test email from Gmail shows `dmarc=pass` in its headers
 
 ## Later, moving to AWS

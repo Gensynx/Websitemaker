@@ -131,7 +131,7 @@ Resources:
       Type: TXT
       TTL: '3600'
       ResourceRecords:
-        - !Sub '"v=DMARC1; p=${DmarcPolicy}; rua=mailto:hello@${DomainName}"'
+        - !Sub '"v=DMARC1; p=${DmarcPolicy}; rua=mailto:info@${DomainName}"'
 
   # Only Amazon may issue certificates for the domain, which stops anyone
   # else obtaining one in its name. iodef is where a refused attempt is reported.
@@ -145,7 +145,7 @@ Resources:
       ResourceRecords:
         - 0 issue "amazon.com"
         - 0 issuewild ";"
-        - !Sub '0 iodef "mailto:hello@${DomainName}"'
+        - !Sub '0 iodef "mailto:info@${DomainName}"'
 
 Outputs:
   NameServers:

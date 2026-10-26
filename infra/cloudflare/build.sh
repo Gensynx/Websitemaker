@@ -17,7 +17,7 @@ cp infra/cloudflare/_headers dist/_headers
 
 mkdir -p dist/.well-known
 cat > dist/.well-known/security.txt <<TXT
-Contact: mailto:hello@vassallodevelopments.com
+Contact: mailto:info@vassallodevelopments.com
 Expires: $(date -u -d '+1 year' +%Y-%m-%dT%H:%M:%SZ)
 Preferred-Languages: en
 Canonical: https://vassallodevelopments.com/.well-known/security.txt

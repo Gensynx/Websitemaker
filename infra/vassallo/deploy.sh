@@ -29,7 +29,7 @@ find "$STAGE" \( -name '*.txt' -o -name '*.md' -o -name '*.patch' -o -name '_hea
 # an expiry date, so it is written fresh on every deploy.
 mkdir -p "$STAGE/.well-known"
 cat > "$STAGE/.well-known/security.txt" <<EOF
-Contact: mailto:hello@vassallodevelopments.com
+Contact: mailto:info@vassallodevelopments.com
 Expires: $(date -u -d '+1 year' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v+1y +%Y-%m-%dT%H:%M:%SZ)
 Preferred-Languages: en
 Canonical: https://vassallodevelopments.com/.well-known/security.txt
