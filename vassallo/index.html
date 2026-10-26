@@ -394,6 +394,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 .foot-col h4{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ink-faint);font-family:var(--sans);font-weight:500;margin:0 0 1.1rem}
 .foot-col a,.foot-col p{display:block;color:var(--ink-soft);font-size:.9rem;margin-bottom:.6rem;transition:color .3s}
 .foot-col a:hover{color:var(--ink)}
+.foot-legal{margin:1rem 0 0;color:var(--ink-faint);font-size:.78rem;line-height:1.6;letter-spacing:.02em}
 .foot-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;margin-top:clamp(3rem,7vh,5rem);padding-top:1.8rem;border-top:1px solid var(--line);color:var(--ink-faint);font-size:.78rem;letter-spacing:.04em}
 
 /* ============================================================
@@ -473,6 +474,11 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 <section class="intro" id="intro" aria-label="A walk into a derelict house, and back out as every room is renovated around you">
   <div class="intro-sticky">
     <video class="intro-video" id="introVideo" muted playsinline preload="auto" disablepictureinpicture>
+      <!-- Phones play the film straight through, so they get a normally
+           compressed copy (2.8 MB). Desktop scrubs it frame by frame on scroll,
+           which needs every frame to be a keyframe (11 MB). The media query
+           matches the touch test in site.js. -->
+      <source src="assets/vassallo-transformation-mobile.mp4" type="video/mp4" media="(pointer: coarse), (max-width: 760px)">
       <source src="assets/vassallo-transformation.mp4" type="video/mp4">
     </video>
     <div class="intro-shade" aria-hidden="true"></div>
@@ -829,6 +835,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       <span>© <span id="yr">2026</span> Vassallo Developments. All rights reserved.</span>
       <span>The film and images on this site are illustrative.</span>
     </div>
+    <p class="foot-legal">Vassallo Developments Ltd, registered in England and Wales, company number 16225510. Registered office: 1 Pennyfields, London, E14 8HP.</p>
   </div>
 </footer>
 
