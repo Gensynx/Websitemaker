@@ -67,6 +67,12 @@ Email keeps working only if step 2 is checked before step 3.
 
 ## Later, moving to AWS
 
+Decided 26 October 2026: Cloudflare is the interim host only. Payments,
+booking and the database (orders, deposits, booked days) will be built on
+AWS (Lambda, DynamoDB in London), and the site moves there with them.
+Nothing is stored on Cloudflare in the meantime: enquiries are emails.
+
+
 Keep DNS on Cloudflare and point the domain at CloudFront instead of Pages;
 `infra/vassallo/site.yaml` still applies, and `infra/vassallo/dns.yaml`
 (Route 53) is then not needed.

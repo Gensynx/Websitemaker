@@ -14,6 +14,10 @@ If the domain's DNS is already on Cloudflare (see `infra/cloudflare/`), skip
 `dns.yaml` and steps 6 and 7: point the domain at the CloudFront address in
 Cloudflare instead, as a DNS-only record.
 
+CloudFront and S3 answer byte-range requests themselves, so the intro film
+plays on iPhones without the extra Worker the Cloudflare set-up needs
+(`infra/cloudflare/worker.js`).
+
 ## The order matters
 
 Email keeps working throughout only if the steps run in this order.
