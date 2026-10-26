@@ -395,12 +395,24 @@
     vid.addEventListener("ended", function(){ if(raf) cancelAnimationFrame(raf); paintBeats(1); }); /* hold the finale */
     paint();
 
+    /* The film runs for about 12 seconds on its own, so it gets a pause
+       button (WCAG 2.2.2: moving content over 5 seconds must be pausable). */
+    var userPaused = false;
+    var pauseBtn = document.getElementById("introPause");
+    function syncPause(){ pauseBtn.textContent = vid.ended ? "Replay film" : (vid.paused ? "Play film" : "Pause film"); }
+    pauseBtn.hidden = false;
+    pauseBtn.addEventListener("click", function(ev){
+      ev.stopPropagation();
+      if(vid.paused || vid.ended){ userPaused = false; play(); } else { userPaused = true; vid.pause(); }
+    });
+    ["play","playing","pause","ended"].forEach(function(t){ vid.addEventListener(t, syncPause); });
+
     /* try to autoplay; if the browser blocks it, start on the first interaction */
     function play(){ var pr; try{ pr = vid.play(); }catch(e){} return pr; }
     var pr = play();
     if(pr && pr.catch){
       pr.catch(function(){
-        var kick = function(){ play(); window.removeEventListener("touchstart",kick); window.removeEventListener("scroll",kick); window.removeEventListener("click",kick); };
+        var kick = function(){ if(!userPaused){ play(); } window.removeEventListener("touchstart",kick); window.removeEventListener("scroll",kick); window.removeEventListener("click",kick); };
         window.addEventListener("touchstart", kick, {passive:true});
         window.addEventListener("scroll", kick, {passive:true});
         window.addEventListener("click", kick);
