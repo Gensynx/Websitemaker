@@ -473,13 +473,14 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 <main>
 <section class="intro" id="intro" aria-label="A walk into a derelict house, and back out as every room is renovated around you">
   <div class="intro-sticky">
-    <video class="intro-video" id="introVideo" muted playsinline preload="auto" disablepictureinpicture>
+    <video class="intro-video" id="introVideo" muted playsinline preload="auto" disablepictureinpicture poster="assets/vassallo-transformation-poster.webp">
       <!-- Phones play the film straight through, so they get a normally
            compressed copy (2.8 MB). Desktop scrubs it frame by frame on scroll,
-           which needs every frame to be a keyframe (11 MB). The media query
-           matches the touch test in site.js. -->
+           which needs every frame to be a keyframe (5.8 MB). The media query
+           matches the touch test in site.js. The poster is the first frame,
+           shown while the film loads. -->
       <source src="assets/vassallo-transformation-mobile.mp4" type="video/mp4" media="(pointer: coarse), (max-width: 760px)">
-      <source src="assets/vassallo-transformation.mp4" type="video/mp4">
+      <source src="assets/vassallo-transformation-v2.mp4" type="video/mp4">
     </video>
     <div class="intro-shade" aria-hidden="true"></div>
     <div class="intro-beat"><p>Every building has a past.</p></div>

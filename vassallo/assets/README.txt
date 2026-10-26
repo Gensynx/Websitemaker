@@ -1,7 +1,18 @@
 Vassallo Developments — video assets
 ====================================
 
-vassallo-transformation.mp4  (COMMITTED — the site serves this file directly)
+vassallo-transformation-v2.mp4  (COMMITTED, desktop scroll-scrub)
+  Re-encoded 26 Oct 2026 from the original all-intra file at CRF 26 instead
+  of 20: 5.8 MB against 11 MB, SSIM 0.980, still a keyframe on every frame
+  so scrubbing lands instantly. New name so no browser or Cloudflare cache
+  mixes ranges of the old and new files.
+    ffmpeg -i original.mp4 -an -c:v libx264 -preset slow -crf 26 -g 1 \
+      -pix_fmt yuv420p -movflags +faststart vassallo-transformation-v2.mp4
+
+vassallo-transformation-poster.webp
+  The film's first frame, shown while the film loads.
+
+Original notes, for vassallo-transformation.mp4 (since replaced by -v2):
   The 12s Higgsfield (Cinema Studio) story shot: into the derelict house,
   through the decayed hallway and living room, then gliding back out as every
   room renovates itself around the camera, ending with the new front door
