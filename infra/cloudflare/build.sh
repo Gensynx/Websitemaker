@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Cloudflare Pages build for the Vassallo site. In the Pages project:
+# Cloudflare build for the Vassallo site, as a Worker or a Pages project:
 #   Build command:          bash infra/cloudflare/build.sh
-#   Build output directory: dist
+#   Worker deploy command:  npx wrangler deploy  (wrangler.jsonc points it at dist/)
+#   Pages output directory: dist
 #   Root directory:         (leave blank)
 # It publishes only what visitors need (no notes or patches, snag list S-12),
 # adds the security headers and a security.txt. Every push is already scanned

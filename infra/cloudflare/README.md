@@ -1,15 +1,18 @@
-# Hosting vassallodevelopments.com on Cloudflare Pages
+# Hosting vassallodevelopments.com on Cloudflare
 
 The interim host until AWS. Free, and unlike GitHub Pages it sends the
 security headers in `_headers` (frame protection, nosniff, and the rest).
-Tested locally with Cloudflare's own `wrangler pages dev`: every header
-applies, notes and missing pages return 404 with the site's own 404 page, and
-the configurator runs with no policy violations.
+It works as either a Worker (Cloudflare's default for new projects) or a
+Pages project. Both were tested locally with Cloudflare's own `wrangler`:
+every header applies, notes, repository files and missing pages return 404
+with the site's own 404 page, and the configurator runs with no policy
+violations.
 
 | File | Purpose |
 | --- | --- |
 | `build.sh` | Cloudflare's build step: copies `vassallo/`, drops notes, adds `_headers` and `security.txt` |
-| `_headers` | The security headers, and noindex on the `pages.dev` copies |
+| `_headers` | The security headers, and noindex on the `workers.dev` and `pages.dev` copies |
+| `../../wrangler.jsonc` | Worker settings: serve only `dist/`, never the repository |
 
 ## Set-up, in this order
 
@@ -25,13 +28,18 @@ Email keeps working only if step 2 is checked before step 3.
 3. **Switch nameservers.** In Squarespace, Domains, vassallodevelopments.com,
    set custom nameservers to the two Cloudflare gives you. Keep the domain
    registered with Squarespace; only its DNS moves.
-4. **Pages project.** Workers & Pages, Create, Pages, Connect to Git, choose
-   `Gensynx/Websitemaker`:
-   - Project name: `vassallo-developments` (the `_headers` file expects this name)
-   - Production branch: `main`
+4. **Worker.** Workers & Pages, Create, import the `Gensynx/Websitemaker`
+   repository from GitHub:
+   - Name: `vassallo-developments` (must match `wrangler.jsonc`)
    - Build command: `bash infra/cloudflare/build.sh`
-   - Build output directory: `dist`
-5. **Custom domains** on the project: add `vassallodevelopments.com` and
+   - Deploy command: `npx wrangler deploy` (the default)
+   - Root directory: blank
+
+   `wrangler.jsonc` tells the deploy to upload `dist/` only. Without it,
+   Wrangler guesses the whole repository, `.git` included. If you choose a
+   Pages project instead, use the same build command and set the build
+   output directory to `dist`.
+5. **Custom domains** on the Worker (Settings, Domains & Routes) or Pages project: add `vassallodevelopments.com` and
    `www.vassallodevelopments.com`. Cloudflare replaces the old Squarespace
    records for both (snag list D-08); delete any Squarespace A or CNAME
    records that are left.

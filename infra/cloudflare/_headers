@@ -15,7 +15,10 @@
 /configurator/assets/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Keep the pages.dev copies out of search results, so only the real domain is indexed.
+# Keep the workers.dev and pages.dev copies out of search results, so only the
+# real domain is indexed.
+https://:version.:subdomain.workers.dev/*
+  X-Robots-Tag: noindex
 https://vassallo-developments.pages.dev/*
   X-Robots-Tag: noindex
 https://:version.vassallo-developments.pages.dev/*

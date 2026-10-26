@@ -1,0 +1,14 @@
+// Cloudflare Workers settings for the Vassallo Developments website.
+// The Worker serves only the built site in dist/ (made by
+// infra/cloudflare/build.sh), never the repository itself, which also holds
+// other sites, notes and the git history. See infra/cloudflare/README.md.
+{
+  "name": "vassallo-developments",
+  "compatibility_date": "2026-10-23",
+  "assets": {
+    "directory": "./dist/",
+    // Unknown addresses get vassallo/404.html with a real 404 status.
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}
