@@ -1,6 +1,16 @@
 Vassallo Developments — video assets
 ====================================
 
+vassallo-transformation-portrait.mp4  (COMMITTED, phones held upright)
+  The middle 406x720 of the original film, so it fills a portrait screen
+  instead of sitting in a letterbox: 1.1 MB, SSIM 0.982 against the same crop
+  of the original. Made from the original all-intra file (in git history at
+  a9a781c), not from a re-encode.
+    ffmpeg -i original.mp4 -an -vf "crop=406:720:(iw-406)/2:0" -c:v libx264 \
+      -preset slow -crf 23 -g 48 -keyint_min 24 -pix_fmt yuv420p \
+      -profile:v high -level 4.0 -movflags +faststart \
+      vassallo-transformation-portrait.mp4
+
 vassallo-transformation-v2.mp4  (COMMITTED, desktop scroll-scrub)
   Re-encoded 26 Oct 2026 from the original all-intra file at CRF 26 instead
   of 20: 5.8 MB against 11 MB, SSIM 0.980, still a keyframe on every frame

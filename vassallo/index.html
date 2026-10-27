@@ -395,6 +395,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 .foot-col a,.foot-col p{display:block;color:var(--ink-soft);font-size:.9rem;margin-bottom:.6rem;transition:color .3s}
 .foot-col a:hover{color:var(--ink)}
 .foot-legal{margin:1rem 0 0;color:var(--ink-faint);font-size:.78rem;line-height:1.6;letter-spacing:.02em}
+.foot-legal a{color:inherit;text-decoration:underline;text-underline-offset:2px}
 .foot-bottom{display:flex;flex-wrap:wrap;justify-content:space-between;gap:1rem;margin-top:clamp(3rem,7vh,5rem);padding-top:1.8rem;border-top:1px solid var(--line);color:var(--ink-faint);font-size:.78rem;letter-spacing:.04em}
 
 /* ============================================================
@@ -419,8 +420,6 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 .intro-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 /* on upright phones show the whole wide frame (no zoom-crop) so it stays sharp;
    slim dark bars top/bottom match the intro background */
-@media (orientation:portrait) and (pointer:coarse){ .intro-video{object-fit:contain} }
-@media (orientation:portrait) and (max-width:760px){ .intro-video{object-fit:contain} }
 .intro-shade{position:absolute;inset:0;background:
   linear-gradient(rgba(10,8,6,.38), rgba(10,8,6,0) 30%, rgba(10,8,6,0) 62%, rgba(10,8,6,.48)),
   radial-gradient(ellipse at center, transparent 45%, rgba(10,8,6,.38))}
@@ -474,11 +473,14 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 <section class="intro" id="intro" aria-label="A walk into a derelict house, and back out as every room is renovated around you">
   <div class="intro-sticky">
     <video class="intro-video" id="introVideo" muted playsinline preload="auto" disablepictureinpicture poster="assets/vassallo-transformation-poster.webp">
-      <!-- Phones play the film straight through, so they get a normally
-           compressed copy (2.8 MB). Desktop scrubs it frame by frame on scroll,
+      <!-- Phones held upright get a portrait cut of the film (the middle of the
+           frame, 1.1 MB) that fills the screen. Other phones and tablets play
+           the film straight through, so they get a normally compressed copy
+           (2.8 MB). Desktop scrubs it frame by frame on scroll,
            which needs every frame to be a keyframe (5.8 MB). The media query
            matches the touch test in site.js. The poster is the first frame,
            shown while the film loads. -->
+      <source src="assets/vassallo-transformation-portrait.mp4" type="video/mp4" media="(orientation: portrait) and (pointer: coarse), (orientation: portrait) and (max-width: 760px)">
       <source src="assets/vassallo-transformation-mobile.mp4" type="video/mp4" media="(pointer: coarse), (max-width: 760px)">
       <source src="assets/vassallo-transformation-v2.mp4" type="video/mp4">
     </video>
@@ -836,7 +838,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
       <span>© <span id="yr">2026</span> Vassallo Developments. All rights reserved.</span>
       <span>The film and images on this site are illustrative.</span>
     </div>
-    <p class="foot-legal">Vassallo Developments Ltd, registered in England and Wales, company number 16225510. Registered office: 1 Pennyfields, London, E14 8HP.</p>
+    <p class="foot-legal">Vassallo Developments Ltd, registered in England and Wales, company number 16225510. <a href="privacy.html">Registered office and company details</a>.</p>
   </div>
 </footer>
 
