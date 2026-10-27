@@ -38,8 +38,8 @@ Pages is static and cannot run PHP, so:
 
 The handoff
 -----------
-Rather than leave a dead end where the send used to be, the review dialog now
-offers "Send it to Vassallo Developments", which returns to
+With no enquiry endpoint (this build), the review dialog shows no contact
+form at all: one button, "Send to Vassallo Developments", returns to
 
     ../?spec=<the written specification>&cfg=<share link>#enquire
 
