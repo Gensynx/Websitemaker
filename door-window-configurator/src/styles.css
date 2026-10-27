@@ -1482,6 +1482,11 @@ h1 {
   padding-inline: 1.5rem;
 }
 
+.review__handoff-only {
+  display: grid;
+  gap: 1rem;
+}
+
 .review__send:disabled {
   opacity: 0.6;
   cursor: progress;

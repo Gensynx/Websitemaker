@@ -598,6 +598,21 @@ const heightField = page.getByLabel(/^Height/);
     problems.push('the summary is missing options or the handing statement');
   }
 
+  // 8.3 With no enquiry endpoint (the Vassallo website, and the dev server)
+  // there is no contact form: one link carries the specification into the
+  // website's enquiry form. With an endpoint, the form is tested below.
+  const connected = (await tab.getByRole('button', { name: 'Send enquiry' }).count()) === 1;
+  if (!connected) {
+    const handoff = tab.getByRole('link', { name: 'Send to Vassallo Developments' });
+    const href = (await handoff.count()) === 1 ? await handoff.getAttribute('href') : null;
+    const params = href ? new URLSearchParams(href.slice(href.indexOf('?') + 1, href.indexOf('#'))) : null;
+    const handsOver = href !== null && href.startsWith('../?') && href.endsWith('#enquire')
+      && /Width/.test(params?.get('spec') ?? '') && (params?.get('cfg') ?? '').length > 0;
+    const noFields = (await tab.locator('.review__enquiry input, .review__enquiry textarea').count()) === 0;
+    console.log(`enquiry: not connected -> hand-off link=${handsOver}, contact fields shown=${!noFields}`);
+    if (!handsOver) problems.push('the review does not hand the specification to the website enquiry form');
+    if (!noFields) problems.push('the review asks for contact details it cannot send');
+  } else {
   // 8.3 An empty form: an error summary, focused, one entry per problem.
   await tab.getByRole('button', { name: 'Send enquiry' }).click();
   await tab.waitForSelector('.error-summary');
@@ -615,7 +630,8 @@ const heightField = page.getByLabel(/^Height/);
   await tab.waitForSelector('.review__result .review__status');
   const outcome = await tab.locator('.review__result').textContent();
   console.log(`enquiry: valid submit -> "${outcome?.slice(0, 80)}…"`);
-  if (!/has not been sent/.test(outcome ?? '')) problems.push('the stubbed enquiry does not say that nothing was sent');
+  if (!/has not been sent|has been sent|not been sent/.test(outcome ?? '')) problems.push('the enquiry gives no outcome');
+  }
   await tab.screenshot({ path: `${SHOTS}/shot-review.png` });
 
   // Escape closes it and returns focus to the button that opened it.
@@ -630,7 +646,8 @@ const heightField = page.getByLabel(/^Height/);
   await tab.goto(setBase.replace('ce=RAL7016', 'ce=x8a2be2'), { waitUntil: 'networkidle' });
   await tab.getByRole('button', { name: 'Review and enquire' }).click();
   const note = await tab.locator('.review__summary .review__status').first().textContent();
-  const formThere = (await tab.getByRole('button', { name: 'Send enquiry' }).count()) === 1;
+  const formThere = (await tab.getByRole('button', { name: 'Send enquiry' }).count())
+    + (await tab.getByRole('link', { name: 'Send to Vassallo Developments' }).count()) === 1;
   console.log(`review: explore colour -> "${note?.slice(0, 40)}…", form=${formThere}`);
   if (!/Not orderable/.test(note ?? '') || !formThere) problems.push('an explore colour is not reviewed as enquire-only');
   await tab.keyboard.press('Escape');
@@ -639,7 +656,8 @@ const heightField = page.getByLabel(/^Height/);
   await tab.goto(setBase.replace('w=1800', 'w=900'), { waitUntil: 'networkidle' });
   await tab.getByRole('button', { name: 'Review and enquire' }).click();
   const blocked = await tab.locator('.review__summary .review__status').first().textContent();
-  const noForm = (await tab.getByRole('button', { name: 'Send enquiry' }).count()) === 0;
+  const noForm = (await tab.getByRole('button', { name: 'Send enquiry' }).count())
+    + (await tab.getByRole('link', { name: 'Send to Vassallo Developments' }).count()) === 0;
   const noPicture = (await tab.locator('.review__picture').count()) === 0;
   console.log(`review: unbuildable -> "${blocked?.slice(0, 40)}…", form hidden=${noForm}, drawing hidden=${noPicture}`);
   if (!/cannot be made/.test(blocked ?? '') || !noForm) problems.push('an unbuildable configuration can still be enquired about');

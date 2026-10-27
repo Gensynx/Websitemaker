@@ -11,8 +11,11 @@
  * each field also carries its own message, tied to it with aria-describedby.
  *
  * Nothing here pretends. With no enquiry destination configured (see
- * output/enquiry.ts), submitting says plainly that nothing was sent. Contact
- * details are never written to storage.
+ * output/enquiry.ts), as on the Vassallo website today, there is no contact
+ * form at all: one button carries the specification into the website's own
+ * enquiry form, where the customer adds their details once. With an
+ * endpoint, the form below collects and sends them. Contact details are never
+ * written to storage.
  */
 
 import { forwardRef, useEffect, useId, useImperativeHandle, useRef, useState } from 'react';
@@ -20,7 +23,7 @@ import type { ReactNode } from 'react';
 import type { ConfigState } from '../config/types';
 import { buildSummary, summaryText } from '../output/summary';
 import { copyText, shareUrl } from '../output/share';
-import { buildEnquiryRequest, EMPTY_CONTACT, submitEnquiry, validateContact } from '../output/enquiry';
+import { buildEnquiryRequest, EMPTY_CONTACT, ENQUIRY_ENDPOINT, submitEnquiry, validateContact } from '../output/enquiry';
 import type { ContactDetails, ContactField, FieldError, SubmitResult } from '../output/enquiry';
 import { StaticElevation } from '../viewer/StaticElevation';
 
@@ -294,6 +297,16 @@ export const ReviewDialog = forwardRef<ReviewDialogHandle, { config: ConfigState
 
               {summary.status.kind === 'invalid' ? (
                 <p className="section__hint">An enquiry can be sent once the configuration can be made.</p>
+              ) : ENQUIRY_ENDPOINT === null ? (
+                <div className="review__handoff-only">
+                  <p className="section__hint">
+                    Your design goes into the enquiry form on the Vassallo Developments website, already written out.
+                    Add your details there and send it.
+                  </p>
+                  <a className="button review__send" href={handoffUrl()}>
+                    Send to Vassallo Developments
+                  </a>
+                </div>
               ) : (
                 <form
                   noValidate
@@ -431,16 +444,6 @@ export const ReviewDialog = forwardRef<ReviewDialogHandle, { config: ConfigState
                         <p>
                           <strong>Your enquiry has not been sent.</strong> {result.reason} Your details have not been
                           stored.
-                        </p>
-                        <p>Send it straight to Vassallo Developments, and the enquiry form there opens with this
-                          specification already filled in.</p>
-                        <p className="review__handoff">
-                          <a className="button" href={handoffUrl()}>
-                            Send it to Vassallo Developments
-                          </a>
-                          <button type="button" className="button button--quiet" onClick={() => void copy('enquiry')}>
-                            Copy the enquiry
-                          </button>
                         </p>
                       </Status>
                     )}

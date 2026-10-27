@@ -280,9 +280,14 @@ async function tabUntil(page, predicate, limit = 60) {
     const escaped = leaks.size > 0;
     console.log(`review dialog: focus stayed inside over 40 tabs=${!escaped}, via browser UI=${visitedChrome}${escaped ? `, reached ${[...leaks].join(', ')}` : ''}`);
     if (escaped) problems.push('keyboard focus escapes the review dialog');
-    await page.getByRole('button', { name: 'Send enquiry' }).click();
-    await page.waitForSelector('.error-summary');
-    await axe(page, 'desktop, review dialog with errors');
+    // Only a connected build has a contact form to show errors in.
+    if ((await page.getByRole('button', { name: 'Send enquiry' }).count()) === 1) {
+      await page.getByRole('button', { name: 'Send enquiry' }).click();
+      await page.waitForSelector('.error-summary');
+      await axe(page, 'desktop, review dialog with errors');
+    } else {
+      await axe(page, 'desktop, review dialog');
+    }
     await page.keyboard.press('Escape');
   }
 
