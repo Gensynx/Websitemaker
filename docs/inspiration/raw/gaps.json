@@ -1,0 +1,126 @@
+{
+ "gutters": {
+  "390": {
+   "maxWidth": "1200px",
+   "width": 390,
+   "pl": "20px",
+   "pr": "20px",
+   "gutter": 0,
+   "sectionY": "clamp(72px,8vw,112px)",
+   "heroH1": "44px"
+  },
+  "560": {
+   "maxWidth": "1200px",
+   "width": 560,
+   "pl": "20px",
+   "pr": "20px",
+   "gutter": 0,
+   "sectionY": "clamp(72px,8vw,112px)",
+   "heroH1": "44px"
+  },
+  "640": {
+   "maxWidth": "1200px",
+   "width": 640,
+   "pl": "32px",
+   "pr": "32px",
+   "gutter": 0,
+   "sectionY": "clamp(72px,8vw,112px)",
+   "heroH1": "44px"
+  },
+  "768": {
+   "maxWidth": "1200px",
+   "width": 768,
+   "pl": "32px",
+   "pr": "32px",
+   "gutter": 0,
+   "sectionY": "clamp(72px,8vw,112px)",
+   "heroH1": "44px"
+  },
+  "1024": {
+   "maxWidth": "1200px",
+   "width": 1024,
+   "pl": "40px",
+   "pr": "40px",
+   "gutter": 0,
+   "sectionY": "clamp(72px,8vw,112px)",
+   "heroH1": "47.104px"
+  },
+  "1100": {
+   "maxWidth": "1200px",
+   "width": 1100,
+   "pl": "40px",
+   "pr": "40px",
+   "gutter": 0,
+   "sectionY": "clamp(72px,8vw,112px)",
+   "heroH1": "50.6px"
+  },
+  "1280": {
+   "maxWidth": "1200px",
+   "width": 1200,
+   "pl": "40px",
+   "pr": "40px",
+   "gutter": 40,
+   "sectionY": "clamp(72px,8vw,112px)",
+   "heroH1": "58.88px"
+  },
+  "1440": {
+   "maxWidth": "1200px",
+   "width": 1200,
+   "pl": "40px",
+   "pr": "40px",
+   "gutter": 120,
+   "sectionY": "clamp(72px,8vw,112px)",
+   "heroH1": "64px"
+  },
+  "1560": {
+   "maxWidth": "1200px",
+   "width": 1200,
+   "pl": "40px",
+   "pr": "40px",
+   "gutter": 180,
+   "sectionY": "clamp(72px,8vw,112px)",
+   "heroH1": "64px"
+  }
+ },
+ "components": {},
+ "sticky": {
+  "before": {
+   "pos": "sticky",
+   "bg": "rgba(250, 247, 240, 0.97)",
+   "h": 77,
+   "shadow": "none",
+   "cls": "sticky top-0 z-50 border-b border-cream-line bg-cream/[.97]"
+  },
+  "after": {
+   "bg": "rgba(250, 247, 240, 0.97)",
+   "h": 77,
+   "shadow": "none",
+   "top": 0,
+   "cls": "sticky top-0 z-50 border-b border-cream-line bg-cream/[.97]"
+  }
+ },
+ "faq": {
+  "closed": {
+   "expanded": "false",
+   "tag": "BUTTON",
+   "controls": null,
+   "text": "Subjects"
+  },
+  "open": {
+   "expanded": "true"
+  },
+  "panelFound": false,
+  "panelHidden": null,
+  "panelH": null
+ },
+ "nav": {
+  "before": {
+   "expanded": "false",
+   "label": "Open menu"
+  },
+  "after": {
+   "expanded": "true",
+   "visibleLinks": 15
+  }
+ }
+}

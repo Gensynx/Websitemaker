@@ -1,0 +1,89 @@
+{
+ "noJS": {
+  "total": 456,
+  "fadedCount": 25,
+  "samples": [
+   {
+    "cls": "wa-pill wa-pill--sm !hidden lg:!inline-grid ",
+    "op": "0",
+    "text": "Message us on WhatsApp"
+   },
+   {
+    "cls": "rl-note-small",
+    "op": "0.85",
+    "text": "s = ut + ½at²"
+   },
+   {
+    "cls": "rl-note-small",
+    "op": "0.85",
+    "text": "Macbeth, Act 2: imagery of guilt →"
+   },
+   {
+    "cls": "rl-vt-card rl-reveal-card",
+    "op": "0.35",
+    "text": "My name is Shahid. I sat my GCSE Maths a year "
+   },
+   {
+    "cls": "rl-vt-card rl-reveal-card",
+    "op": "0.35",
+    "text": "Hi, my name is Halima. I just got my GCSEs bac"
+   },
+   {
+    "cls": "rl-vt-card rl-reveal-card",
+    "op": "0.35",
+    "text": "Hi, my name is Riyad. I got an 8 in Maths and "
+   },
+   {
+    "cls": "rl-step rl-reveal-item",
+    "op": "0.25",
+    "text": "1UnderstandWe assess their current level, expl"
+   },
+   {
+    "cls": "rl-step rl-reveal-item",
+    "op": "0.25",
+    "text": "2PrioritiseWe identify the topics and skills t"
+   }
+  ],
+  "textLen": 5621,
+  "h1": "Built around the student"
+ },
+ "rating": [
+  {
+   "text": "★★★★★",
+   "color": "rgb(234, 192, 80)",
+   "bg": "rgb(250, 247, 240)",
+   "fontSize": "16px",
+   "ariaHidden": "true",
+   "ctxTxt": "What families say5.0★★★★★45 Google reviewsWithout a doubt the best tutor I’ve ever had. I was struggling with maths throughout my GCSEs but "
+  },
+  {
+   "text": "self.__nex",
+   "color": "rgb(23, 23, 23)",
+   "bg": "rgb(255, 255, 255)",
+   "fontSize": "16px",
+   "ariaHidden": null,
+   "ctxTxt": "Prices: GCSE from £25, A-Level from £30 an Hour | Revolearn{\"@context\":\"https://schema.org\",\"@type\":\"EducationalOrganization\",\"@id\":\"https:/"
+  }
+ ],
+ "focus": {
+  "outline": "rgb(234, 192, 80) solid 3px",
+  "outlineWidth": "3px",
+  "outlineColor": "rgb(234, 192, 80)",
+  "boxShadow": "none"
+ },
+ "contact": {
+  "hasForm": false,
+  "fields": [],
+  "links": [
+   "https://wa.me/447949348441?text=Hello%20Revolearn%2C%20I%20would%20like%20to%20enquire%20about%20tutoring.",
+   "https://wa.me/447949348441?text=Hello%20Revolearn%2C%20I%20would%20like%20to%20enquire%20about%20tutoring.",
+   "https://wa.me/447949348441?text=Hello%20Revolearn%2C%20I%20would%20like%20to%20enquire%20about%20tutoring.",
+   "tel:07949348441",
+   "mailto:revolearnuk@gmail.com",
+   "mailto:revolearnuk@gmail.com",
+   "tel:07949348441",
+   "https://wa.me/447949348441?text=Hello%20Revolearn%2C%20I%20would%20like%20to%20enquire%20about%20tutoring."
+  ],
+  "bodyText": "Revolearn About Subjects How it works Pricing Reviews FAQs Join our team Message us on WhatsApp x² + 5x + 6 = 0 (x + 2)(x + 3) = 0 x = −2 or x = −3 “Is this a dagger which I see before me” Macbeth, Act 2: imagery of guilt → Home / Contact Enquire about tutoring The quickest way to reach us is WhatsApp. Tell us the subject, your child’s year group and what they are finding difficult, and we will reply with how we can help and arrange a first lesson. There is no obligation. Message us on WhatsApp Ways to reach us WHATSAPP Message us directly Usually the fastest response. TELEPHONE 07949 348441 If you would rather speak to someone. EMAIL revolearnuk@gmail.com For longer enquiries or sending doc"
+ }
+}
