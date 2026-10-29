@@ -384,6 +384,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
 .foot-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:2.5rem;align-items:flex-start}
 .foot-brand{display:block}
 .foot-brand img{display:block;width:min(330px,76vw);height:auto}
+@media (max-width:760px){.foot-brand{width:100%;display:flex;justify-content:center}}
 :root[data-theme="dark"] .brand img,
 :root[data-theme="dark"] .foot-brand img{filter:invert(1)}
 @media (prefers-color-scheme: dark){
@@ -564,7 +565,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
   <div class="wrap">
     <div class="band-head reveal">
       <span class="eyebrow">What we take on</span>
-      <h2>Projects we've worked on.</h2>
+      <h2>What we offer.</h2>
       <p>From a property stripped back to brick to a single window replaced properly. Pick the work you need and it carries straight through to the enquiry form.</p>
     </div>
     <div class="trade-grid">
@@ -651,6 +652,19 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
         </div>
         <div class="meta"><h3>Kitchens</h3></div>
         <p class="scope">Kitchen design, supply and installation, coordinated with the electrics and plumbing behind it.</p>
+      </a>
+      <a class="trade reveal" href="#enquire" data-service="Cleaning">
+        <div class="frame">
+          <svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M40 34h22l4 10v32a4 4 0 0 1-4 4H40a4 4 0 0 1-4-4V44z"/>
+            <path d="M44 34v-8h14v8"/><path d="M58 26h12l-4 6"/>
+            <path d="M36 56h30"/>
+            <path class="hl" d="M84 22v12M78 28h12M94 44v8M90 48h8M80 60v6M77 63h6"/>
+          </svg>
+          <span class="badge live">Enquire</span>
+        </div>
+        <div class="meta"><h3>Cleaning</h3></div>
+        <p class="scope">From builders cleans at the end of a project to regular residential and business cleans.</p>
       </a>
     </div>
     <p class="illus-note">Images are illustrative, not photographs of our projects.</p>
@@ -751,6 +765,7 @@ footer{border-top:1px solid var(--line);padding-block:clamp(3rem,8vh,6rem);posit
               <button type="button" class="chip" aria-pressed="false" data-v="Roofing works">Roofing works</button>
               <button type="button" class="chip" aria-pressed="false" data-v="Bathrooms">Bathrooms</button>
               <button type="button" class="chip" aria-pressed="false" data-v="Kitchens">Kitchens</button>
+              <button type="button" class="chip" aria-pressed="false" data-v="Cleaning">Cleaning</button>
               <button type="button" class="chip" aria-pressed="false" data-v="Full service">Full service</button>
               <button type="button" class="chip" aria-pressed="false" data-v="Not sure yet">Not sure yet</button>
             </div>
