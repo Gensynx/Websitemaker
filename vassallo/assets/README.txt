@@ -1,6 +1,41 @@
 Vassallo Developments — video assets
 ====================================
 
+Rubble-free cut (29 Oct 2026)
+  The three films below are made from a cleaned copy of the original in which
+  the plaster rubble left on the hallway floor after the renovation (frames
+  136-262 of 289) has been removed. Only the floor where the rubble lay was
+  changed; every other pixel is the original film:
+    1. The renovated section (frame 128 to the end) was edited with FLUX 3
+       Video Edit on Higgsfield ("remove the rubble, keep everything else").
+       Its output is darker and softer than the original, so it was not used
+       as it came.
+    2. Its clean floor was blended into the original frames only around the
+       rubble, shifted to line up and brightness-matched to the floor around
+       it, fading in over frames 138-146 while the wall finishes forming.
+  New file names (-v3, -mobile-v2, -portrait-v2) so no browser or Cloudflare
+  cache mixes ranges of the old and new films. Encoded from the cleaned PNG
+  frames with the same settings as before; quality on the untouched frames
+  matches the previous files (SSIM 0.977 desktop, 0.981 phone, against the
+  original). The poster is the first frame, which did not change.
+  The files the notes below call original.mp4 are the old film (with the
+  rubble); to re-encode, start from the cleaned frames, not from it.
+
+  vassallo-transformation-v3.mp4          desktop, scroll-scrubbed, 5.8 MB
+    ffmpeg -framerate 24 -i %03d.png -an -c:v libx264 -preset slow -crf 26 \
+      -g 1 -pix_fmt yuv420p -movflags +faststart vassallo-transformation-v3.mp4
+  vassallo-transformation-mobile-v2.mp4   phones and narrow windows, 2.9 MB
+    ffmpeg -framerate 24 -i %03d.png -an -c:v libx264 -preset slow -crf 25 \
+      -g 48 -keyint_min 24 -pix_fmt yuv420p -profile:v high -level 4.0 \
+      -movflags +faststart vassallo-transformation-mobile-v2.mp4
+  vassallo-transformation-portrait-v2.mp4 phones held upright, 1.1 MB
+    ffmpeg -framerate 24 -i %03d.png -an -vf "crop=406:720:(iw-406)/2:0" \
+      -c:v libx264 -preset slow -crf 23 -g 48 -keyint_min 24 -pix_fmt yuv420p \
+      -profile:v high -level 4.0 -movflags +faststart \
+      vassallo-transformation-portrait-v2.mp4
+
+Earlier versions (replaced by the files above)
+
 vassallo-transformation-portrait.mp4  (COMMITTED, phones held upright)
   The middle 406x720 of the original film, so it fills a portrait screen
   instead of sitting in a letterbox: 1.1 MB, SSIM 0.982 against the same crop

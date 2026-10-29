@@ -27,7 +27,7 @@ rooms, then back out as every room rebuilds itself around the camera.
 vassallo/
   index.html                          the site (fonts embedded as data URIs)
   assets/
-    vassallo-transformation.mp4       the intro film — committed, 1280x720, all-intra
+    vassallo-transformation-v3.mp4    the intro film (desktop) — 1280x720, all-intra; -mobile-v2 and -portrait-v2 for phones
     README.txt                        asset provenance and re-encode instructions
 ```
 
