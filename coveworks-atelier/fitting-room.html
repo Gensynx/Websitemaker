@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fitting room · Coveworks</title>
+<meta name="description" content="Cut a demo website for your own business: choose a trade, a look, a layout, a colour and your sections, and watch it build live.">
+<meta name="theme-color" content="#EFE9DD">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23EFE9DD'/%3E%3Cpath d='M44 20a16 16 0 1 0 0 24' fill='none' stroke='%23191613' stroke-width='5'/%3E%3Cpath d='M48 12v40' stroke='%23B4412A' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/bodoni-moda.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+<div class="tape" aria-hidden="true">
+  <div class="ticks" id="tapeTicks"></div>
+  <div id="tapeNums"></div>
+  <div class="cap">cm</div>
+  <div class="mark"><span id="tapeRead">0.0 cm</span></div>
+</div>
+
+<header class="top" id="top">
+  <div class="wrap bar">
+    <a class="wordmark" href="index.html" aria-label="Coveworks, home">Coveworks<sup>Atelier</sup></a>
+    <nav class="main" aria-label="Primary"><a href="work.html">Work</a><a href="fitting-room.html" aria-current="page">Fitting room</a><a href="studio.html">Studio</a><a href="contact.html">Contact</a></nav>
+    <div class="h-right">
+      <a class="btn sm" href="fitting-room.html"><span>Book a fitting</span></a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><i></i><i></i></button>
+    </div>
+  </div>
+</header>
+<nav class="mnav" id="mnav" aria-label="Menu"><a href="index.html">Home<span>01</span></a><a href="work.html">Work<span>02</span></a><a href="fitting-room.html" aria-current="page">Fitting room<span>03</span></a><a href="studio.html">Studio<span>04</span></a><a href="contact.html">Contact<span>05</span></a></nav>
+
+<main>
+  <section class="page-head">
+    <div class="wrap">
+      <p class="label" data-rise><b>02</b> The fitting room</p>
+      <div class="ph-row">
+        <h1 data-rise>Cut a demo <em>of your own.</em></h1>
+        <p class="lede" data-rise>Take your measurements and watch a site cut itself to fit. Nothing is stored. When it fits, send it to us and we will make the real one.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="fit-wrap">
+    <div class="wrap">
+      <div class="fit-grid">
+        <div class="ticket">
+          <div class="t-head"><strong>Measurements</strong><span id="orderNo">Order no. 0000</span></div>
+          <fieldset>
+            <legend><span><b>01</b>Name</span><small>as it appears on the door</small></legend>
+            <input class="t-input" id="fName" maxlength="32" placeholder="Your business name" autocomplete="off" spellcheck="false">
+          </fieldset>
+          <fieldset>
+            <legend><span><b>02</b>Trade</span></legend>
+            <div class="chips" id="fTrade"></div>
+          </fieldset>
+          <fieldset>
+            <legend><span><b>03</b>Look</span><small>nine cuts</small></legend>
+            <div class="cloths" id="fCloth"></div>
+            <p class="cloth-desc" id="fClothDesc"></p>
+          </fieldset>
+          <fieldset>
+            <legend><span><b>04</b>Layout</span><small>the opening section</small></legend>
+            <div class="layouts" id="fLayout"></div>
+          </fieldset>
+          <fieldset>
+            <legend><span><b>05</b>Colour</span></legend>
+            <div class="swatches" id="fAccent"></div>
+          </fieldset>
+          <fieldset>
+            <legend><span><b>06</b>Sections</span><small>tick, then set the order</small></legend>
+            <ol class="secs" id="fSecs"></ol>
+          </fieldset>
+          <fieldset>
+            <legend><span><b>07</b>Headline</span><small>optional · leave blank for ours</small></legend>
+            <input class="t-input sm" id="fHead" maxlength="70" placeholder="" autocomplete="off">
+          </fieldset>
+          <div class="t-actions">
+            <a class="btn chalk" id="fSend" href="mailto:hello@coveworks.studio"><span>Send this fitting to Coveworks</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <div class="row">
+              <button class="btn sm" id="fCopy" type="button"><span>Copy link</span></button>
+              <button class="btn sm" id="fReset" type="button"><span>Start again</span></button>
+            </div>
+            <p class="t-status" id="fStatus" role="status"></p>
+            <p class="t-fine">Sending opens your own email app with the brief written for you. A demo shows the cut; the real build is drawn and written for your business alone.</p>
+          </div>
+        </div>
+        <div class="stage">
+          <div class="browser">
+            <div class="b-bar">
+              <span class="b-url" id="pvUrl">yourbusiness.co.uk</span>
+              <div class="dev" role="group" aria-label="Preview size">
+                <button type="button" data-dev="desktop" aria-pressed="true">Desktop</button>
+                <button type="button" data-dev="phone" aria-pressed="false">Phone</button>
+              </div>
+            </div>
+            <div class="viewport" id="pvView" tabindex="0" aria-label="Live preview of your demo site">
+              <div class="sizer" id="pvSizer"><div class="pvs" id="pvSite"></div></div>
+            </div>
+          </div>
+          <div class="cap"><span>Live preview · scroll inside</span><span>Photography slots swap for yours</span></div>
+        </div>
+      </div>
+      <noscript><p class="lede" style="margin-top:16px">The fitting room needs JavaScript. You can still write to hello@coveworks.studio.</p></noscript>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-grid">
+      <div>
+        <a class="wordmark" href="index.html">Coveworks<sup>Atelier</sup></a>
+        <p>An independent web studio. Animated websites, drawn, written and built by hand.</p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <ul><li><a href="index.html">Home</a></li><li><a href="work.html">Work</a></li><li><a href="fitting-room.html">Fitting room</a></li><li><a href="studio.html">Studio</a></li><li><a href="contact.html">Contact</a></li></ul>
+      </div>
+      <div>
+        <h4>Studio</h4>
+        <ul><li><a href="mailto:hello@coveworks.studio">hello@coveworks.studio</a></li><li>Working worldwide</li><li>One build at a time</li></ul>
+      </div>
+      <div>
+        <h4>Other cuts</h4>
+        <ul><li><a href="../coveworks-scifi/">The flagship, nine themes</a></li></ul>
+      </div>
+    </div>
+    <div class="f-base"><span>© <span class="year">2026</span> Coveworks</span><span>Made to measure</span></div>
+  </div>
+</footer>
+<script src="assets/site.js"></script>
+</body>
+</html>
