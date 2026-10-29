@@ -21,7 +21,7 @@ FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox
            "%3Cpath d='M44 20a16 16 0 1 0 0 24' fill='none' stroke='%23191613' stroke-width='5'/%3E%3Cpath d='M48 12v40' stroke='%23B4412A' stroke-width='3'/%3E%3C/svg%3E")
 
 
-def head(title, desc):
+def head(title, desc, extra_css=''):
     return f'''<!doctype html>
 <html lang="en">
 <head>
@@ -33,7 +33,7 @@ def head(title, desc):
 <link rel="icon" href="{FAVICON}">
 <link rel="preload" href="assets/fonts/bodoni-moda.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/site.css">
-<script>document.documentElement.classList.add('js');</script>
+{extra_css}<script>document.documentElement.classList.add('js');</script>
 </head>
 <body>
 '''
@@ -65,7 +65,7 @@ def chrome(current):
 '''
 
 
-FOOTER = f'''
+FOOTER_TOP = f'''
 <footer>
   <div class="wrap">
     <div class="f-grid">
@@ -89,10 +89,11 @@ FOOTER = f'''
     <div class="f-base"><span>© <span class="year">2026</span> Coveworks</span><span>Made to measure</span></div>
   </div>
 </footer>
-<script src="assets/site.js"></script>
-</body>
-</html>
 '''
+
+
+def footer(extra_js=''):
+    return FOOTER_TOP + '<script src="assets/site.js"></script>\n' + extra_js + '</body>\n</html>\n'
 
 
 def page_head(no, kicker, title, lede):
@@ -163,9 +164,9 @@ HOME = f'''<main>
       <div class="hero-row">
         <p class="sub fade d2">We design and build animated websites with the patience of a tailor. Every page is drawn, written and engineered by hand. No templates. Nothing off the rack.</p>
         <form class="starter fade d3" action="fitting-room.html" method="get" autocomplete="off">
-          <label for="starterName"><b>Begin your fitting</b> · what is your business called?</label>
+          <label for="starterBrief"><b>Begin your fitting</b> · what site do you need?</label>
           <div class="field">
-            <input id="starterName" name="name" maxlength="32" placeholder="Your business name" spellcheck="false">
+            <input id="starterBrief" name="brief" maxlength="140" placeholder="A photography portfolio" spellcheck="false">
             <button type="submit">Cut my demo {ARROW}</button>
           </div>
           <p class="alt">Or <a href="work.html">see the work first</a>.</p>
@@ -198,19 +199,19 @@ HOME = f'''<main>
       <div data-rise>
         <p class="label"><b>02</b> The fitting room</p>
         <h2 class="title">Cut a demo <em>of your own.</em></h2>
-        <p class="lede">Seven measurements and one live preview. Pick your trade, a look, a layout, a colour and the sections you want, in your order, and watch your site cut itself to fit. Nothing is stored until you send it to us.</p>
+        <p class="lede">Tell us in plain words what you need, a photography portfolio, a dental clinic, a launch page for an app, and a preview is cut for that kind of business: its own structure, its own copy, real photography. Then change the look, the layout and the sections until it fits.</p>
         <div class="actions">
           <a class="btn chalk" href="fitting-room.html"><span>Open the fitting room</span>{ARROW}</a>
         </div>
       </div>
       <div data-rise>
         <div class="steps">
-          <div><b>01</b><p><strong>Name</strong><span>As it appears on the door</span></p></div>
-          <div><b>02</b><p><strong>Trade</strong><span>Seven, each with its own copy</span></p></div>
-          <div><b>03</b><p><strong>Look</strong><span>Nine, six of them professional</span></p></div>
-          <div><b>04</b><p><strong>Layout</strong><span>Split, centred or full image</span></p></div>
-          <div><b>05</b><p><strong>Colour</strong><span>Eight considered accents</span></p></div>
-          <div><b>06</b><p><strong>Sections</strong><span>Switch on, switch off, reorder</span></p></div>
+          <div><b>00</b><p><strong>Your words</strong><span>Describe the site you need</span></p></div>
+          <div><b>01</b><p><strong>Site type</strong><span>Thirteen, each built differently</span></p></div>
+          <div><b>02</b><p><strong>Look</strong><span>Fifteen, from Swiss to Aurora</span></p></div>
+          <div><b>03</b><p><strong>Layout</strong><span>Split, centred or full image</span></p></div>
+          <div><b>04</b><p><strong>Colour</strong><span>Ten considered accents</span></p></div>
+          <div><b>05</b><p><strong>Sections</strong><span>The blocks that type needs, in your order</span></p></div>
         </div>
         <div class="mini-cloths" aria-hidden="true">
           <span class="sw clean">Clean</span><span class="sw boardroom">Boardroom</span><span class="sw gallery">Gallery</span><span class="sw slate">Slate</span>
@@ -247,10 +248,23 @@ WORK = f'''<main>
 '''
 
 FITTING = f'''<main>
-{page_head('02', 'The fitting room', 'Cut a demo <em>of your own.</em>', 'Take your measurements and watch a site cut itself to fit. Nothing is stored. When it fits, send it to us and we will make the real one.')}
+{page_head('02', 'The fitting room', 'Cut a demo <em>of your own.</em>', 'Describe the site you need in plain words, or pick a type. Each of the thirteen is cut with its own structure, copy and photography, in any of fifteen looks. Nothing is stored. When it fits, send it to us and we will make the real one.')}
   <section class="fit-wrap">
     <div class="wrap">
       <div class="fit-grid">
+        <div>
+        <form class="brief" id="fBriefForm" autocomplete="off">
+          <label for="fBrief"><b>00</b>Describe the site you need</label>
+          <div class="row">
+            <input id="fBrief" maxlength="160" placeholder="A minimal photography portfolio in black and white" spellcheck="false">
+            <button type="submit">Cut it {ARROW}</button>
+          </div>
+          <div class="brief-eg" aria-label="Examples">
+            <button type="button">A photography portfolio</button><button type="button">A dental clinic, calm and friendly</button><button type="button">A launch page for our app, dark</button>
+            <button type="button">An Italian restaurant called Nonna</button><button type="button">A wedding venue, elegant</button><button type="button">A plumber, bold and blue</button>
+          </div>
+          <p class="brief-read" id="fBriefRead" role="status"></p>
+        </form>
         <div class="ticket">
           <div class="t-head"><strong>Measurements</strong><span id="orderNo">Order no. 0000</span></div>
           <fieldset>
@@ -258,11 +272,11 @@ FITTING = f'''<main>
             <input class="t-input" id="fName" maxlength="32" placeholder="Your business name" autocomplete="off" spellcheck="false">
           </fieldset>
           <fieldset>
-            <legend><span><b>02</b>Trade</span></legend>
-            <div class="chips" id="fTrade"></div>
+            <legend><span><b>02</b>Site type</span><small>each one is built differently</small></legend>
+            <div class="chips" id="fType"></div>
           </fieldset>
           <fieldset>
-            <legend><span><b>03</b>Look</span><small>nine cuts</small></legend>
+            <legend><span><b>03</b>Look</span><small>fifteen styles</small></legend>
             <div class="cloths" id="fCloth"></div>
             <p class="cloth-desc" id="fClothDesc"></p>
           </fieldset>
@@ -289,8 +303,9 @@ FITTING = f'''<main>
               <button class="btn sm" id="fReset" type="button"><span>Start again</span></button>
             </div>
             <p class="t-status" id="fStatus" role="status"></p>
-            <p class="t-fine">Sending opens your own email app with the brief written for you. A demo shows the cut; the real build is drawn and written for your business alone.</p>
+            <p class="t-fine">Sending opens your own email app with the brief written for you. A demo shows the cut; the real build is drawn and written for your business alone. Photography from Unsplash.</p>
           </div>
+        </div>
         </div>
         <div class="stage">
           <div class="browser">
@@ -385,7 +400,10 @@ CONTENT = {
 
 for href, _label in PAGES:
     title, desc, body = CONTENT[href]
-    html = head(title, desc) + chrome(href) + '\n' + body + FOOTER
+    fit = href == 'fitting-room.html'
+    css = '<link rel="stylesheet" href="assets/fitting.css">\n' if fit else ''
+    js = '<script src="assets/fitting.js"></script>\n' if fit else ''
+    html = head(title, desc, css) + chrome(href) + '\n' + body + footer(js)
     with open(os.path.join(ROOT, href), 'w', encoding='utf-8') as f:
         f.write(html)
     print('wrote', href, len(html) // 1024, 'KB')
