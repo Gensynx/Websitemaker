@@ -32,7 +32,7 @@ vassallo/
 ```
 
 ### Notes
-- The six trade cards carry **AI generated placeholder imagery** (Higgsfield, Recraft V4.1), not photographs of real
+- The seven trade cards carry **AI generated placeholder imagery** (Higgsfield, Recraft V4.1), not photographs of real
   Vassallo projects. The section is headed "Projects we've worked on", so replace these with genuine project
   photography before the site is promoted. Drop a 4:3 image in at the same filename in `vassallo/images/` and the
   card picks it up with no code change. See `vassallo/images/README.txt`.
