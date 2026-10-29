@@ -1,29 +1,29 @@
-/* Coveworks · Atelier · fitting room: brief box, look tiles and the preview site */
+/* Coveworks · Lab · configurator: brief box, look tiles and the preview site */
 
 /* ---------- the brief ---------- */
-.brief{background:var(--ink);color:var(--paper);padding:18px 20px 16px;margin-bottom:16px;position:relative}
+.brief{background:var(--ink);color:#F4F4F2;padding:18px 20px 16px;margin-bottom:12px;position:relative;border-radius:var(--rad)}
 .brief label{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:rgba(239,233,221,.6);margin-bottom:8px}
-.brief label b{color:#E07B62;font-weight:500;margin-right:8px}
+.brief label b{font-family:var(--dot);font-weight:800;font-size:12px;color:var(--sig);margin-right:8px;letter-spacing:.02em}
 .brief .row{display:flex;gap:10px;align-items:stretch}
-.brief input{flex:1;min-width:0;background:transparent;border:0;border-bottom:1px solid rgba(239,233,221,.4);outline:0;color:var(--paper);font-family:var(--serif);font-size:21px;padding:2px 0 7px}
+.brief input{flex:1;min-width:0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:999px;outline:0;color:#fff;font-family:var(--sans);font-size:16px;padding:11px 16px}
 .brief input::placeholder{color:rgba(239,233,221,.45)}
-.brief input:focus{border-bottom-color:var(--paper)}
-.brief button[type=submit]{background:var(--chalk);color:#FBF6EE;padding:0 16px;font-size:13.5px;white-space:nowrap;display:flex;align-items:center;gap:8px}
-.brief button[type=submit]:hover{background:#9A3622}
+.brief input:focus{border-color:rgba(255,255,255,.6)}
+.brief button[type=submit]{background:var(--sig);color:#fff;padding:0 18px;border-radius:999px;font-size:13.5px;font-weight:500;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.brief button[type=submit]:hover{background:#fff;color:var(--ink)}
 .brief-eg{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
-.brief-eg button{font-size:12px;color:rgba(239,233,221,.8);border:1px solid rgba(239,233,221,.25);padding:4px 9px;transition:border-color .3s,color .3s}
+.brief-eg button{font-size:12px;color:rgba(255,255,255,.8);border:1px solid rgba(255,255,255,.2);border-radius:999px;padding:4px 11px;transition:border-color .3s,color .3s}
 .brief-eg button:hover{border-color:var(--paper);color:var(--paper)}
 .brief-read{font-size:12.5px;color:rgba(239,233,221,.75);margin-top:10px;min-height:0}
 .brief-read:empty{display:none}
-.brief-read b{color:#E9A48F;font-weight:600}
+.brief-read b{color:#fff;font-weight:600}
 
 /* ---------- extra look tiles ---------- */
 .sw.swiss{background:#fff;color:#0A0A0A;font-family:'IBM Plex Sans',sans-serif;font-weight:700;border:1px solid var(--rule);border-top:3px solid #E5322D}
-.sw.aurora{background:radial-gradient(70% 120% at 20% 0%,#5B4BD6,transparent 70%),radial-gradient(60% 120% at 100% 100%,#22B8CF,transparent 70%),#07080F;color:#EDEBFF;font-family:'Manrope',sans-serif;font-weight:700;border-radius:6px;--dot:50%}
-.sw.glass{background:linear-gradient(135deg,#E9E4FF,#DDF3FF 55%,#FFE7F1);color:#1A1B2E;font-family:'Manrope',sans-serif;font-weight:600;border:1px solid #fff;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);--dot:50%}
+.sw.aurora{background:radial-gradient(70% 120% at 20% 0%,#5B4BD6,transparent 70%),radial-gradient(60% 120% at 100% 100%,#22B8CF,transparent 70%),#07080F;color:#EDEBFF;font-family:'Manrope',sans-serif;font-weight:700;border-radius:6px;--dot-r:50%}
+.sw.glass{background:linear-gradient(135deg,#E9E4FF,#DDF3FF 55%,#FFE7F1);color:#1A1B2E;font-family:'Manrope',sans-serif;font-weight:600;border:1px solid #fff;border-radius:8px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.7);--dot-r:50%}
 .sw.brutal{background:#FFE66D;color:#111;font-family:var(--sans);font-weight:800;border:2px solid #111;box-shadow:3px 3px 0 #111}
 .sw.grid{background:#FAFBFC radial-gradient(rgba(20,30,45,.22) 1px,transparent 1.2px) 0 0/7px 7px;color:#14202D;font-family:'JetBrains Mono',monospace;font-weight:500;font-size:12px;border:1px solid #DDE3EA;border-radius:4px}
-.sw.mono{background:#fff;color:#09090B;font-family:'Manrope',sans-serif;font-weight:700;letter-spacing:-.03em;border:1px solid #E4E4E7;border-radius:6px;--dot:2px}
+.sw.mono{background:#fff;color:#09090B;font-family:'Manrope',sans-serif;font-weight:700;letter-spacing:-.03em;border:1px solid #E4E4E7;border-radius:6px;--dot-r:2px}
 .cloths .cloth-group{grid-column:1/-1}
 
 /* ---------- preview site: base ---------- */
@@ -68,13 +68,17 @@
 .pvs.l-centred .x-search{margin-left:auto;margin-right:auto}
 .pvs.l-full .x-hero{display:flex;align-items:flex-end;min-height:760px;padding:0;overflow:hidden}
 .pvs.l-full .x-hero-img{position:absolute;inset:0;aspect-ratio:auto;border-radius:0;border:0}
-.pvs.l-full .x-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.08) 30%,rgba(0,0,0,.62));z-index:1}
+.pvs.l-full .x-hero::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.28),rgba(0,0,0,.18) 35%,rgba(0,0,0,.7));z-index:1}
+.pvs.l-full .x-hero-copy{text-shadow:0 1px 18px rgba(0,0,0,.45)}
+.pvs.l-full .x-hero .x-kick{display:inline-block;background:rgba(0,0,0,.42);padding:6px 12px;border-radius:999px;backdrop-filter:blur(6px);text-shadow:none;color:#fff !important}
+.pvs.l-full .x-hero .x-ghost{background:rgba(0,0,0,.32);backdrop-filter:blur(6px);text-shadow:none}
 .pvs.l-full .x-hero-copy{position:relative;z-index:2;padding:0 72px 88px;max-width:1000px;color:#fff}
 .pvs.l-full .x-hero .x-kick{color:rgba(255,255,255,.8)}
 .pvs.l-full .x-hero-copy > p:not(.x-kick){color:rgba(255,255,255,.84)}
 .pvs.l-full .x-hero .x-ghost{border-color:rgba(255,255,255,.5);color:#fff}
 .pvs.l-full .x-hero h1{font-size:96px;color:#fff;background:none;-webkit-text-fill-color:#fff}
 .pvs.t-photography.l-full .x-hero{align-items:center;justify-content:center;min-height:820px}
+.pvs.t-photography.l-full .x-hero::after{background:radial-gradient(60% 55% at 50% 50%,rgba(0,0,0,.5),rgba(0,0,0,.18) 70%),linear-gradient(180deg,rgba(0,0,0,.2),rgba(0,0,0,.35))}
 .pvs.t-photography.l-full .x-hero-copy{text-align:center;padding:0 72px}
 .pvs.t-photography.l-full .x-hero-copy > p:not(.x-kick){margin:0 auto}
 .pvs.t-photography.l-full .x-cta{justify-content:center}
@@ -374,3 +378,10 @@
 .pvs.is-phone .x-gal .x-ph:first-child{grid-column:span 2;grid-row:auto}
 .pvs.is-phone .x-foot{flex-direction:column;gap:6px;padding:24px 22px}
 .pvs.is-phone .x-price strong{font-size:42px}
+
+/* the describe box could not read the brief: dim the old preview and offer the closest types */
+.stage.unsure .browser{opacity:.35;filter:grayscale(1);transition:opacity .3s,filter .3s}
+.stage .browser{transition:opacity .3s,filter .3s}
+.brief-pick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.brief-pick button{background:#fff;color:var(--ink);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600}
+.brief-pick button:hover{background:var(--sig);color:#fff}

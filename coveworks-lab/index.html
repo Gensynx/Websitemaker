@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coveworks · made to measure</title>
+<meta name="description" content="Coveworks is an independent web studio. We design and build animated websites by hand. Describe the site you need and build a preview in the configurator.">
+<meta name="theme-color" content="#F4F4F2">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23F4F4F2'/%3E%3Ccircle cx='32' cy='32' r='12' fill='%23E5321E'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/doto.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/site.css">
+<script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+<div class="tape" aria-hidden="true">
+  <div class="ticks" id="tapeTicks"></div>
+  <div id="tapeNums"></div>
+  <div class="cap">SCR</div>
+  <div class="mark"><span id="tapeRead">000%</span></div>
+</div>
+
+<header class="top" id="top">
+  <div class="wrap bar">
+    <a class="wordmark" href="index.html" aria-label="Coveworks, home">Coveworks<sup>Lab</sup></a>
+    <nav class="main" aria-label="Primary"><a href="work.html">Work</a><a href="configurator.html">Configurator</a><a href="studio.html">Studio</a><a href="contact.html">Contact</a></nav>
+    <div class="h-right">
+      <a class="btn sm" href="configurator.html"><span>Start a build</span></a>
+      <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="mnav"><i></i><i></i></button>
+    </div>
+  </div>
+</header>
+<nav class="mnav" id="mnav" aria-label="Menu"><a href="index.html" aria-current="page">Home<span>01</span></a><a href="work.html">Work<span>02</span></a><a href="configurator.html">Configurator<span>03</span></a><a href="studio.html">Studio<span>04</span></a><a href="contact.html">Contact<span>05</span></a></nav>
+
+<main>
+  <section id="hero">
+    <div class="wrap">
+      <div class="hero-top fade d1">
+        <p class="label"><span class="led pulse"></span><b>Coveworks</b> Independent web studio</p>
+        <p class="label">System · online</p>
+      </div>
+      <h1 aria-label="The web, made to measure.">
+        <span class="ln">The web,</span>
+        <span class="ln">made to measure<span class="stop">.</span></span>
+      </h1>
+      <div class="hero-row">
+        <div class="mod fade d2">
+          <div class="mod-head"><span>01 · Studio</span><span class="led ok"></span></div>
+          <p class="sub">We design and build animated websites with the patience of a tailor. Every page is drawn, written and engineered by hand. No templates. Nothing off the rack.</p>
+        </div>
+        <form class="mod starter fade d3" action="configurator.html" method="get" autocomplete="off">
+          <div class="mod-head"><span>02 · Configurator</span><span>Ready</span></div>
+          <label class="sub" for="starterBrief" style="margin-bottom:14px">What site do you need? Describe it and we will build a preview.</label>
+          <div class="field">
+            <input id="starterBrief" name="brief" maxlength="140" placeholder="A photography portfolio" spellcheck="false">
+            <button class="btn sig" type="submit"><span>Build it</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+          </div>
+          <p class="alt">Or <a href="work.html">see the work first</a>.</p>
+        </form>
+        <div class="mod readout fade d4">
+          <div class="mod-head"><span>03 · Status</span><span>London</span></div>
+          <p class="big" id="clock">00:00</p>
+          <ul>
+            <li><span class="led ok"></span> One build at a time</li>
+            <li><span class="led ok"></span> Working worldwide</li>
+            <li><span class="led ok"></span> Replies within a day</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:clamp(24px,3vw,40px)">
+    <div class="wrap">
+      <div class="s-head">
+        <div data-rise>
+          <p class="label"><b>01</b> Selected work</p>
+          <h2 class="title">Built here, <em>recently.</em></h2>
+        </div>
+        <a class="more" href="work.html" data-rise>All eight builds <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="w-list" id="wList" data-limit="4"></div>
+      <noscript><p class="lede" style="margin-top:16px"><a href="work.html">See the work</a></p></noscript>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap teaser">
+      <div data-rise>
+        <p class="label"><b>02</b> The configurator</p>
+        <h2 class="title">Build a demo <em>of your own.</em></h2>
+        <p class="lede">Tell us in plain words what you need, a photography portfolio, a dental clinic, a launch page for an app, and a preview is built for that kind of business: its own structure, its own copy, real photography. Then change the look, the layout and the sections until it fits.</p>
+        <div class="actions">
+          <a class="btn sig" href="configurator.html"><span>Open the configurator</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        </div>
+      </div>
+      <div data-rise>
+        <div class="steps">
+          <div><b>00</b><p><strong>Your words</strong><span>Describe the site you need</span></p></div>
+          <div><b>01</b><p><strong>Site type</strong><span>Thirteen, each built differently</span></p></div>
+          <div><b>02</b><p><strong>Look</strong><span>Fifteen, from Swiss to Aurora</span></p></div>
+          <div><b>03</b><p><strong>Layout</strong><span>Split, centred or full image</span></p></div>
+          <div><b>04</b><p><strong>Colour</strong><span>Ten considered accents</span></p></div>
+          <div><b>05</b><p><strong>Sections</strong><span>The blocks that type needs, in your order</span></p></div>
+        </div>
+        <div class="mini-cloths" aria-hidden="true">
+          <span class="sw clean">Clean</span><span class="sw boardroom">Boardroom</span><span class="sw gallery">Gallery</span><span class="sw slate">Slate</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="s-head">
+        <div data-rise>
+          <p class="label"><b>03</b> Services</p>
+          <h2 class="title">What the <em>studio does.</em></h2>
+        </div>
+        <a class="more" href="studio.html" data-rise>How we work <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+      </div>
+      <div class="svc"><article data-rise><p class="label"><span>Module</span><b>01</b></p><h3>Art direction and design</h3><p>The look, the type, the palette, the mood. We design every screen as a composition, not a layout, so the site reads as one continuous piece.</p></article><article data-rise><p class="label"><span>Module</span><b>02</b></p><h3>Development</h3><p>Clean, fast, dependency light code that ships as a single artifact and loads like a whisper. Built by hand, easy to host anywhere.</p></article><article data-rise><p class="label"><span>Module</span><b>03</b></p><h3>Motion and interaction</h3><p>Cinematic intros, scroll choreography, cursors that respond, pages that breathe. Motion with intent, never decoration for its own sake.</p></article><article data-rise><p class="label"><span>Module</span><b>04</b></p><h3>Identity and voice</h3><p>Wordmarks, copy and tone that carry the same conviction as the design. We write the words as carefully as we set them.</p></article></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="c-band" data-rise>
+        <div>
+          <p class="label"><span class="led ok pulse"></span><b>Contact</b> Taking new builds</p>
+          <h2 class="title">Tell us what you are <em>building.</em></h2>
+          <a class="mail" href="mailto:hello@coveworks.studio">hello@coveworks.studio</a>
+        </div>
+        <div class="acts">
+          <a class="btn sig" href="configurator.html"><span>Start in the configurator</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+          <a class="btn ghost" href="contact.html"><span>Write to us</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="f-grid">
+      <div>
+        <a class="wordmark" href="index.html">Coveworks<sup>Lab</sup></a>
+        <p>An independent web studio. Animated websites, designed, written and engineered by hand.</p>
+      </div>
+      <div>
+        <h4>Pages</h4>
+        <ul><li><a href="index.html">Home</a></li><li><a href="work.html">Work</a></li><li><a href="configurator.html">Configurator</a></li><li><a href="studio.html">Studio</a></li><li><a href="contact.html">Contact</a></li></ul>
+      </div>
+      <div>
+        <h4>Studio</h4>
+        <ul><li><a href="mailto:hello@coveworks.studio">hello@coveworks.studio</a></li><li>Working worldwide</li><li>One build at a time</li></ul>
+      </div>
+      <div>
+        <h4>Other editions</h4>
+        <ul><li><a href="../coveworks-scifi/">The flagship, nine themes</a></li></ul>
+      </div>
+    </div>
+    <p class="f-big" aria-hidden="true">Coveworks<span>.</span></p>
+    <div class="f-base"><span>© <span class="year">2026</span> Coveworks</span><span>Made to measure</span></div>
+  </div>
+</footer>
+<script src="assets/site.js"></script>
+</body>
+</html>

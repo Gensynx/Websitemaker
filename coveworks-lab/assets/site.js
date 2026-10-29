@@ -1,4 +1,4 @@
-/* Coveworks · Atelier edition · shared behaviour (each block only runs on pages that have its elements) */
+/* Coveworks · Lab edition · shared behaviour (each block only runs on pages that have its elements) */
 (function(){
 'use strict';
 var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -10,11 +10,37 @@ var smooth = reduce ? 'auto' : 'smooth';
 
 /* ============ entrance, clock, year ============ */
 requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.documentElement.classList.add('ready'); }); });
+
+/* dot matrix headline powers up character by character, in a random order */
+(function(){
+  var h = document.querySelector('#hero h1');
+  if (!h) return;
+  var chars = [];
+  h.querySelectorAll('.ln').forEach(function(ln){
+    var nodes = Array.prototype.slice.call(ln.childNodes);
+    ln.textContent = '';
+    nodes.forEach(function(n){
+      var text = n.textContent, cls = n.nodeType === 1 ? n.className : '';
+      for (var i = 0; i < text.length; i++){
+        var c = document.createElement('span');
+        c.className = 'ch' + (cls ? ' ' + cls : '');
+        c.textContent = text[i];
+        if (text[i] === ' ') c.style.width = '.3em';
+        ln.appendChild(c);
+        chars.push(c);
+      }
+    });
+  });
+  if (reduce){ h.classList.add('on'); return; }
+  var order = chars.map(function(c, i){ return i; }).sort(function(){ return Math.random() - .5; });
+  order.forEach(function(idx, k){ setTimeout(function(){ chars[idx].style.opacity = '1'; }, 120 + k * 22 + Math.random() * 60); });
+  setTimeout(function(){ h.classList.add('on'); }, 160 + order.length * 22 + 120);
+})();
 function clock(){
   var d = new Date(), c = $('clock');
   if (c){
-    try { c.textContent = 'London · ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' }); }
-    catch(e) { c.textContent = 'London'; }
+    try { c.textContent = d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' }); }
+    catch(e) { c.textContent = ''; }
   }
   document.querySelectorAll('.year').forEach(function(y){ y.textContent = d.getFullYear(); });
 }
@@ -58,7 +84,8 @@ function drawTape(y){
     k++;
   }
   for (; k < numPool.length; k++) numPool[k].style.display = 'none';
-  tapeRead.textContent = ((y + vh / 2) / CM).toFixed(1) + ' cm';
+  var max = Math.max(1, document.documentElement.scrollHeight - vh);
+  tapeRead.textContent = String(Math.round(Math.min(1, y / max) * 100)).padStart(3, '0') + '%';
 }
 
 /* ============ reveals + counters ============ */
@@ -128,7 +155,7 @@ if (wList){
   if (wList.hasAttribute('data-next')){
     var nextRow = document.createElement('div');
     nextRow.className = 'w-row next';
-    nextRow.innerHTML = '<a class="w-btn" href="fitting-room.html"><span class="no">' + String(WORKS.length + 1).padStart(2, '0') + '</span><span class="nm">Your name, <em>next.</em></span><span class="tg">Begin with a fitting</span><span class="st">Reserved</span><span class="pl" aria-hidden="true"></span></a>';
+    nextRow.innerHTML = '<a class="w-btn" href="configurator.html"><span class="no">' + String(WORKS.length + 1).padStart(2, '0') + '</span><span class="nm">Your name, <em>next.</em></span><span class="tg">Start in the configurator</span><span class="st">Reserved</span><span class="pl" aria-hidden="true"></span></a>';
     wList.appendChild(nextRow);
   }
   wList.addEventListener('click', function(e){

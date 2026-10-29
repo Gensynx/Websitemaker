@@ -1,4 +1,4 @@
-/* Coveworks · Atelier · the fitting room
+/* Coveworks · Lab · the configurator
    Each site type carries its own structure, copy and photography; each look restyles it.
    Photography: Unsplash via Lorem Picsum, see assets/stock/CREDITS.txt */
 (function(){
@@ -234,16 +234,48 @@ var LOOK_WORDS = [['minimal', 'gallery'], ['clean', 'clean'], ['simple', 'clean'
 var COLOUR_WORDS = [['navy', 'navy'], ['blue', 'blue'], ['teal', 'teal'], ['green', 'forest'], ['purple', 'violet'], ['violet', 'violet'], ['burgundy', 'oxblood'], ['wine', 'oxblood'],
   ['red', 'chalk'], ['orange', 'chalk'], ['gold', 'ochre'], ['yellow', 'ochre'], ['grey', 'graphite'], ['gray', 'graphite'], ['black', 'ink']];
 var LAYOUT_WORDS = [['centred', 'centred'], ['centered', 'centred'], ['full screen', 'full'], ['full image', 'full'], ['big photo', 'full'], ['split', 'split']];
-function readBrief(text){
-  var t = ' ' + text.toLowerCase() + ' ', found = { type: null, look: null, accent: null, layout: null, name: null };
+function lev(a, b){
+  if (a === b) return 0;
+  var prev = [], cur, i, j;
+  for (j = 0; j <= b.length; j++) prev[j] = j;
+  for (i = 1; i <= a.length; i++){
+    cur = [i];
+    for (j = 1; j <= b.length; j++) cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    prev = cur;
+  }
+  return prev[b.length];
+}
+/* how well one keyword matches the brief: exact word, a longer form of it (photographer, minimalist),
+   or a near spelling (resturant). Keywords padded with spaces must match exactly as written. */
+function hit(kw, t, ws, loose){
+  if (/^\s|\s$/.test(kw) || kw.indexOf(' ') > -1) return t.indexOf(kw) > -1 ? kw.trim().length + 1 : 0;
   var best = 0;
-  Object.keys(TYPES).forEach(function(k){
-    var score = 0;
-    TYPES[k].kw.forEach(function(w){ if (t.indexOf(w) > -1) score += w.length; });
-    if (score > best){ best = score; found.type = k; }
+  ws.forEach(function(w){
+    if (w === kw || w === kw + 's' || w === kw + 'es'){ best = Math.max(best, kw.length + 1); return; }
+    if (w.indexOf(kw) === 0 && (kw.length >= 4 || w.length <= kw.length + 1)){ best = Math.max(best, kw.length); return; }
+    if (kw.length < 5 || w.length < 4) return;
+    var tol = (kw.length >= 8 ? 2 : 1) + (loose ? 1 : 0);
+    if (Math.abs(w.length - kw.length) <= tol && lev(w, kw) <= tol) best = Math.max(best, kw.length - 1);
+    else if (w.length > kw.length && lev(w.slice(0, kw.length), kw) <= tol) best = Math.max(best, kw.length - 2);
   });
-  LOOK_WORDS.forEach(function(p){ if (!found.look && new RegExp('\\b' + p[0] + '\\b').test(t)) found.look = p[1]; });
-  COLOUR_WORDS.forEach(function(p){ if (!found.accent && new RegExp('\\b' + p[0] + '\\b').test(t)) found.accent = p[1]; });
+  return best;
+}
+function scoreTypes(t, ws, loose){
+  return Object.keys(TYPES).map(function(k){
+    var score = 0;
+    TYPES[k].kw.forEach(function(w){ score += hit(w, t, ws, loose); });
+    return [k, score];
+  }).filter(function(p){ return p[1] > 0; }).sort(function(x, y){ return y[1] - x[1]; });
+}
+function readBrief(text){
+  var t = ' ' + text.toLowerCase().replace(/[^a-z0-9&é ]+/g, ' ') + ' ';
+  var ws = t.split(/\s+/).filter(Boolean);
+  var found = { type: null, look: null, accent: null, layout: null, name: null, guesses: [] };
+  var ranked = scoreTypes(t, ws, false);
+  if (ranked.length) found.type = ranked[0][0];
+  else found.guesses = scoreTypes(t, ws, true).slice(0, 3).map(function(p){ return p[0]; });
+  LOOK_WORDS.forEach(function(p){ if (!found.look && hit(p[0], t, ws, false)) found.look = p[1]; });
+  COLOUR_WORDS.forEach(function(p){ if (!found.accent && hit(p[0], t, ws, false)) found.accent = p[1]; });
   LAYOUT_WORDS.forEach(function(p){ if (!found.layout && t.indexOf(p[0]) > -1) found.layout = p[1]; });
   var m = text.match(/(?:called|named)\s+["“']?([^,.;"”']{2,32})/i) || text.match(/["“]([^"”]{2,32})["”]/);
   if (m) found.name = m[1].trim();
@@ -258,7 +290,7 @@ function typeDefaults(k){
 }
 function fresh(){
   var s = typeDefaults('photography');
-  s.name = ''; s.headline = ''; s.device = window.innerWidth < 760 ? 'phone' : 'desktop';
+  s.name = ''; s.nameSrc = ''; s.headline = ''; s.device = window.innerWidth < 760 ? 'phone' : 'desktop';
   return s;
 }
 var S = fresh();
@@ -268,8 +300,8 @@ function applyType(k){
 }
 (function(){
   var q = new URLSearchParams(location.search);
-  if (q.get('name')) S.name = q.get('name').slice(0, 32);
-  if (q.get('brief')) { var f = readBrief(q.get('brief')); if (f.type) applyType(f.type); if (f.look) S.look = f.look; if (f.accent) S.accent = f.accent; if (f.layout) S.layout = f.layout; if (f.name) S.name = f.name; }
+  if (q.get('name')){ S.name = q.get('name').slice(0, 32); S.nameSrc = 'user'; }
+  if (q.get('brief')) { var f = readBrief(q.get('brief')); if (f.type) applyType(f.type); if (f.look) S.look = f.look; if (f.accent) S.accent = f.accent; if (f.layout) S.layout = f.layout; if (f.name){ S.name = f.name; S.nameSrc = 'brief'; } var bi = document.getElementById('fBrief'); if (bi) bi.value = q.get('brief'); }
   var fit = q.get('fit');
   if (!fit) return;
   try {
@@ -294,7 +326,7 @@ function nm(){ return S.name.trim() || 'Your Business'; }
 function fill(s){ return esc(String(s).replace(/\{n\}/g, nm())); }
 function slug(){ return (nm().toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, '') || 'yourbusiness') + '.co.uk'; }
 function initials(n){ return n.replace(/^Dr\s+/, '').split(' ').map(function(w){ return w[0]; }).join('').slice(0, 2); }
-$('orderNo').textContent = 'Order no. ' + String(1000 + Math.floor(Math.random() * 9000));
+$('orderNo').textContent = 'Build no. ' + String(1000 + Math.floor(Math.random() * 9000));
 
 /* ============ controls ============ */
 $('fType').innerHTML = Object.keys(TYPES).map(function(k){
@@ -518,7 +550,7 @@ function showSection(k){
 function mailto(){
   var T = TYPES[S.type];
   var live = S.order.filter(function(k){ return S.on[k]; }).map(function(k){ return BLOCKS[k]; });
-  var body = 'Hello Coveworks,\n\nI cut a demo in your fitting room and would like to talk about the real thing.\n\n' +
+  var body = 'Hello Coveworks,\n\nI built a demo in your configurator and would like to talk about the real thing.\n\n' +
     'Business: ' + nm() + '\n' +
     'Type of site: ' + T.label + '\n' +
     'Look: ' + LOOKS[S.look].label + ' (' + LOOKS[S.look].desc.toLowerCase() + ')\n' +
@@ -527,9 +559,9 @@ function mailto(){
     'Sections, in order: Opening · ' + (live.join(' · ') || 'none yet') + '\n' +
     'Headline: ' + (S.headline.trim() || T.h) + '\n' +
     ($('fBrief').value.trim() ? 'In my words: ' + $('fBrief').value.trim() + '\n' : '') + '\n' +
-    'My fitting: ' + fitURL() + '\n\n' +
+    'My build: ' + fitURL() + '\n\n' +
     'My name:\nBest way to reach me:\n';
-  return 'mailto:hello@coveworks.studio?subject=' + encodeURIComponent('Fitting · ' + nm()) + '&body=' + encodeURIComponent(body);
+  return 'mailto:hello@coveworks.studio?subject=' + encodeURIComponent('Configurator · ' + nm()) + '&body=' + encodeURIComponent(body);
 }
 function status(t){
   var el = $('fStatus');
@@ -545,32 +577,49 @@ function fadeRender(){
 }
 
 /* ============ wiring ============ */
+function setUnsure(on){ document.querySelector('.stage').classList.toggle('unsure', !!on); }
 function runBrief(text){
   var f = readBrief(text), said = [];
-  if (f.type){ applyType(f.type); said.push(TYPES[f.type].label + ' site'); }
+  if (!f.type){
+    var picks = (f.guesses.length ? f.guesses : ['photography', 'restaurant', 'clinic']);
+    $('fBriefRead').innerHTML = '<b>Not sure what kind of site that is.</b> ' + (f.guesses.length ? 'Did you mean' : 'Try one of these, or pick any type below') + ':' +
+      '<span class="brief-pick">' + picks.map(function(k){ return '<button type="button" data-pick="' + k + '">' + TYPES[k].label + '</button>'; }).join('') + '</span>';
+    setUnsure(true);
+    return;
+  }
+  setUnsure(false);
+  applyType(f.type); said.push(TYPES[f.type].label + ' site');
   if (f.look){ S.look = f.look; said.push(LOOKS[f.look].label + ' look'); }
-  else if (f.type) said.push(LOOKS[S.look].label + ' look');
+  else said.push(LOOKS[S.look].label + ' look');
   if (f.layout){ S.layout = f.layout; }
   said.push(LAYOUTS[S.layout].label.toLowerCase() + ' opening');
   if (f.accent){ S.accent = f.accent; said.push(ACCENTS[f.accent][0].toLowerCase()); }
-  if (f.name){ S.name = f.name.slice(0, 32); said.push('named ' + S.name); }
+  if (f.name){ S.name = f.name.slice(0, 32); S.nameSrc = 'brief'; said.push('named ' + S.name); }
+  else if (S.nameSrc === 'brief'){ S.name = ''; S.nameSrc = ''; }
   S.headline = '';
   syncControls();
   fadeRender();
   pvView.scrollTo({ top: 0, behavior: smooth });
-  $('fBriefRead').innerHTML = f.type || f.look
-    ? '<b>Cut as</b> ' + esc(said.join(' · ')) + '. Adjust anything below.'
-    : '<b>Not sure yet.</b> Try naming the kind of business, for example “a photography portfolio” or “a dental clinic”.';
+  $('fBriefRead').innerHTML = '<b>Built as</b> ' + esc(said.join(' · ')) + '. Adjust anything below.';
 }
+$('fBriefRead').addEventListener('click', function(e){
+  var b = e.target.closest('[data-pick]');
+  if (!b) return;
+  var k = b.getAttribute('data-pick');
+  if (S.nameSrc === 'brief'){ S.name = ''; S.nameSrc = ''; }
+  applyType(k); S.headline = ''; setUnsure(false);
+  syncControls(); fadeRender(); pvView.scrollTo({ top: 0, behavior: smooth });
+  $('fBriefRead').innerHTML = '<b>Built as</b> ' + esc(TYPES[k].label + ' site · ' + LOOKS[S.look].label + ' look') + '. Adjust anything below.';
+});
 $('fBriefForm').addEventListener('submit', function(e){ e.preventDefault(); runBrief($('fBrief').value); });
 document.querySelectorAll('.brief-eg button').forEach(function(b){
   b.addEventListener('click', function(){ $('fBrief').value = b.textContent; runBrief(b.textContent); });
 });
-$('fName').addEventListener('input', function(){ S.name = this.value; render(); });
+$('fName').addEventListener('input', function(){ S.name = this.value; S.nameSrc = this.value ? 'user' : ''; render(); });
 $('fHead').addEventListener('input', function(){ S.headline = this.value; render(); });
 $('fHead').addEventListener('focus', function(){ pvView.scrollTo({ top: 0, behavior: smooth }); });
 document.querySelectorAll('input[name=type]').forEach(function(r){
-  r.addEventListener('change', function(){ applyType(r.value); S.headline = ''; syncControls(); fadeRender(); pvView.scrollTo({ top: 0, behavior: smooth }); });
+  r.addEventListener('change', function(){ if (S.nameSrc === 'brief'){ S.name = ''; S.nameSrc = ''; } applyType(r.value); S.headline = ''; setUnsure(false); syncControls(); fadeRender(); pvView.scrollTo({ top: 0, behavior: smooth }); });
 });
 document.querySelectorAll('input[name=look]').forEach(function(r){
   r.addEventListener('change', function(){ S.look = r.value; describe(); fadeRender(); });
@@ -613,7 +662,7 @@ $('fCopy').addEventListener('click', function(){
   var url = fitURL();
   try { history.replaceState(null, '', url); } catch(e) {}
   if (navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(url).then(function(){ status('Link copied · it reopens this exact fitting'); }, function(){ status('Link is in the address bar'); });
+    navigator.clipboard.writeText(url).then(function(){ status('Link copied · it reopens this exact build'); }, function(){ status('Link is in the address bar'); });
   } else status('Link is in the address bar');
 });
 $('fReset').addEventListener('click', function(){
@@ -623,7 +672,8 @@ $('fReset').addEventListener('click', function(){
   try { history.replaceState(null, '', location.pathname); } catch(e) {}
   syncControls(); render();
   pvView.scrollTop = 0;
-  status('Fresh cloth');
+  status('Reset');
+  setUnsure(false);
 });
 $('fSend').addEventListener('click', function(){ this.setAttribute('href', mailto()); status('Your email app is opening'); });
 
