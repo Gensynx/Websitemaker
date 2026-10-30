@@ -1,6 +1,6 @@
 /* Coveworks · Lab · the configurator
    Each site type carries its own structure, copy and photography; each look restyles it.
-   Photography: Unsplash via Lorem Picsum, see assets/stock/CREDITS.txt */
+   Photography: generated for Coveworks with Higgsfield, see assets/gen/CREDITS.txt */
 (function(){
 'use strict';
 var pvSite = document.getElementById('pvSite');
@@ -9,7 +9,7 @@ var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var smooth = reduce ? 'auto' : 'smooth';
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
-function img(id, cls, alt){ return '<span class="x-ph' + (cls ? ' ' + cls : '') + '"><img src="assets/stock/' + id + '.webp" alt="' + esc(alt || '') + '" decoding="async"></span>'; }
+function img(id, cls, alt){ return '<span class="x-ph' + (cls ? ' ' + cls : '') + '"><img src="assets/gen/' + id + '.webp" alt="' + esc(alt || '') + '" decoding="async"></span>'; }
 
 /* ============ site types ============ */
 var TYPES = {
@@ -17,7 +17,7 @@ var TYPES = {
     kw: ['photo', 'photograph', 'portrait', 'camera', 'shoot', 'film', 'portfolio', 'videograph'],
     kick: 'Portrait and landscape photography', h: 'Light, held still.', cta: 'Book a shoot',
     sub: '{n} photographs people and places for editorial, commercial and private clients, on film and digital.',
-    hero: 1052, imgs: [1027, 778, 477, 29, 1001, 669, 822, 646, 1015],
+    hero: 'photography-0', imgs: ['photography-1', 'photography-2', 'photography-3', 'photography-4', 'photography-5', 'photography-6', 'photography-7'],
     caps: ['Portrait · Studio', 'Golden hour', 'Lake series', 'Alps · Winter', 'Couples', 'Street', 'Family', 'Fields', 'Fjords'],
     blocks: [['work', 1], ['series', 1], ['about', 1], ['packages', 1], ['testimonial', 1], ['faq', 0], ['contact', 1]],
     about: 'I am {n}. I make quiet, honest pictures: people as they are, places as they feel. Every commission starts with a conversation and ends with a set of images you will keep for life.',
@@ -31,7 +31,7 @@ var TYPES = {
     kw: ['restaurant', 'dining', 'bistro', 'kitchen', 'food', 'bar ', 'pub', 'steak', 'sushi', 'pizza', 'chef', 'eatery'],
     kick: 'Kitchen and dining room', h: 'Seasonal plates, cooked with care.', cta: 'Book a table',
     sub: '{n} is a neighbourhood dining room with a short menu that changes with whatever the market brings in.',
-    hero: 999, imgs: [292, 488, 995, 395, 42],
+    hero: 'restaurant-0', imgs: ['restaurant-1', 'restaurant-2', 'restaurant-3', 'restaurant-4', 'restaurant-5'],
     blocks: [['about', 1], ['menu', 1], ['strip', 1], ['hours', 1], ['testimonial', 1], ['faq', 0], ['contact', 1]],
     about: 'We opened {n} to cook the food we wanted to eat: honest, generous and made from scratch every morning. The menu is short on purpose, so everything on it is the best it can be.',
     menu: [['To start', [['Burrata', 'blood orange, basil oil', '9'], ['Cured trout', 'cucumber, dill, rye', '11'], ['Charred leeks', 'romesco, hazelnut', '8']]],
@@ -46,7 +46,7 @@ var TYPES = {
     kw: ['cafe', 'café', 'coffee', 'bakery', 'brunch', 'tea', 'patisserie', 'roaster'],
     kick: 'Coffee, bakes and brunch', h: 'Good coffee, slow mornings.', cta: 'See the menu',
     sub: '{n} roasts its own beans and bakes everything on site, every morning, from seven.',
-    hero: 431, imgs: [1060, 225, 365, 766, 513],
+    hero: 'cafe-0', imgs: ['cafe-1', 'cafe-2', 'cafe-3', 'cafe-4', 'cafe-5'],
     blocks: [['strip', 1], ['menu', 1], ['about', 1], ['hours', 1], ['testimonial', 1], ['contact', 1]],
     about: '{n} started with one machine and a counter of cakes. We still weigh every shot, still bake at dawn, and still know most of our regulars by name.',
     menu: [['Coffee', [['Espresso', 'house blend', '2.6'], ['Flat white', 'whole or oat', '3.4'], ['Filter', 'single origin, changes weekly', '3.8']]],
@@ -60,7 +60,7 @@ var TYPES = {
     kw: ['clinic', 'dental', 'dentist', 'aesthetic', 'skin', 'physio', 'doctor', 'therapy', 'therapist', 'health', 'wellness', 'spa', 'beauty', 'massage', 'osteo'],
     kick: 'Clinic and treatments', h: 'Results that look like you, rested.', cta: 'Book a consultation',
     sub: '{n} offers doctor led treatments in a calm private clinic, with honest advice before anything else.',
-    hero: 1068, imgs: [785, 306, 832, 940, 691],
+    hero: 'clinic-0', imgs: ['clinic-1', 'clinic-2', 'clinic-3', 'clinic-4', 'clinic-5'],
     blocks: [['treatments', 1], ['about', 1], ['team', 1], ['steps', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
     about: 'Every treatment at {n} starts with a conversation. We take the time to understand what you want, explain what is realistic, and never push a treatment you do not need.',
     treatments: [['Skin consultation', '30 min', 'Free'], ['Skin boosters', '45 min', '£180'], ['Anti wrinkle · one area', '30 min', '£150'], ['Chemical peel', '40 min', '£95'], ['Hydrating facial', '60 min', '£85']],
@@ -74,10 +74,10 @@ var TYPES = {
     kw: ['property', 'estate agent', 'real estate', 'homes', 'lettings', 'developer', 'development', 'architect', 'interior', 'house', 'apartment', 'rental'],
     kick: 'Property and development', h: 'Homes worth living in.', cta: 'Arrange a viewing',
     sub: '{n} finds, restores and sells homes across the city, from the first viewing to the day you get the keys.',
-    hero: 625, imgs: [834, 946, 887, 1008, 859],
+    hero: 'property-0', imgs: ['property-1', 'property-2', 'property-3', 'property-4', 'property-5'],
     blocks: [['listings', 1], ['about', 1], ['stats', 1], ['steps', 0], ['testimonial', 1], ['contact', 1]],
     about: '{n} takes on the properties others walk past. We plan every project in detail, manage the build ourselves and finish each home as if we were moving in.',
-    listings: [[834, '£595,000', 'Garden flat', 'Islington · 2 bed · 820 sq ft'], [946, '£825,000', 'Victorian terrace', 'Walthamstow · 3 bed · 1,240 sq ft'], [887, '£2,150 pcm', 'Lateral apartment', 'Hackney · 2 bed · 900 sq ft']],
+    listings: [['property-1', '£595,000', 'Garden flat', 'Islington · 2 bed · 820 sq ft'], ['property-2', '£825,000', 'Victorian terrace', 'Walthamstow · 3 bed · 1,240 sq ft'], ['property-3', '£2,150 pcm', 'Lateral apartment', 'Hackney · 2 bed · 900 sq ft']],
     stats: [['240', 'Homes sold'], ['18', 'Years in the city'], ['4.9', 'Average review'], ['21 days', 'Average time to offer']],
     steps: [['Value', 'An honest valuation within 48 hours.'], ['Market', 'Photography, floorplans and viewings handled.'], ['Complete', 'We chase every party until the keys change hands.']],
     q: 'They turned a tired terrace into the home we had been searching for. The finish is outstanding.', qc: 'a homeowner',
@@ -87,10 +87,10 @@ var TYPES = {
     kw: ['car', 'cars', 'motor', 'hire', 'rental car', 'chauffeur', 'garage', 'dealership', 'vehicle', 'auto'],
     kick: 'Car hire and motors', h: 'The keys to a better drive.', cta: 'Reserve a car',
     sub: '{n} keeps a private collection of cars, prepared to a standard and handed over wherever you need them.',
-    hero: 133, imgs: [1071, 551, 605, 111],
+    hero: 'motors-0', imgs: ['motors-1', 'motors-2', 'motors-3', 'motors-4', 'motors-5'],
     blocks: [['fleet', 1], ['steps', 1], ['about', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
     about: 'Every car at {n} is chosen, cleaned and checked by us before it leaves. No call centres and no surprises at the counter, just the car you booked, ready on time.',
-    fleet: [[1071, 'Grand tourer', 'Automatic · 4 seats · 380 hp', '£320'], [551, 'Weekend cruiser', 'Manual · 2 seats · 260 hp', '£240'], [111, 'Classic saloon', 'Automatic · 5 seats · 1964', '£410']],
+    fleet: [['motors-1', 'Grand tourer', 'Automatic · 4 seats · 380 hp', '£320'], ['motors-2', 'Weekend cruiser', 'Manual · 2 seats · 260 hp', '£240'], ['motors-3', 'Classic saloon', 'Automatic · 5 seats · 1964', '£410']],
     steps: [['Choose', 'Pick a car and your dates.'], ['Delivered', 'We bring it to your door, fuelled and cleaned.'], ['Drive', 'Fully insured, with mileage to spare.']],
     q: 'Delivered to my door, spotless and full of fuel. The easiest hire I have ever booked.', qc: 'a weekend client',
     faq: [['What do I need to hire?', 'A full licence held for three years and a valid card in your name.'], ['Is insurance included?', 'Yes, fully comprehensive cover comes with every hire.']],
@@ -100,7 +100,7 @@ var TYPES = {
     kw: ['plumber', 'electrician', 'builder', 'roofer', 'mechanic', 'carpenter', 'joiner', 'decorator', 'trades', 'handyman', 'repair', 'cleaning', 'cleaner', 'landscap', 'gardener', 'locksmith'],
     kick: 'Trades and repair', h: 'Fixed properly, the first time.', cta: 'Get a quote',
     sub: '{n} comes to you, explains the problem in plain words and fixes it at an agreed price.',
-    hero: 491, imgs: [527, 210, 307, 143],
+    hero: 'trades-0', imgs: ['trades-1', 'trades-2', 'trades-3', 'trades-4', 'trades-5'],
     blocks: [['services', 1], ['steps', 1], ['areas', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
     about: 'At {n} we treat every job as if it were our own. You get a clear quote before we start, tidy work, and a call back if anything is not right.',
     services: [['Repairs', 'Most jobs completed on the same visit.', 'from £60'], ['Installations', 'Fitted, tested and certified.', 'quoted'], ['Servicing', 'Regular care that saves money later.', 'from £120']],
@@ -114,10 +114,10 @@ var TYPES = {
     kw: ['shop', 'store', 'boutique', 'fashion', 'clothing', 'brand', 'ecommerce', 'jewellery', 'jewelry', 'streetwear', 'products', 'apparel', 'candle', 'homeware'],
     kick: 'New season · small batch', h: 'Made in small runs, built to last.', cta: 'Shop the collection',
     sub: '{n} makes a short collection each season, cut from good cloth and finished by hand.',
-    hero: 1059, imgs: [535, 758, 21, 26, 604],
+    hero: 'boutique-0', imgs: ['boutique-1', 'boutique-2', 'boutique-3', 'boutique-4', 'boutique-5'],
     blocks: [['products', 1], ['strip', 1], ['about', 1], ['testimonial', 1], ['faq', 0], ['contact', 1]],
     about: '{n} began with one idea: make fewer things, and make them properly. Every piece is designed in house and produced in small numbers, so nothing is wasted.',
-    products: [[535, 'Oxford shirt', '£85'], [758, 'Wool scarf', '£60'], [21, 'Leather court', '£140'], [26, 'Everyday kit', '£45']],
+    products: [['boutique-1', 'Oxford shirt', '£85'], ['boutique-2', 'Wool scarf', '£60'], ['boutique-3', 'Leather court', '£140'], ['boutique-4', 'Everyday kit', '£45']],
     q: 'The quality is unreal for the price. I have bought three more pieces since my first order.', qc: 'a customer',
     faq: [['Do you ship worldwide?', 'Yes, to most countries, with tracked delivery.'], ['Can I return an item?', 'Within thirty days, unworn, for a full refund.']],
     c: 'Free delivery over £100 · returns within thirty days.' },
@@ -126,7 +126,7 @@ var TYPES = {
     kw: ['accountant', 'accounting', 'law', 'lawyer', 'solicitor', 'legal', 'finance', 'financial', 'consult', 'advisor', 'adviser', 'insurance', 'bookkeep', 'tax', 'firm', 'recruit'],
     kick: 'Professional services', h: 'Your books in order, your deadlines met.', cta: 'Book a call',
     sub: '{n} looks after the accounts, tax and payroll of growing businesses, at fixed fees agreed in writing.',
-    hero: 856, imgs: [378, 534, 939, 1078],
+    hero: 'professional-0', imgs: ['professional-1', 'professional-2', 'professional-3', 'professional-4', 'professional-5'],
     blocks: [['logos', 1], ['services', 1], ['pricing', 1], ['team', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
     about: '{n} is a small firm by choice. You speak to the same people every time, you always know what you are paying, and you hear from us before deadlines, not after them.',
     logos: ['Hartley & Co', 'Northfield', 'Oakline', 'Marlow Group', 'Kestrel'],
@@ -141,7 +141,7 @@ var TYPES = {
     kw: ['saas', 'software', 'app', 'startup', 'platform', 'tool', 'dashboard', 'ai ', ' ai', 'tech', 'product launch', 'api', 'fintech'],
     kick: 'Now in public beta', h: 'Ship the work, not the busywork.', cta: 'Start free',
     sub: '{n} turns scattered tasks, docs and approvals into one calm workspace your whole team will actually use.',
-    hero: 893, imgs: [532, 668, 983, 1048],
+    hero: 'saas-0', imgs: ['saas-1', 'saas-2', 'saas-3', 'saas-4', 'saas-5'],
     blocks: [['logos', 1], ['bento', 1], ['stats', 1], ['pricing', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
     about: '{n} was built by a small team tired of switching between nine tools to finish one task. So we made the one we wanted.',
     logos: ['Northwind', 'Lumen', 'Parcel', 'Arcadia', 'Fieldnote', 'Orbit'],
@@ -156,7 +156,7 @@ var TYPES = {
     kw: ['agency', 'studio', 'design', 'creative', 'branding', 'marketing', 'architecture practice', 'freelance', 'designer', 'developer', 'digital'],
     kick: 'Brand and digital studio', h: 'Brands with a point of view.', cta: 'Start a project',
     sub: '{n} is an independent studio making identities, websites and campaigns for companies that want to be remembered.',
-    hero: 951, imgs: [526, 949, 20, 1081],
+    hero: 'agency-0', imgs: ['agency-1', 'agency-2', 'agency-3', 'agency-4', 'agency-5'],
     blocks: [['series', 1], ['services', 1], ['logos', 1], ['stats', 1], ['testimonial', 1], ['contact', 1]],
     about: '{n} is twelve people in one room. We work with a handful of clients a year, so each gets our full attention.',
     series: [['Field Notes', 'Identity · Packaging', '2026'], ['Harbour Line', 'Website · Motion', '2026'], ['Common Ground', 'Campaign', '2025'], ['Atlas Coffee', 'Brand system', '2025']],
@@ -170,7 +170,7 @@ var TYPES = {
     kw: ['gym', 'fitness', 'yoga', 'pilates', 'personal trainer', 'trainer', 'crossfit', 'boxing', 'running', 'swim', 'sport', 'martial', 'dance', 'cycling'],
     kick: 'Strength, conditioning, community', h: 'Stronger every week.', cta: 'Book a free class',
     sub: '{n} runs small group classes and personal training for every level, coached by people who know your name.',
-    hero: 841, imgs: [770, 1077, 839, 845],
+    hero: 'fitness-0', imgs: ['fitness-1', 'fitness-2', 'fitness-3', 'fitness-4', 'fitness-5'],
     blocks: [['timetable', 1], ['pricing', 1], ['strip', 1], ['team', 1], ['testimonial', 1], ['faq', 0], ['contact', 1]],
     about: '{n} is not a mirror and machine gym. Every session is coached, every plan is written for you, and every member is part of the crew.',
     timetable: [['06:30', ['Strength', 'Conditioning', 'Strength', 'Conditioning', 'Strength']], ['12:15', ['Mobility', 'Swim', 'Mobility', 'Swim', 'Mobility']], ['18:30', ['Conditioning', 'Strength', 'Boxing', 'Strength', 'Open gym']]],
@@ -184,7 +184,7 @@ var TYPES = {
     kw: ['wedding', 'event', 'venue', 'party', 'festival', 'conference', 'planner', 'catering', 'dj', 'music', 'band', 'celebration', 'ceremony'],
     kick: 'Weddings, parties and gatherings', h: 'Days worth remembering.', cta: 'Check a date',
     sub: '{n} plans and hosts weddings and celebrations, from the first idea to the last dance.',
-    hero: 1004, imgs: [815, 195, 508, 407, 129],
+    hero: 'events-0', imgs: ['events-1', 'events-2', 'events-3', 'events-4', 'events-5'],
     blocks: [['dates', 1], ['packages', 1], ['gallery', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
     about: '{n} has hosted more than four hundred celebrations. We take care of every detail so you can be a guest at your own event.',
     dates: [['14 Jun', 'Summer garden open day', 'Tour the grounds and meet the team'], ['02 Aug', 'Wedding showcase', 'Suppliers, tastings and live music'], ['21 Sep', 'Autumn supper club', 'Long tables under the lights']],

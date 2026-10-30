@@ -13,7 +13,7 @@ assets/site.css     shared styles (including every look in the configurator prev
 assets/site.js      shared behaviour; each part only runs on pages that have its elements
 assets/fonts/       Bodoni Moda, Archivo, JetBrains Mono, plus Source Serif 4, IBM Plex Sans and Manrope for the configurator looks
 assets/img/         work captures
-assets/stock/       photography for the configurator previews, with CREDITS.txt
+assets/gen/         imagery generated with Higgsfield: configurator photography, studio plates, share image
 assets/fitting.*    the configurator script and preview styles
 sitegen/build.py    writes the five pages from one shared header, footer and tape
 ```
@@ -64,8 +64,8 @@ The preview renders a full width desktop site (1280 px, scaled to fit) or a phon
 
 The configurator's code is `assets/fitting.js` (types, copy, looks and the brief reader) and `assets/fitting.css` (the preview site), loaded only on that page.
 
-## Photography
-`assets/stock/` holds 76 photographs from Unsplash, via Lorem Picsum, free to use under the Unsplash License. Photographers are credited in `assets/stock/CREDITS.txt`. A preview loads only the five or six photos for its type.
+## Imagery
+Every image in `assets/gen/` was generated for Coveworks with Higgsfield (GPT Image 2.5): six for each of the thirteen site types (eight for photography), three studio plates for the home and studio pages, and the share image `lab-cover.jpg`. They are illustrative and show no real client. A preview loads only the photos for its type. See `assets/gen/CREDITS.txt`.
 
 ## Content notes
 - `hello@coveworks.studio` must exist (or be replaced in `sitegen/build.py` and `assets/site.js`) before go live

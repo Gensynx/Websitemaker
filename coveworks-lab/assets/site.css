@@ -377,3 +377,15 @@ footer{border-top:1px solid var(--rule);padding:28px 0 30px}
   .js #hero .fade{transform:none;opacity:1}
   .js #hero h1 .ch{opacity:1}
 }
+
+/* plates: generated studio imagery */
+.plate{margin:0;position:relative;background:var(--panel);border:1px solid var(--rule);border-radius:var(--rad);overflow:hidden}
+.plate img{display:block;width:100%;height:auto;object-fit:cover}
+.plate.wide{margin-top:14px}
+.plate.wide img{aspect-ratio:21/8}
+.plate.band{margin-bottom:10px}
+.plate.band img{aspect-ratio:21/7}
+.plate figcaption{position:absolute;left:12px;bottom:12px;display:flex;gap:10px;align-items:center;background:rgba(255,255,255,.86);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border:1px solid var(--rule);border-radius:999px;padding:6px 12px;font-family:var(--mono);font-size:11px;letter-spacing:.04em;color:var(--ink-2)}
+.plate figcaption span{color:var(--sig)}
+.plate-row{padding-top:clamp(8px,1.4vw,16px)}
+@media (max-width:720px){.plate.wide img{aspect-ratio:16/10}.plate figcaption{font-size:10px;right:12px}}

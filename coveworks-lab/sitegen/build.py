@@ -30,6 +30,11 @@ def head(title, desc, extra_css=''):
 <title>{title}</title>
 <meta name="description" content="{desc}">
 <meta name="theme-color" content="#F4F4F2">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{title}">
+<meta property="og:description" content="{desc}">
+<meta property="og:image" content="https://gensynx.github.io/Websitemaker/coveworks-lab/assets/gen/lab-cover.jpg">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="{FAVICON}">
 <link rel="preload" href="assets/fonts/doto.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="assets/fonts/space-grotesk.woff2" as="font" type="font/woff2" crossorigin>
@@ -192,6 +197,10 @@ HOME = f'''<main>
           </ul>
         </div>
       </div>
+      <figure class="plate wide fade d4">
+        <img src="assets/gen/lab-hero.webp" alt="White modular devices with a red dot matrix display, laid out on a white bench" width="1600" height="900" fetchpriority="high">
+        <figcaption><span>Fig. 01</span> Every site, assembled from modules made for it</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -214,12 +223,16 @@ HOME = f'''<main>
       <div data-rise>
         <p class="label"><b>02</b> The configurator</p>
         <h2 class="title">Build a demo <em>of your own.</em></h2>
-        <p class="lede">Tell us in plain words what you need, a photography portfolio, a dental clinic, a launch page for an app, and a preview is built for that kind of business: its own structure, its own copy, real photography. Then change the look, the layout and the sections until it fits.</p>
+        <p class="lede">Tell us in plain words what you need, a photography portfolio, a dental clinic, a launch page for an app, and a preview is built for that kind of business: its own structure, its own copy, its own photography. Then change the look, the layout and the sections until it fits.</p>
         <div class="actions">
           <a class="btn sig" href="configurator.html"><span>Open the configurator</span>{ARROW}</a>
         </div>
       </div>
       <div data-rise>
+        <figure class="plate band">
+          <img src="assets/gen/lab-modules.webp" alt="A row of white website modules floating above a white surface" width="1600" height="686" loading="lazy">
+          <figcaption><span>Fig. 02</span> Blocks, in your order</figcaption>
+        </figure>
         <div class="steps">
           <div><b>00</b><p><strong>Your words</strong><span>Describe the site you need</span></p></div>
           <div><b>01</b><p><strong>Site type</strong><span>Thirteen, each built differently</span></p></div>
@@ -346,6 +359,14 @@ CONFIGURATOR = f'''<main>
 
 STUDIO = f'''<main>
 {page_head('03', 'The studio', 'Small on <em>purpose.</em>', 'One studio, one build at a time, every page made by hand. This is what we do and how a project runs.')}
+  <section class="plate-row">
+    <div class="wrap">
+      <figure class="plate wide" data-rise>
+        <img src="assets/gen/lab-studio.webp" alt="A clean white studio desk with a laptop, sketches and a small red indicator" width="1600" height="900" loading="lazy">
+        <figcaption><span>Fig. 03</span> The bench, where every build is made by hand</figcaption>
+      </figure>
+    </div>
+  </section>
   <section class="block ink">
     <div class="wrap">
       <p class="label" data-rise><b>Statement</b> Why Coveworks</p>
