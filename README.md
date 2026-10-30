@@ -9,7 +9,7 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 - **London Classic Aesthetics** — `london-classic-aesthetics/` (24 page redesign)
 - **Coveworks** — `coveworks/` folder, the studio's own animated site, editorial luxury edition (see `coveworks/README.md`)
 - **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, nine full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
-- **Coveworks Atelier** — `coveworks-atelier/` folder: a five page tailor's atelier edition of the studio site with the fitting room, where visitors describe the site they need and get a preview cut for that kind of business (thirteen types, each with its own structure and photography, in fifteen looks) and send it as a brief (see `coveworks-atelier/README.md`)
+- **Coveworks Lab** — `coveworks-lab/` folder: a five page futuristic "lab white" edition of the studio site with the configurator, where visitors describe the site they need and get a preview built for that kind of business (thirteen types, each with its own structure and photography, in fifteen looks) and send it as a brief (see `coveworks-lab/README.md`). The earlier `coveworks-atelier/` addresses forward here
 - **381 Accountants** — `381-accountants/` (12-page site for the Canary Wharf accountancy firm, see `381-accountants/README.md`)
 - **381 Accountants premium** — `381-accountants-premium/` (dark, high-interaction edition: calculator, countdown, wizard, marquee; see its README)
 - **381 Accountants Ledger** — `381-accountants-ledger/` (calm, typographic third edition: Swiss grid, self-hosted fonts, deadline finder; shares its facts with the standard edition; see its README)

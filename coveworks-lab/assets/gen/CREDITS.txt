@@ -1,0 +1,10 @@
+Imagery generated for Coveworks with Higgsfield (GPT Image 2.5).
+
+<type>-0.webp        the opening image for that site type in the configurator
+<type>-1 to -5.webp  photography used by that type's sections (photography has -1 to -7)
+lab-hero.webp        home page, under the opening modules
+lab-modules.webp     home page, configurator teaser
+lab-studio.webp      studio page
+lab-cover.jpg        share image (og:image)
+
+All images are illustrative. None shows a real client, place or product.
