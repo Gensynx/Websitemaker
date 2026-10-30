@@ -1,6 +1,7 @@
 /* Coveworks · Lab · the configurator
    Each site type carries its own structure, copy and photography; each look restyles it.
-   Photography: generated for Coveworks with Higgsfield, see assets/gen/CREDITS.txt */
+   Photography: generated for Coveworks with Higgsfield, see assets/gen/CREDITS.txt
+   A brief that names no known type still builds: the "custom" type is written around the words it was given. */
 (function(){
 'use strict';
 var pvSite = document.getElementById('pvSite');
@@ -14,7 +15,7 @@ function img(id, cls, alt){ return '<span class="x-ph' + (cls ? ' ' + cls : '') 
 /* ============ site types ============ */
 var TYPES = {
   photography: { label: 'Photography', look: 'gallery', layout: 'full', accent: 'ink', nav: 'centre',
-    kw: ['photo', 'photograph', 'portrait', 'camera', 'shoot', 'film', 'portfolio', 'videograph'],
+    kw: ['photo', 'photograph', 'portrait', 'camera', 'shoot', 'film', 'portfolio', 'videograph', 'headshot', 'drone', 'wedding photo', 'filmmaker', 'cinematograph'],
     kick: 'Portrait and landscape photography', h: 'Light, held still.', cta: 'Book a shoot',
     sub: '{n} photographs people and places for editorial, commercial and private clients, on film and digital.',
     hero: 'photography-0', imgs: ['photography-1', 'photography-2', 'photography-3', 'photography-4', 'photography-5', 'photography-6', 'photography-7'],
@@ -28,7 +29,7 @@ var TYPES = {
     c: 'Booking six weeks ahead · studio in East London.' },
 
   restaurant: { label: 'Restaurant', look: 'savile', layout: 'full', accent: 'oxblood', nav: 'bar', extra: 'reserve',
-    kw: ['restaurant', 'dining', 'bistro', 'kitchen', 'food', 'bar ', 'pub', 'steak', 'sushi', 'pizza', 'chef', 'eatery'],
+    kw: ['restaurant', 'dining', 'bistro', 'kitchen', 'food', 'bar ', 'pub', 'steak', 'sushi', 'pizza', 'chef', 'eatery', 'takeaway', 'burger', 'grill', 'tapas', 'ramen', 'curry', 'indian', 'thai', 'chinese', 'italian', 'trattoria', 'pizzeria', 'brasserie', 'gastropub', 'diner', 'food truck', 'street food', 'kebab', 'noodle', 'taco', 'mexican', 'vegan', 'cocktail', 'wine bar', 'brewery', 'bbq', 'barbecue', 'seafood', 'fish and chips', 'dumpling', 'dim sum', 'korean', 'japanese', 'greek', 'turkish', 'lebanese', 'caribbean'],
     kick: 'Kitchen and dining room', h: 'Seasonal plates, cooked with care.', cta: 'Book a table',
     sub: '{n} is a neighbourhood dining room with a short menu that changes with whatever the market brings in.',
     hero: 'restaurant-0', imgs: ['restaurant-1', 'restaurant-2', 'restaurant-3', 'restaurant-4', 'restaurant-5'],
@@ -43,7 +44,7 @@ var TYPES = {
     c: 'Reservations by phone or online · private room for twenty.' },
 
   cafe: { label: 'Café', look: 'linen', layout: 'split', accent: 'ochre', nav: 'bar', extra: 'reserve',
-    kw: ['cafe', 'café', 'coffee', 'bakery', 'brunch', 'tea', 'patisserie', 'roaster'],
+    kw: ['cafe', 'café', 'coffee', 'bakery', 'brunch', ' tea ', 'tea room', 'tearoom', 'patisserie', 'roaster', 'cake', 'bake', 'dessert', 'ice cream', 'gelato', 'juice', 'smoothie', 'donut', 'doughnut', 'bubble tea', ' deli ', 'sandwich', 'crepe', 'waffle', 'cupcake', 'chocolat', 'brownie', 'pastry', 'pastries', 'espresso'],
     kick: 'Coffee, bakes and brunch', h: 'Good coffee, slow mornings.', cta: 'See the menu',
     sub: '{n} roasts its own beans and bakes everything on site, every morning, from seven.',
     hero: 'cafe-0', imgs: ['cafe-1', 'cafe-2', 'cafe-3', 'cafe-4', 'cafe-5'],
@@ -57,7 +58,7 @@ var TYPES = {
     c: 'Takeaway and tables · laptops welcome before noon.' },
 
   clinic: { label: 'Clinic', look: 'fresh', layout: 'split', accent: 'teal', nav: 'bar',
-    kw: ['clinic', 'dental', 'dentist', 'aesthetic', 'skin', 'physio', 'doctor', 'therapy', 'therapist', 'health', 'wellness', 'spa', 'beauty', 'massage', 'osteo'],
+    kw: ['clinic', 'dental', 'dentist', 'aesthetic', 'skin', 'physio', 'doctor', 'therapy', 'therapist', ' health ', 'healthcare', 'wellness', 'spa', 'massage', 'osteo', 'orthodont', 'chiropract', 'podiat', 'optician', 'optometr', 'pharmacy', 'medical', 'surgery', 'hospital', 'counsell', 'psycholog', 'psychotherap', 'mental health', 'nutrition', 'dietit', 'acupunct', 'hearing', 'botox', 'filler', 'laser', 'cosmetic', 'fertility', 'midwife', 'care home', 'home care', 'carer', 'hypnother', 'reflexolog', 'reiki'],
     kick: 'Clinic and treatments', h: 'Results that look like you, rested.', cta: 'Book a consultation',
     sub: '{n} offers doctor led treatments in a calm private clinic, with honest advice before anything else.',
     hero: 'clinic-0', imgs: ['clinic-1', 'clinic-2', 'clinic-3', 'clinic-4', 'clinic-5'],
@@ -71,7 +72,7 @@ var TYPES = {
     c: 'Appointments Monday to Saturday · consultation first.' },
 
   property: { label: 'Property', look: 'clean', layout: 'full', accent: 'navy', nav: 'bar', extra: 'search',
-    kw: ['property', 'estate agent', 'real estate', 'homes', 'lettings', 'developer', 'development', 'architect', 'interior', 'house', 'apartment', 'rental'],
+    kw: ['property', 'estate agent', 'real estate', 'homes', 'lettings', 'developer', 'development', 'architect', 'interior', 'house', 'apartment', 'rental', 'estate', 'letting', 'landlord', 'mortgage', 'surveyor', 'construction', 'renovation', 'refurb', 'extension', 'loft conversion', 'flats', 'condo', 'housing', 'property management', 'realtor', 'new build'],
     kick: 'Property and development', h: 'Homes worth living in.', cta: 'Arrange a viewing',
     sub: '{n} finds, restores and sells homes across the city, from the first viewing to the day you get the keys.',
     hero: 'property-0', imgs: ['property-1', 'property-2', 'property-3', 'property-4', 'property-5'],
@@ -84,7 +85,7 @@ var TYPES = {
     c: 'Viewings by appointment · seven days a week.' },
 
   motors: { label: 'Car hire', look: 'noir', layout: 'full', accent: 'chalk', nav: 'bar',
-    kw: ['car', 'cars', 'motor', 'hire', 'rental car', 'chauffeur', 'garage', 'dealership', 'vehicle', 'auto'],
+    kw: ['car', 'cars', 'motor', 'car hire', 'van hire', 'rental car', 'chauffeur', 'garage', 'dealership', 'vehicle', 'auto', 'taxi', 'cab', 'minicab', 'limo', 'limousine', 'car wash', 'valet', 'detailing', 'tyre', ' mot ', 'bodyshop', 'body shop', 'car sales', 'used car', 'motorbike', 'motorcycle', 'scooter', 'supercar', 'classic car', 'driving instructor'],
     kick: 'Car hire and motors', h: 'The keys to a better drive.', cta: 'Reserve a car',
     sub: '{n} keeps a private collection of cars, prepared to a standard and handed over wherever you need them.',
     hero: 'motors-0', imgs: ['motors-1', 'motors-2', 'motors-3', 'motors-4', 'motors-5'],
@@ -97,7 +98,7 @@ var TYPES = {
     c: 'Bookings seven days a week · by phone or WhatsApp.' },
 
   trades: { label: 'Trades', look: 'boardroom', layout: 'split', accent: 'blue', nav: 'bar', extra: 'quote',
-    kw: ['plumber', 'electrician', 'builder', 'roofer', 'mechanic', 'carpenter', 'joiner', 'decorator', 'trades', 'handyman', 'repair', 'cleaning', 'cleaner', 'landscap', 'gardener', 'locksmith'],
+    kw: ['plumber', 'electrician', 'builder', 'roofer', 'mechanic', 'carpenter', 'joiner', 'decorator', 'trades', 'handyman', 'repair', 'cleaning', 'cleaner', 'landscap', 'gardener', 'locksmith', 'plumbing', 'heating', 'boiler', 'gas engineer', 'electrical', 'roofing', 'scaffold', 'plaster', 'painter', 'tiler', 'tiling', 'flooring', 'fencing', 'paving', 'driveway', 'window clean', 'pest control', 'removal', 'man and van', 'skip hire', 'odd jobs', 'gutter', 'damp', 'glazier', 'glazing', 'air con', 'aircon', 'hvac', 'solar', 'welder', 'welding', 'tree surgeon', 'courier', 'carpet', 'upholster', 'appliance', 'kitchen fitter', 'bathroom fitter', 'fitter', 'maintenance', 'drain', 'cctv', 'lawn'],
     kick: 'Trades and repair', h: 'Fixed properly, the first time.', cta: 'Get a quote',
     sub: '{n} comes to you, explains the problem in plain words and fixes it at an agreed price.',
     hero: 'trades-0', imgs: ['trades-1', 'trades-2', 'trades-3', 'trades-4', 'trades-5'],
@@ -111,7 +112,7 @@ var TYPES = {
     c: 'Monday to Saturday · same day call outs.' },
 
   boutique: { label: 'Shop', look: 'mono', layout: 'split', accent: 'ink', nav: 'centre',
-    kw: ['shop', 'store', 'boutique', 'fashion', 'clothing', 'brand', 'ecommerce', 'jewellery', 'jewelry', 'streetwear', 'products', 'apparel', 'candle', 'homeware'],
+    kw: ['shop', 'store', 'boutique', 'fashion', 'clothing', 'brand', 'ecommerce', 'jewellery', 'jewelry', 'streetwear', 'products', 'apparel', 'candle', 'homeware', 'clothes', 'merch', 'handmade', 'craft', 'gift', 'florist', 'flower', 'bookshop', 'bookstore', 'record shop', 'vinyl', 'furniture', 'ceramic', 'pottery', 'prints', 'sneaker', 'perfume', 'fragrance', 'watches', 'handbag', 'accessories', 'etsy', 'online shop', 'tshirt', 't shirt', 'hoodie', 'vintage', 'thrift', 'toys', 'tailor', 'alterations', 'stationery', 'plants', 'soap', 'skincare', 'cosmetics', 'bridal', 'lingerie', 'swimwear', 'shoes', 'eyewear', 'sell online', 'selling'],
     kick: 'New season · small batch', h: 'Made in small runs, built to last.', cta: 'Shop the collection',
     sub: '{n} makes a short collection each season, cut from good cloth and finished by hand.',
     hero: 'boutique-0', imgs: ['boutique-1', 'boutique-2', 'boutique-3', 'boutique-4', 'boutique-5'],
@@ -123,7 +124,7 @@ var TYPES = {
     c: 'Free delivery over £100 · returns within thirty days.' },
 
   professional: { label: 'Professional', look: 'ledger', layout: 'split', accent: 'navy', nav: 'bar',
-    kw: ['accountant', 'accounting', 'law', 'lawyer', 'solicitor', 'legal', 'finance', 'financial', 'consult', 'advisor', 'adviser', 'insurance', 'bookkeep', 'tax', 'firm', 'recruit'],
+    kw: ['accountant', 'accounting', 'law', 'lawyer', 'solicitor', 'legal', 'finance', 'financial', 'consult', 'advisor', 'adviser', 'insurance', 'bookkeep', 'tax', 'firm', 'recruit', 'accountancy', 'audit', 'payroll', 'broker', 'wealth', 'investment', 'will writing', 'notary', 'barrister', 'immigration', ' hr ', 'coach', 'life coach', 'business coach', 'translator', 'translation', 'it support', 'cyber', 'virtual assistant', 'mediation', 'probate', 'pension', 'compliance'],
     kick: 'Professional services', h: 'Your books in order, your deadlines met.', cta: 'Book a call',
     sub: '{n} looks after the accounts, tax and payroll of growing businesses, at fixed fees agreed in writing.',
     hero: 'professional-0', imgs: ['professional-1', 'professional-2', 'professional-3', 'professional-4', 'professional-5'],
@@ -138,7 +139,7 @@ var TYPES = {
     c: 'Monday to Friday · nine till half past five.' },
 
   saas: { label: 'Software', look: 'aurora', layout: 'centred', accent: 'violet', nav: 'bar', extra: 'mock',
-    kw: ['saas', 'software', 'app', 'startup', 'platform', 'tool', 'dashboard', 'ai ', ' ai', 'tech', 'product launch', 'api', 'fintech'],
+    kw: ['saas', 'software', 'app', 'startup', 'platform', 'tool', 'dashboard', 'ai ', ' ai', 'tech', 'product launch', 'api', 'fintech', 'web app', 'mobile app', 'ios', 'android', 'crypto', 'blockchain', 'web3', 'machine learning', 'analytics', 'crm', 'devtool', 'developer tool', 'plugin', 'chatbot', 'automation', 'b2b', 'subscription', 'marketplace', 'cloud', 'productivity', 'no code', 'open source', 'browser extension', 'launch page', 'waitlist', 'beta'],
     kick: 'Now in public beta', h: 'Ship the work, not the busywork.', cta: 'Start free',
     sub: '{n} turns scattered tasks, docs and approvals into one calm workspace your whole team will actually use.',
     hero: 'saas-0', imgs: ['saas-1', 'saas-2', 'saas-3', 'saas-4', 'saas-5'],
@@ -153,9 +154,10 @@ var TYPES = {
     c: 'Free for small teams · no card needed.' },
 
   agency: { label: 'Studio', look: 'swiss', layout: 'split', accent: 'chalk', nav: 'bar',
-    kw: ['agency', 'studio', 'design', 'creative', 'branding', 'marketing', 'architecture practice', 'freelance', 'designer', 'developer', 'digital'],
+    kw: ['agency', 'studio', 'design', 'creative', 'branding', 'marketing', 'architecture practice', 'freelance', 'designer', 'web developer', 'digital', 'graphic design', 'web design', 'ux', 'illustrat', 'animator', 'animation', 'motion design', 'video production', 'copywrit', ' pr ', 'seo', 'social media', 'design studio', 'product design', 'brand identity', 'advertising', 'production company', 'film production', 'case studies'],
     kick: 'Brand and digital studio', h: 'Brands with a point of view.', cta: 'Start a project',
     sub: '{n} is an independent studio making identities, websites and campaigns for companies that want to be remembered.',
+    heads: { series: ['Case studies', 'Selected projects.'] },
     hero: 'agency-0', imgs: ['agency-1', 'agency-2', 'agency-3', 'agency-4', 'agency-5'],
     blocks: [['series', 1], ['services', 1], ['logos', 1], ['stats', 1], ['testimonial', 1], ['contact', 1]],
     about: '{n} is twelve people in one room. We work with a handful of clients a year, so each gets our full attention.',
@@ -167,7 +169,7 @@ var TYPES = {
     c: 'Taking two new projects this season.' },
 
   fitness: { label: 'Fitness', look: 'brutal', layout: 'split', accent: 'blue', nav: 'bar',
-    kw: ['gym', 'fitness', 'yoga', 'pilates', 'personal trainer', 'trainer', 'crossfit', 'boxing', 'running', 'swim', 'sport', 'martial', 'dance', 'cycling'],
+    kw: ['gym', 'fitness', 'yoga', 'pilates', 'personal trainer', 'personal training', 'trainer', 'crossfit', 'boxing', 'running', 'swim', 'sport', 'martial', 'dance', 'cycling', 'bootcamp', 'hiit', 'spin', 'climbing', 'bouldering', 'tennis', 'golf', 'football', 'rugby', 'cricket', 'basketball', 'netball', 'padel', 'squash', 'athletics', 'marathon', 'triathlon', 'karate', 'judo', 'jiu jitsu', 'bjj', 'mma', 'kickbox', 'muay thai', 'taekwondo', 'surfing', ' surf ', ' ski ', 'skiing', 'horse riding', 'equestrian', 'stables', 'bodybuild', 'sports club', 'strength', 'run club'],
     kick: 'Strength, conditioning, community', h: 'Stronger every week.', cta: 'Book a free class',
     sub: '{n} runs small group classes and personal training for every level, coached by people who know your name.',
     hero: 'fitness-0', imgs: ['fitness-1', 'fitness-2', 'fitness-3', 'fitness-4', 'fitness-5'],
@@ -181,7 +183,7 @@ var TYPES = {
     c: 'Open 06:00 till 21:00 · first class free.' },
 
   events: { label: 'Events', look: 'glass', layout: 'centred', accent: 'violet', nav: 'centre',
-    kw: ['wedding', 'event', 'venue', 'party', 'festival', 'conference', 'planner', 'catering', 'dj', 'music', 'band', 'celebration', 'ceremony'],
+    kw: ['wedding', 'event', 'venue', 'party', 'festival', 'conference', 'planner', 'catering', 'celebration', 'ceremony', 'birthday', 'marquee', 'banqueting', 'function room', 'exhibition', 'gala', ' prom ', 'christening', 'hen party', 'stag do', 'balloon', 'decor', 'photo booth', 'wedding planner', 'venue hire', 'awards'],
     kick: 'Weddings, parties and gatherings', h: 'Days worth remembering.', cta: 'Check a date',
     sub: '{n} plans and hosts weddings and celebrations, from the first idea to the last dance.',
     hero: 'events-0', imgs: ['events-1', 'events-2', 'events-3', 'events-4', 'events-5'],
@@ -191,7 +193,163 @@ var TYPES = {
     packages: [['Intimate', 'Up to forty guests, ceremony and supper.', 'from £4,500'], ['Classic', 'Up to one hundred and twenty, all day.', 'from £11,000'], ['Grand', 'Two days, exclusive use of the venue.', 'from £24,000']],
     q: 'Every detail was taken care of. All we had to do was turn up and enjoy it.', qc: 'a couple married here',
     faq: [['How far ahead should we book?', 'Most couples book twelve to eighteen months ahead.'], ['Can we bring our own suppliers?', 'Yes, alongside our trusted list.']],
-    c: 'Viewings most weekends · dates for next year now open.' }
+    c: 'Viewings most weekends · dates for next year now open.' },
+  gaming: { label: 'Gaming', look: 'aurora', layout: 'full', accent: 'violet', nav: 'bar',
+    kw: ['game', 'gaming', 'gamer', 'esport', 'esports', 'e sports', 'stream', 'twitch', 'clan', 'guild', 'minecraft', 'fortnite', 'roblox', 'valorant', 'league of legends', 'call of duty', 'fifa', 'console', 'playstation', 'xbox', 'nintendo', 'speedrun', 'tournament', 'discord', 'arcade', 'board game', 'tabletop', 'dungeons', 'warhammer'],
+    kick: 'Streams, tournaments, community', h: 'Press start.', cta: 'Join the squad',
+    sub: '{n} streams, competes and builds a community around the games we love, live most nights of the week.',
+    hero: 'gaming-0', imgs: ['gaming-1', 'gaming-2', 'gaming-3', 'gaming-4', 'gaming-5'],
+    heads: { dates: ['Schedule', 'Live this week.'], team: ['The roster', 'Meet the squad.'], gallery: ['Clips', 'Highlights.'] },
+    blocks: [['dates', 1], ['stats', 1], ['gallery', 1], ['team', 1], ['about', 0], ['testimonial', 1], ['faq', 1], ['contact', 1]],
+    about: '{n} started as a few friends streaming after work. Now it is a team, a schedule and a community that grows every season.',
+    dates: [['07 Nov', 'Ranked night', 'Live from 20:00 · everyone welcome'], ['14 Nov', 'Community cup', 'Sixteen teams · prizes for the top three'], ['21 Nov', 'Retro marathon', 'Twelve hours of classics for charity']],
+    stats: [['48k', 'Followers'], ['1.2M', 'Views this year'], ['16', 'Tournaments won'], ['24/7', 'Community chat open']],
+    team: [['Nova', 'Captain · support'], ['Rook', 'Entry'], ['Juno', 'Coach and analyst']],
+    q: 'The friendliest community I have found online. The Friday streams are the highlight of my week.', qc: 'a community member',
+    faq: [['How do I join?', 'Hop into the community chat and say hello. Everyone is welcome.'], ['Are you recruiting players?', 'Trials open every season. Keep an eye on the schedule.']],
+    c: 'Live most nights from 20:00 · sponsorship enquiries by email.' },
+
+  music: { label: 'Music', look: 'noir', layout: 'full', accent: 'chalk', nav: 'centre',
+    kw: ['music', 'musician', 'band', 'dj', 'singer', 'songwriter', 'rapper', 'artist', 'producer', 'record label', 'album', 'gig', 'gigs', ' tour ', 'touring', 'concert', 'orchestra', 'choir', 'composer', 'guitarist', 'drummer', 'pianist', 'violinist', 'recording studio', 'mixing', 'mastering', 'hip hop', 'jazz', ' rock ', ' techno ', 'nightclub', 'karaoke', ' opera '],
+    kick: 'New record out now', h: 'Turn it up.', cta: 'Get tickets',
+    sub: '{n} makes loud, honest music and plays it live wherever there is a stage and a crowd.',
+    hero: 'music-0', imgs: ['music-1', 'music-2', 'music-3', 'music-4', 'music-5'],
+    heads: { dates: ['On tour', 'Live dates.'], series: ['Releases', 'Listen now.'], gallery: ['Photos', 'Live and loud.'] },
+    blocks: [['dates', 1], ['series', 1], ['gallery', 1], ['about', 1], ['testimonial', 1], ['contact', 1]],
+    about: '{n} started in a rehearsal room above a pub and never really left. Four records in, the songs still get written the same way: loud, late and together.',
+    dates: [['14 Mar', 'London', 'Doors 19:00 · few tickets left'], ['22 Mar', 'Manchester', 'Doors 19:30 · on sale now'], ['05 Apr', 'Glasgow', 'Doors 19:00 · on sale now']],
+    series: [['Night Swimming', 'Album', '2026'], ['Static', 'Single', '2025'], ['Live in Glasgow', 'Live album', '2025'], ['First Light', 'EP', '2024']],
+    q: 'A band that sounds even bigger live than on record. Catch them in a small room while you still can.', qc: 'a music writer',
+    c: 'Bookings and press by email · management on request.' },
+
+  salon: { label: 'Salon', look: 'savile', layout: 'split', accent: 'ink', nav: 'centre',
+    kw: ['salon', 'hair', 'hairdresser', 'hairdressing', 'barber', 'barbers', 'barbershop', 'nail', 'manicure', 'pedicure', 'lash', 'eyebrow', ' brows ', 'beauty', 'beautician', 'makeup', 'make up', 'waxing', 'tanning', 'tattoo', 'tattoo studio', 'piercing', 'blow dry', 'braids'],
+    kick: 'Hair, colour and care', h: 'Leave looking like yourself, only better.', cta: 'Book online',
+    sub: '{n} is a friendly salon for cuts, colour and styling, with stylists who listen before they pick up the scissors.',
+    hero: 'salon-0', imgs: ['salon-1', 'salon-2', 'salon-3', 'salon-4', 'salon-5'],
+    heads: { treatments: ['Services', 'Services and prices.'] },
+    blocks: [['treatments', 1], ['team', 1], ['strip', 1], ['hours', 1], ['testimonial', 1], ['faq', 0], ['contact', 1]],
+    about: '{n} is a small, relaxed salon where nobody is rushed. Every appointment starts with a proper chat, so you leave with the hair you asked for.',
+    treatments: [['Cut and finish', '45 min', '£55'], ['Full colour', '90 min', '£95'], ['Balayage', '150 min', '£160'], ['Blow dry', '30 min', '£30'], ['Beard trim', '20 min', '£18']],
+    team: [['Rosa Bell', 'Owner · colour'], ['Kai Moreno', 'Senior stylist'], ['Ivy Grant', 'Stylist · curls']],
+    hours: [['Tuesday to Friday', '09:00 till 20:00'], ['Saturday', '09:00 till 17:00'], ['Sunday and Monday', 'Closed']],
+    addr: '22 High Street · Leeds',
+    q: 'Best colour I have ever had, and they actually listened to what I wanted. Booked in again already.', qc: 'a regular client',
+    faq: [['Do you do patch tests?', 'Yes, at least 48 hours before any colour appointment.'], ['Can I book online?', 'Any time, day or night, in under a minute.']],
+    c: 'Open six days · late nights Thursday and Friday.' },
+
+  education: { label: 'Education', look: 'fresh', layout: 'split', accent: 'blue', nav: 'bar',
+    kw: ['tutor', 'tutoring', 'tuition', 'teacher', 'teaching', 'school', 'academy', 'college', 'university', 'course', 'lesson', 'learn', 'learning', 'education', 'training', 'language', 'maths', 'math', 'science', 'exam', 'gcse', 'a level', 'coding', 'online course', 'workshop', 'music lessons', 'piano lessons', 'driving lessons', 'student'],
+    kick: 'Tuition and courses', h: 'Learning that sticks.', cta: 'Book a free lesson',
+    sub: '{n} offers patient, expert teaching for every level, one to one or in small groups, in person or online.',
+    hero: 'education-0', imgs: ['education-1', 'education-2', 'education-3', 'education-4', 'education-5'],
+    heads: { services: ['Subjects', 'What we teach.'], team: ['Tutors', 'The people who teach.'] },
+    blocks: [['services', 1], ['steps', 1], ['pricing', 1], ['team', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
+    about: 'At {n} we believe anyone can learn anything with the right teacher and a little patience. Our tutors are qualified, checked and love their subjects.',
+    services: [['Maths', 'From times tables to A level.', 'from £35'], ['English', 'Reading, writing and exam technique.', 'from £35'], ['Sciences', 'Biology, chemistry and physics.', 'from £40']],
+    steps: [['Free lesson', 'A first session to find the right level.'], ['A plan', 'Clear goals and a simple weekly routine.'], ['Progress', 'A short report every half term.']],
+    pricing: [['Single lesson', '£40', 'an hour', ['One to one', 'Online or in person'], 0], ['Termly', '£360', 'ten lessons', ['Weekly lessons', 'Progress reports', 'Homework support'], 1], ['Small group', '£20', 'per pupil', ['Up to four pupils', 'Exam focused'], 0]],
+    team: [['Hannah Cole', 'Director · maths'], ['Raj Mehta', 'English lead'], ['Chloe Price', 'Science tutor']],
+    q: 'Our daughter went from dreading maths to asking for extra practice. Her grades jumped two levels.', qc: 'a parent',
+    faq: [['Do you teach online?', 'Yes, every subject is available online or in person.'], ['Are tutors checked?', 'Every tutor is qualified and DBS checked.']],
+    c: 'Lessons after school and at weekends · first lesson free.' },
+
+  charity: { label: 'Charity', look: 'linen', layout: 'full', accent: 'forest', nav: 'bar',
+    kw: ['charity', 'charitable', 'nonprofit', 'non profit', 'ngo', 'foundation', 'fundrais', 'donate', 'donation', 'volunteer', ' appeal ', 'food bank', 'foodbank', 'shelter', 'social enterprise', 'relief', 'humanitarian', 'conservation', 'climate', 'wildlife', 'homeless', 'environment'],
+    kick: 'Registered charity', h: 'Small acts, real change.', cta: 'Donate',
+    sub: '{n} works alongside local people to make lasting change, and every pound you give goes where it is needed most.',
+    hero: 'charity-0', imgs: ['charity-1', 'charity-2', 'charity-3', 'charity-4', 'charity-5'],
+    heads: { steps: ['Your gift', 'Where your money goes.'], gallery: ['Our work', 'On the ground.'] },
+    blocks: [['stats', 1], ['steps', 1], ['gallery', 1], ['about', 1], ['testimonial', 1], ['faq', 0], ['contact', 1]],
+    about: '{n} began around a kitchen table with a handful of neighbours. Today it is a team of volunteers who turn up, week after week, because they care.',
+    stats: [['12,400', 'Meals served this year'], ['380', 'Volunteers'], ['92p', 'Of every pound spent on our work'], ['14', 'Years of service']],
+    steps: [['£10', 'Feeds a family for a week.'], ['£25', 'Buys school supplies for one child.'], ['£100', 'Funds a month of after school clubs.']],
+    q: 'The volunteers here changed our year. We had somewhere to turn when we needed it most.', qc: 'a family the charity supports',
+    faq: [['Can I give monthly?', 'Yes. Regular gifts help us plan ahead.'], ['Can I add Gift Aid?', 'Yes, and we can claim 25p more for every pound you give.']],
+    c: 'Registered charity · volunteers always welcome.' },
+
+  blog: { label: 'Creator', look: 'ledger', layout: 'centred', accent: 'oxblood', nav: 'centre',
+    kw: ['blog', 'blogger', 'writer', 'writing', 'author', ' book ', 'books', 'novel', 'journalist', 'newsletter', 'substack', 'podcast', 'creator', 'content creator', 'influencer', 'youtube', 'youtuber', 'tiktok', 'instagram', 'vlog', 'personal site', 'personal website', 'personal page', 'resume', ' cv ', 'about me', 'poet', 'poetry', 'essay', 'magazine', 'journal', 'recipes', 'food blog', 'travel blog'],
+    kick: 'Essays, notes and a weekly letter', h: 'Ideas worth your Sunday morning.', cta: 'Subscribe',
+    sub: '{n} writes about work, culture and the small things that make life better, with a new letter every Sunday.',
+    hero: 'blog-0', imgs: ['blog-1', 'blog-2', 'blog-3', 'blog-4', 'blog-5'],
+    heads: { series: ['Latest', 'Recent writing.'], logos: 'As featured in' },
+    blocks: [['series', 1], ['about', 1], ['logos', 1], ['testimonial', 1], ['contact', 1]],
+    about: 'I am {n}. I write to make sense of things, and I share it here every week. No noise, no algorithm, just good writing for curious people.',
+    series: [['The case for slow work', 'Essay', '12 min'], ['A year mostly offline', 'Notes', '8 min'], ['Small rooms, big ideas', 'Interview', '15 min'], ['Reading list · autumn', 'List', '5 min']],
+    logos: ['The Weekly', 'Northern Review', 'Field Journal', 'Daily Letter', 'Common Room'],
+    q: 'The only newsletter I open the moment it lands. Thoughtful, funny and always worth the read.', qc: 'a reader',
+    c: 'New letters every Sunday · free to read.' },
+
+  community: { label: 'Community', look: 'clean', layout: 'split', accent: 'forest', nav: 'bar',
+    kw: ['church', 'mosque', 'temple', 'synagogue', 'gurdwara', 'faith', 'parish', 'chapel', 'ministry', 'community', 'community centre', 'club', 'society', 'association', 'members', 'scouts', 'allotment', 'residents', 'village hall', 'youth club', 'book club', 'supper club'],
+    kick: 'A place for everyone', h: 'Everyone is welcome here.', cta: 'Come along',
+    sub: '{n} brings neighbours together through weekly gatherings, clubs and events that are open to all.',
+    hero: 'community-0', imgs: ['community-1', 'community-2', 'community-3', 'community-4', 'community-5'],
+    heads: { dates: ['What’s on', 'Coming up this month.'], hours: ['Visit', 'Every week.'] },
+    blocks: [['dates', 1], ['hours', 1], ['about', 1], ['gallery', 1], ['testimonial', 1], ['contact', 1]],
+    about: '{n} has been at the heart of the neighbourhood for more than fifty years. Whoever you are and whatever brings you here, there is a seat for you.',
+    dates: [['09 Nov', 'Sunday gathering', 'All ages · tea and cake after'], ['15 Nov', 'Winter fair', 'Stalls, food and live music'], ['23 Nov', 'Volunteers evening', 'Meet the team and lend a hand']],
+    hours: [['Sunday', 'Gathering · 10:30'], ['Wednesday', 'Coffee morning · 10:00'], ['Friday', 'Youth club · 18:00']],
+    addr: 'The Old Hall · Norwich',
+    q: 'We moved here knowing nobody. Within a month this place felt like family.', qc: 'a member',
+    c: 'Doors open every day · everyone welcome.' },
+
+  childcare: { label: 'Childcare', look: 'fresh', layout: 'split', accent: 'ochre', nav: 'bar',
+    kw: ['nursery', 'preschool', 'pre school', 'childcare', 'child care', 'childminder', 'creche', 'daycare', 'day care', 'kindergarten', 'montessori', 'playgroup', 'toddler', 'baby', 'babies', 'kids', 'children', 'after school', 'holiday club', 'soft play', 'nanny', 'babysit'],
+    kick: 'Nursery and preschool', h: 'Little days, full of wonder.', cta: 'Book a visit',
+    sub: '{n} is a warm, home from home nursery for children aged three months to five years, open all year round.',
+    hero: 'childcare-0', imgs: ['childcare-1', 'childcare-2', 'childcare-3', 'childcare-4', 'childcare-5'],
+    heads: { steps: ['Joining', 'Starting is simple.'], team: ['Our team', 'The people who care for your child.'] },
+    blocks: [['steps', 1], ['gallery', 1], ['hours', 1], ['team', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
+    about: 'At {n} children learn through play, outdoors as much as in. Our rooms are calm and bright, and our team has looked after local families for years.',
+    steps: [['Visit', 'Come and see us, and meet the team.'], ['Settle in', 'Short, gentle sessions to start.'], ['Grow', 'Daily updates and termly reports.']],
+    hours: [['Monday to Friday', '07:30 till 18:30'], ['Holidays', 'Open fifty one weeks a year']],
+    addr: '5 Orchard Road · Cambridge',
+    team: [['Laura Finch', 'Nursery manager'], ['Ben Adeyemi', 'Early years teacher'], ['Mia Novak', 'Room leader · babies']],
+    q: 'Our son runs in every morning. The team are kind, patient and tell us everything about his day.', qc: 'a parent',
+    faq: [['Do you accept funded hours?', 'Yes, we accept all government funded hours.'], ['What about meals?', 'Fresh, healthy meals cooked on site every day.']],
+    c: 'Visits by appointment · funded places available.' },
+
+  travel: { label: 'Travel', look: 'gallery', layout: 'full', accent: 'teal', nav: 'centre', extra: 'stay',
+    kw: ['hotel', 'b&b', 'bnb', 'bed and breakfast', 'guesthouse', 'guest house', 'inn', 'hostel', 'airbnb', 'holiday let', 'holiday', 'cottage', 'cabin', 'glamping', 'campsite', 'camping', 'resort', 'retreat', 'lodge', ' villa ', 'travel', ' tours ', 'tour operator', 'tourism', 'tourist', 'safari', 'cruise', 'boutique hotel', 'staycation', 'accommodation'],
+    kick: 'Rooms, suites and slow weekends', h: 'Stay a little longer.', cta: 'Check availability',
+    sub: '{n} is a small hotel with twelve rooms, a good kitchen and nowhere you have to be.',
+    hero: 'travel-0', imgs: ['travel-1', 'travel-2', 'travel-3', 'travel-4', 'travel-5'],
+    heads: { listings: ['Rooms', 'Choose your room.', 'All rooms'] },
+    blocks: [['listings', 1], ['gallery', 1], ['about', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
+    about: '{n} was a tired coaching inn until we gave it a second life. Now it is the place we always wished we could find: quiet, generous and properly comfortable.',
+    listings: [['travel-1', 'from £145', 'Garden room', 'King bed · garden view · sleeps 2'], ['travel-2', 'from £210', 'The loft suite', 'Roll top bath · sleeps 2'], ['travel-3', 'from £260', 'Family room', 'Two rooms · sleeps 4']],
+    q: 'The most restful weekend we have had in years. Breakfast alone is worth the trip.', qc: 'a guest',
+    faq: [['What time is check in?', 'From three in the afternoon. Check out is by eleven.'], ['Are dogs welcome?', 'Yes, in our garden rooms, with a bed and a treat waiting.']],
+    c: 'Book direct for the best rate · free cancellation up to 48 hours before.' },
+
+  pets: { label: 'Pets', look: 'clean', layout: 'split', accent: 'ochre', nav: 'bar',
+    kw: ['pet', 'pets', 'dog', 'cat', 'puppy', 'kitten', 'vet', 'veterinary', 'groomer', 'grooming', 'dog walker', 'dog walking', 'dog training', 'kennel', 'cattery', 'pet sitter', 'pet sitting', 'animal', 'animal rescue', 'pet shop'],
+    kick: 'Grooming, walks and care', h: 'Happy dogs, happy owners.', cta: 'Book a groom',
+    sub: '{n} grooms, walks and cares for dogs as if they were our own, with gentle handling and plenty of treats.',
+    hero: 'pets-0', imgs: ['pets-1', 'pets-2', 'pets-3', 'pets-4', 'pets-5'],
+    blocks: [['services', 1], ['steps', 1], ['strip', 1], ['team', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
+    about: '{n} started with one van and a lot of love for dogs. We keep groups small and visits calm, so every dog gets the attention it deserves.',
+    services: [['Full groom', 'Bath, dry, cut and nails.', 'from £45'], ['Daily walks', 'An hour out in small groups.', '£15 a walk'], ['Day care', 'Play, rest and cuddles, all day.', '£30 a day']],
+    steps: [['Meet', 'A free meet and greet for your dog.'], ['Book', 'Choose a slot online in seconds.'], ['Relax', 'Photos sent during every visit.']],
+    team: [['Ellie Shaw', 'Founder · groomer'], ['Marcus Hill', 'Walker'], ['Tia Brooks', 'Day care lead']],
+    q: 'Our nervous rescue dog actually loves going. She comes back fluffy, calm and very pleased with herself.', qc: 'a dog owner',
+    faq: [['Are you insured?', 'Yes, fully insured and first aid trained.'], ['Do you take puppies?', 'From twelve weeks, with gentle first visits.']],
+    c: 'Open Monday to Saturday · collection available.' },
+
+  custom: { label: 'Something else', look: 'clean', layout: 'split', accent: 'graphite', nav: 'bar', kw: [],
+    kick: '{T}', h: '{T}, done properly.', cta: 'Get in touch',
+    sub: '{n} is all about {t}: clear information, honest prices and an easy way to get in touch.',
+    hero: 'custom-0', imgs: ['custom-1', 'custom-2', 'custom-3', 'custom-4', 'custom-5'],
+    blocks: [['about', 1], ['services', 1], ['steps', 1], ['gallery', 1], ['testimonial', 1], ['faq', 1], ['contact', 1]],
+    about: 'Everything at {n} comes back to {t}. We keep it simple, do it properly and answer every message ourselves.',
+    services: [['First steps', 'Everything a newcomer needs to know, in plain words.', 'Free'], ['The full service', 'Our most popular option, from start to finish.', 'Most popular'], ['Something bespoke', 'Tell us what you have in mind and we will shape it around you.', 'On request']],
+    steps: [['Say hello', 'Tell us what you are looking for.'], ['Plan it', 'We agree the details and a fair price.'], ['Enjoy it', 'We take care of the rest.']],
+    q: 'Friendly, knowledgeable and clearly passionate about {t}. Could not recommend them more.', qc: 'a happy customer',
+    faq: [['How do I get started?', 'Send us a message and we will reply within a day.'], ['Do you work with beginners?', 'Always. Everyone starts somewhere.']],
+    c: 'Messages answered within a day.' }
+
 };
 var BLOCKS = { work: 'Work', series: 'Projects', about: 'About', packages: 'Packages', testimonial: 'Reviews', faq: 'Questions', contact: 'Contact',
   menu: 'Menu', strip: 'Photos', hours: 'Hours', treatments: 'Treatments', team: 'Team', steps: 'How it works', listings: 'Listings', stats: 'Numbers',
@@ -256,7 +414,7 @@ function hit(kw, t, ws, loose){
     if (kw.length < 5 || w.length < 4) return;
     var tol = (kw.length >= 8 ? 2 : 1) + (loose ? 1 : 0);
     if (Math.abs(w.length - kw.length) <= tol && lev(w, kw) <= tol) best = Math.max(best, kw.length - 1);
-    else if (w.length > kw.length && lev(w.slice(0, kw.length), kw) <= tol) best = Math.max(best, kw.length - 2);
+    else if (loose && w.length > kw.length && lev(w.slice(0, kw.length), kw) <= tol) best = Math.max(best, kw.length - 2);
   });
   return best;
 }
@@ -267,18 +425,50 @@ function scoreTypes(t, ws, loose){
     return [k, score];
   }).filter(function(p){ return p[1] > 0; }).sort(function(x, y){ return y[1] - x[1]; });
 }
+/* words that say nothing about the subject, so a brief like "a site for my pottery classes" leaves "pottery classes" */
+var FILLER = ('a an the my our your their his her its i im we me us you for of about to with and or in on at by from that this these those it is are be ' +
+  'been was were site sites website websites web webpage page pages landing home homepage one some need needs want wants would like love make making build ' +
+  'building create creating please new simple small little local online business company just really very good great nice best look looking style styled ' +
+  'colour color theme something thing things stuff kind type sort based help helps people who which where what do does doing offer offers service services ' +
+  'them they can will get has have had so as all any more also too up out into over our own mine called named full screen image photo big split centred centered').split(' ');
+function readTopic(text, name){
+  var t = name ? text.split(name).join(' ') : text;
+  var skip = {};
+  FILLER.forEach(function(w){ skip[w] = 1; });
+  LOOK_WORDS.concat(COLOUR_WORDS).forEach(function(p){ p[0].split(' ').forEach(function(w){ skip[w] = 1; }); });
+  var link = { 'in': 1, 'of': 1, 'and': 1, 'for': 1, 'with': 1, '&': 1 }, ws = [];
+  t.replace(/[^A-Za-z0-9& ]+/g, ' ').split(/\s+/).forEach(function(w){
+    var l = w.toLowerCase();
+    if (link[l]){ if (ws.length && !link[ws[ws.length - 1]]) ws.push(l); return; }   /* keep "in" in "escape room in Bristol" */
+    if (w.length > 1 && !skip[l]) ws.push(/^[A-Z][a-z]/.test(w) ? w : l);            /* keep place and proper names as typed */
+  });
+  while (ws.length && link[ws[ws.length - 1]]) ws.pop();
+  return ws.slice(0, 5).join(' ');
+}
+function cap(t){ return t.charAt(0).toUpperCase() + t.slice(1); }
+var CUSTOM = JSON.stringify(TYPES.custom);
+function setTopic(t){
+  S.topic = String(t || '').replace(/[^A-Za-z0-9& ]+/g, '').trim().slice(0, 40);
+  var w = S.topic || 'what you do';
+  TYPES.custom = JSON.parse(CUSTOM.replace(/\{t\}/g, w).replace(/\{T\}/g, cap(w)));
+}
 function readBrief(text){
   var t = ' ' + text.toLowerCase().replace(/[^a-z0-9&é ]+/g, ' ') + ' ';
   var ws = t.split(/\s+/).filter(Boolean);
   var found = { type: null, look: null, accent: null, layout: null, name: null, guesses: [] };
   var ranked = scoreTypes(t, ws, false);
   if (ranked.length) found.type = ranked[0][0];
-  else found.guesses = scoreTypes(t, ws, true).slice(0, 3).map(function(p){ return p[0]; });
+  else {
+    var near = scoreTypes(t, ws, true);
+    if (near.length && near[0][1] >= 8) found.type = near[0][0];   /* a clear misspelling of a long keyword: resturant, photgrapher */
+    else found.guesses = near.filter(function(p){ return p[1] >= 5; }).slice(0, 3).map(function(p){ return p[0]; });
+  }
   LOOK_WORDS.forEach(function(p){ if (!found.look && hit(p[0], t, ws, false)) found.look = p[1]; });
   COLOUR_WORDS.forEach(function(p){ if (!found.accent && hit(p[0], t, ws, false)) found.accent = p[1]; });
   LAYOUT_WORDS.forEach(function(p){ if (!found.layout && t.indexOf(p[0]) > -1) found.layout = p[1]; });
   var m = text.match(/(?:called|named)\s+["“']?([^,.;"”']{2,32})/i) || text.match(/["“]([^"”]{2,32})["”]/);
   if (m) found.name = m[1].trim();
+  if (!found.type) found.topic = readTopic(text, found.name);
   return found;
 }
 
@@ -290,10 +480,12 @@ function typeDefaults(k){
 }
 function fresh(){
   var s = typeDefaults('photography');
-  s.name = ''; s.nameSrc = ''; s.headline = ''; s.device = window.innerWidth < 760 ? 'phone' : 'desktop';
+  s.name = ''; s.nameSrc = ''; s.headline = ''; s.topic = ''; s.device = window.innerWidth < 760 ? 'phone' : 'desktop';
   return s;
 }
 var S = fresh();
+setTopic('');
+var pendingBrief = '';
 function applyType(k){
   var d = typeDefaults(k);
   Object.keys(d).forEach(function(key){ S[key] = d[key]; });
@@ -301,11 +493,12 @@ function applyType(k){
 (function(){
   var q = new URLSearchParams(location.search);
   if (q.get('name')){ S.name = q.get('name').slice(0, 32); S.nameSrc = 'user'; }
-  if (q.get('brief')) { var f = readBrief(q.get('brief')); if (f.type) applyType(f.type); if (f.look) S.look = f.look; if (f.accent) S.accent = f.accent; if (f.layout) S.layout = f.layout; if (f.name){ S.name = f.name; S.nameSrc = 'brief'; } var bi = document.getElementById('fBrief'); if (bi) bi.value = q.get('brief'); }
+  if (q.get('brief')){ pendingBrief = q.get('brief').slice(0, 140); var bi = document.getElementById('fBrief'); if (bi) bi.value = pendingBrief; }
   var fit = q.get('fit');
   if (!fit) return;
   try {
     var o = JSON.parse(decodeURIComponent(escape(atob(fit.replace(/-/g, '+').replace(/_/g, '/')))));
+    if (typeof o.topic === 'string') setTopic(o.topic);
     if (TYPES[o.type]) applyType(o.type);
     if (LOOKS[o.look]) S.look = o.look;
     if (LAYOUTS[o.layout]) S.layout = o.layout;
@@ -318,7 +511,7 @@ function applyType(k){
   } catch(e) {}
 })();
 function encodeFit(){
-  var o = { type: S.type, name: S.name, look: S.look, layout: S.layout, accent: S.accent, headline: S.headline, order: S.order, on: S.on };
+  var o = { type: S.type, topic: S.topic, name: S.name, look: S.look, layout: S.layout, accent: S.accent, headline: S.headline, order: S.order, on: S.on };
   return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 function fitURL(){ return location.href.split('#')[0].split('?')[0] + '?fit=' + encodeFit(); }
@@ -378,6 +571,8 @@ function syncControls(){
 }
 
 /* ============ block renderers ============ */
+function H(T, k, d){ return (T.heads && T.heads[k]) || d; }
+function head(T, k, d){ var h = H(T, k, d); return '<div class="x-head">' + kick(h[0]) + '<h2>' + esc(h[1]) + '</h2></div>'; }
 function kick(t){ return '<p class="x-kick">' + esc(t) + '</p>'; }
 function sec(k, inner, cls){ return '<section class="x-sec s-' + k + (cls ? ' ' + cls : '') + '" data-sec="' + k + '">' + inner + '</section>'; }
 var R = {
@@ -386,14 +581,14 @@ var R = {
       T.imgs.slice(0, 6).map(function(id, i){ return '<figure>' + img(id, '', T.caps[i]) + '<figcaption>' + esc(T.caps[i] || '') + '</figcaption></figure>'; }).join('') + '</div>');
   },
   series: function(T){
-    return sec('series', '<div class="x-head">' + kick(T.label === 'Studio' ? 'Case studies' : 'Series') + '<h2>' + (T.label === 'Studio' ? 'Selected projects.' : 'Ongoing series.') + '</h2></div><div class="x-list">' +
+    return sec('series', head(T, 'series', ['Series', 'Ongoing series.']) + '<div class="x-list">' +
       T.series.map(function(s, i){ return '<div class="x-li"><span class="x-n">' + String(i + 1).padStart(2, '0') + '</span><strong>' + esc(s[0]) + '</strong><span>' + esc(s[1]) + '</span><span>' + esc(s[2]) + '</span>' + img(T.imgs[(i + 2) % T.imgs.length], 'x-li-img') + '</div>'; }).join('') + '</div>');
   },
   about: function(T){
     return sec('about', '<div class="x-about"><div>' + kick('About') + '<h2>' + esc(nm()) + '</h2><p>' + fill(T.about) + '</p></div>' + img(T.imgs[T.imgs.length - 1], 'x-about-img') + '</div>');
   },
   packages: function(T){
-    return sec('packages', '<div class="x-head">' + kick('Packages') + '<h2>Simple, clear packages.</h2></div><div class="x-three">' +
+    return sec('packages', head(T, 'packages', ['Packages', 'Simple, clear packages.']) + '<div class="x-three">' +
       T.packages.map(function(p){ return '<div class="x-card"><h3>' + esc(p[0]) + '</h3><p>' + esc(p[1]) + '</p><b>' + esc(p[2]) + '</b></div>'; }).join('') + '</div>');
   },
   testimonial: function(T){
@@ -414,23 +609,25 @@ var R = {
     return sec('strip', '<div class="x-strip">' + T.imgs.slice(0, 3).map(function(id){ return img(id); }).join('') + '</div>', 'x-flush');
   },
   hours: function(T){
-    return sec('hours', '<div class="x-hours"><div>' + kick('Visit') + '<h2>Opening hours.</h2><p>' + esc(T.addr || '') + '</p></div><dl>' +
+    var h = H(T, 'hours', ['Visit', 'Opening hours.']);
+    return sec('hours', '<div class="x-hours"><div>' + kick(h[0]) + '<h2>' + esc(h[1]) + '</h2><p>' + esc(T.addr || '') + '</p></div><dl>' +
       T.hours.map(function(h){ return '<div><dt>' + esc(h[0]) + '</dt><dd>' + esc(h[1]) + '</dd></div>'; }).join('') + '</dl></div>');
   },
   treatments: function(T){
-    return sec('treatments', '<div class="x-head">' + kick('Treatments') + '<h2>Treatments and prices.</h2></div><div class="x-rows">' +
+    return sec('treatments', head(T, 'treatments', ['Treatments', 'Treatments and prices.']) + '<div class="x-rows">' +
       T.treatments.map(function(t){ return '<div><strong>' + esc(t[0]) + '</strong><span>' + esc(t[1]) + '</span><b>' + esc(t[2]) + '</b><span class="x-book">Book</span></div>'; }).join('') + '</div>');
   },
   team: function(T){
-    return sec('team', '<div class="x-head">' + kick('The team') + '<h2>The people you will meet.</h2></div><div class="x-team">' +
+    return sec('team', head(T, 'team', ['The team', 'The people you will meet.']) + '<div class="x-team">' +
       T.team.map(function(p){ return '<div><span class="x-av">' + esc(initials(p[0])) + '</span><strong>' + esc(p[0]) + '</strong><span>' + esc(p[1]) + '</span></div>'; }).join('') + '</div>');
   },
   steps: function(T){
-    return sec('steps', '<div class="x-head">' + kick('How it works') + '<h2>Three simple steps.</h2></div><div class="x-steps">' +
+    return sec('steps', head(T, 'steps', ['How it works', 'Three simple steps.']) + '<div class="x-steps">' +
       T.steps.map(function(s, i){ return '<div><span class="x-n">' + String(i + 1).padStart(2, '0') + '</span><h3>' + esc(s[0]) + '</h3><p>' + esc(s[1]) + '</p></div>'; }).join('') + '</div>');
   },
   listings: function(T){
-    return sec('listings', '<div class="x-head x-head-row"><div>' + kick('Listings') + '<h2>Available now.</h2></div><span class="x-ghost">View all homes</span></div><div class="x-three">' +
+    var h = H(T, 'listings', ['Listings', 'Available now.', 'View all homes']);
+    return sec('listings', '<div class="x-head x-head-row"><div>' + kick(h[0]) + '<h2>' + esc(h[1]) + '</h2></div><span class="x-ghost">' + esc(h[2]) + '</span></div><div class="x-three">' +
       T.listings.map(function(l){ return '<div class="x-listing">' + img(l[0]) + '<div><b>' + esc(l[1]) + '</b><h3>' + esc(l[2]) + '</h3><p>' + esc(l[3]) + '</p></div></div>'; }).join('') + '</div>');
   },
   stats: function(T){
@@ -441,7 +638,7 @@ var R = {
       T.fleet.map(function(f){ return '<div class="x-listing">' + img(f[0]) + '<div><h3>' + esc(f[1]) + '</h3><p>' + esc(f[2]) + '</p><div class="x-row"><b>' + esc(f[3]) + '<small> a day</small></b><span class="x-btn x-btn-sm">Reserve</span></div></div></div>'; }).join('') + '</div>');
   },
   services: function(T){
-    return sec('services', '<div class="x-head">' + kick('Services') + '<h2>What we offer.</h2></div><div class="x-three">' +
+    return sec('services', head(T, 'services', ['Services', 'What we offer.']) + '<div class="x-three">' +
       T.services.map(function(s){ return '<div class="x-card"><h3>' + esc(s[0]) + '</h3><p>' + esc(s[1]) + '</p><b>' + esc(s[2]) + '</b></div>'; }).join('') + '</div>');
   },
   areas: function(T){
@@ -452,7 +649,7 @@ var R = {
       T.products.map(function(p){ return '<div class="x-product">' + img(p[0]) + '<div class="x-row"><strong>' + esc(p[1]) + '</strong><b>' + esc(p[2]) + '</b></div><span class="x-add">Add to bag</span></div>'; }).join('') + '</div>');
   },
   logos: function(T){
-    return sec('logos', '<p class="x-trust">Trusted by teams at</p><div class="x-logos">' + T.logos.map(function(l){ return '<span>' + esc(l) + '</span>'; }).join('') + '</div>', 'x-thin');
+    return sec('logos', '<p class="x-trust">' + esc(H(T, 'logos', 'Trusted by teams at')) + '</p><div class="x-logos">' + T.logos.map(function(l){ return '<span>' + esc(l) + '</span>'; }).join('') + '</div>', 'x-thin');
   },
   pricing: function(T){
     return sec('pricing', '<div class="x-head x-center">' + kick('Pricing') + '<h2>Simple, honest pricing.</h2></div><div class="x-three">' +
@@ -473,11 +670,11 @@ var R = {
       T.timetable.map(function(r){ return '<div class="x-tr"><span class="x-time">' + esc(r[0]) + '</span>' + r[1].map(function(c){ return '<span class="x-class">' + esc(c) + '</span>'; }).join('') + '</div>'; }).join('') + '</div>');
   },
   dates: function(T){
-    return sec('dates', '<div class="x-head">' + kick('Coming up') + '<h2>Dates for your diary.</h2></div><div class="x-dates">' +
+    return sec('dates', head(T, 'dates', ['Coming up', 'Dates for your diary.']) + '<div class="x-dates">' +
       T.dates.map(function(d){ var p = d[0].split(' '); return '<div><span class="x-cal"><strong>' + esc(p[0]) + '</strong>' + esc(p[1]) + '</span><span><strong>' + esc(d[1]) + '</strong><em>' + esc(d[2]) + '</em></span><span class="x-ghost">Reserve</span></div>'; }).join('') + '</div>');
   },
   gallery: function(T){
-    return sec('gallery', '<div class="x-head">' + kick('Gallery') + '<h2>A look inside.</h2></div><div class="x-gal">' + T.imgs.slice(0, 4).map(function(id){ return img(id); }).join('') + '</div>');
+    return sec('gallery', head(T, 'gallery', ['Gallery', 'A look inside.']) + '<div class="x-gal">' + T.imgs.slice(0, 4).map(function(id){ return img(id); }).join('') + '</div>');
   }
 };
 function mockRows(n){
@@ -493,13 +690,14 @@ function mock(){
 function heroExtra(T){
   if (T.extra === 'search') return '<div class="x-search"><span><small>Location</small>Islington, London</span><span><small>Type</small>Any home</span><span><small>Budget</small>Up to £900,000</span><span class="x-btn">Search</span></div>';
   if (T.extra === 'reserve') return '<div class="x-search x-reserve"><span><small>Guests</small>2 people</span><span><small>Date</small>Friday 14 June</span><span><small>Time</small>19:30</span><span class="x-btn">' + esc(T.cta) + '</span></div>';
+  if (T.extra === 'stay') return '<div class="x-search x-reserve"><span><small>Check in</small>Friday 14 June</span><span><small>Check out</small>Sunday 16 June</span><span><small>Guests</small>2 adults</span><span class="x-btn">' + esc(T.cta) + '</span></div>';
   if (T.extra === 'quote') return '<div class="x-quotecard"><strong>Get a quote in minutes</strong><span class="x-field">Your postcode</span><span class="x-field">What needs doing?</span><span class="x-btn">Send request</span><small>Replies within the hour</small></div>';
   return '';
 }
 function hero(T){
   var head = S.headline.trim() || T.h;
   var media = (T.extra === 'mock' && S.layout !== 'full') ? mock() : (T.extra === 'quote' && S.layout === 'split') ? heroExtra(T) : img(T.hero, 'x-hero-img', T.label);
-  var after = (T.extra === 'search' || T.extra === 'reserve') ? heroExtra(T) : '';
+  var after = (T.extra === 'search' || T.extra === 'reserve' || T.extra === 'stay') ? heroExtra(T) : '';
   return '<section class="x-hero" data-sec="hero"><div class="x-hero-copy"><p class="x-kick">' + esc(T.kick) + '</p><h1>' + esc(head) + '</h1><p>' + fill(T.sub) + '</p>' +
     '<div class="x-cta"><span class="x-btn">' + esc(T.cta) + '</span><span class="x-ghost">Find out more</span></div>' + after + '</div>' + media + '</section>';
 }
@@ -552,7 +750,7 @@ function mailto(){
   var live = S.order.filter(function(k){ return S.on[k]; }).map(function(k){ return BLOCKS[k]; });
   var body = 'Hello Coveworks,\n\nI built a demo in your configurator and would like to talk about the real thing.\n\n' +
     'Business: ' + nm() + '\n' +
-    'Type of site: ' + T.label + '\n' +
+    'Type of site: ' + (S.type === 'custom' ? 'Something else · ' + (S.topic || 'not described') : T.label) + '\n' +
     'Look: ' + LOOKS[S.look].label + ' (' + LOOKS[S.look].desc.toLowerCase() + ')\n' +
     'Opening layout: ' + LAYOUTS[S.layout].label + '\n' +
     'Colour: ' + ACCENTS[S.accent][0] + '\n' +
@@ -579,16 +777,21 @@ function fadeRender(){
 /* ============ wiring ============ */
 function setUnsure(on){ document.querySelector('.stage').classList.toggle('unsure', !!on); }
 function runBrief(text){
-  var f = readBrief(text), said = [];
+  var f = readBrief(text), said = [], also = '';
+  if (!f.type && f.topic){
+    setTopic(f.topic);
+    f.type = 'custom';
+    if (f.guesses.length) also = ' Or did you mean:<span class="brief-pick">' + f.guesses.map(function(k){ return '<button type="button" data-pick="' + k + '">' + TYPES[k].label + '</button>'; }).join('') + '</span>';
+  }
   if (!f.type){
     var picks = (f.guesses.length ? f.guesses : ['photography', 'restaurant', 'clinic']);
-    $('fBriefRead').innerHTML = '<b>Not sure what kind of site that is.</b> ' + (f.guesses.length ? 'Did you mean' : 'Try one of these, or pick any type below') + ':' +
+    $('fBriefRead').innerHTML = '<b>What is the site for?</b> ' + (f.guesses.length ? 'Did you mean' : 'Add a word or two about what you do, or start from one of these') + ':' +
       '<span class="brief-pick">' + picks.map(function(k){ return '<button type="button" data-pick="' + k + '">' + TYPES[k].label + '</button>'; }).join('') + '</span>';
     setUnsure(true);
     return;
   }
   setUnsure(false);
-  applyType(f.type); said.push(TYPES[f.type].label + ' site');
+  applyType(f.type); said.push(f.type === 'custom' ? 'a site about ' + S.topic : TYPES[f.type].label + ' site');
   if (f.look){ S.look = f.look; said.push(LOOKS[f.look].label + ' look'); }
   else said.push(LOOKS[S.look].label + ' look');
   if (f.layout){ S.layout = f.layout; }
@@ -600,7 +803,7 @@ function runBrief(text){
   syncControls();
   fadeRender();
   pvView.scrollTo({ top: 0, behavior: smooth });
-  $('fBriefRead').innerHTML = '<b>Built as</b> ' + esc(said.join(' · ')) + '. Adjust anything below.';
+  $('fBriefRead').innerHTML = '<b>Built as</b> ' + esc(said.join(' · ')) + '.' + (also || ' Adjust anything below.');
 }
 $('fBriefRead').addEventListener('click', function(e){
   var b = e.target.closest('[data-pick]');
@@ -667,7 +870,7 @@ $('fCopy').addEventListener('click', function(){
 });
 $('fReset').addEventListener('click', function(){
   var dev = S.device;
-  S = fresh(); S.device = dev;
+  S = fresh(); S.device = dev; setTopic('');
   $('fBrief').value = ''; $('fBriefRead').innerHTML = '';
   try { history.replaceState(null, '', location.pathname); } catch(e) {}
   syncControls(); render();
@@ -679,6 +882,7 @@ $('fSend').addEventListener('click', function(){ this.setAttribute('href', mailt
 
 syncControls();
 render();
+if (pendingBrief) runBrief(pendingBrief);
 if (window.ResizeObserver) new ResizeObserver(function(){ fitPreview(); }).observe(pvView);
 if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitPreview);
 document.addEventListener('loadingdone', fitPreview);

@@ -235,7 +235,7 @@ HOME = f'''<main>
         </figure>
         <div class="steps">
           <div><b>00</b><p><strong>Your words</strong><span>Describe the site you need</span></p></div>
-          <div><b>01</b><p><strong>Site type</strong><span>Thirteen, each built differently</span></p></div>
+          <div><b>01</b><p><strong>Site type</strong><span>Twenty three, or anything else you name</span></p></div>
           <div><b>02</b><p><strong>Look</strong><span>Fifteen, from Swiss to Aurora</span></p></div>
           <div><b>03</b><p><strong>Layout</strong><span>Split, centred or full image</span></p></div>
           <div><b>04</b><p><strong>Colour</strong><span>Ten considered accents</span></p></div>
@@ -276,7 +276,7 @@ WORK = f'''<main>
 '''
 
 CONFIGURATOR = f'''<main>
-{page_head('02', 'The configurator', 'Build a demo <em>of your own.</em>', 'Describe the site you need in plain words, or pick a type. Each of the thirteen is built with its own structure, copy and photography, in any of fifteen looks. Nothing is stored. When it fits, send it to us and we will make the real one.')}
+{page_head('02', 'The configurator', 'Build a demo <em>of your own.</em>', 'Describe the site you need in plain words, or pick a type. Each of the twenty three types is built with its own structure, copy and photography, in any of fifteen looks, and anything else gets a site written around your own words. Nothing is stored. When it fits, send it to us and we will make the real one.')}
   <section class="fit-wrap">
     <div class="wrap">
       <div class="fit-grid">
