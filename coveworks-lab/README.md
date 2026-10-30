@@ -31,9 +31,9 @@ The generated HTML is committed. After editing a page in `sitegen/build.py`, run
 ## The configurator
 Visitors arrive from the home page ("Begin your fitting · what site do you need?", which carries their words across) or any Book a fitting button.
 
-**00 · Describe the site you need.** Plain words such as "a minimal photography portfolio in black and white" or "an Italian restaurant called Nonna" are read for the kind of business, a look, a colour, a layout and a name, and the preview is cut to match. This is keyword reading in the browser, not an AI model, so it needs no server and stores nothing.
+**00 · Describe the site you need.** Plain words such as "a minimal photography portfolio in black and white" or "an Italian restaurant called Nonna" are read for the kind of business, a look, a colour, a layout and a name, and the preview is cut to match. This is keyword reading in the browser, not an AI model, so it needs no server and stores nothing. Each type knows dozens of words, and close misspellings of long ones ("resturant", "photgrapher") still match. A brief that names no known type is never turned away: the Something else type builds a site around the words given ("a site for beekeeping supplies" becomes a site about beekeeping supplies, with neutral imagery) and offers any near types as alternatives.
 
-**Site types.** Thirteen, each with its own page structure, written copy and real photography, not one skeleton reskinned:
+**Site types.** Twenty three, each with its own page structure, written copy and photography, not one skeleton reskinned, plus Something else:
 
 | Type | Built around |
 |---|---|
@@ -50,6 +50,17 @@ Visitors arrive from the home page ("Begin your fitting · what site do you need
 | Studio | case studies, services, numbers |
 | Fitness | class timetable, memberships, coaches |
 | Events | dates for the diary, packages, gallery |
+| Gaming | stream schedule, numbers, highlights, roster |
+| Music | tour dates, releases, live photos |
+| Salon | services with times and prices, stylists, opening hours |
+| Education | subjects, three steps, lesson pricing, tutors |
+| Charity | impact numbers, where your gift goes, the work on the ground |
+| Creator | recent writing, featured in, subscribe |
+| Community | what's on, weekly times, gallery |
+| Childcare | joining steps, gallery, opening hours, team |
+| Travel | stay booking bar, rooms with rates, gallery |
+| Pets | services, three steps, photo strip, team |
+| Something else | written around the visitor's own words, with neutral imagery |
 
 Each type also has its own sections to switch on, off and reorder, its own call to action, and a default look, layout and colour.
 
@@ -65,7 +76,7 @@ The preview renders a full width desktop site (1280 px, scaled to fit) or a phon
 The configurator's code is `assets/fitting.js` (types, copy, looks and the brief reader) and `assets/fitting.css` (the preview site), loaded only on that page.
 
 ## Imagery
-Every image in `assets/gen/` was generated for Coveworks with Higgsfield (GPT Image 2.5): six for each of the thirteen site types (eight for photography), three studio plates for the home and studio pages, and the share image `lab-cover.jpg`. They are illustrative and show no real client. A preview loads only the photos for its type. See `assets/gen/CREDITS.txt`.
+Every image in `assets/gen/` was generated for Coveworks with Higgsfield (GPT Image 2.5): six for each of the twenty three site types and the Something else fallback (eight for photography), three studio plates for the home and studio pages, and the share image `lab-cover.jpg`. They are illustrative and show no real client. A preview loads only the photos for its type. See `assets/gen/CREDITS.txt`.
 
 ## Content notes
 - `hello@coveworks.studio` must exist (or be replaced in `sitegen/build.py` and `assets/site.js`) before go live
