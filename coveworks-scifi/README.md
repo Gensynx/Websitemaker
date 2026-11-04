@@ -43,7 +43,7 @@ The welcome screen has ambient drifting glows, a word by word title entrance and
 
 ## Content notes
 - The carousel shows live captures of every build in the repo, embedded in the file (~1.3 MB total).
-- The contact form opens the visitor's email app with the message pre-filled, addressed to `hello@coveworks.studio`. Create that mailbox (or search-and-replace the address in `index.html`) before go-live.
+- The contact form opens the visitor's email app with the message pre-filled, addressed to `sales@coveworks.tech`. Create that mailbox (or search-and-replace the address in `index.html`) before go-live.
 - Copy is dash free by request.
 
 ## Deploy

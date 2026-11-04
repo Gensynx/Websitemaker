@@ -211,7 +211,7 @@ if (cForm) cForm.addEventListener('submit', function(e){
   });
   if (!ok){ $('cOk').textContent = 'A field needs another look'; return; }
   var n = $('cName').value.trim(), em = $('cEmail').value.trim(), msg = $('cMsg').value.trim();
-  window.location.href = 'mailto:hello@coveworks.studio?subject=' + encodeURIComponent('Project enquiry · ' + n) + '&body=' + encodeURIComponent(msg + '\n\n· ' + n + '\n· ' + em);
+  window.location.href = 'mailto:sales@coveworks.tech?subject=' + encodeURIComponent('Project enquiry · ' + n) + '&body=' + encodeURIComponent(msg + '\n\n· ' + n + '\n· ' + em);
   $('cOk').textContent = 'Your email app has opened · hit send to finish';
 });
 

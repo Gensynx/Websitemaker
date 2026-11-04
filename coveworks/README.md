@@ -19,7 +19,7 @@ index.html          the whole site (fonts and images embedded, ~490 KB)
 
 ## Content notes
 - The work carousel shows live screenshots of the Dar Ul Amir build (repo root), embedded in the file. The Vassallo Developments slide is typographic since no visual asset exists in the repo.
-- `hello@coveworks.studio` is a placeholder address and the contact form is a demo until wired to an inbox.
+- `sales@coveworks.tech` is a placeholder address and the contact form is a demo until wired to an inbox.
 - Copy is dash free by request; separators use middots.
 
 ## Deploy

@@ -85,7 +85,7 @@ FOOTER_TOP = f'''
       </div>
       <div>
         <h4>Studio</h4>
-        <ul><li><a href="mailto:hello@coveworks.studio">hello@coveworks.studio</a></li><li>Working worldwide</li><li>One build at a time</li></ul>
+        <ul><li><a href="mailto:sales@coveworks.tech">sales@coveworks.tech</a></li><li>Working worldwide</li><li>One build at a time</li></ul>
       </div>
       <div>
         <h4>Other editions</h4>
@@ -151,7 +151,7 @@ CONTACT_BAND = f'''  <section class="block">
         <div>
           <p class="label"><span class="led ok pulse"></span><b>Contact</b> Taking new builds</p>
           <h2 class="title">Tell us what you are <em>building.</em></h2>
-          <a class="mail" href="mailto:hello@coveworks.studio">hello@coveworks.studio</a>
+          <a class="mail" href="mailto:sales@coveworks.tech">sales@coveworks.tech</a>
         </div>
         <div class="acts">
           <a class="btn sig" href="configurator.html"><span>Start in the configurator</span>{ARROW}</a>
@@ -269,7 +269,7 @@ WORK = f'''<main>
   <section class="block" style="padding-top:clamp(20px,2.6vw,32px)">
     <div class="wrap">
       <div class="w-list" id="wList" data-next></div>
-      <noscript><p class="lede" style="margin-top:16px">Turn on JavaScript to open the work index, or write to hello@coveworks.studio.</p></noscript>
+      <noscript><p class="lede" style="margin-top:16px">Turn on JavaScript to open the work index, or write to sales@coveworks.tech.</p></noscript>
     </div>
   </section>
 {CONTACT_BAND}</main>
@@ -325,7 +325,7 @@ CONFIGURATOR = f'''<main>
             <input class="t-input sm" id="fHead" maxlength="70" placeholder="" autocomplete="off">
           </fieldset>
           <div class="t-actions">
-            <a class="btn sig" id="fSend" href="mailto:hello@coveworks.studio"><span>Send this build to Coveworks</span>{ARROW}</a>
+            <a class="btn sig" id="fSend" href="mailto:sales@coveworks.tech"><span>Send this build to Coveworks</span>{ARROW}</a>
             <div class="row">
               <button class="btn ghost sm" id="fCopy" type="button"><span>Copy link</span></button>
               <button class="btn ghost sm" id="fReset" type="button"><span>Start again</span></button>
@@ -351,7 +351,7 @@ CONFIGURATOR = f'''<main>
           <div class="cap"><span>Live preview · scroll inside</span><span>Photography slots swap for yours</span></div>
         </div>
       </div>
-      <noscript><p class="lede" style="margin-top:16px">The configurator needs JavaScript. You can still write to hello@coveworks.studio.</p></noscript>
+      <noscript><p class="lede" style="margin-top:16px">The configurator needs JavaScript. You can still write to sales@coveworks.tech.</p></noscript>
     </div>
   </section>
 </main>
@@ -406,7 +406,7 @@ CONTACT = f'''<main>
     <div class="wrap c-grid">
       <div data-rise>
         <p class="label"><span class="led ok pulse"></span><b>Write</b> Directly</p>
-        <a class="mail" href="mailto:hello@coveworks.studio">hello@coveworks.studio</a>
+        <a class="mail" href="mailto:sales@coveworks.tech">sales@coveworks.tech</a>
         <dl class="c-facts">
           <div><dt>Replies</dt><dd>Personally, usually within a day</dd></div>
           <div><dt>Where</dt><dd>Working worldwide</dd></div>

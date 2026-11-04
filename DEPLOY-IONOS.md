@@ -38,7 +38,7 @@ In **Domains & SSL**, assign the included **SSL certificate** to the domain and 
 
 ## 5. Pre-launch checks
 
-- The contact form opens the visitor's **email app** with the message pre-filled, addressed to `hello@coveworks.studio` — no backend needed. Make that address real by creating the mailbox under IONOS → **Email**, or search-and-replace `hello@coveworks.studio` in `index.html` with your actual address (it appears in the form handler, the footer, and two mailto links).
+- The contact form opens the visitor's **email app** with the message pre-filled, addressed to `sales@coveworks.tech` — no backend needed. Make that address real by creating the mailbox under IONOS → **Email**, or search-and-replace `sales@coveworks.tech` in `index.html` with your actual address (it appears in the form handler, the footer, and two mailto links).
 - After upload, hard-refresh the live URL (Ctrl/Cmd+Shift+R), submit a test enquiry through the form, and check the site on a phone.
 
 ## Updating the site later
