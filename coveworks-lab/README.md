@@ -71,7 +71,7 @@ Each type also has its own sections to switch on, off and reorder, its own call 
 
 **Layout** of the opening: split, centred or full image. **Colour**: ten accents. **Headline**: optional.
 
-The preview renders a full width desktop site (1280 px, scaled to fit) or a phone cut (390 px). Reviews are marked as samples. **Copy link** encodes the whole fitting into the address (`configurator.html?fit=`); **Send this fitting** opens the visitor's own email app with the brief, including their own words, addressed to `hello@coveworks.studio`.
+The preview renders a full width desktop site (1280 px, scaled to fit) or a phone cut (390 px). Reviews are marked as samples. **Copy link** encodes the whole fitting into the address (`configurator.html?fit=`); **Send this fitting** opens the visitor's own email app with the brief, including their own words, addressed to `sales@coveworks.tech`.
 
 The configurator's code is `assets/fitting.js` (types, copy, looks and the brief reader) and `assets/fitting.css` (the preview site), loaded only on that page.
 
@@ -79,7 +79,7 @@ The configurator's code is `assets/fitting.js` (types, copy, looks and the brief
 Every image in `assets/gen/` was generated for Coveworks with Higgsfield (GPT Image 2.5): six for each of the twenty three site types and the Something else fallback (eight for photography), three studio plates for the home and studio pages, and the share image `lab-cover.jpg`. They are illustrative and show no real client. A preview loads only the photos for its type. See `assets/gen/CREDITS.txt`.
 
 ## Content notes
-- `hello@coveworks.studio` must exist (or be replaced in `sitegen/build.py` and `assets/site.js`) before go live
+- `sales@coveworks.tech` must exist (or be replaced in `sitegen/build.py` and `assets/site.js`) before go live
 - The work list lives in `assets/site.js` (`WORKS`); London's Aesthetics Academy shows as a private preview until it goes live
 - Copy is dash free by request
 

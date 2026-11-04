@@ -759,7 +759,7 @@ function mailto(){
     ($('fBrief').value.trim() ? 'In my words: ' + $('fBrief').value.trim() + '\n' : '') + '\n' +
     'My build: ' + fitURL() + '\n\n' +
     'My name:\nBest way to reach me:\n';
-  return 'mailto:hello@coveworks.studio?subject=' + encodeURIComponent('Configurator · ' + nm()) + '&body=' + encodeURIComponent(body);
+  return 'mailto:sales@coveworks.tech?subject=' + encodeURIComponent('Configurator · ' + nm()) + '&body=' + encodeURIComponent(body);
 }
 function status(t){
   var el = $('fStatus');
