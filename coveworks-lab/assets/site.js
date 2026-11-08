@@ -17,7 +17,7 @@ requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.doc
   if (!h) return;
   var chars = [];
   h.querySelectorAll('.ln').forEach(function(ln){
-    var nodes = Array.prototype.slice.call(ln.childNodes);
+    var nodes = Array.prototype.slice.call(ln.childNodes), word = null;
     ln.textContent = '';
     nodes.forEach(function(n){
       var text = n.textContent, cls = n.nodeType === 1 ? n.className : '';
@@ -25,8 +25,12 @@ requestAnimationFrame(function(){ requestAnimationFrame(function(){ document.doc
         var c = document.createElement('span');
         c.className = 'ch' + (cls ? ' ' + cls : '');
         c.textContent = text[i];
-        if (text[i] === ' ') c.style.width = '.3em';
-        ln.appendChild(c);
+        if (text[i] === ' '){ c.style.width = '.3em'; ln.appendChild(c); word = null; }
+        else {
+          /* letters of one word share a wrapper, so a line can only break at a space, never inside MEASURE */
+          if (!word){ word = document.createElement('span'); word.className = 'wd'; ln.appendChild(word); }
+          word.appendChild(c);
+        }
         chars.push(c);
       }
     });
