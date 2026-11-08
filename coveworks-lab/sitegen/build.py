@@ -21,7 +21,9 @@ FAVICON = ("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox
            "%3Ccircle cx='32' cy='32' r='12' fill='%23E5321E'/%3E%3C/svg%3E")
 
 
-def head(title, desc, extra_css=''):
+SITE = 'https://coveworks.tech/'   # the live domain; GitHub Pages serves a copy
+
+def head(title, desc, extra_css='', page='index.html'):
     return f'''<!doctype html>
 <html lang="en">
 <head>
@@ -33,7 +35,9 @@ def head(title, desc, extra_css=''):
 <meta property="og:type" content="website">
 <meta property="og:title" content="{title}">
 <meta property="og:description" content="{desc}">
-<meta property="og:image" content="https://gensynx.github.io/Websitemaker/coveworks-lab/assets/gen/lab-cover.jpg">
+<link rel="canonical" href="{SITE}{'' if page == 'index.html' else page}">
+<meta property="og:url" content="{SITE}{'' if page == 'index.html' else page}">
+<meta property="og:image" content="{SITE}assets/gen/lab-cover.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="{FAVICON}">
 <link rel="preload" href="assets/fonts/doto.woff2" as="font" type="font/woff2" crossorigin>
@@ -89,7 +93,7 @@ FOOTER_TOP = f'''
       </div>
       <div>
         <h4>Other editions</h4>
-        <ul><li><a href="../coveworks-scifi/">The flagship, nine themes</a></li></ul>
+        <ul><li><a href="https://gensynx.github.io/Websitemaker/coveworks-scifi/">The flagship, nine themes</a></li></ul>
       </div>
     </div>
     <p class="f-big" aria-hidden="true">Coveworks<span>.</span></p>
@@ -439,7 +443,7 @@ for href, _label in PAGES:
     cfg = href == 'configurator.html'
     css = '<link rel="stylesheet" href="assets/fitting.css">\n' if cfg else ''
     js = '<script src="assets/fitting.js"></script>\n' if cfg else ''
-    html = head(title, desc, css) + chrome(href) + '\n' + body + footer(js)
+    html = head(title, desc, css, href) + chrome(href) + '\n' + body + footer(js)
     with open(os.path.join(ROOT, href), 'w', encoding='utf-8') as f:
         f.write(html)
     print('wrote', href, len(html) // 1024, 'KB')
