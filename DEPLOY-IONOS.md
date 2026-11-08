@@ -10,9 +10,15 @@ file sci-fi edition that went live in July 2026.
 python3 coveworks-lab/sitegen/package.py
 ```
 
-This writes `dist/coveworks-lab-upload.zip` (about 6 MB): the five pages, the `assets/`
-folder and `.htaccess`, laid out to sit at the root of the webspace. Notes, credits and
-the `sitegen/` scripts are left out.
+This stages the whole webspace in `dist/site/` and zips it to `dist/coveworks-lab-upload.zip`
+(about 50 MB, most of it the Dar Ul Amir intro films):
+
+- `/`: the five Lab pages, `assets/` and `.htaccess`
+- `/work/<slug>/`: a copy of every site in the work list (Vassallo, Dar Ul Amir and the
+  five fictional brand sites), which the work list links to. `work/.htaccess` keeps them
+  out of search results.
+
+Notes, build scripts and master files are left out.
 
 ## 2. Upload it
 
@@ -60,8 +66,9 @@ skips with a notice. To switch it on, once:
 4. Actions, Deploy Coveworks to IONOS, **Run workflow**. The last step checks that the
    live site serves the new files and fails loudly if not.
 
-The workflow uploads the pages, `assets/` (folders included) and `.htaccess`, never
-README, CREDITS or `sitegen/`, and deletes nothing on the server. Secrets are encrypted
+The workflow runs the packager and uploads `dist/site/`, folders included. Each file
+carries the time of its last commit, so after the first upload only changed files are sent.
+It deletes nothing on the server. Secrets are encrypted
 by GitHub and never appear in logs, so this is safe on a public repository.
 
 ## Updating the site by hand

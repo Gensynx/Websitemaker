@@ -80,7 +80,7 @@ Every image in `assets/gen/` was generated for Coveworks with Higgsfield (GPT Im
 
 ## Content notes
 - `sales@coveworks.tech` must exist (or be replaced in `sitegen/build.py` and `assets/site.js`) before go live
-- The work list lives in `assets/site.js` (`WORKS`); London's Aesthetics Academy shows as a private preview until it goes live
+- The work list lives in `assets/site.js` (`WORKS`). Its links point at copies of each site under coveworks.tech/work/, uploaded by the deploy workflow (see `sitegen/package.py`). Apart from Vassallo and Dar Ul Amir, the portfolio sites carry fictional brands, because the real clients did not agree to be shown
 - Copy is dash free by request
 
 ## Deploy

@@ -215,7 +215,7 @@ HOME = f'''<main>
           <p class="label"><b>01</b> Selected work</p>
           <h2 class="title">Built here, <em>recently.</em></h2>
         </div>
-        <a class="more" href="work.html" data-rise>All eight builds {ARROW}</a>
+        <a class="more" href="work.html" data-rise>All seven builds {ARROW}</a>
       </div>
       <div class="w-list" id="wList" data-limit="4"></div>
       <noscript><p class="lede" style="margin-top:16px"><a href="work.html">See the work</a></p></noscript>

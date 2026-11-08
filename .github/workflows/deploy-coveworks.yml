@@ -1,5 +1,6 @@
-# Uploads Coveworks Lab to the IONOS webspace behind www.coveworks.tech whenever
-# coveworks-lab/ changes on main, or on demand from the Actions tab.
+# Uploads Coveworks Lab, and the portfolio sites its work list links to (under /work/),
+# to the IONOS webspace behind www.coveworks.tech whenever any of them changes on main,
+# or on demand from the Actions tab. coveworks-lab/sitegen/package.py decides what goes up.
 #
 # Needs three repository secrets (Settings, Secrets and variables, Actions):
 #   IONOS_SFTP_HOST      e.g. access-1234567.webspace-host.com (IONOS, Hosting, SFTP & SSH)
@@ -8,8 +9,8 @@
 # and, if the site does not live at the root of the SFTP login, one variable:
 #   IONOS_REMOTE_DIR     the folder holding index.html, e.g. /public (default /)
 #
-# It uploads the pages, assets/ and .htaccess, and leaves out README, CREDITS and
-# sitegen/. Nothing is deleted on the server, so other files there are safe.
+# Notes, build scripts and master files stay out. Nothing is deleted on the server, so
+# other files there are safe. Only files changed since the last upload are sent.
 name: Deploy Coveworks to IONOS
 
 on:
@@ -17,6 +18,16 @@ on:
     branches: [main]
     paths:
       - 'coveworks-lab/**'
+      - 'vassallo/**'
+      - 'index.html'
+      - 'assets/**'
+      - 'aesthetics-clinic/**'
+      - 'accountants/**'
+      - 'accountants-premium/**'
+      - 'accountants-ledger/**'
+      - 'streetwear/**'
+      - 'car-hire/**'
+      - 'mobile-mechanic/**'
       - '.github/workflows/deploy-coveworks.yml'
   workflow_dispatch:
 
@@ -33,6 +44,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 0   # the packager stamps each file with its last commit time
 
       - name: Check the IONOS secrets are set
         id: secrets
@@ -56,6 +69,10 @@ jobs:
         if: steps.secrets.outputs.ready == 'true'
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
 
+      - name: Stage the webspace
+        if: steps.secrets.outputs.ready == 'true'
+        run: python3 coveworks-lab/sitegen/package.py
+
       - name: Upload to IONOS
         if: steps.secrets.outputs.ready == 'true'
         env:
@@ -69,9 +86,7 @@ jobs:
             set net:max-retries 3
             set net:timeout 30
             open --env-password -u \"$USER_NAME\" sftp://$HOST
-            mirror --reverse --verbose --parallel=4 \
-              --exclude-glob README.md --exclude-glob sitegen/ --exclude-glob '*.txt' \
-              coveworks-lab \"$REMOTE_DIR\"
+            mirror --reverse --verbose --parallel=4 dist/site \"$REMOTE_DIR\"
           "
 
       - name: Check the live site
@@ -81,7 +96,7 @@ jobs:
         run: |
           sleep 5
           fail=0
-          for path in / /configurator.html /assets/site.css /assets/fitting.js /assets/fonts/doto.woff2 /assets/gen/lab-hero.webp; do
+          for path in / /configurator.html /assets/site.css /assets/fitting.js /assets/fonts/doto.woff2 /assets/gen/lab-hero.webp /work/aesthetics-clinic/ /work/accountants/ /work/streetwear/ /work/car-hire/ /work/mobile-mechanic/ /work/vassallo/ /work/dar-ul-amir/; do
             code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE$path")
             echo "$code $path"
             [ "$code" = "200" ] || fail=1
