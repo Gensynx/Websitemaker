@@ -9,9 +9,9 @@ and you can add photography one piece at a time.
 | Filename | Shot |
 |---|---|
 | `tee-bone-front.jpg` | Bone tee, front, flat lay or ghost mannequin |
-| `tee-bone-back.jpg` | Bone tee, back print — **in place** (your on-body shot, story dots cropped) |
+| `tee-bone-back.jpg` | Bone tee, back print · **in place** (AI generated placeholder) |
 | `tee-asphalt-front.jpg` | Black tee, front |
-| `tee-asphalt-back.jpg` | Black tee, back print — **in place** (recoloured from the bone shot, see below) |
+| `tee-asphalt-back.jpg` | Black tee, back print · **in place** (AI generated placeholder) |
 | `hoodie-bone-front.jpg` | Bone hoodie, front |
 | `hoodie-bone-back.jpg` | Bone hoodie, back print |
 | `hoodie-asphalt-front.jpg` | Black hoodie, front |
@@ -37,28 +37,9 @@ distance or the hover swap will jump.
 - Keep one background for the whole product grid. Mixed backgrounds across tiles is the single
   fastest way to make a drop look like a reseller listing rather than a brand.
 
-## The black colourway — how `tee-asphalt-back.jpg` was made
+## The photos in place
 
-Regenerate it with `python3 tools-recolour.py` from the site folder (needs `pillow numpy scipy`).
-The master is kept at `source/tee-bone-onbody-master.png` — do not delete it, the script reads it.
-
-The photograph is lit from one side at night, so the garment spans luminance 0.11 in the shadowed
-left to 0.76 on the lit right — no single brightness threshold holds both. Saturation separates it
-instead: cloth sits at 0.06–0.28, skin and foliage at 0.46–1.00. So the script seeds on the clearly
-lit cloth, grows that seed through anything unsaturated enough to be cotton, then remaps the
-garment's own tonal range (0.22–0.68) into a dark one (0.03–0.22) so the folds survive rather than
-crushing to a flat slab. The printed wordmark is masked separately and re-rendered in bone, because
-on a black tee it is a different ink, not the same ink darkened. Fine grain is added over the
-recoloured area so it sits in the same photograph as the background.
-
-**Why the print is masked with a continuous alpha, not a threshold.** The strokes are thin and
-anti-aliased at 777 px. A binary cut eats the serifs and a component-size filter deletes parts of
-the digits, which is what made the first attempt look chewed up. The alpha now comes from how much
-darker each pixel is than the cloth around it, so anti-aliased edges survive exactly as the camera
-recorded them. That alone paints the creases as ink too — a fold is also darker than its surround —
-so it is gated by an absolute darkness term as well: ink bottoms out at luminance 0.03-0.07 while a
-crease only reaches 0.22-0.35. Both terms are continuous, so the letterforms stay smooth.
-
-**It is a mock-up asset, not a product shot.** It is derived from a 777 px screenshot, the mask
-edge against the bag at lower left is slightly blocky, and no customer should be sold a black tee
-on the strength of a recoloured photo of a white one. Shoot the real black piece before launch.
+`tee-bone-back.jpg`, `tee-asphalt-back.jpg` and `look-01.jpg` were generated with Higgsfield
+(GPT Image 2.5) for this fictional brand: a back print reading LOWTIDE 1996, shot on the river at
+night and on the foreshore at dusk. They are placeholders, not product photography. Replace them
+with real shots at the same filenames (777 by 894 px) and nothing else needs to change.

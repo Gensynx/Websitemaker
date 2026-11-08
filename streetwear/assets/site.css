@@ -217,7 +217,7 @@ h1,h2,h3{text-wrap:balance}
 .hero__sub i{flex:1;height:1px;background:var(--line);font-style:normal}
 .hero__thesis{font-family:var(--display);font-size:clamp(1.3rem,2.5vw,1.95rem);line-height:1.32;
   font-weight:400;max-width:22ch;margin:clamp(24px,3vw,40px) 0 0}
-.hero__thesis b{font-weight:400;font-style:italic;color:var(--accent)}
+.hero__thesis b{font-weight:400;font-style:normal;color:var(--accent)}
 
 .clock{border:var(--edge);background:var(--raise);padding:clamp(18px,2.4vw,28px)}
 .clock__h{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;margin-bottom:1rem}

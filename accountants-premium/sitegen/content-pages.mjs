@@ -1,4 +1,4 @@
-/* Page bodies for the 381 Accountants premium site. */
+/* Page bodies for the Fenwick & Rowe premium site. */
 import {
   SITE, yearsExp, icon, stars5, breadcrumbs, wizard, ctaBanner,
   quoteCard, REVIEWS, REVIEWS_ALL,
@@ -11,18 +11,18 @@ const rel = (path) => (path.includes('/') ? '../' : '');
 
 function marqueeBand() {
   const items = [
-    `<span class="mq-item"><span class="q-stars">${stars5}</span><b>5.0 on Google</b> · ${SITE.reviewCount} reviews</span>`,
-    `<span class="mq-item">“Efficient, fast and reliable” <b>Sima Akram</b></span>`,
+    `<span class="mq-item"><span class="q-stars">${stars5}</span><b>5.0 client rating</b> · ${SITE.reviewCount} sample reviews</span>`,
+    `<span class="mq-item">“Clear advice, no jargon” <b>Tom W.</b></span>`,
     `<span class="mq-item">Fast response</span>`,
-    `<span class="mq-item">“No messing around!” <b>Zulfiqar Ali</b></span>`,
+    `<span class="mq-item">“Proper advice, not just form filling” <b>Hannah B.</b></span>`,
     `<span class="mq-item">Professional team</span>`,
-    `<span class="mq-item">“Peace of mind, accuracy and no hidden charges” <b>Knowledge Bank</b></span>`,
+    `<span class="mq-item">“Peace of mind for a fixed monthly fee” <b>Chloe V.</b></span>`,
     `<span class="mq-item">Value for money</span>`,
-    `<span class="mq-item">“A pleasure to work with” <b>Sofia Gouveia</b></span>`,
+    `<span class="mq-item">“Still a pleasure every year” <b>Martin D.</b></span>`,
     `<span class="mq-item">Cooperative staff</span>`,
-    `<span class="mq-item">“I would never change to a different accountant” <b>Gulsara S. Wennell</b></span>`,
+    `<span class="mq-item">“Never once thought about moving” <b>Priya S.</b></span>`,
   ].join('<span class="mq-dot"></span>');
-  return `<div class="marquee-band" aria-label="What clients say on Google">
+  return `<div class="marquee-band" aria-label="What clients say (sample reviews)">
   <div class="marquee"><div class="marquee-inner">${items}<span class="mq-dot"></span></div></div>
 </div>`;
 }
@@ -30,7 +30,7 @@ function marqueeBand() {
 function statsStrip() {
   return `<div class="stats-strip rv">
   <div class="stat-cell"><b data-count="${yearsExp}" data-suffix="+">${yearsExp}+</b><span>Years serving London</span></div>
-  <div class="stat-cell"><b data-count="5.0">5.0</b><span>Google rating</span></div>
+  <div class="stat-cell"><b data-count="5.0">5.0</b><span>Client rating</span></div>
   <div class="stat-cell"><b data-count="${SITE.reviewCount}">${SITE.reviewCount}</b><span>Reviews, all five stars</span></div>
   <div class="stat-cell"><b data-count="7">7</b><span>Services under one roof</span></div>
 </div>`;
@@ -132,7 +132,7 @@ function reviewsCarousel(path, revs) {
   <div class="carousel rv">
     ${revs.map((q) => quoteCard(q)).join('\n    ')}
   </div>
-  <p class="divider-note rv">${icon('google')} Real Google reviews, published names, lightly tidied for spelling only. <a class="text-link" href="${r}reviews.html">Read the full wall ${icon('arrow')}</a></p>
+  <p class="divider-note rv">${icon('quote')} Sample reviews written for this demonstration site; names and details are fictional. <a class="text-link" href="${r}reviews.html">Read the full wall ${icon('arrow')}</a></p>
 </div>`;
 }
 
@@ -147,15 +147,15 @@ export function homeBody(path = 'index.html') {
   <div class="wrap">
     <div class="hero-inner">
       <div>
-        <span class="eyebrow">Certified accountants · Canary Wharf, London</span>
+        <span class="eyebrow">Certified accountants · City of London</span>
         <h1>Your numbers, in <em>expert hands</em>.</h1>
-        <p class="hero-sub">${SITE.name} is an independent firm of certified accountants at 30 Churchill Place. For <strong>${yearsExp}+ years</strong> we have kept London businesses compliant, informed and ahead, <strong>whatever their size</strong>.</p>
+        <p class="hero-sub">${SITE.name} is an independent firm of certified accountants at ${SITE.address} in the ${SITE.town}. For <strong>${yearsExp}+ years</strong> we have kept London businesses compliant, informed and ahead, <strong>whatever their size</strong>.</p>
         <div class="hero-ctas">
           <a class="btn btn-gold btn-lg magnetic" href="${r}contact.html"><span>Book a free consultation ${icon('arrow')}</span></a>
           <a class="btn btn-ghost" href="${r}services/index.html"><span>Explore services</span></a>
         </div>
         <ul class="hero-meta">
-          <li>${icon('star')} 5.0 · ${SITE.reviewCount} Google reviews</li>
+          <li>${icon('star')} 5.0 · ${SITE.reviewCount} client reviews</li>
           <li>${icon('shield')} HMRC &amp; Companies House compliant</li>
           <li>${icon('cloud')} Sage &amp; QuickBooks certified</li>
         </ul>
@@ -167,7 +167,7 @@ export function homeBody(path = 'index.html') {
       <div class="hero-visual" aria-hidden="true">
         <div class="hv-layer" data-depth="10" style="position:absolute;inset:0">
           <div class="hv-card hv-main" style="position:absolute;inset:6% 8% auto 0">
-            <div class="hv-head"><b>Your year, handled</b><span class="hv-badge">381 · Est. ${SITE.established}</span></div>
+            <div class="hv-head"><b>Your year, handled</b><span class="hv-badge">F&amp;R · Est. ${SITE.established}</span></div>
             <div class="hv-rows">
               <div class="hv-row"><span>Bookkeeping</span><b class="pos">UP TO DATE</b></div>
               <div class="hv-row"><span>VAT return · Q2</span><b class="pos">FILED EARLY</b></div>
@@ -188,7 +188,7 @@ export function homeBody(path = 'index.html') {
         <div class="hv-layer hv-c1" data-depth="26" style="position:absolute">
           <div class="hv-card hv-chip">
             ${icon('star')}
-            <span><b>5.0 on Google</b><small class="hv-stars">★★★★★ · ${SITE.reviewCount} reviews</small></span>
+            <span><b>5.0 client rating</b><small class="hv-stars">★★★★★ · ${SITE.reviewCount} reviews</small></span>
           </div>
         </div>
         <div class="hv-layer hv-c2" data-depth="18" style="position:absolute">
@@ -234,16 +234,16 @@ ${marqueeBand()}
 <section class="section">
   <div class="wrap">
     <div class="section-head rv">
-      <span class="eyebrow">Why 381</span>
+      <span class="eyebrow">Why Fenwick &amp; Rowe</span>
       <h2>The firm London businesses <em>keep</em></h2>
     </div>
     <div class="bento">
-      <div class="tile tilt wide rv"><span class="tile-big">${yearsExp}+</span><h3>Years serving London</h3><p>Established ${SITE.established}, with senior experience in the industry stretching back over 25 years. Clients who joined us in 2011, 2012 and 2013 are still with us today.</p></div>
-      <div class="tile tilt rv rv-d1"><span class="q-stars">${stars5}</span><h3>5.0 from ${SITE.reviewCount} reviews</h3><p>Every Google review we have ever received is five stars.</p></div>
+      <div class="tile tilt wide rv"><span class="tile-big">${yearsExp}+</span><h3>Years serving London</h3><p>Established ${SITE.established}, with senior experience in the industry stretching back over twenty years. Clients who joined us in 2012, 2013 and 2014 are still with us today.</p></div>
+      <div class="tile tilt rv rv-d1"><span class="q-stars">${stars5}</span><h3>5.0 from ${SITE.reviewCount} reviews</h3><p>Every client review shown on this site is five stars.</p></div>
       <div class="tile tilt rv rv-d2"><span class="svc-glyph">${icon('cloud')}</span><h3>Cloud accounting</h3><p>Sage One, Sage 50 and QuickBooks as standard. Your live numbers, any device.</p></div>
       <div class="tile tilt rv"><span class="svc-glyph">${icon('shield')}</span><h3>Compliance, guaranteed</h3><p>Every VAT, payroll, accounts and tax deadline diarised and hit early.</p></div>
-      <div class="tile tilt rv rv-d1"><span class="svc-glyph">${icon('pin')}</span><h3>Canary Wharf</h3><p>30 Churchill Place, E14. Serving clients across all of Greater London and Essex.</p></div>
-      <div class="tile tilt wide rv rv-d2"><span class="svc-glyph">${icon('handshake')}</span><h3>A person, not a portal</h3><p>Our mission is an efficient, proactive service for every client, regardless of size. You deal directly with the people doing your work; reviewers mention Habib and the team by name.</p></div>
+      <div class="tile tilt rv rv-d1"><span class="svc-glyph">${icon('pin')}</span><h3>City of London</h3><p>${SITE.address}, ${SITE.postcode}. Serving clients across all of Greater London and Hertfordshire.</p></div>
+      <div class="tile tilt wide rv rv-d2"><span class="svc-glyph">${icon('handshake')}</span><h3>A person, not a portal</h3><p>Clear numbers and early warnings for every client, whatever their size. You deal directly with the people doing your work, and reviewers say so.</p></div>
     </div>
   </div>
 </section>
@@ -395,7 +395,7 @@ export function servicePage(svc, path) {
           <div class="aside-links">
             <a href="tel:${SITE.phone1tel}">${SITE.phone1} ${icon('phone')}</a>
             <a href="mailto:${SITE.email}">${SITE.email} ${icon('mail')}</a>
-            <a href="${SITE.maps}" target="_blank" rel="noopener">${SITE.town}, ${SITE.postcode} ${icon('pin')}</a>
+            <a href="${r}contact.html">${SITE.address}, ${SITE.postcode} ${icon('pin')}</a>
           </div>
         </div>
       </aside>
@@ -433,11 +433,11 @@ export function aboutBody(path = 'about.html') {
     <div class="book-split">
       <div class="rv-l rv">
         <span class="eyebrow">Our story</span>
-        <h2 style="font-size:clamp(1.9rem,4vw,2.8rem);margin-top:14px">East London roots. At home in <em>Canary Wharf</em>.</h2>
+        <h2 style="font-size:clamp(1.9rem,4vw,2.8rem);margin-top:14px">Founded in the City. Working <em>across London</em>.</h2>
         <div style="display:grid;gap:16px;margin-top:22px;color:var(--muted)">
-          <p>381 Accountants was established in ${SITE.established} as an independent firm of certified accountants with a simple mission: <strong style="color:var(--text)">to provide an efficient and proactive service to every client, and to assure them they are investing in the right accountants, regardless of size.</strong></p>
-          <p>From our office at 30 Churchill Place in Canary Wharf we serve sole traders, landlords, contractors and limited companies across ${SITE.areas.slice(0, 6).join(', ')} and the wider London area. Our senior team’s experience in the industry stretches back more than 25 years, through every change in tax law, filing regime and software along the way.</p>
-          <p>Clients come to us for a tax return or a tidy-up, and stay for years. Our Google reviews tell that story better than we can: 5.0 from ${SITE.reviewCount} reviews, with reviewers describing relationships of five, ten and twenty-five years.</p>
+          <p>Fenwick &amp; Rowe was founded in ${SITE.established} as an independent firm of certified accountants with a simple aim: <strong style="color:var(--text)">clear numbers, fixed fees and an accountant who picks up the phone, for every client, whatever their size.</strong></p>
+          <p>From our office at ${SITE.address} in the ${SITE.town} we serve sole traders, landlords, contractors and limited companies across ${SITE.areas.slice(0, 6).join(', ')} and the wider London area. Our senior team’s experience in the industry stretches back more than twenty years, through every change in tax law, filing regime and software along the way.</p>
+          <p>Clients come to us for a tax return or a tidy-up, and stay for years. Our client reviews tell that story better than we can: 5.0 from ${SITE.reviewCount} reviews, with reviewers describing relationships of five, ten and more years.</p>
         </div>
         <div class="hero-ctas" style="margin-top:30px">
           <a class="btn btn-gold magnetic" href="${r}reviews.html"><span>Read our reviews ${icon('arrow')}</span></a>
@@ -447,8 +447,8 @@ export function aboutBody(path = 'about.html') {
       <div class="bento rv rv-d1" style="grid-template-columns:1fr">
         <div class="tile tilt"><span class="svc-glyph">${icon('shield')}</span><h3>Certified accountants</h3><p>An independent, certified firm registered in England &amp; Wales, company no. ${SITE.companyNo}.</p></div>
         <div class="tile tilt"><span class="svc-glyph">${icon('cloud')}</span><h3>Sage &amp; QuickBooks</h3><p>Cloud accounting on Sage One, Sage 50 and QuickBooks as standard.</p></div>
-        <div class="tile tilt"><span class="q-stars">${stars5}</span><h3>5.0 · ${SITE.reviewCount} Google reviews</h3><p>Every review we have ever received is five stars.</p></div>
-        <div class="tile tilt"><span class="svc-glyph">${icon('pin')}</span><h3>Canary Wharf address</h3><p>30 Churchill Place, London ${SITE.postcode}, serving all of Greater London.</p></div>
+        <div class="tile tilt"><span class="q-stars">${stars5}</span><h3>5.0 · ${SITE.reviewCount} client reviews</h3><p>Every review shown on this site is five stars.</p></div>
+        <div class="tile tilt"><span class="svc-glyph">${icon('pin')}</span><h3>City of London address</h3><p>${SITE.address}, London ${SITE.postcode}, serving all of Greater London.</p></div>
       </div>
     </div>
   </div>
@@ -473,8 +473,8 @@ export function aboutBody(path = 'about.html') {
   <div class="wrap">
     <div class="section-head center rv">
       <span class="eyebrow center">Where we work</span>
-      <h2>Serving clients across <em>London &amp; Essex</em></h2>
-      <p>Based in ${SITE.town}, and with cloud accounting, distance has never mattered less.</p>
+      <h2>Serving clients across <em>London &amp; Hertfordshire</em></h2>
+      <p>Based in the ${SITE.town}, and with cloud accounting, distance has never mattered less.</p>
     </div>
     <ul class="area-cloud rv" style="justify-content:center">
       ${SITE.areas.map((a) => `<li>${a}</li>`).join('\n      ')}
@@ -496,9 +496,9 @@ export function reviewsBody(path = 'reviews.html') {
   <div class="wrap">
     ${breadcrumbs(path, [['Home', 'index.html'], ['Reviews', '']])}
     <h1>Five stars, <em>${SITE.reviewCount} times over</em></h1>
-    <p class="lede">We could tell you we are professional, responsive and worth the money, but our clients already did, in public, on Google. <strong>${SITE.reviewCount} reviews, a 5.0 rating, every single one five stars.</strong></p>
+    <p class="lede">We could tell you we are professional, responsive and worth the money, but our clients put it better. <strong>${SITE.reviewCount} reviews, a 5.0 rating, every single one five stars.</strong></p>
     <div class="hero-ctas">
-      <a class="btn btn-gold magnetic" href="${SITE.google}" target="_blank" rel="noopener"><span>See our reviews on Google ${icon('arrow')}</span></a>
+      <a class="btn btn-gold magnetic" href="#wall"><span>Read every review ${icon('arrow')}</span></a>
     </div>
   </div>
 </section>
@@ -509,8 +509,8 @@ ${marqueeBand()}
   <div class="wrap">
     <div class="rating-banner rv">
       <span class="stars" aria-hidden="true">${stars5}</span>
-      <b>5.0 on Google</b>
-      <span>${SITE.reviewCount} reviews, every one of them five stars</span>
+      <b>5.0 client rating</b>
+      <span>${SITE.reviewCount} sample reviews, every one of them five stars</span>
     </div>
     <div class="bento" style="grid-template-columns:repeat(3,1fr)">
       ${REVIEWS.map((q, i) => quoteCard(q, `rv${i ? ` rv-d${i}` : ''}`)).join('\n      ')}
@@ -518,16 +518,16 @@ ${marqueeBand()}
     <div class="praise-row rv">
       ${['Fast response', 'Professional team', 'Cooperative staff', 'Value for money', 'Trustworthy advice'].map((p) => `<span class="praise-chip">${icon('check')} ${p}</span>`).join('\n      ')}
     </div>
-    <p class="divider-note rv">${icon('google')} The topics above are the ones Google highlights across our ${SITE.reviewCount} reviews.</p>
+    <p class="divider-note rv">${icon('quote')} The topics above come up again and again across our ${SITE.reviewCount} reviews. These are sample reviews written for this demonstration site; names and details are fictional.</p>
   </div>
 </section>
 
-<section class="section raised">
+<section class="section raised" id="wall">
   <div class="wrap">
     <div class="section-head center rv">
-      <span class="eyebrow center">Straight from Google</span>
+      <span class="eyebrow center">Client voices</span>
       <h2>In their <em>own words</em></h2>
-      <p>A selection from the ${SITE.reviewCount} five-star reviews on our Google listing. Clients of a year, of a decade, and of twenty-five.</p>
+      <p>More from our ${SITE.reviewCount} five star sample reviews. Clients of a year, and clients of a decade and more.</p>
     </div>
     <div class="review-wall">
       ${REVIEWS_ALL.map((q) => quoteCard(q, 'rv')).join('\n      ')}
@@ -540,10 +540,10 @@ ${marqueeBand()}
     <div class="section-head center rv" style="margin-bottom:24px">
       <span class="eyebrow center">Add your voice</span>
       <h2>Worked with us? <em>Tell others.</em></h2>
-      <p>Reviews help small businesses like ours, and like yours, get found. If we have looked after you, two minutes on Google goes a long way.</p>
+      <p>Reviews help small businesses like ours, and like yours, get found. If we have looked after you, two minutes of feedback goes a long way.</p>
     </div>
     <div class="hero-ctas rv" style="justify-content:center">
-      <a class="btn btn-gold magnetic" href="${SITE.google}" target="_blank" rel="noopener"><span>${icon('google')} Review us on Google</span></a>
+      <a class="btn btn-gold magnetic" href="mailto:${SITE.email}?subject=${encodeURIComponent('My review')}"><span>${icon('mail')} Send us your review</span></a>
     </div>
   </div>
 </section>
@@ -585,8 +585,7 @@ export function contactBody(path = 'contact.html') {
       <div class="contact-card tilt rv rv-d2">
         <span class="svc-glyph">${icon('pin')}</span>
         <h3>Visit us</h3>
-        <address>${SITE.address},<br>${SITE.town}, London ${SITE.postcode}</address>
-        <a class="big" href="${SITE.maps}" target="_blank" rel="noopener">Open in Google Maps</a>
+        <address>${SITE.address},<br>${SITE.town},<br>London ${SITE.postcode}</address>
       </div>
     </div>
   </div>

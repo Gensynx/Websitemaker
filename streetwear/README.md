@@ -62,8 +62,6 @@ assets/site.js      skin toggle, garment flats, bag, drop clock, previews, forms
 assets/data.js      generated — product data shared by pages and the bag
 sitegen/build.mjs   the generator
 images/             photography slots (see images/README.md)
-source/             the untouched master photo the recolour reads
-tools-recolour.py   derives the asphalt colourway from the bone photo
 ```
 
 Regenerate with `node sitegen/build.mjs` from this folder. Product data lives in one place —

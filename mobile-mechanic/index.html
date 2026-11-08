@@ -1213,8 +1213,8 @@ const countIO=new IntersectionObserver((es)=>{es.forEach(e=>{
   if(e.isIntersecting){
     countUp(e.target); countIO.unobserve(e.target);
     if(e.target.closest('.gauge-center')&&gaugeArc){
-      // 4.8/5 => 96%
-      const pct=4.8/5, len=327;
+      // 4.9/5 => 98%
+      const pct=4.9/5, len=327;
       requestAnimationFrame(()=>{gaugeArc.style.transition='stroke-dashoffset 1.6s cubic-bezier(.22,.61,.36,1)';gaugeArc.style.strokeDashoffset=len*(1-pct);});
     }
   }

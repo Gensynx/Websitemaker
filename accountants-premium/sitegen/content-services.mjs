@@ -1,4 +1,4 @@
-/* Service definitions for 381 Accountants. Each entry drives a card on the
+/* Service definitions for Fenwick & Rowe. Each entry drives a card on the
    services hub, a footer link, a line in the booking panel (mini) and a full
    detail page (intro, included, steps, callout, faqs). */
 
