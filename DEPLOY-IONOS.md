@@ -1,46 +1,56 @@
-# Deploying Coveworks to IONOS
+# Deploying Coveworks to IONOS (coveworks.tech)
 
-**The chosen build is `coveworks-scifi/`** (the sci-fi edition, previewable at
-https://gensynx.github.io/Websitemaker/coveworks-scifi/). It is a single,
-self-contained file with no build step — fonts and images are embedded — so the
-whole deployment is uploading two files from the `coveworks-scifi/` folder:
+**The live build is `coveworks-lab/`**, the five page Lab edition with the configurator
+(preview: https://gensynx.github.io/Websitemaker/coveworks-lab/). It replaced the single
+file sci-fi edition that went live in July 2026.
 
-- `index.html` (~1.4 MB) — the entire site
-- `.htaccess` — forces HTTPS (see step 4)
+## 1. Make the upload package
 
-## 1. Get your webspace access
+```
+python3 coveworks-lab/sitegen/package.py
+```
 
-1. Log in at [login.ionos.co.uk](https://login.ionos.co.uk) (or ionos.com).
-2. Go to **Menu → Hosting**. If the domain package doesn't include webspace, add a hosting plan first (any tier works; the site is one file).
-3. Open **SFTP & SSH** under the hosting package to see your SFTP host, username and to set a password. IONOS SFTP is usually `access-ssh.ionos.co.uk` (shown in the panel), port **22**.
+This writes `dist/coveworks-lab-upload.zip` (about 6 MB): the five pages, the `assets/`
+folder and `.htaccess`, laid out to sit at the root of the webspace. Notes, credits and
+the `sitegen/` scripts are left out.
 
-## 2. Upload the files
+## 2. Upload it
 
-**Option A — IONOS File Manager (no software needed):**
-Hosting → **File Manager**, then upload `coveworks-scifi/index.html` and `coveworks-scifi/.htaccess` into the webspace. Either put them in the root, or make a folder such as `/coveworks` and upload them there. (`.htaccess` is a hidden file — enable "show hidden files" in your file browser if you can't see it.)
+**IONOS File Manager (no software needed):** Menu, Hosting, **File Manager**.
 
-**Option B — SFTP client (FileZilla, Cyberduck):**
-Connect with the credentials from step 1 and drag both files into the target folder.
+1. Open the folder the domain points at (Domains & SSL shows it; it is `/` unless it was changed).
+2. Upload the zip and use **Extract** on it, or unzip it on your computer and upload the
+   contents. Either way, `index.html` and the `assets` folder must end up directly in that
+   folder, not inside a `coveworks-lab-upload` subfolder.
+3. Allow it to overwrite the old `index.html` and `.htaccess`. The July site was that one
+   `index.html`, so nothing else needs deleting. `.htaccess` is a hidden file; turn on
+   "show hidden files" if you cannot see it.
+4. Delete the zip from the webspace once extracted.
 
-IONOS serves `index.html` automatically as the directory index, so no renaming is needed.
+**SFTP (FileZilla, Cyberduck):** the credentials are under Hosting, **SFTP & SSH**
+(usually `access-ssh.ionos.co.uk`, port 22). Unzip locally and drag the contents into the
+domain's folder.
 
-## 3. Point the domain at it
+## 3. Check it
 
-1. Go to **Menu → Domains & SSL**.
-2. Next to your domain, choose **Use Domain / Adjust Destination → Connect to a webspace**.
-3. Set the **home directory** to the folder you uploaded to (`/` or `/coveworks`).
-
-Because the domain and the hosting are both at IONOS, DNS is wired up automatically — no manual A records needed. Allow up to an hour for it to take effect (usually minutes).
-
-## 4. Enable HTTPS
-
-In **Domains & SSL**, assign the included **SSL certificate** to the domain and wait for it to activate. The `.htaccess` file uploaded in step 2 then redirects all plain-HTTP visits to HTTPS automatically.
-
-## 5. Pre-launch checks
-
-- The contact form opens the visitor's **email app** with the message pre-filled, addressed to `sales@coveworks.tech` — no backend needed. Make that address real by creating the mailbox under IONOS → **Email**, or search-and-replace `sales@coveworks.tech` in `index.html` with your actual address (it appears in the form handler, the footer, and two mailto links).
-- After upload, hard-refresh the live URL (Ctrl/Cmd+Shift+R), submit a test enquiry through the form, and check the site on a phone.
+- Hard refresh https://coveworks.tech (Ctrl or Cmd + Shift + R). The headline should read
+  "The web, made to measure."
+- Open the configurator, type "gamer site", and check a preview builds.
+- `http://coveworks.tech` should redirect to `https://` (the `.htaccess` does this).
+- Every contact button opens an email to `sales@coveworks.tech`: create that mailbox under
+  IONOS, Email, or messages will bounce.
+- Check on a phone.
 
 ## Updating the site later
 
-Edit `coveworks-scifi/index.html` in this repo, then re-upload the file over the old one via File Manager or SFTP. That's the whole update.
+Edit `coveworks-lab/sitegen/build.py` (pages) or `coveworks-lab/assets/` (styles, scripts,
+images), run `python3 coveworks-lab/sitegen/build.py`, then repeat steps 1 and 2. Uploading
+only the files you changed also works.
+
+## Notes
+
+- Each page carries a canonical link and share tags pointing at coveworks.tech, so search
+  engines treat the GitHub Pages copy as a preview, and links shared on social media show
+  `assets/gen/lab-cover.jpg`.
+- `.htaccess` also sets browser caching: images and fonts for 30 days to a year, pages
+  always fresh.
