@@ -1,28 +1,25 @@
-/* Layout + shared components for the 381 Accountants site.
-   Run `node sitegen/build.mjs` from the 381-accountants folder to
+/* Layout + shared components for the Fenwick & Rowe site.
+   Run `node sitegen/build.mjs` from the accountants folder to
    regenerate the static HTML pages. No runtime build step. */
 
 export const rel = (path) => (path.includes('/') ? '../' : '');
 
 export const SITE = {
-  name: '381 Accountants',
-  legal: '381 Accountancy & Bookkeeping Services Ltd',
-  companyNo: '07327043',
-  established: 2010,
-  phone1: '020 8214 1259',
-  phone1tel: '+442082141259',
-  phone2: '020 3129 8066',
-  phone2tel: '+442031298066',
-  email: 'info@381abs.com',
-  address: '10th Floor, Office 104, Suite 10, 30 Churchill Place',
-  town: 'Canary Wharf',
-  postcode: 'E14 5RE',
+  name: 'Fenwick & Rowe',
+  legal: 'Fenwick & Rowe Accountants Ltd',
+  companyNo: '00000000',
+  established: 2012,
+  phone1: '020 7946 0123',
+  phone1tel: '+442079460123',
+  phone2: '020 7946 0456',
+  phone2tel: '+442079460456',
+  email: 'fenwickrowe@example.com',
+  address: '4 Larch Yard',
+  town: 'City of London',
+  postcode: 'EC2',
   hours: 'Mon–Fri 9:00–17:30',
-  reviewCount: 42,
-  google: 'https://www.google.com/search?q=381+Accountancy+%26+Bookkeeping+Services+Ltd+Canary+Wharf+reviews',
-  maps: 'https://www.google.com/maps/search/?api=1&query=' +
-    encodeURIComponent('381 Accountancy & Bookkeeping Services Ltd, 30 Churchill Pl, Canary Wharf, London E14 5RE'),
-  areas: ['Canary Wharf', 'Barking', 'Ilford', 'Dagenham', 'Woodford', 'Bexley', 'Romford', 'East London', 'Greater London', 'Essex'],
+  reviewCount: 21,
+  areas: ['City of London', 'Shoreditch', 'Clerkenwell', 'Islington', 'Hackney', 'Southwark', 'Bermondsey', 'Camden', 'Greater London', 'Hertfordshire'],
   /* Facts still to be confirmed by the firm. Anything left null renders as a
      visible [placeholder] so it cannot go live unnoticed; see the README. */
   team: [
@@ -67,7 +64,6 @@ const paths = {
   planning: '<circle cx="12" cy="12" r="8.5"/><path d="M12 12 8 8"/><path d="M12 3.5V6M20.5 12H18M12 20.5V18M3.5 12H6"/>',
   selfassess: '<path d="M8 3h8a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M9.5 8H12M9.5 12h5M9.5 16h5"/><path d="m14.5 6.5 1.5 1.5 3-3.5"/>',
   star: '<path d="m12 2.8 2.8 5.9 6.2.8-4.6 4.4 1.2 6.3L12 17.1l-5.6 3.1 1.2-6.3L3 9.5l6.2-.8L12 2.8Z"/>',
-  google: '<circle cx="12" cy="12" r="8.5"/><path d="M12 12h6a6 6 0 1 1-1.8-4.3"/>',
   quote: '<path d="M5 16c-.7-1-1-2.2-1-3.7C4 8.6 6.2 6 9.5 5l.7 1.6C8 7.5 6.9 9 6.8 10.8c.3-.1.6-.2 1-.2 1.6 0 2.8 1.2 2.8 2.8S9.4 16.2 7.7 16.2c-1.1 0-2.1-.5-2.7-1.4Zm9 0c-.7-1-1-2.2-1-3.7 0-3.7 2.2-6.3 5.5-7.3l.7 1.6c-2.2.9-3.3 2.4-3.4 4.2.3-.1.6-.2 1-.2 1.6 0 2.8 1.2 2.8 2.8s-1.2 2.8-2.9 2.8c-1.1 0-2.1-.5-2.7-1.4Z" fill="currentColor" stroke="none"/>',
   cloud: '<path d="M7 18.5a4.5 4.5 0 0 1-.4-9A6 6 0 0 1 18.3 11a3.8 3.8 0 0 1-.8 7.5H7Z"/>',
   handshake: '<path d="m11 6.5-3.2-1.7L2 8l3.4 6.2 2.2-1.1"/><path d="m16.2 4.8 5.8 3-3.3 6.4-1.5-.8"/><path d="M11 6.5 16.2 4.8l1 8.6-2.5 3.7c-.6.9-1.9 1-2.7.3L7.6 14l3.4-7.5Z"/><path d="m10.4 17.8-1.2 1a1.6 1.6 0 0 1-2.3-.3"/>',
@@ -87,15 +83,14 @@ export const arrow = icon('arrow');
 const starFilled = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2.8 2.8 5.9 6.2.8-4.6 4.4 1.2 6.3L12 17.1l-5.6 3.1 1.2-6.3L3 9.5l6.2-.8L12 2.8Z"/></svg>';
 export const stars5 = starFilled.repeat(5);
 
-/* Favicon: the logo's blue rounded square with a white “381” */
+/* Favicon: a navy rounded square with a white “F&R” monogram */
 const FAVICON = 'data:image/svg+xml,' + encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#005179"/><text x="32" y="43" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="700" fill="#ffffff" text-anchor="middle">381</text></svg>`
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#0d1f42"/><text x="32" y="40" font-family="Georgia,'Times New Roman',serif" font-size="22" font-weight="700" fill="#ffffff" text-anchor="middle">F&amp;R</text></svg>`
 );
 
-/* The firm's logo: the "381" mark with the chart-and-ledger icon, cut from
-   the supplied artwork onto a transparent background (2x for sharp
-   rendering). The full lockup is assets/img/logo-full.png. */
-const logoMark = (r) => `<img class="brand-logo" src="${r}assets/img/logo-mark.png" width="87" height="46" alt="">`;
+/* The firm's monogram: “F&R” set in the display serif on a navy tile
+   (styled by .brand-mark in main.css). Pure markup, no image files. */
+const logoMark = () => `<span class="brand-mark" aria-hidden="true"><span>F&amp;R</span></span>`;
 
 /* ---------------- Nav ---------------- */
 export const NAV = [
@@ -133,7 +128,7 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script
 function topStrip() {
   return `<div class="top-strip">
   <div class="wrap">
-    <span class="strip-hours">${icon('clock')} ${SITE.hours} · ${SITE.town}, London</span>
+    <span class="strip-hours">${icon('clock')} ${SITE.hours} · ${SITE.town}</span>
     <div class="strip-links">
       <a href="tel:${SITE.phone1tel}">${icon('phone')} ${SITE.phone1}</a>
       <a href="mailto:${SITE.email}">${icon('mail')} ${SITE.email}</a>
@@ -150,8 +145,8 @@ function header_({ path, active }) {
   return `<header class="site-header">
   <div class="wrap nav-bar">
     <a class="brand" href="${r}index.html" aria-label="${SITE.name} home">
-      ${logoMark(r)}
-      <span class="brand-text"><b>381 Accountants</b><small>Accountancy &amp; Bookkeeping</small></span>
+      ${logoMark()}
+      <span class="brand-text"><b>${SITE.name.replace('&', '&amp;')}</b><small>Accountancy &amp; Bookkeeping</small></span>
     </a>
     <nav aria-label="Main">
       <ul class="nav-links">
@@ -180,10 +175,10 @@ function footer_(path, servicesNav) {
     <div class="footer-grid">
       <div>
         <a class="brand" href="${r}index.html" aria-label="${SITE.name} home">
-          <span class="brand-chip">${logoMark(r)}</span>
-          <span class="brand-text"><b>381 Accountants</b><small>Accountancy &amp; Bookkeeping</small></span>
+          ${logoMark()}
+          <span class="brand-text"><b>${SITE.name.replace('&', '&amp;')}</b><small>Accountancy &amp; Bookkeeping</small></span>
         </a>
-        <p class="footer-about">${SITE.legal} is an independent firm of certified accountants in ${SITE.town}, serving businesses and individuals across London since ${SITE.established}. Efficient, proactive and personal.</p>
+        <p class="footer-about">${SITE.legal.replace('&', '&amp;')} is an independent firm of certified accountants in the ${SITE.town}, serving businesses and individuals across London since ${SITE.established}. Clear advice, fixed fees and the same people every year.</p>
       </div>
       <div class="footer-col">
         <h4>Services</h4>
@@ -199,13 +194,12 @@ function footer_(path, servicesNav) {
           <li><a href="${r}reviews.html">Client reviews</a></li>
           <li><a href="${r}services/index.html">All services</a></li>
           <li><a href="${r}contact.html">Contact &amp; booking</a></li>
-          <li><a href="${SITE.maps}" target="_blank" rel="noopener">Find us on the map</a></li>
         </ul>
       </div>
       <div class="footer-col">
         <h4>Get in touch</h4>
         <ul class="footer-contact">
-          <li>${icon('pin')} <span>${SITE.address},<br>${SITE.town}, London ${SITE.postcode}</span></li>
+          <li>${icon('pin')} <span>${SITE.address},<br>London ${SITE.postcode}</span></li>
           <li>${icon('phone')} <span><a href="tel:${SITE.phone1tel}">${SITE.phone1}</a> · <a href="tel:${SITE.phone2tel}">${SITE.phone2}</a></span></li>
           <li>${icon('mail')} <a href="mailto:${SITE.email}">${SITE.email}</a></li>
           <li>${icon('clock')} <span>${SITE.hours}</span></li>
@@ -213,8 +207,8 @@ function footer_(path, servicesNav) {
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© <span data-year>2026</span> ${SITE.legal}. Registered in England &amp; Wales, company no. ${SITE.companyNo}.</span>
-      <a href="${SITE.google}" target="_blank" rel="noopener">Read our reviews on Google</a>
+      <span>© <span data-year>2026</span> ${SITE.legal.replace('&', '&amp;')}. Registered in England &amp; Wales, company no. ${SITE.companyNo}.</span>
+      <a href="${r}reviews.html">Read client reviews</a>
     </div>
   </div>
 </footer>
@@ -285,14 +279,14 @@ export function bookingForm({ heading = 'Book a free consultation', note = 'Tell
 </form>`;
 }
 
-export function ctaBanner(path, { title = 'Ready to hand your numbers to safe hands?', text } = {}) {
+export function ctaBanner(path, { title = 'Ready to hand your numbers to someone who will keep them straight?', text } = {}) {
   const r = rel(path);
   return `<section class="section tight">
   <div class="wrap">
     <div class="cta-banner rv">
       <div>
         <h2>${title}</h2>
-        <p>${text || `Book a free, no-obligation consultation and find out exactly what ${SITE.name} can take off your plate. We usually reply within one working day.`}</p>
+        <p>${text || `Book a free, no-obligation consultation and find out exactly what ${SITE.name.replace('&', '&amp;')} can take off your plate. We usually reply within one working day.`}</p>
       </div>
       <div class="cta-actions">
         <a class="btn btn-gold" href="${bookHref(path)}">${CTA} ${icon('arrow')}</a>
@@ -342,117 +336,117 @@ export function deadlineFinder(path, { compact = false } = {}) {
 </div>`;
 }
 
-/* Real Google reviews, quoted with the reviewers’ published names and
-   lightly tidied for spelling only. The first three are featured on the
-   home page; the full wall appears on reviews.html. */
+/* Sample reviews written for this demonstration site. Names and details
+   are fictional. The first three are featured on the home page; the full
+   wall appears on reviews.html. */
 export const REVIEWS = [
   {
-    text: 'Very professional, specialised, trustworthy and friendly service. Fast and quick response to any question. I strongly recommend to new customers and clients. I have been with this firm over 25 years and I would never change to a different accountant.',
-    name: 'Gulsara Sarah Wennell',
-    meta: 'Client for over 25 years',
+    text: 'Calm, careful and quick to answer. I joined when the firm was still small and have never once thought about moving. Every deadline is handled before I have even remembered it exists.',
+    name: 'Priya S.',
+    meta: 'Café owner, client since 2012',
   },
   {
-    text: 'I’ve been using 381 accountants for nearly 7 years. They’ve always provided an excellent service. They are efficient, fast and reliable and also great with giving advice that could benefit your business. I would highly recommend them.',
-    name: 'Sima Akram',
-    meta: 'Client for 7 years',
+    text: 'They took over my books when they were a real mess and had everything straightened out within a month. Clear advice, no jargon and a fixed fee that never creeps up.',
+    name: 'Tom W.',
+    meta: 'Builder, client for 8 years',
   },
   {
-    text: 'Been with 381 Accountancy for a decade now; I have never come across such professionalism. My accountant is very down to earth. Very reliable service, always there to help, no messing around!',
-    name: 'Zulfiqar Ali',
-    meta: 'Client for 10 years',
+    text: 'Our accountant knows the business as well as we do. Friendly, sharp and always there when HMRC sends a letter. We would not go anywhere else.',
+    name: 'Grace O.',
+    meta: 'Design studio director, client for 10 years',
   },
 ];
 
 export const REVIEWS_ALL = [
   {
-    text: 'Habib and team offer an amazing service. I have used them for over 5 years now and never had a problem. I would highly recommend them to anyone needing accounting services.',
-    name: 'Dustin Clark',
-    meta: 'Client for 5+ years',
+    text: 'Switching to Fenwick &amp; Rowe was painless. They handled the clearance letter and the handover, and our first year end with them went smoothly. I recommend them to anyone who needs an accountant.',
+    name: 'Marcus L.',
+    meta: 'Client for 6 years',
   },
   {
-    text: 'We have been using 381 accountancy service for more than 10 years. One of the best decisions we have taken to go with this company.',
-    name: 'Ram Krish',
-    meta: 'Client for 10+ years',
+    text: 'Over a decade with this firm and they have only become more useful. Proper advice, not just form filling.',
+    name: 'Hannah B.',
+    meta: 'Client for 11 years',
   },
   {
-    text: 'I have been using 381 Accountancy service for 5 years now. They have always been very professional, extremely knowledgeable and efficient. They are always available to answer any questions and help resolve any issues promptly. I would recommend them highly.',
-    name: 'William Punter',
+    text: 'Very organised and very patient. They explained my tax position in plain English and spotted reliefs I had no idea I could claim. Always quick to pick up the phone when something comes up.',
+    name: 'Daniel K.',
     meta: 'Client for 5 years',
   },
   {
-    text: 'Since 2013 we’ve been with the 381 Accountancy & Bookkeeping family. An amazing service provided by Habib and the entire team; the value they give to their customers is remarkable.',
-    name: 'Universal Electronic Limited',
-    meta: 'Business client since 2013',
+    text: 'They have looked after our payroll and VAT since 2014. Accurate every month, and the fees are exactly what we agreed at the start.',
+    name: 'Ellis M.',
+    meta: 'Director, Bramblewick Joinery Ltd, client since 2014',
   },
   {
-    text: 'I use them since 2011 and they have never let me down. Trusting and efficient, this is how I describe their services. Thank you so much!',
-    name: 'Priscila Currie',
-    meta: 'Client since 2011',
+    text: 'Trustworthy and efficient from day one. I have never had a late filing or a surprise bill.',
+    name: 'Sofia R.',
+    meta: 'Client since 2014',
   },
   {
-    text: 'I have been using 381 Accountants since 2017 and never had any issues with them. I found the team very professional and organised, and they are proactive rather than reactive.',
-    name: 'Ajaz Ul Hussin',
+    text: 'Proactive rather than reactive. They tell me what is coming up months before it is due, and the team is organised from top to bottom.',
+    name: 'Ravi P.',
     meta: 'Client since 2017',
   },
   {
-    text: 'I’m using this accountancy service for the last 5 years, for my company and for self employment, and found them extremely cooperative and professional in every aspect. Their rates are also competitive with any top-class UK accountancy firm.',
-    name: 'Amir Kh',
-    meta: 'Company & self-employed client',
+    text: 'They look after both my limited company and my personal return. Helpful and professional in every respect, and fairly priced for the City.',
+    name: 'Amira H.',
+    meta: 'Company and personal tax client',
   },
   {
-    text: 'I have been with 381 Accountancy since 2013. They are extremely professional in the accounting process and always respond promptly to my queries. I would definitely recommend this service.',
-    name: 'Srinivas Marisetti',
+    text: 'Replies come back the same day, usually within the hour. Exactly what a small business needs from its accountant.',
+    name: 'Oliver T.',
+    meta: 'Client since 2015',
+  },
+  {
+    text: 'Sharp, honest and genuinely good company. Ten out of ten.',
+    name: 'Jess N.',
+    meta: 'Florist',
+  },
+  {
+    text: 'Good value, straight answers and a team that clearly cares about getting it right.',
+    name: 'Kwame A.',
+    meta: 'Restaurant owner',
+  },
+  {
+    text: 'My first ever tax return and they made it feel easy. I booked them again for next year straight away.',
+    name: 'Lucy F.',
+    meta: 'First time self assessment client',
+  },
+  {
+    text: 'We have worked with them since 2013 and it is still a pleasure every year.',
+    name: 'Martin D.',
     meta: 'Client since 2013',
   },
   {
-    text: 'Extremely responsive and prompt, professional integrity, solid competence and advice, very proactive. Above all a joy to work with. 10/10.',
-    name: 'Shubh',
-    meta: 'Google review',
+    text: 'Peace of mind for a fixed monthly fee. No hidden charges and no chasing.',
+    name: 'Chloe V.',
+    meta: 'Online shop owner',
   },
   {
-    text: 'Very professional, very helpful and honest, good value for money, and gives great advice. Would definitely recommend Habib and his team at 381 Accountants.',
-    name: 'Zoob Khan',
-    meta: 'Google review',
-  },
-  {
-    text: 'Best service ever seen so far. Very professional and prompt. Very helpful with my first tax returns. Will try them again next year.',
-    name: 'Taqweem Mirza',
-    meta: 'First-time self assessment client',
-  },
-  {
-    text: 'We’ve been working with them since 2012, always very helpful and professional. A pleasure to work with.',
-    name: 'Sofia Gouveia',
-    meta: 'Client since 2012',
-  },
-  {
-    text: 'The best accountancy service provider. Peace of mind, accuracy and no hidden charges. Highly recommended.',
-    name: 'Knowledge Bank',
-    meta: 'Google review',
-  },
-  {
-    text: 'Super helpful, helping with a self assessment on very short notice!',
-    name: 'Carlo Rizzo',
+    text: 'They rescued a self assessment for me with two days to spare. Very grateful!',
+    name: 'Sam G.',
     meta: 'Self assessment client',
   },
   {
-    text: 'Great price. Fast, professional, and hassle-free. Highly recommended.',
-    name: 'Waleed Nawaz',
-    meta: 'Google review',
+    text: 'Fast, professional and no fuss at all. Highly recommended.',
+    name: 'Nadia Q.',
+    meta: 'Physiotherapist',
   },
   {
-    text: 'I would highly recommend them as tax consultant and accountant. They are very professional and reliable.',
-    name: 'Qasim Mehmood',
-    meta: 'Google review',
+    text: 'Clear on tax and clear on fees. A reliable accountant and a good adviser.',
+    name: 'Ben C.',
+    meta: 'IT contractor',
   },
   {
-    text: 'Excellent service and they know their job thoroughly. Lucky to have such a good accountant.',
-    name: 'Muhammad Tareen',
-    meta: 'Google review',
+    text: 'They know their work inside out. We feel lucky to have found them.',
+    name: 'Ruth E.',
+    meta: 'Bookshop owner',
   },
   {
-    text: 'Excellent and reliable work, always there to help in times of difficulty. A great accountant; I will recommend them to anyone.',
-    name: 'Calm Souls',
-    meta: 'Google review',
+    text: 'Calm and dependable when things get difficult. I recommend them to everyone I know.',
+    name: 'Leon J.',
+    meta: 'Landlord',
   },
 ];
 
@@ -460,15 +454,15 @@ export function quoteCards(revs = REVIEWS, stagger = true) {
   return revs.map((q, i) => `<figure class="quote-card rv${stagger && i % 3 ? ` rv-d${i % 3}` : ''}">
   <span class="q-stars" role="img" aria-label="5 out of 5 stars">${stars5}</span>
   <blockquote>${q.text}</blockquote>
-  <figcaption>${icon('google')} <span><b>${q.name}</b> · ${q.meta} · Google review</span></figcaption>
+  <figcaption>${icon('quote')} <span><b>${q.name}</b> · ${q.meta} · Sample review</span></figcaption>
 </figure>`).join('\n');
 }
 
-export function ratingBanner() {
+export function ratingBanner(path) {
   return `<div class="rating-banner rv">
   <span class="stars" aria-hidden="true">${stars5}</span>
-  <b>5.0 on Google</b>
-  <span>${SITE.reviewCount} reviews, every one of them five stars</span>
-  <a class="text-link" href="${SITE.google}" target="_blank" rel="noopener">Check them on Google ${icon('arrow')}</a>
+  <b>5.0 client rating</b>
+  <span>${SITE.reviewCount} sample reviews, every one of them five stars</span>
+  <a class="text-link" href="${rel(path)}reviews.html#wall">Read them all ${icon('arrow')}</a>
 </div>`;
 }
