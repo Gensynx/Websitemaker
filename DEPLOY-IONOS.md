@@ -41,7 +41,30 @@ domain's folder.
   IONOS, Email, or messages will bounce.
 - Check on a phone.
 
-## Updating the site later
+## Automatic uploads from GitHub
+
+`.github/workflows/deploy-coveworks.yml` uploads the site to IONOS by itself whenever
+`coveworks-lab/` changes on main, and can be run by hand from the repository's
+**Actions** tab, Deploy Coveworks to IONOS, **Run workflow**. Until it has the login it
+skips with a notice. To switch it on, once:
+
+1. IONOS, Hosting, **SFTP & SSH**: note the server, the user and set a password.
+2. GitHub, the repository's **Settings**, **Secrets and variables**, **Actions**,
+   **New repository secret**, three times:
+   - `IONOS_SFTP_HOST`: the server, without `sftp://`
+   - `IONOS_SFTP_USER`: the user
+   - `IONOS_SFTP_PASSWORD`: the password
+3. If `index.html` sits in a folder rather than at the top of the SFTP login (for example
+   `public`), open the **Variables** tab on the same page and add `IONOS_REMOTE_DIR`
+   with that folder, e.g. `/public`.
+4. Actions, Deploy Coveworks to IONOS, **Run workflow**. The last step checks that the
+   live site serves the new files and fails loudly if not.
+
+The workflow uploads the pages, `assets/` (folders included) and `.htaccess`, never
+README, CREDITS or `sitegen/`, and deletes nothing on the server. Secrets are encrypted
+by GitHub and never appear in logs, so this is safe on a public repository.
+
+## Updating the site by hand
 
 Edit `coveworks-lab/sitegen/build.py` (pages) or `coveworks-lab/assets/` (styles, scripts,
 images), run `python3 coveworks-lab/sitegen/build.py`, then repeat steps 1 and 2. Uploading
