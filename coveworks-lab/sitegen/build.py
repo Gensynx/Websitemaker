@@ -4,9 +4,18 @@
 Run from anywhere:  python3 coveworks-lab/sitegen/build.py
 The generated HTML is committed, so hosting needs no build step.
 """
-import os
+import json, os
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# The portfolio: one list drives the work pages here and what package.py uploads
+with open(os.path.join(ROOT, 'sitegen', 'work.json'), encoding='utf-8') as _f:
+    _WORK = json.load(_f)
+WORKS = [{'title': w['title'], 'tag': w['tag'], 'image': w['image'], 'text': w['text'],
+          'link': _WORK['live'] + w['slug'] + '/'} for w in _WORK['work']]
+WORKS_JS = '<script>window.WORKS = ' + json.dumps(WORKS, ensure_ascii=False).replace('</', '<\\/') + ';</script>\n'
+NUMBER = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve']
+WORK_COUNT = NUMBER[len(WORKS)] if len(WORKS) < len(NUMBER) else str(len(WORKS))
 
 PAGES = [
     ('index.html', 'Home'),
@@ -93,7 +102,7 @@ FOOTER_TOP = f'''
       </div>
       <div>
         <h4>Other editions</h4>
-        <ul><li><a href="https://gensynx.github.io/Websitemaker/coveworks-scifi/">The flagship, nine themes</a></li></ul>
+        <ul><li><a href="https://www.coveworks.tech/work/flagship/">The flagship, nine themes</a></li></ul>
       </div>
     </div>
     <p class="f-big" aria-hidden="true">Coveworks<span>.</span></p>
@@ -103,8 +112,8 @@ FOOTER_TOP = f'''
 '''
 
 
-def footer(extra_js=''):
-    return FOOTER_TOP + '<script src="assets/site.js"></script>\n' + extra_js + '</body>\n</html>\n'
+def footer(extra_js='', before_js=''):
+    return FOOTER_TOP + before_js + '<script src="assets/site.js"></script>\n' + extra_js + '</body>\n</html>\n'
 
 
 def page_head(no, kicker, title, lede):
@@ -215,7 +224,7 @@ HOME = f'''<main>
           <p class="label"><b>01</b> Selected work</p>
           <h2 class="title">Built here, <em>recently.</em></h2>
         </div>
-        <a class="more" href="work.html" data-rise>All eight builds {ARROW}</a>
+        <a class="more" href="work.html" data-rise>All {WORK_COUNT} builds {ARROW}</a>
       </div>
       <div class="w-list" id="wList" data-limit="4"></div>
       <noscript><p class="lede" style="margin-top:16px"><a href="work.html">See the work</a></p></noscript>
@@ -442,8 +451,9 @@ for href, _label in PAGES:
     title, desc, body = CONTENT[href]
     cfg = href == 'configurator.html'
     css = '<link rel="stylesheet" href="assets/fitting.css">\n' if cfg else ''
-    js = '<script src="assets/fitting.js"></script>\n' if cfg else ''
-    html = head(title, desc, css, href) + chrome(href) + '\n' + body + footer(js)
+    js = '<script src="assets/fitting-data.js"></script>\n<script src="assets/fitting.js"></script>\n' if cfg else ''
+    works = WORKS_JS if 'id="wList"' in body else ''
+    html = head(title, desc, css, href) + chrome(href) + '\n' + body + footer(js, works)
     with open(os.path.join(ROOT, href), 'w', encoding='utf-8') as f:
         f.write(html)
     print('wrote', href, len(html) // 1024, 'KB')

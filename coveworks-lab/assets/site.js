@@ -3,7 +3,6 @@
 'use strict';
 var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-var LIVE = 'https://gensynx.github.io/Websitemaker/';
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
 var smooth = reduce ? 'auto' : 'smooth';
@@ -114,24 +113,8 @@ var cio = new IntersectionObserver(function(es){
 document.querySelectorAll('[data-count]').forEach(function(el){ cio.observe(el); });
 
 /* ============ work index ============ */
-var WORKS = [
-  { t: 'Vassallo Developments', tag: 'Property · Brand site · Film', img: 'vassallo', link: LIVE + 'vassallo/',
-    d: 'A brand site for Vassallo Developments, who acquire, redesign and rebuild homes worth living in. It opens on a renovation film that walks into a derelict house and back out as every room rebuilds itself around the camera, and carries a 3D door and window configurator for their trade customers.' },
-  { t: 'Dar Ul Amir', tag: 'Commerce · Art direction · Motion', img: 'dar', link: LIVE,
-    d: 'The storefront of darulamir.com, House of the Prince: a thobe atelier and perfumery based in the United Kingdom, shipping worldwide. Four Emirati thobes in sizes 52 to 62 and fourteen perfumes with live pricing, beneath a scroll driven palace intro and a sky of gold dust.' },
-  { t: 'Nuisance 1989', tag: 'Streetwear · Twelve page storefront', img: 'nuisance', link: LIVE + 'nuisance-1989/',
-    d: 'A twelve page storefront for a London streetwear label: drops, the cut, lookbook, archive and a page for every piece, built on a two skin design system where each plate can be inverted to reveal its second colourway.' },
-  { t: '381 Accountants', tag: 'Accountancy · Three editions', img: 'acc381', link: LIVE + '381-accountants/',
-    d: 'Three complete editions for a Canary Wharf accountancy firm trusted by London businesses since 2010: a twelve page standard site, a dark premium edition with a fee calculator and deadline countdown, and a calm typographic Ledger edition with a deadline finder.' },
-  { t: 'House of Autos', tag: 'Car hire · Booking', img: 'autos', link: LIVE + 'house-of-autos/',
-    d: 'The keys to London’s finest drives: a private collection of performance cars for self drive hire, prepared to house standards and handed over anywhere in London. WhatsApp booking, a live fleet ticker and a night blue and gold identity.' },
-  { t: 'Mobile Mechanic Romford', tag: 'Local service · Two designs', img: 'mechanic', link: LIVE + 'mobile-mechanic-romford/',
-    d: 'A site for Farhan, the mobile mechanic who comes to your driveway across Romford and East London. Delivered as two complete designs to choose from, each a single self contained file.' },
-  { t: 'London Classic Aesthetics', tag: 'Clinic · Twenty four pages', img: 'lca', link: LIVE + 'london-classic-aesthetics/',
-    d: 'A full redesign of londonclassicaesthetics.com: twenty four pages covering six treatments, twelve training courses, about, become a model and contact, in an ivory, ink and champagne system set in Marcellus and Jost.' },
-  { t: 'London’s Aesthetics Academy', tag: 'Training · Editorial', img: 'academy', link: null,
-    d: 'A luxury single page redesign of londonsaestheticsacademy.co.uk: warm ivory, espresso ink and champagne gold with Playfair Display. Boutique, trustworthy and built to convert.' }
-];
+/* the portfolio comes from sitegen/work.json, written into the page by build.py */
+var WORKS = (window.WORKS || []).map(function(w){ return { t: w.title, tag: w.tag, img: w.image, link: w.link, d: w.text }; });
 function imgSrc(k){ return 'assets/img/' + k + '.webp'; }
 var wList = $('wList'), hov = null, hovImg = null, hx = 0, hy = 0, tx = 0, ty = 0, hovOn = false;
 if (wList){

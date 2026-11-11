@@ -1,26 +1,104 @@
-"""Zip Coveworks Lab for upload to the IONOS webspace behind coveworks.tech.
+"""Stage everything that goes on the IONOS webspace behind www.coveworks.tech.
 
     python3 coveworks-lab/sitegen/package.py
 
-Writes dist/coveworks-lab-upload.zip at the repository root (dist/ is gitignored):
-the five pages, assets/ and .htaccess, laid out to sit at the root of the webspace.
-README, CREDITS and this sitegen folder stay out.
+Writes, at the repository root (dist/ is gitignored):
+  dist/site/                       the webspace exactly as it should look
+  dist/coveworks-lab-upload.zip    the same, zipped, for a manual upload
+
+Layout:
+  /                  Coveworks Lab: the five pages, assets/ and .htaccess
+  /work/<slug>/      the portfolio sites listed in sitegen/work.json, kept out of search
+                     engines by work/.htaccess
+
+Source notes, build scripts and master files stay out. Each staged file carries the
+time of its last commit, so the deploy workflow only uploads what has changed.
 """
-import os, zipfile
+import json, os, shutil, subprocess, zipfile
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-OUT = os.path.join(os.path.dirname(ROOT), 'dist', 'coveworks-lab-upload.zip')
-PAGES = ['index.html', 'work.html', 'configurator.html', 'studio.html', 'contact.html', '.htaccess']
+LAB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO = os.path.dirname(LAB)
+DIST = os.path.join(REPO, 'dist')
+SITE = os.path.join(DIST, 'site')
+ZIP = os.path.join(DIST, 'coveworks-lab-upload.zip')
 
-os.makedirs(os.path.dirname(OUT), exist_ok=True)
-n = 0
-with zipfile.ZipFile(OUT, 'w', zipfile.ZIP_DEFLATED) as z:
-    for p in PAGES:
-        z.write(os.path.join(ROOT, p), p); n += 1
-    for base, _dirs, files in os.walk(os.path.join(ROOT, 'assets')):
+# What goes under /work/ comes from work.json, the same list the work pages are built from:
+# slug on the webspace -> [(source path in the repository, path inside the slug)]
+with open(os.path.join(LAB, 'sitegen', 'work.json'), encoding='utf-8') as _f:
+    _doc = json.load(_f)
+WORK = {w['slug']: [tuple(p) for p in w['sources']] for w in _doc['work'] + _doc.get('extra', [])}
+SKIP_DIRS = {'sitegen', 'source', '.git', 'node_modules'}
+SKIP_EXT = ('.md', '.mjs', '.py', '.txt')
+
+WORK_HTACCESS = '''# Portfolio copies: viewable, but kept out of search results
+<IfModule mod_headers.c>
+  Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>
+'''
+
+
+def commit_times():
+    """Last commit time of every tracked file, from one pass over the log."""
+    times = {}
+    try:
+        out = subprocess.run(['git', '-C', REPO, 'log', '--format=@%ct', '--name-only'],
+                             capture_output=True, text=True, check=True).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return times
+    t = None
+    for line in out.splitlines():
+        if line.startswith('@'):
+            t = int(line[1:])
+        elif line and line not in times:
+            times[line] = t
+    return times
+
+
+def copy(src, dst, times):
+    os.makedirs(os.path.dirname(dst), exist_ok=True)
+    shutil.copyfile(src, dst)
+    t = times.get(os.path.relpath(src, REPO))
+    if t:
+        os.utime(dst, (t, t))
+
+
+def stage_tree(src, dst, times, lab=False):
+    n = 0
+    if os.path.isfile(src):
+        copy(src, dst, times)
+        return 1
+    for base, dirs, files in os.walk(src):
+        dirs[:] = sorted(d for d in dirs if d not in SKIP_DIRS)
         for f in sorted(files):
-            if f.endswith('.txt'):
+            if f.endswith(SKIP_EXT) and not (lab and f == '.htaccess'):
                 continue
             full = os.path.join(base, f)
-            z.write(full, os.path.relpath(full, ROOT)); n += 1
-print('wrote', os.path.relpath(OUT, os.path.dirname(ROOT)), n, 'files', os.path.getsize(OUT) // 1024, 'KB')
+            copy(full, os.path.join(dst, os.path.relpath(full, src)), times)
+            n += 1
+    return n
+
+
+def main():
+    times = commit_times()
+    shutil.rmtree(SITE, ignore_errors=True)
+    n = 0
+    for p in ['index.html', 'work.html', 'configurator.html', 'studio.html', 'contact.html', '.htaccess']:
+        copy(os.path.join(LAB, p), os.path.join(SITE, p), times); n += 1
+    n += stage_tree(os.path.join(LAB, 'assets'), os.path.join(SITE, 'assets'), times, lab=True)
+    for slug, parts in WORK.items():
+        for src, inner in parts:
+            n += stage_tree(os.path.join(REPO, src), os.path.join(SITE, 'work', slug, inner), times)
+    with open(os.path.join(SITE, 'work', '.htaccess'), 'w') as f:
+        f.write(WORK_HTACCESS)
+    n += 1
+    with zipfile.ZipFile(ZIP, 'w', zipfile.ZIP_DEFLATED) as z:
+        for base, _dirs, files in os.walk(SITE):
+            for f in sorted(files):
+                full = os.path.join(base, f)
+                z.write(full, os.path.relpath(full, SITE))
+    size = sum(os.path.getsize(os.path.join(b, f)) for b, _d, fs in os.walk(SITE) for f in fs)
+    print('staged dist/site', n, 'files', size // (1024 * 1024), 'MB; zipped to', os.path.relpath(ZIP, REPO))
+
+
+if __name__ == '__main__':
+    main()

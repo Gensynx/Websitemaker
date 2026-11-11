@@ -4,16 +4,16 @@ Static websites built with Claude Code. Each site is a self-contained folder tha
 
 ## Sites in this repo
 - **Dar Ul Amir** — repo root (`index.html`), deployed at https://gensynx.github.io/Websitemaker/
-- **House of Autos** — `house-of-autos/` (self drive performance car hire, London)
-- **Mobile Mechanic Romford** — `mobile-mechanic-romford/` (two designs)
-- **London Classic Aesthetics** — `london-classic-aesthetics/` (24 page redesign)
+- **Halcyon Drive** — `car-hire/` (self drive performance car hire, London; fictional brand)
+- **Driveway Mechanic** — `mobile-mechanic/` (two designs; fictional brand)
+- **Ivory Room Aesthetics** — `aesthetics-clinic/` (24 page clinic and academy site; fictional brand)
 - **Coveworks** — `coveworks/` folder, the studio's own animated site, editorial luxury edition (see `coveworks/README.md`)
 - **Coveworks flagship** — `coveworks-scifi/` folder: welcome theme selector, nine full themes and a cursor following switcher bubble in one file (see `coveworks-scifi/README.md`)
 - **Coveworks Lab** — `coveworks-lab/` folder: a five page futuristic "lab white" edition of the studio site with the configurator, where visitors describe the site they need and get a preview built for that kind of business (twenty three types, each with its own structure and photography, plus a fallback built around any other brief, in fifteen looks) and send it as a brief (see `coveworks-lab/README.md`). The earlier `coveworks-atelier/` addresses forward here
-- **381 Accountants** — `381-accountants/` (12-page site for the Canary Wharf accountancy firm, see `381-accountants/README.md`)
-- **381 Accountants premium** — `381-accountants-premium/` (dark, high-interaction edition: calculator, countdown, wizard, marquee; see its README)
-- **381 Accountants Ledger** — `381-accountants-ledger/` (calm, typographic third edition: Swiss grid, self-hosted fonts, deadline finder; shares its facts with the standard edition; see its README)
-- **Nuisance 1989** — `nuisance-1989/` (12-page luxury streetwear storefront with a two-skin design system; live at https://gensynx.github.io/Websitemaker/nuisance-1989/ — see its README)
+- **Fenwick & Rowe** — `accountants/` (12 page accountancy site; fictional brand, see `accountants/README.md`)
+- **Fenwick & Rowe premium** — `accountants-premium/` (dark, high interaction edition: calculator, countdown, wizard, marquee; see its README)
+- **Fenwick & Rowe Ledger** — `accountants-ledger/` (calm, typographic third edition: Swiss grid, self hosted fonts, deadline finder; shares its facts with the standard edition; see its README)
+- **Lowtide 1996** — `streetwear/` (12 page streetwear storefront with a two skin design system; fictional brand, see its README)
 - **Vassallo Developments** — `vassallo/` (single-page site for the property developer, with a scroll-scrubbed renovation video intro; live at https://gensynx.github.io/Websitemaker/vassallo/)
 
 ## Site: Vassallo Developments (`vassallo/`)
@@ -49,21 +49,24 @@ vassallo/
 - **Contact details are placeholders**: `hello@vassallodevelopments.com` and `tel:+00000000000`. Replace both
   before treating this as a live public site.
 
-## Site: 381 Accountants (`381-accountants/`)
+## Fictional portfolio brands
 
-A conversion-focused, multi-page site for 381 Accountancy & Bookkeeping Services Ltd (381accountants.com): home, services hub + 7 service pages, about, reviews (real Google quotes), contact with booking form. Navy + gold Trust & Authority design system, EB Garamond + IBM Plex Sans, scroll reveals, JSON-LD local-business schema.
+Fenwick & Rowe, Lowtide 1996, Halcyon Drive, Driveway Mechanic and Ivory Room Aesthetics are made up businesses. Each site was designed for a real client who did not agree to be shown, so every name, contact detail, address, review, staff name and external link was replaced with fictional ones. Phone numbers use Ofcom's reserved drama ranges (020 7946 0xxx, 07700 900xxx) and emails the reserved `example.com` domain, so nothing reaches a real person. Keep it that way when editing them.
 
-- Open `381-accountants/index.html` directly, or serve the repo root.
-- Pages are generated for consistency by `381-accountants/sitegen/build.mjs` (`node sitegen/build.mjs` from the site folder); the generated HTML is committed, so deployment needs no build step.
-- Booking forms open a pre-filled email to info@381abs.com — no backend needed; swap for a form service before launch if preferred.
+## Site: Fenwick & Rowe (`accountants/`)
 
-## Site: London Classic Aesthetics (`london-classic-aesthetics/`)
+A conversion focused, multi page accountancy site: home, services hub and 7 service pages, about, sample reviews, contact with booking form. Navy and gold design system, EB Garamond and IBM Plex Sans, scroll reveals, JSON-LD local business schema.
 
-A full multi-page redesign of londonclassicaesthetics.com: 24 pages (home, 6 treatment pages + hub, 12 training course pages + hub, about, become-a-model, contact). Ivory/ink/champagne design system, Marcellus + Jost type (fonts committed as woff2), scroll-reveal and hero animations, all self-contained.
+- Open `accountants/index.html` directly, or serve the repo root.
+- Pages are generated by `accountants/sitegen/build.mjs` (`node sitegen/build.mjs` from the site folder); the generated HTML is committed.
 
-- Open `london-classic-aesthetics/index.html` directly, or serve the repo root.
-- Photo slots show branded gradient placeholders until real photos are dropped into `london-classic-aesthetics/images/` (exact filenames in that folder's README) — they swap in automatically.
-- Pages are generated for consistency by `london-classic-aesthetics/sitegen/build.mjs` (`node sitegen/build.mjs` from the site folder); the generated HTML is committed, so deployment needs no build step.
+## Site: Ivory Room Aesthetics (`aesthetics-clinic/`)
+
+A 24 page clinic and academy site: home, 6 treatment pages and hub, 12 training course pages and hub, about, become a model, contact. Ivory, ink and champagne design system, Marcellus and Jost (fonts committed as woff2), scroll reveal and hero animations, all self contained.
+
+- Open `aesthetics-clinic/index.html` directly, or serve the repo root.
+- Photo slots show branded gradient placeholders until photos are dropped into `aesthetics-clinic/images/` (filenames in that folder's README).
+- Pages are generated by `aesthetics-clinic/sitegen/build.mjs` (`node sitegen/build.mjs` from the site folder); the generated HTML is committed.
 
 ## Site: Dar Ul Amir (repo root)
 
