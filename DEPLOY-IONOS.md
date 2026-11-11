@@ -68,7 +68,7 @@ skips with a notice. To switch it on, once:
 
 The workflow runs the packager and uploads `dist/site/`, folders included. Each file
 carries the time of its last commit, so after the first upload only changed files are sent.
-It deletes nothing on the server. Secrets are encrypted
+Files that have left the repository are removed from `assets/` and `work/`, the two folders the site owns; nothing else on the server is deleted. Secrets are encrypted
 by GitHub and never appear in logs, so this is safe on a public repository.
 
 ## Updating the site by hand
