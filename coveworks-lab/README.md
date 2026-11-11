@@ -14,10 +14,25 @@ assets/site.js      shared behaviour; each part only runs on pages that have its
 assets/fonts/       Bodoni Moda, Archivo, JetBrains Mono, plus Source Serif 4, IBM Plex Sans and Manrope for the configurator looks
 assets/img/         work captures
 assets/gen/         imagery generated with Higgsfield: configurator photography, studio plates, share image
-assets/fitting.*    the configurator script and preview styles
-sitegen/build.py    writes the five pages from one shared header, footer and tape
+assets/fitting-data.js   the configurator's content: site types, copy, looks, colours, the words the brief reader knows
+assets/fitting.js        the configurator's behaviour: brief reader, state, share link, preview renderer
+assets/fitting.css       the preview site's styles
+sitegen/build.py         writes the five pages from one shared header, footer and tape
+sitegen/work.json        the portfolio: one list for the work pages and for what gets uploaded under /work/
+sitegen/package.py       stages the whole webspace in dist/site/ (and a zip) for upload
+sitegen/check.mjs        regression check: every page, the headline, the work list, 36 briefs, every site type, share links
 ```
-The generated HTML is committed. After editing a page in `sitegen/build.py`, run `python3 coveworks-lab/sitegen/build.py`. Styles and behaviour are edited directly in `assets/`.
+The generated HTML is committed. Where to change things:
+
+| To change | Edit | Then |
+|---|---|---|
+| Page copy or structure | `sitegen/build.py` | `python3 coveworks-lab/sitegen/build.py` |
+| The portfolio (add, remove, reorder, reword) | `sitegen/work.json`, with a 1600 by 1000 capture in `assets/img/` | the same build |
+| A site type's copy, sections, keywords or photos; a look; a colour | `assets/fitting-data.js` | nothing |
+| How the configurator behaves | `assets/fitting.js` | nothing |
+| Styles | `assets/site.css`, `assets/fitting.css` | nothing |
+
+Before merging, run `node coveworks-lab/sitegen/check.mjs` (needs Playwright). Merging to main uploads the site to coveworks.tech by itself; see `DEPLOY-IONOS.md`.
 
 ## The look
 - Bright white with a fine dot grid, one signal red, and green status lights; inspired by hardware such as Nothing and Teenage Engineering rather than neon sci fi
@@ -73,14 +88,14 @@ Each type also has its own sections to switch on, off and reorder, its own call 
 
 The preview renders a full width desktop site (1280 px, scaled to fit) or a phone cut (390 px). Reviews are marked as samples. **Copy link** encodes the whole fitting into the address (`configurator.html?fit=`); **Send this fitting** opens the visitor's own email app with the brief, including their own words, addressed to `sales@coveworks.tech`.
 
-The configurator's code is `assets/fitting.js` (types, copy, looks and the brief reader) and `assets/fitting.css` (the preview site), loaded only on that page.
+The configurator loads `assets/fitting-data.js` (content), `assets/fitting.js` (behaviour) and `assets/fitting.css` (the preview site) on that page only.
 
 ## Imagery
 Every image in `assets/gen/` was generated for Coveworks with Higgsfield (GPT Image 2.5): six for each of the twenty three site types and the Something else fallback (eight for photography), three studio plates for the home and studio pages, and the share image `lab-cover.jpg`. They are illustrative and show no real client. A preview loads only the photos for its type. See `assets/gen/CREDITS.txt`.
 
 ## Content notes
 - `sales@coveworks.tech` must exist (or be replaced in `sitegen/build.py` and `assets/site.js`) before go live
-- The work list lives in `assets/site.js` (`WORKS`). Its links point at copies of each site under coveworks.tech/work/, uploaded by the deploy workflow (see `sitegen/package.py`). Apart from Vassallo and Dar Ul Amir, the portfolio sites carry fictional brands, because the real clients did not agree to be shown
+- The work list lives in `sitegen/work.json`. Its links point at copies of each site under coveworks.tech/work/, uploaded by the deploy workflow (see `sitegen/package.py`). Apart from Vassallo and Dar Ul Amir, the portfolio sites carry fictional brands, because the real clients did not agree to be shown
 - Copy is dash free by request
 
 ## Deploy

@@ -1,0 +1,130 @@
+{
+  "_note": "The portfolio, in display order. build.py writes it into the home and work pages; package.py stages each entry's sources at coveworks.tech/work/<slug>/. 'sources' are [path in the repository, path inside the slug]. 'extra' is staged the same way but not listed.",
+  "live": "https://www.coveworks.tech/work/",
+  "work": [
+    {
+      "title": "Vassallo Developments",
+      "tag": "Property · Brand site · Film",
+      "image": "vassallo",
+      "slug": "vassallo",
+      "text": "A brand site for Vassallo Developments, who acquire, redesign and rebuild homes worth living in. It opens on a renovation film that walks into a derelict house and back out as every room rebuilds itself around the camera, and carries a 3D door and window configurator for their trade customers.",
+      "sources": [
+        [
+          "vassallo",
+          ""
+        ]
+      ]
+    },
+    {
+      "title": "Dar Ul Amir",
+      "tag": "Commerce · Art direction · Motion",
+      "image": "dar",
+      "slug": "dar-ul-amir",
+      "text": "The storefront of darulamir.com, House of the Prince: a thobe atelier and perfumery based in the United Kingdom, shipping worldwide. Four Emirati thobes in sizes 52 to 62 and fourteen perfumes with live pricing, beneath a scroll driven palace intro and a sky of gold dust.",
+      "sources": [
+        [
+          "index.html",
+          "index.html"
+        ],
+        [
+          "assets",
+          "assets"
+        ]
+      ]
+    },
+    {
+      "title": "Ivory Room Aesthetics",
+      "tag": "Clinic and academy · Twenty four pages",
+      "image": "aesthetics",
+      "slug": "aesthetics-clinic",
+      "text": "A clinic and training academy in one: twenty four pages covering six treatments, twelve training courses, the team, a become a model programme and booking, in an ivory, ink and champagne system set in Marcellus and Jost.",
+      "sources": [
+        [
+          "aesthetics-clinic",
+          ""
+        ]
+      ]
+    },
+    {
+      "title": "Fenwick & Rowe",
+      "tag": "Accountancy · Three editions",
+      "image": "accountants",
+      "slug": "accountants",
+      "text": "Three complete editions for a London accountancy firm: a twelve page standard site, a dark premium edition with a fee calculator and deadline countdown, and a calm typographic Ledger edition with a deadline finder.",
+      "sources": [
+        [
+          "accountants",
+          ""
+        ]
+      ]
+    },
+    {
+      "title": "Lowtide 1996",
+      "tag": "Streetwear · Twelve page storefront",
+      "image": "streetwear",
+      "slug": "streetwear",
+      "text": "A twelve page storefront for a London streetwear label: drops, the cut, lookbook, archive and a page for every piece, built on a two skin design system where each plate can be inverted to reveal its second colourway.",
+      "sources": [
+        [
+          "streetwear",
+          ""
+        ]
+      ]
+    },
+    {
+      "title": "Halcyon Drive",
+      "tag": "Car hire · Booking",
+      "image": "carhire",
+      "slug": "car-hire",
+      "text": "A private collection of performance cars for self drive hire in London, prepared to a standard and handed over anywhere in the city. WhatsApp booking, a live fleet ticker and a night blue and gold identity.",
+      "sources": [
+        [
+          "car-hire",
+          ""
+        ]
+      ]
+    },
+    {
+      "title": "Driveway Mechanic",
+      "tag": "Local service · Two designs",
+      "image": "mechanic",
+      "slug": "mobile-mechanic",
+      "text": "A site for a mobile mechanic who comes to your driveway across East London and Essex. Delivered as two complete designs to choose from, each a single self contained file.",
+      "sources": [
+        [
+          "mobile-mechanic",
+          ""
+        ]
+      ]
+    }
+  ],
+  "extra": [
+    {
+      "slug": "accountants-premium",
+      "sources": [
+        [
+          "accountants-premium",
+          ""
+        ]
+      ]
+    },
+    {
+      "slug": "accountants-ledger",
+      "sources": [
+        [
+          "accountants-ledger",
+          ""
+        ]
+      ]
+    },
+    {
+      "slug": "flagship",
+      "sources": [
+        [
+          "coveworks-scifi",
+          ""
+        ]
+      ]
+    }
+  ]
+}

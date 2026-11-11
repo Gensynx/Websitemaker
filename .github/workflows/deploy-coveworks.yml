@@ -28,6 +28,7 @@ on:
       - 'streetwear/**'
       - 'car-hire/**'
       - 'mobile-mechanic/**'
+      - 'coveworks-scifi/**'
       - '.github/workflows/deploy-coveworks.yml'
   workflow_dispatch:
 
@@ -96,7 +97,7 @@ jobs:
         run: |
           sleep 5
           fail=0
-          for path in / /configurator.html /assets/site.css /assets/fitting.js /assets/fonts/doto.woff2 /assets/gen/lab-hero.webp /work/aesthetics-clinic/ /work/accountants/ /work/streetwear/ /work/car-hire/ /work/mobile-mechanic/ /work/vassallo/ /work/dar-ul-amir/; do
+          for path in / /configurator.html /assets/site.css /assets/fitting.js /assets/fonts/doto.woff2 /assets/gen/lab-hero.webp /work/aesthetics-clinic/ /work/accountants/ /work/streetwear/ /work/car-hire/ /work/mobile-mechanic/ /work/vassallo/ /work/dar-ul-amir/ /work/flagship/; do
             code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE$path")
             echo "$code $path"
             [ "$code" = "200" ] || fail=1

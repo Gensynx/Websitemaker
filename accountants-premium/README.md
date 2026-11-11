@@ -1,7 +1,7 @@
-# 381 Accountants — premium edition
+# Fenwick & Rowe — premium edition
 
-The high-interaction sibling of `381-accountants/`: same verified business
-content (services, real Google reviews, Canary Wharf address), rebuilt as a
+The high-interaction sibling of `accountants/`: same fictional business
+content (services, sample reviews, City of London address), rebuilt as a
 dark, cinematic, agency-grade experience. Twelve pages, no build step to
 deploy, no dependencies.
 
@@ -17,8 +17,8 @@ deploy, no dependencies.
   service links to a full step-by-step breakdown page with a timeline
 - **Booking wizard**: three-step flow (service chips, details, review) with
   validation and a pre-filled email draft at the end; `?service=` pre-selects
-- **Review marquee + carousel + masonry wall**: real named Google reviews
-  (5.0 from 42) in three presentations
+- **Review marquee + carousel + masonry wall**: sample client reviews with
+  fictional names (5.0 from 21) in three presentations
 - **Micro-interactions**: magnetic CTAs, 3D tilt + spotlight cards, scroll
   progress bar, back-to-top orb with progress ring, full-screen staggered
   mobile menu, cross-document view transitions on supporting browsers
@@ -40,7 +40,7 @@ detail pages, about, reviews, contact.
 ## Editing
 
 ```
-cd 381-accountants-premium
+cd accountants-premium
 node sitegen/build.mjs
 ```
 

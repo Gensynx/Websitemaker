@@ -1,8 +1,8 @@
-# 381 Accountants — Ledger edition
+# Fenwick & Rowe — Ledger edition
 
-A third take on the 381 Accountants site, alongside the standard edition
-(`381-accountants/`) and the dark premium edition
-(`381-accountants-premium/`). Same verified business, rebuilt as a calm,
+A third take on the Fenwick & Rowe site, alongside the standard edition
+(`accountants/`) and the dark premium edition
+(`accountants-premium/`). Same fictional business, rebuilt as a calm,
 typographic, very fast site: a Swiss grid on warm ledger paper, one signal
 colour, hairline rules instead of cards and shadows, and tabular figures.
 Thirteen pages, no dependencies, no build step to deploy.
@@ -18,8 +18,8 @@ Thirteen pages, no dependencies, no build step to deploy.
   Without JavaScript the table shows the rules instead.
 - **Services as a ledger**: one ruled row per service with its starting fee,
   instead of a card grid. The whole row is the link.
-- **Proof beside the headline**: a real Google review, the rating linked to
-  the public listing, and checkable facts (established, company number,
+- **Proof beside the headline**: a sample client review, the rating linked
+  to the reviews page, and checkable facts (established, company number,
   office) set with dotted leaders.
 - **People & regulation** on the home page and About page.
 - **One action, one wording**: every primary button reads "Book a free
@@ -30,17 +30,17 @@ Thirteen pages, no dependencies, no build step to deploy.
   waiting for a scroll animation.
 - **Booking form** validates on submit (error summary, `aria-invalid`,
   focus moves to the first problem), then opens a pre-filled email to
-  info@381abs.com. Swap for a form service before launch if preferred.
+  fenwickrowe@example.com. Swap for a form service before launch if preferred.
 
 ## Shared facts (fill in once)
 
 Business facts, reviews and service content (including fees and key dates)
 are imported from the standard edition's generator
-(`../381-accountants/sitegen/lib.mjs` and `content-services.mjs`). Facts the
+(`../accountants/sitegen/lib.mjs` and `content-services.mjs`). Facts the
 firm has not confirmed yet (fees, team, professional body, AML supervisor,
 indemnity insurance, ICO number, notice period) render as outlined
 **[placeholders]** and are kept out of structured data. Fill them in there,
-then rebuild both editions. See `../381-accountants/README.md` for the list.
+then rebuild both editions. See `../accountants/README.md` for the list.
 
 ## Design system
 
@@ -61,7 +61,7 @@ so nothing reflows when the fonts arrive.
 ## Editing
 
 ```
-cd 381-accountants-ledger
+cd accountants-ledger
 node sitegen/build.mjs
 ```
 

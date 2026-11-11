@@ -8,13 +8,13 @@ Writes, at the repository root (dist/ is gitignored):
 
 Layout:
   /                  Coveworks Lab: the five pages, assets/ and .htaccess
-  /work/<slug>/      the portfolio sites the work list links to, kept out of search
+  /work/<slug>/      the portfolio sites listed in sitegen/work.json, kept out of search
                      engines by work/.htaccess
 
 Source notes, build scripts and master files stay out. Each staged file carries the
 time of its last commit, so the deploy workflow only uploads what has changed.
 """
-import os, shutil, subprocess, zipfile
+import json, os, shutil, subprocess, zipfile
 
 LAB = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(LAB)
@@ -22,18 +22,11 @@ DIST = os.path.join(REPO, 'dist')
 SITE = os.path.join(DIST, 'site')
 ZIP = os.path.join(DIST, 'coveworks-lab-upload.zip')
 
-# slug on the webspace: list of (source path in the repo, path inside the slug)
-WORK = {
-    'vassallo': [('vassallo', '')],
-    'dar-ul-amir': [('index.html', 'index.html'), ('assets', 'assets')],
-    'aesthetics-clinic': [('aesthetics-clinic', '')],
-    'accountants': [('accountants', '')],
-    'accountants-premium': [('accountants-premium', '')],
-    'accountants-ledger': [('accountants-ledger', '')],
-    'streetwear': [('streetwear', '')],
-    'car-hire': [('car-hire', '')],
-    'mobile-mechanic': [('mobile-mechanic', '')],
-}
+# What goes under /work/ comes from work.json, the same list the work pages are built from:
+# slug on the webspace -> [(source path in the repository, path inside the slug)]
+with open(os.path.join(LAB, 'sitegen', 'work.json'), encoding='utf-8') as _f:
+    _doc = json.load(_f)
+WORK = {w['slug']: [tuple(p) for p in w['sources']] for w in _doc['work'] + _doc.get('extra', [])}
 SKIP_DIRS = {'sitegen', 'source', '.git', 'node_modules'}
 SKIP_EXT = ('.md', '.mjs', '.py', '.txt')
 

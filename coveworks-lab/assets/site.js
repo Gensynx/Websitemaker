@@ -3,7 +3,6 @@
 'use strict';
 var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-var LIVE = 'https://www.coveworks.tech/work/';   /* portfolio copies, uploaded with the site by the deploy workflow */
 function $(id){ return document.getElementById(id); }
 function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]; }); }
 var smooth = reduce ? 'auto' : 'smooth';
@@ -114,22 +113,8 @@ var cio = new IntersectionObserver(function(es){
 document.querySelectorAll('[data-count]').forEach(function(el){ cio.observe(el); });
 
 /* ============ work index ============ */
-var WORKS = [
-  { t: 'Vassallo Developments', tag: 'Property · Brand site · Film', img: 'vassallo', link: LIVE + 'vassallo/',
-    d: 'A brand site for Vassallo Developments, who acquire, redesign and rebuild homes worth living in. It opens on a renovation film that walks into a derelict house and back out as every room rebuilds itself around the camera, and carries a 3D door and window configurator for their trade customers.' },
-  { t: 'Dar Ul Amir', tag: 'Commerce · Art direction · Motion', img: 'dar', link: LIVE + 'dar-ul-amir/',
-    d: 'The storefront of darulamir.com, House of the Prince: a thobe atelier and perfumery based in the United Kingdom, shipping worldwide. Four Emirati thobes in sizes 52 to 62 and fourteen perfumes with live pricing, beneath a scroll driven palace intro and a sky of gold dust.' },
-  { t: 'Ivory Room Aesthetics', tag: 'Clinic and academy · Twenty four pages', img: 'aesthetics', link: LIVE + 'aesthetics-clinic/',
-    d: 'A clinic and training academy in one: twenty four pages covering six treatments, twelve training courses, the team, a become a model programme and booking, in an ivory, ink and champagne system set in Marcellus and Jost.' },
-  { t: 'Fenwick & Rowe', tag: 'Accountancy · Three editions', img: 'accountants', link: LIVE + 'accountants/',
-    d: 'Three complete editions for a London accountancy firm: a twelve page standard site, a dark premium edition with a fee calculator and deadline countdown, and a calm typographic Ledger edition with a deadline finder.' },
-  { t: 'Lowtide 1996', tag: 'Streetwear · Twelve page storefront', img: 'streetwear', link: LIVE + 'streetwear/',
-    d: 'A twelve page storefront for a London streetwear label: drops, the cut, lookbook, archive and a page for every piece, built on a two skin design system where each plate can be inverted to reveal its second colourway.' },
-  { t: 'Halcyon Drive', tag: 'Car hire · Booking', img: 'carhire', link: LIVE + 'car-hire/',
-    d: 'A private collection of performance cars for self drive hire in London, prepared to a standard and handed over anywhere in the city. WhatsApp booking, a live fleet ticker and a night blue and gold identity.' },
-  { t: 'Driveway Mechanic', tag: 'Local service · Two designs', img: 'mechanic', link: LIVE + 'mobile-mechanic/',
-    d: 'A site for a mobile mechanic who comes to your driveway across East London and Essex. Delivered as two complete designs to choose from, each a single self contained file.' }
-];
+/* the portfolio comes from sitegen/work.json, written into the page by build.py */
+var WORKS = (window.WORKS || []).map(function(w){ return { t: w.title, tag: w.tag, img: w.image, link: w.link, d: w.text }; });
 function imgSrc(k){ return 'assets/img/' + k + '.webp'; }
 var wList = $('wList'), hov = null, hovImg = null, hx = 0, hy = 0, tx = 0, ty = 0, hovOn = false;
 if (wList){

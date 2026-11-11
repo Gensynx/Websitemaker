@@ -1,5 +1,5 @@
-/* Layout + shared components for the Ledger edition of the 381 Accountants
-   site. Run `node sitegen/build.mjs` from the 381-accountants-ledger folder
+/* Layout + shared components for the Ledger edition of the Fenwick & Rowe
+   site. Run `node sitegen/build.mjs` from the accountants-ledger folder
    to regenerate the static HTML pages. No runtime build step.
 
    Business facts, reviews and service content are imported from the
@@ -7,8 +7,8 @@
    regulation) appears in both editions after a rebuild of each. */
 import {
   SITE, REVIEWS, REVIEWS_ALL, tbc, fact,
-} from '../../381-accountants/sitegen/lib.mjs';
-import { services } from '../../381-accountants/sitegen/content-services.mjs';
+} from '../../accountants/sitegen/lib.mjs';
+import { services } from '../../accountants/sitegen/content-services.mjs';
 
 export { SITE, REVIEWS, REVIEWS_ALL, tbc, fact, services };
 
@@ -40,7 +40,7 @@ export function icon(name, cls = '') {
 }
 
 const FAVICON = 'data:image/svg+xml,' + encodeURIComponent(
-  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="10" fill="#0B5A43"/><text x="32" y="41" font-family="ui-monospace,Menlo,monospace" font-size="24" font-weight="600" fill="#F4F1EA" text-anchor="middle">381</text></svg>'
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="10" fill="#0B5A43"/><text x="32" y="41" font-family="ui-monospace,Menlo,monospace" font-size="24" font-weight="600" fill="#F4F1EA" text-anchor="middle">F&amp;R</text></svg>'
 );
 
 /* ---------------- Nav ---------------- */
@@ -81,8 +81,8 @@ function header_({ path, active }) {
   return `<header class="site-header">
   <div class="wrap bar">
     <a class="brand" href="${r}index.html" aria-label="${SITE.name}, home">
-      <span class="brand-mark" aria-hidden="true">381</span>
-      <span class="brand-name">Accountants</span>
+      <span class="brand-mark" aria-hidden="true">F&amp;R</span>
+      <span class="brand-name">Fenwick &amp; Rowe</span>
     </a>
     <nav class="nav" id="site-nav" aria-label="Main">
       <ul>
@@ -108,8 +108,8 @@ function footer_(path) {
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
-        <a class="brand" href="${r}index.html"><span class="brand-mark" aria-hidden="true">381</span><span class="brand-name">Accountants</span></a>
-        <p>${SITE.legal}. Independent certified accountants in ${SITE.town}, serving businesses and individuals across London since ${SITE.established}.</p>
+        <a class="brand" href="${r}index.html"><span class="brand-mark" aria-hidden="true">F&amp;R</span><span class="brand-name">Fenwick &amp; Rowe</span></a>
+        <p>${SITE.legal}. Independent certified accountants in the ${SITE.town}, serving businesses and individuals across London since ${SITE.established}.</p>
       </div>
       <div>
         <h2 class="foot-h">Services</h2>
@@ -129,13 +129,13 @@ function footer_(path) {
       </div>
       <div>
         <h2 class="foot-h">Office</h2>
-        <address>${SITE.address}<br>${SITE.town}, London ${SITE.postcode}</address>
+        <address>${SITE.address}<br>${SITE.town}<br>London ${SITE.postcode}</address>
         <p class="foot-lines"><a href="tel:${SITE.phone1tel}">${SITE.phone1}</a><br><a href="tel:${SITE.phone2tel}">${SITE.phone2}</a><br><a href="mailto:${SITE.email}">${SITE.email}</a><br>${SITE.hours}</p>
       </div>
     </div>
     <div class="foot-base">
       <span>© <span data-year>2026</span> ${SITE.legal}. Registered in England &amp; Wales, company no. ${SITE.companyNo}.</span>
-      <a href="${SITE.google}" target="_blank" rel="noopener">Our reviews on Google ${icon('arrowUpRight')}</a>
+      <a href="${r}reviews.html">Client reviews ${icon('arrow')}</a>
     </div>
   </div>
 </footer>
@@ -230,12 +230,12 @@ ${services.map((s, i) => `  <li class="ledger-row">
 export function reviewFigure(q, { large = false } = {}) {
   return `<figure class="quote${large ? ' quote-lg' : ''}">
   <blockquote><p>${q.text}</p></blockquote>
-  <figcaption><b>${q.name}</b> <span>${q.meta} · Google review</span></figcaption>
+  <figcaption><b>${q.name}</b> <span>${q.meta} · Sample review</span></figcaption>
 </figure>`;
 }
 
-export function ratingLine() {
-  return `<p class="rating-line"><span class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</span> <b>5.0</b> from ${SITE.reviewCount} Google reviews · <a href="${SITE.google}" target="_blank" rel="noopener">check them on Google ${icon('arrowUpRight')}</a></p>`;
+export function ratingLine(path) {
+  return `<p class="rating-line"><span class="stars" role="img" aria-label="5 out of 5 stars">★★★★★</span> <b>5.0</b> from ${SITE.reviewCount} sample client reviews · <a href="${rel(path)}reviews.html">read them all ${icon('arrow')}</a></p>`;
 }
 
 export function bookingForm({ heading = CTA, note = 'Tell us what you need. A real person replies within one working day.' } = {}) {

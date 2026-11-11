@@ -3,6 +3,9 @@ RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Pages without their own charset declaration (the Dar Ul Amir copy under /work/) are UTF-8
+AddDefaultCharset UTF-8
+
 AddType image/webp .webp
 AddType font/woff2 .woff2
 

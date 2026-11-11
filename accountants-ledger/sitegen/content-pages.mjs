@@ -10,8 +10,8 @@ function factRows() {
   return `<dl class="facts">
     <div><dt>Established</dt><dd class="mono">${SITE.established}</dd></div>
     <div><dt>Company no.</dt><dd class="mono">${SITE.companyNo}</dd></div>
-    <div><dt>Google rating</dt><dd><a href="${SITE.google}" target="_blank" rel="noopener"><span class="mono">5.0</span> from ${SITE.reviewCount} reviews</a></dd></div>
-    <div><dt>Office</dt><dd>30 Churchill Place, ${SITE.postcode}</dd></div>
+    <div><dt>Client rating</dt><dd><a href="reviews.html"><span class="mono">5.0</span> from ${SITE.reviewCount} reviews</a></dd></div>
+    <div><dt>Office</dt><dd>${SITE.address}, ${SITE.postcode}</dd></div>
   </dl>`;
 }
 
@@ -44,7 +44,7 @@ export function homeBody(path = 'index.html') {
 <section class="hero">
   <div class="wrap hero-grid">
     <div class="hero-copy">
-      <p class="kicker mono">Certified accountants · Canary Wharf · Since ${SITE.established}</p>
+      <p class="kicker mono">Certified accountants · City of London · Since ${SITE.established}</p>
       <h1>Your books in order. <span class="hl">Your deadlines met.</span></h1>
       <p class="lede">An independent firm looking after the bookkeeping, payroll, VAT, accounts and tax of London businesses for ${yearsExp} years. Fixed fees agreed in writing, and the same people answering your calls.</p>
       <div class="actions">
@@ -53,7 +53,7 @@ export function homeBody(path = 'index.html') {
       </div>
     </div>
     <aside class="hero-proof" aria-label="What clients say">
-      <p class="proof-label mono">Client for over 25 years</p>
+      <p class="proof-label mono">${lead.meta}</p>
       ${reviewFigure(lead, { large: true })}
       ${factRows()}
     </aside>
@@ -63,7 +63,7 @@ export function homeBody(path = 'index.html') {
 <section class="figures" aria-label="The firm in figures">
   <div class="wrap fig-grid">
     <p><b class="mono">${yearsExp}+</b><span>years serving London</span></p>
-    <p><b class="mono">5.0</b><span>Google rating, ${SITE.reviewCount} reviews</span></p>
+    <p><b class="mono">5.0</b><span>client rating, ${SITE.reviewCount} reviews</span></p>
     <p><b class="mono">7</b><span>services under one roof</span></p>
     <p><b class="mono">1</b><span>fixed fee, agreed in writing</span></p>
   </div>
@@ -96,8 +96,8 @@ export function homeBody(path = 'index.html') {
 
 <section class="sec sec-alt">
   <div class="wrap">
-    ${sectionHead({ no: '04', label: 'Clients', title: 'They stay for years. Some for decades.', intro: 'Real reviews from our Google listing, quoted with the reviewers’ published names.' })}
-    ${ratingLine()}
+    ${sectionHead({ no: '04', label: 'Clients', title: 'They stay for years. Some for decades.', intro: 'Sample reviews written for this demonstration site; names and details are fictional.' })}
+    ${ratingLine(path)}
     <div class="quote-grid">
       ${REVIEWS.slice(1).concat(REVIEWS_ALL.slice(0, 1)).map((q) => reviewFigure(q)).join('\n      ')}
     </div>
@@ -277,10 +277,10 @@ ${pageHero(path, {
 
 <section class="sec">
   <div class="wrap">
-    ${sectionHead({ no: '01', label: 'The firm', title: 'East London roots, at home in Canary Wharf' })}
+    ${sectionHead({ no: '01', label: 'The firm', title: 'Founded in the City, working across London' })}
     <div class="prose">
-      <p>381 Accountants was set up in ${SITE.established} as an independent firm of certified accountants with one aim: an efficient, proactive service for every client, whatever their size.</p>
-      <p>From 30 Churchill Place we work with sole traders, landlords, contractors and limited companies across ${SITE.areas.slice(0, 6).join(', ')} and the wider London area, on Sage One, Sage 50 and QuickBooks. Our senior team’s experience goes back more than 25 years, through every change in tax law and filing regime along the way.</p>
+      <p>Fenwick &amp; Rowe was set up in ${SITE.established} as an independent firm of certified accountants with one aim: clear numbers, fixed fees and an accountant who picks up the phone, for every client, whatever their size.</p>
+      <p>From ${SITE.address} we work with sole traders, landlords, contractors and limited companies across ${SITE.areas.slice(0, 6).join(', ')} and the wider London area, on Sage One, Sage 50 and QuickBooks. Our senior team’s experience goes back more than twenty years, through every change in tax law and filing regime along the way.</p>
       <p>Clients come to us for one return and stay for years. Our reviews say it better than we can: professional, responsive, accurate and good value.</p>
     </div>
   </div>
@@ -309,7 +309,7 @@ ${pageHero(path, {
 
 <section class="sec sec-alt">
   <div class="wrap">
-    ${sectionHead({ no: '04', label: 'Where', title: 'Clients across London and Essex', intro: `Based in ${SITE.town}; with cloud accounting, distance has never mattered less.` })}
+    ${sectionHead({ no: '04', label: 'Where', title: 'Clients across London and Hertfordshire', intro: `Based in the ${SITE.town}; with cloud accounting, distance has never mattered less.` })}
     <ul class="areas">${SITE.areas.map((a) => `<li>${a}</li>`).join('')}</ul>
   </div>
 </section>
@@ -323,10 +323,10 @@ export function reviewsBody(path = 'reviews.html') {
   return `
 ${pageHero(path, {
     trail: [['Home', 'index.html'], ['Reviews', '']],
-    kicker: `5.0 · ${SITE.reviewCount} Google reviews`,
+    kicker: `5.0 · ${SITE.reviewCount} client reviews`,
     title: 'Every review five stars. Many from clients of ten years or more.',
-    lede: 'Quoted from our public Google listing with the reviewers’ published names, lightly tidied for spelling only. Check any of them on Google.',
-    actions: `<a class="btn btn-primary btn-lg" href="${bookHref(path)}">${CTA} ${icon('arrow')}</a><a class="btn btn-quiet btn-lg" href="${SITE.google}" target="_blank" rel="noopener">Check them on Google ${icon('arrowUpRight')}</a>`,
+    lede: 'Sample reviews written for this demonstration site, to show how client feedback appears. Names and details are fictional.',
+    actions: `<a class="btn btn-primary btn-lg" href="${bookHref(path)}">${CTA} ${icon('arrow')}</a><a class="btn btn-quiet btn-lg" href="#wall">Read every review ${icon('arrow')}</a>`,
   })}
 
 <section class="sec">
@@ -337,7 +337,7 @@ ${pageHero(path, {
   </div>
 </section>
 
-<section class="sec sec-alt">
+<section class="sec sec-alt" id="wall">
   <div class="wrap">
     ${sectionHead({ no: '01', label: 'More reviews', title: 'In their own words' })}
     <div class="review-wall">
@@ -349,8 +349,8 @@ ${pageHero(path, {
 <section class="sec">
   <div class="wrap narrow center">
     <h2>Already a client?</h2>
-    <p class="sec-intro">Two minutes on Google helps other businesses find an accountant they can trust.</p>
-    <p class="actions center"><a class="btn btn-quiet" href="${SITE.google}" target="_blank" rel="noopener">Leave a review on Google ${icon('arrowUpRight')}</a></p>
+    <p class="sec-intro">Two minutes of feedback helps other businesses find an accountant they can trust.</p>
+    <p class="actions center"><a class="btn btn-quiet" href="mailto:${SITE.email}?subject=${encodeURIComponent('My review')}">Send us your review ${icon('arrow')}</a></p>
   </div>
 </section>
 
@@ -378,7 +378,7 @@ ${pageHero(path, {
       <dl class="contact-list">
         <div><dt>Phone</dt><dd><a href="tel:${SITE.phone1tel}">${SITE.phone1}</a><br><a href="tel:${SITE.phone2tel}">${SITE.phone2}</a></dd></div>
         <div><dt>Email</dt><dd><a href="mailto:${SITE.email}">${SITE.email}</a></dd></div>
-        <div><dt>Office</dt><dd><address>${SITE.address}<br>${SITE.town}, London ${SITE.postcode}</address><a href="${SITE.maps}" target="_blank" rel="noopener">Open in Google Maps ${icon('arrowUpRight')}</a></dd></div>
+        <div><dt>Office</dt><dd><address>${SITE.address}<br>${SITE.town}<br>London ${SITE.postcode}</address></dd></div>
         <div><dt>Hours</dt><dd>Monday to Friday, 9:00 to 17:30<br>Closed weekends. Email or the form outside these hours; we reply the next working morning.</dd></div>
       </dl>
       <div class="next">
