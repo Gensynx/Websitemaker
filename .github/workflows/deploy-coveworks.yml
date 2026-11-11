@@ -9,8 +9,9 @@
 # and, if the site does not live at the root of the SFTP login, one variable:
 #   IONOS_REMOTE_DIR     the folder holding index.html, e.g. /public (default /)
 #
-# Notes, build scripts and master files stay out. Nothing is deleted on the server, so
-# other files there are safe. Only files changed since the last upload are sent.
+# Notes, build scripts and master files stay out. Only files changed since the last upload
+# are sent. Files that have left the repository are removed from assets/ and work/, the two
+# folders this site owns; nothing else on the server is ever deleted.
 name: Deploy Coveworks to IONOS
 
 on:
@@ -88,6 +89,8 @@ jobs:
             set net:timeout 30
             open --env-password -u \"$USER_NAME\" sftp://$HOST
             mirror --reverse --verbose --parallel=4 dist/site \"$REMOTE_DIR\"
+            mirror --reverse --verbose --delete dist/site/assets \"$REMOTE_DIR/assets\"
+            mirror --reverse --verbose --delete dist/site/work \"$REMOTE_DIR/work\"
           "
 
       - name: Check the live site
