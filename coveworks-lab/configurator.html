@@ -56,9 +56,9 @@
       <div class="fit-grid">
         <div>
         <form class="brief" id="fBriefForm" autocomplete="off">
-          <label for="fBrief"><b>00</b>Describe the site you need</label>
+          <label for="fBrief"><b>00</b>Describe the site you need, or paste your current address</label>
           <div class="row">
-            <input id="fBrief" maxlength="160" placeholder="A minimal photography portfolio in black and white" spellcheck="false">
+            <input id="fBrief" maxlength="160" placeholder="A minimal photography portfolio, or yoursite.co.uk" spellcheck="false" autocapitalize="off">
             <button type="submit">Build it <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
           </div>
           <div class="brief-eg" aria-label="Examples">
@@ -99,13 +99,21 @@
             <input class="t-input sm" id="fHead" maxlength="70" placeholder="" autocomplete="off">
           </fieldset>
           <div class="t-actions">
-            <a class="btn sig" id="fSend" href="mailto:sales@coveworks.tech"><span>Send this build to Coveworks</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            <form class="lead" id="fLead" novalidate>
+              <p class="lead-h">Like it? Send it to us and we will reply within a day.</p>
+              <input class="t-input sm" id="lName" placeholder="Your name" autocomplete="name" maxlength="80" aria-label="Your name">
+              <input class="t-input sm" id="lEmail" type="email" placeholder="Email" autocomplete="email" maxlength="120" aria-label="Email" required>
+              <input class="t-input sm" id="lPhone" type="tel" placeholder="Phone, if you prefer a call" autocomplete="tel" maxlength="40" aria-label="Phone">
+              <input class="hp" id="lWeb" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+              <button class="btn sig" id="fSend" type="submit"><span>Send this build to Coveworks</span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+              <p class="lead-alt" id="fLeadAlt" hidden>Or <a href="mailto:sales@coveworks.tech">send it from your own email</a>.</p>
+            </form>
             <div class="row">
               <button class="btn ghost sm" id="fCopy" type="button"><span>Copy link</span></button>
               <button class="btn ghost sm" id="fReset" type="button"><span>Start again</span></button>
             </div>
             <p class="t-status" id="fStatus" role="status"></p>
-            <p class="t-fine">Sending opens your own email app with the brief written for you. A demo shows the structure; the real build is designed and written for your business alone. Photography from Unsplash.</p>
+            <p class="t-fine">We use your details only to reply about this build. A demo shows the structure; the real site is designed and written for your business alone. Imagery in the preview is illustrative.</p>
           </div>
         </div>
         </div>
@@ -146,8 +154,8 @@
         <ul><li><a href="mailto:sales@coveworks.tech">sales@coveworks.tech</a></li><li>Working worldwide</li><li>One build at a time</li></ul>
       </div>
       <div>
-        <h4>Other editions</h4>
-        <ul><li><a href="https://www.coveworks.tech/work/flagship/">The flagship, nine themes</a></li></ul>
+        <h4>More</h4>
+        <ul><li><a href="websites-for.html">Websites by trade</a></li><li><a href="https://www.coveworks.tech/work/flagship/">The flagship, nine themes</a></li></ul>
       </div>
     </div>
     <p class="f-big" aria-hidden="true">Coveworks<span>.</span></p>

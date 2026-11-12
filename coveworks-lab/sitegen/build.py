@@ -4,7 +4,8 @@
 Run from anywhere:  python3 coveworks-lab/sitegen/build.py
 The generated HTML is committed, so hosting needs no build step.
 """
-import json, os
+import base64, html as htmllib, json, os
+from urllib.parse import quote
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -14,6 +15,11 @@ with open(os.path.join(ROOT, 'sitegen', 'work.json'), encoding='utf-8') as _f:
 WORKS = [{'title': w['title'], 'tag': w['tag'], 'image': w['image'], 'text': w['text'],
           'link': _WORK['live'] + w['slug'] + '/'} for w in _WORK['work']]
 WORKS_JS = '<script>window.WORKS = ' + json.dumps(WORKS, ensure_ascii=False).replace('</', '<\\/') + ';</script>\n'
+with open(os.path.join(ROOT, 'sitegen', 'trades.json'), encoding='utf-8') as _f:
+    TRADES = json.load(_f)['trades']
+FIT_LABEL = {'salon': 'Salon', 'restaurant': 'Restaurant', 'cafe': 'Café', 'trades': 'Trades', 'clinic': 'Clinic', 'fitness': 'Fitness',
+             'photography': 'Photography', 'property': 'Property', 'professional': 'Professional', 'education': 'Education',
+             'childcare': 'Childcare', 'pets': 'Pets', 'travel': 'Travel', 'events': 'Events', 'boutique': 'Shop', 'saas': 'Software'}
 NUMBER = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve']
 WORK_COUNT = NUMBER[len(WORKS)] if len(WORKS) < len(NUMBER) else str(len(WORKS))
 
@@ -101,8 +107,8 @@ FOOTER_TOP = f'''
         <ul><li><a href="mailto:sales@coveworks.tech">sales@coveworks.tech</a></li><li>Working worldwide</li><li>One build at a time</li></ul>
       </div>
       <div>
-        <h4>Other editions</h4>
-        <ul><li><a href="https://www.coveworks.tech/work/flagship/">The flagship, nine themes</a></li></ul>
+        <h4>More</h4>
+        <ul><li><a href="websites-for.html">Websites by trade</a></li><li><a href="https://www.coveworks.tech/work/flagship/">The flagship, nine themes</a></li></ul>
       </div>
     </div>
     <p class="f-big" aria-hidden="true">Coveworks<span>.</span></p>
@@ -193,9 +199,9 @@ HOME = f'''<main>
         </div>
         <form class="mod starter fade d3" action="configurator.html" method="get" autocomplete="off">
           <div class="mod-head"><span>02 · Configurator</span><span>Ready</span></div>
-          <label class="sub" for="starterBrief" style="margin-bottom:14px">What site do you need? Describe it and we will build a preview.</label>
+          <label class="sub" for="starterBrief" style="margin-bottom:14px">Describe the site you need, or paste the address of the one you have, and we will build a preview.</label>
           <div class="field">
-            <input id="starterBrief" name="brief" maxlength="140" placeholder="A photography portfolio" spellcheck="false">
+            <input id="starterBrief" name="brief" maxlength="140" placeholder="A barber shop, or yoursite.co.uk" spellcheck="false" autocapitalize="off">
             <button class="btn sig" type="submit"><span>Build it</span>{ARROW}</button>
           </div>
           <p class="alt">Or <a href="work.html">see the work first</a>.</p>
@@ -295,9 +301,9 @@ CONFIGURATOR = f'''<main>
       <div class="fit-grid">
         <div>
         <form class="brief" id="fBriefForm" autocomplete="off">
-          <label for="fBrief"><b>00</b>Describe the site you need</label>
+          <label for="fBrief"><b>00</b>Describe the site you need, or paste your current address</label>
           <div class="row">
-            <input id="fBrief" maxlength="160" placeholder="A minimal photography portfolio in black and white" spellcheck="false">
+            <input id="fBrief" maxlength="160" placeholder="A minimal photography portfolio, or yoursite.co.uk" spellcheck="false" autocapitalize="off">
             <button type="submit">Build it {ARROW}</button>
           </div>
           <div class="brief-eg" aria-label="Examples">
@@ -338,13 +344,21 @@ CONFIGURATOR = f'''<main>
             <input class="t-input sm" id="fHead" maxlength="70" placeholder="" autocomplete="off">
           </fieldset>
           <div class="t-actions">
-            <a class="btn sig" id="fSend" href="mailto:sales@coveworks.tech"><span>Send this build to Coveworks</span>{ARROW}</a>
+            <form class="lead" id="fLead" novalidate>
+              <p class="lead-h">Like it? Send it to us and we will reply within a day.</p>
+              <input class="t-input sm" id="lName" placeholder="Your name" autocomplete="name" maxlength="80" aria-label="Your name">
+              <input class="t-input sm" id="lEmail" type="email" placeholder="Email" autocomplete="email" maxlength="120" aria-label="Email" required>
+              <input class="t-input sm" id="lPhone" type="tel" placeholder="Phone, if you prefer a call" autocomplete="tel" maxlength="40" aria-label="Phone">
+              <input class="hp" id="lWeb" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+              <button class="btn sig" id="fSend" type="submit"><span>Send this build to Coveworks</span>{ARROW}</button>
+              <p class="lead-alt" id="fLeadAlt" hidden>Or <a href="mailto:sales@coveworks.tech">send it from your own email</a>.</p>
+            </form>
             <div class="row">
               <button class="btn ghost sm" id="fCopy" type="button"><span>Copy link</span></button>
               <button class="btn ghost sm" id="fReset" type="button"><span>Start again</span></button>
             </div>
             <p class="t-status" id="fStatus" role="status"></p>
-            <p class="t-fine">Sending opens your own email app with the brief written for you. A demo shows the structure; the real build is designed and written for your business alone. Photography from Unsplash.</p>
+            <p class="t-fine">We use your details only to reply about this build. A demo shows the structure; the real site is designed and written for your business alone. Imagery in the preview is illustrative.</p>
           </div>
         </div>
         </div>
@@ -431,6 +445,7 @@ CONTACT = f'''<main>
         <div class="f"><label for="cName">Name</label><input id="cName" autocomplete="name"></div>
         <div class="f"><label for="cEmail">Email</label><input id="cEmail" type="email" autocomplete="email"></div>
         <div class="f"><label for="cMsg">The project</label><textarea id="cMsg"></textarea></div>
+        <input class="hp" id="cWeb" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div><button class="btn sig" type="submit"><span>Send it over</span>{ARROW}</button></div>
         <p class="c-ok" id="cOk" role="status"></p>
       </form>
@@ -457,3 +472,145 @@ for href, _label in PAGES:
     with open(os.path.join(ROOT, href), 'w', encoding='utf-8') as f:
         f.write(html)
     print('wrote', href, len(html) // 1024, 'KB')
+
+
+# ---------- preview.html: a shared build, full page, with no configurator around it ----------
+PREVIEW = f"""<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Preview · Coveworks</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="{FAVICON}">
+<link rel="stylesheet" href="assets/site.css">
+<link rel="stylesheet" href="assets/fitting.css">
+</head>
+<body class="pv-page">
+<a class="pv-bar" id="pvBar" href="configurator.html"><span><span class="led ok"></span>A preview, built in the Coveworks configurator</span><b>Make it yours {ARROW}</b></a>
+<div class="sizer" id="pvSizer"><div class="pvs" id="pvSite"></div></div>
+<noscript><p style="padding:40px">This preview needs JavaScript.</p></noscript>
+<script src="assets/fitting-data.js"></script>
+<script src="assets/fitting.js"></script>
+</body>
+</html>
+"""
+with open(os.path.join(ROOT, 'preview.html'), 'w', encoding='utf-8') as f:
+    f.write(PREVIEW)
+print('wrote preview.html')
+
+
+# ---------- websites-for-<trade>.html ----------
+def fit_code(state):
+    """The share code the configurator and preview page read: URL safe base64 of the state as JSON."""
+    raw = json.dumps(state, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+    return base64.urlsafe_b64encode(raw).decode('ascii').rstrip('=')
+
+
+def e(text):
+    return htmllib.escape(text, quote=True)
+
+
+def trade_page(t):
+    others = ''.join(f'<a href="websites-for-{o["slug"]}.html">{e(o["name"].capitalize())}</a>' for o in TRADES if o['slug'] != t['slug'])
+    needs = ''.join(f'<article data-rise><p class="label"><b>{i:02d}</b></p><h3>{e(n[0])}</h3><p>{e(n[1])}</p></article>' for i, n in enumerate(t['needs'], 1))
+    faq = ''.join(f'<div data-rise><dt>{e(q)}</dt><dd>{e(a)}</dd></div>' for q, a in t['faq'])
+    domain = ''.join(c for c in t['demo'].lower().replace('&', 'and') if c.isalnum()) + '.co.uk'
+    code = fit_code({'type': t['type'], 'name': t['demo']})
+    return f"""<main>
+{page_head('05', 'Websites by trade', f'Websites for <em>{e(t["name"])}.</em>', e(t['intro']))}
+  <section class="block" style="padding-top:clamp(20px,2.6vw,32px)">
+    <div class="wrap">
+      <div class="browser" data-rise>
+        <div class="b-bar"><span class="b-url">{domain}</span><span class="b-note">A sample · scroll inside</span></div>
+        <div class="live-frame"><iframe src="preview.html?embed=1&amp;fit={code}" title="A sample {e(t['one'])} website" loading="lazy"></iframe></div>
+      </div>
+      <div class="live-cta" data-rise>
+        <p>This sample was built in seconds in our configurator. Put your own name on it, try other looks and colours, and reorder the sections until it fits.</p>
+        <a class="btn sig" href="configurator.html?brief={quote(t['brief'])}"><span>Make this one yours</span>{ARROW}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div data-rise>
+        <p class="label"><b>01</b> What it needs</p>
+        <h2 class="title">What a good {e(t['one'])} site <em>needs.</em></h2>
+      </div>
+      <div class="svc three">{needs}</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap teaser">
+      <div data-rise>
+        <p class="label"><b>02</b> Already have a site?</p>
+        <h2 class="title">See yours, <em>rebuilt.</em></h2>
+        <p class="lede">Paste the address of the site you have now. We read your name, your colour and your own words, and show the same business in a new design, in a few seconds.</p>
+      </div>
+      <form class="mod starter" action="configurator.html" method="get" autocomplete="off" data-rise>
+        <div class="mod-head"><span>Rebuild</span><span>Ready</span></div>
+        <label class="sub" for="tSite" style="margin-bottom:14px">Your current web address</label>
+        <div class="field">
+          <input id="tSite" name="brief" maxlength="140" placeholder="yoursite.co.uk" spellcheck="false" autocapitalize="off" inputmode="url">
+          <button class="btn sig" type="submit"><span>Rebuild it</span>{ARROW}</button>
+        </div>
+        <p class="alt">No site yet? <a href="configurator.html?brief={quote(t['brief'])}">Start from the sample</a>.</p>
+      </form>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div data-rise>
+        <p class="label"><b>03</b> Questions</p>
+        <h2 class="title">Asked <em>often.</em></h2>
+      </div>
+      <dl class="qa">{faq}<div data-rise><dt>What does it cost, and how long does it take?</dt><dd>Every site is quoted for the job. Send us the build you made in the configurator and we reply within a day with a fixed price and a date.</dd></div></dl>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <p class="label" data-rise><b>04</b> Other trades</p>
+      <nav class="trades" aria-label="Websites for other trades" data-rise>{others}</nav>
+    </div>
+  </section>
+{CONTACT_BAND}</main>
+"""
+
+
+extra_pages = []
+for t in TRADES:
+    href = f'websites-for-{t["slug"]}.html'
+    title = f'Websites for {t["name"]} · Coveworks'
+    desc = e(t['intro'])
+    with open(os.path.join(ROOT, href), 'w', encoding='utf-8') as f:
+        f.write(head(title, desc, '', href) + chrome('') + '\n' + trade_page(t) + footer())
+    extra_pages.append(href)
+
+cards = ''.join(f'<a class="mod" href="websites-for-{t["slug"]}.html" data-rise><span class="mod-head"><span>{i:02d}</span><span>{e(FIT_LABEL.get(t["type"], ""))}</span></span><strong>{e(t["name"].capitalize())}</strong><span>{e(t["needs"][0][0])}, {e(t["needs"][1][0].lower())}, {e(t["needs"][2][0].lower())}.</span></a>' for i, t in enumerate(TRADES, 1))
+INDEX_TRADES = f"""<main>
+{page_head('05', 'Websites by trade', 'A site built for <em>your trade.</em>', 'Every kind of business needs something different from its website. Pick yours to see a sample built for it, then make it your own in the configurator.')}
+  <section class="block" style="padding-top:clamp(20px,2.6vw,32px)">
+    <div class="wrap">
+      <div class="trade-grid">{cards}</div>
+      <p class="lede" style="margin-top:22px" data-rise>Not on the list? <a href="configurator.html">Describe your business in the configurator</a> and it builds around your own words.</p>
+    </div>
+  </section>
+{CONTACT_BAND}</main>
+"""
+with open(os.path.join(ROOT, 'websites-for.html'), 'w', encoding='utf-8') as f:
+    f.write(head('Websites by trade · Coveworks', 'Sample websites for barbers, restaurants, plumbers, dentists, photographers and twenty more trades, each built for what that business needs.', '', 'websites-for.html') + chrome('') + '\n' + INDEX_TRADES + footer())
+extra_pages.insert(0, 'websites-for.html')
+print('wrote', len(extra_pages), 'trade pages')
+
+# ---------- sitemap.xml and robots.txt ----------
+urls = [SITE] + [SITE + href for href, _l in PAGES if href != 'index.html'] + [SITE + href for href in extra_pages]
+with open(os.path.join(ROOT, 'sitemap.xml'), 'w', encoding='utf-8') as f:
+    f.write('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+            ''.join(f'  <url><loc>{u}</loc></url>\n' for u in urls) + '</urlset>\n')
+with open(os.path.join(ROOT, 'robots.txt'), 'w', encoding='utf-8') as f:
+    f.write(f'User-agent: *\nDisallow: /api/\n\nSitemap: {SITE}sitemap.xml\n')
+print('wrote sitemap.xml with', len(urls), 'addresses, and robots.txt')
