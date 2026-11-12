@@ -295,7 +295,7 @@ WORK = f'''<main>
 '''
 
 CONFIGURATOR = f'''<main>
-{page_head('02', 'The configurator', 'Build a demo <em>of your own.</em>', 'Describe the site you need in plain words, or pick a type. Each of the twenty three types is built with its own structure, copy and photography, in any of fifteen looks, and anything else gets a site written around your own words. Nothing is stored. When it fits, send it to us and we will make the real one.')}
+{page_head('02', 'The configurator', 'Build a demo <em>of your own.</em>', 'Describe the site you need in plain words, or pick a type. Each of the twenty three types is built with its own structure, copy and photography, in any of fifteen looks, and anything else gets a site written around your own words. Already have a site? Paste its address and see it rebuilt. Nothing is saved unless you send it to us.')}
   <section class="fit-wrap">
     <div class="wrap">
       <div class="fit-grid">

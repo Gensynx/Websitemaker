@@ -1,6 +1,6 @@
 # Deploying Coveworks to IONOS (coveworks.tech)
 
-**The live build is `coveworks-lab/`**, the five page Lab edition with the configurator
+**The live build is `coveworks-lab/`**, the Lab edition with the configurator, the trade pages and the lead capture
 (preview: https://gensynx.github.io/Websitemaker/coveworks-lab/). It replaced the single
 file sci-fi edition that went live in July 2026.
 
@@ -76,6 +76,20 @@ by GitHub and never appear in logs, so this is safe on a public repository.
 Edit `coveworks-lab/sitegen/build.py` (pages) or `coveworks-lab/assets/` (styles, scripts,
 images), run `python3 coveworks-lab/sitegen/build.py`, then repeat steps 1 and 2. Uploading
 only the files you changed also works.
+
+## Leads and PHP
+
+The site now has two small PHP files in `api/`: `lead.php` (saves and emails every enquiry)
+and `site.php` (reads a visitor's existing site for the configurator). They need:
+
+- **PHP switched on** for the webspace (IONOS, Hosting, PHP version: any 8.x). The deploy
+  checks this on every run and fails with a clear message if `api/lead.php` is not running.
+- **The mailbox `sales@coveworks.tech`** to exist under IONOS, Email. Leads are sent from and
+  to that address. If it does not exist they are still saved, but not emailed.
+
+Saved leads live in `api/data/leads.php` on the server, one per line: open it in File Manager.
+That folder is created by the site itself, is never uploaded, overwritten or deleted by a
+deploy, and refuses every request from the web.
 
 ## Notes
 

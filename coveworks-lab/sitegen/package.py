@@ -7,7 +7,9 @@ Writes, at the repository root (dist/ is gitignored):
   dist/coveworks-lab-upload.zip    the same, zipped, for a manual upload
 
 Layout:
-  /                  Coveworks Lab: the five pages, assets/ and .htaccess
+  /                  Coveworks Lab: every page, assets/, .htaccess, sitemap.xml and robots.txt
+  /api/              lead capture and the site reader (PHP); api/data/ on the server holds the
+                     leads and is never uploaded, overwritten or deleted from here
   /work/<slug>/      the portfolio sites listed in sitegen/work.json, kept out of search
                      engines by work/.htaccess
 
@@ -82,8 +84,11 @@ def main():
     times = commit_times()
     shutil.rmtree(SITE, ignore_errors=True)
     n = 0
-    for p in ['index.html', 'work.html', 'configurator.html', 'studio.html', 'contact.html', '.htaccess']:
+    pages = sorted(f for f in os.listdir(LAB) if f.endswith('.html'))          # every page build.py wrote
+    for p in pages + ['.htaccess', 'sitemap.xml', 'robots.txt']:
         copy(os.path.join(LAB, p), os.path.join(SITE, p), times); n += 1
+    for p in ['lib.php', 'lead.php', 'site.php', os.path.join('data', '.htaccess')]:   # the two endpoints, and the lock on their data
+        copy(os.path.join(LAB, 'api', p), os.path.join(SITE, 'api', p), times); n += 1
     n += stage_tree(os.path.join(LAB, 'assets'), os.path.join(SITE, 'assets'), times, lab=True)
     for slug, parts in WORK.items():
         for src, inner in parts:

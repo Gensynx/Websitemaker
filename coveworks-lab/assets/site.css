@@ -425,7 +425,7 @@ footer{border-top:1px solid var(--rule);padding:28px 0 30px}
 @media (max-width:520px){.trade-grid{grid-template-columns:minmax(0,1fr)}.b-note{display:none}}
 
 /* preview.html: a shared build shown full page */
-body.pv-page{background:#fff;background-image:none;margin:0;overflow-x:hidden}
+body.pv-page{background:#fff;background-image:none;margin:0;padding:0;overflow-x:hidden}
 .pv-page .sizer{margin:0;overflow:hidden;position:relative}
 .pv-bar{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:9px 16px;background:var(--ink);color:#F4F4F2;font-size:13px;position:sticky;top:0;z-index:5}
 .pv-bar span{display:flex;align-items:center;gap:9px;min-width:0}

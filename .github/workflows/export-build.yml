@@ -1,0 +1,60 @@
+# Turns a build a visitor made in the configurator into the starting files for the real
+# site, on a branch of its own.
+#
+# Run it from the Actions tab: Export a build, Run workflow, and paste the "Open their build"
+# link from the lead email (or any link made with Copy link in the configurator).
+# It renders that exact build, writes it as plain files under clients/<name>/ and pushes
+# them to a new branch named build/<name>-<run number>. Nothing on main or the live site changes.
+name: Export a build
+
+on:
+  workflow_dispatch:
+    inputs:
+      link:
+        description: The share link of the build ("Open their build" in the lead email)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Install a headless browser
+        run: |
+          npm install --no-save --no-package-lock playwright
+          npx playwright install --with-deps chromium
+
+      - name: Export the build
+        env:
+          LINK: ${{ inputs.link }}          # passed as data, never pasted into the script
+        run: node coveworks-lab/sitegen/export.mjs "$LINK" "$RUNNER_TEMP/build"
+
+      - name: Push it to its own branch
+        env:
+          RUN: ${{ github.run_number }}
+        run: |
+          slug=$(node -p "(require(process.env.RUNNER_TEMP + '/build/build.json').name || 'build').toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]+/g,'-').replace(/^-|-\$/g,'') || 'build'")
+          branch="build/$slug-$RUN"
+          mkdir -p clients
+          rm -rf "clients/$slug"
+          cp -r "$RUNNER_TEMP/build" "clients/$slug"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add "clients/$slug"
+          git commit -m "Starter files for $slug, exported from the configurator"
+          git push origin "$branch"
+          {
+            echo "### Exported: $slug"
+            echo "Starter files are on the branch \`$branch\`, in \`clients/$slug/\`."
+            echo ""
+            echo "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/tree/$branch/clients/$slug"
+            echo ""
+            cat "clients/$slug/BRIEF.md"
+          } >> "$GITHUB_STEP_SUMMARY"

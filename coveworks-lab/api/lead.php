@@ -37,7 +37,7 @@ $lead = [
     'ref' => cw_line($in['ref'] ?? '', 40),
 ];
 if ($kind === 'contact' && $lead['message'] === '') cw_json(422, ['ok' => false, 'field' => 'message', 'error' => 'Tell us a little about the project.']);
-if ($lead['link'] !== '' && strpos($lead['link'], CW_SITE . '/') !== 0 && !getenv('CW_ALLOW_LOCAL')) $lead['link'] = '';
+if ($lead['link'] !== '' && !preg_match('#^https://(www\.)?coveworks\.tech/#', $lead['link']) && !getenv('CW_ALLOW_LOCAL')) $lead['link'] = '';   // only links to our own configurator
 
 if (!cw_rate_ok('lead', 6, 3600)) cw_json(429, ['ok' => false, 'error' => 'That is a lot of messages. Please email ' . CW_TO . ' instead.']);
 

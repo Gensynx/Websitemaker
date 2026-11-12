@@ -17,3 +17,7 @@ Thumbs.db
 
 # Cloudflare Pages build output (infra/cloudflare/build.sh)
 /dist/
+
+# Leads and the site reader cache are written on the server only
+coveworks-lab/api/data/*
+!coveworks-lab/api/data/.htaccess
