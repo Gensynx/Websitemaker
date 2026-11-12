@@ -431,3 +431,14 @@ body.pv-page{background:#fff;background-image:none;margin:0;padding:0;overflow-x
 .pv-bar span{display:flex;align-items:center;gap:9px;min-width:0}
 .pv-bar b{display:flex;align-items:center;gap:8px;font-weight:500;white-space:nowrap;background:var(--sig);border-radius:999px;padding:6px 14px}
 @media (max-width:560px){.pv-bar span{font-size:11.5px}}
+
+/* privacy page */
+.legal{display:grid;gap:12px;max-width:860px}
+.legal article{background:var(--panel);border:1px solid var(--rule);border-radius:var(--rad);padding:22px 24px 24px}
+.legal h2{font-weight:600;font-size:clamp(20px,1.9vw,24px);letter-spacing:-.03em;line-height:1.15;margin-bottom:10px}
+.legal p{color:var(--ink-2);font-size:15.5px;max-width:68ch}
+.legal p + p{margin-top:10px}
+.legal strong{color:var(--ink);font-weight:600}
+.legal a,.t-fine a,.c-fine a{color:var(--ink);border-bottom:1px solid var(--rule)}
+.legal-date{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);padding:4px 2px}
+.c-fine{font-size:12.5px;color:var(--ink-3)}

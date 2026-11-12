@@ -3,6 +3,8 @@
    POST JSON from the configurator ("Send this build") or the contact form. Every lead is
    written to data/leads.php first and then emailed, so one that cannot be emailed is not lost.
 
+   Saved leads older than CW_KEEP_DAYS are deleted whenever a new one arrives.
+
    Body: { kind: "build" | "contact", name, email, phone, business, message, summary, link,
            brief, site, ref, website (honeypot, must be empty), t (ms the page was open) } */
 require __DIR__ . '/lib.php';
@@ -41,10 +43,17 @@ if ($lead['link'] !== '' && !preg_match('#^https://(www\.)?coveworks\.tech/#', $
 
 if (!cw_rate_ok('lead', 6, 3600)) cw_json(429, ['ok' => false, 'error' => 'That is a lot of messages. Please email ' . CW_TO . ' instead.']);
 
-/* 1. keep it */
+/* 1. keep it, and drop anything older than the twelve months the privacy notice promises */
 $file = cw_data_dir() . '/leads.php';
-if (!is_file($file)) @file_put_contents($file, "<?php http_response_code(404); exit; ?>\n", LOCK_EX);
-$saved = @file_put_contents($file, json_encode($lead, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n", FILE_APPEND | LOCK_EX) !== false;
+$guard = "<?php http_response_code(404); exit; ?>\n";
+$keep = [];
+$cutoff = time() - CW_KEEP_DAYS * 86400;
+foreach (is_file($file) ? (file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: []) : [] as $line) {
+    $old = json_decode($line, true);
+    if (is_array($old) && isset($old['at']) && strtotime((string) $old['at']) >= $cutoff) $keep[] = $line;
+}
+$keep[] = json_encode($lead, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+$saved = @file_put_contents($file, $guard . implode("\n", $keep) . "\n", LOCK_EX) !== false;
 
 /* 2. send it */
 $who = $lead['name'] !== '' ? $lead['name'] : $email;

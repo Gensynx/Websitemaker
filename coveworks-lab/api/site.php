@@ -39,7 +39,7 @@ if (stripos($page['type'], 'html') === false && stripos($page['body'], '<html') 
 $out = cw_extract($page['body'], $page['url'], $page['type']);
 $out = ['ok' => true, 'url' => $page['url'], 'host' => preg_replace('/^www\./', '', (string) parse_url($page['url'], PHP_URL_HOST))] + $out;
 @file_put_contents($key, CW_GUARD . json_encode($out, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
-if (mt_rand(1, 40) === 1) foreach (glob($cache . '/*.php') ?: [] as $f) if (@filemtime($f) < time() - 7200) @unlink($f);
+foreach (glob($cache . '/*.php') ?: [] as $f) if (@filemtime($f) < time() - 3600) @unlink($f);   // the cache is temporary
 cw_json(200, $out);
 
 /* ---------- fetching, safely ---------- */
