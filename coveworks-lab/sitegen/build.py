@@ -108,11 +108,11 @@ FOOTER_TOP = f'''
       </div>
       <div>
         <h4>More</h4>
-        <ul><li><a href="websites-for.html">Websites by trade</a></li><li><a href="https://www.coveworks.tech/work/flagship/">The flagship, nine themes</a></li></ul>
+        <ul><li><a href="websites-for.html">Websites by trade</a></li><li><a href="privacy.html">Privacy</a></li><li><a href="https://www.coveworks.tech/work/flagship/">The flagship, nine themes</a></li></ul>
       </div>
     </div>
     <p class="f-big" aria-hidden="true">Coveworks<span>.</span></p>
-    <div class="f-base"><span>© <span class="year">2026</span> Coveworks</span><span>Made to measure</span></div>
+    <div class="f-base"><span>© <span class="year">2026</span> Coveworks Ltd</span><span>Made to measure</span></div>
   </div>
 </footer>
 '''
@@ -358,7 +358,7 @@ CONFIGURATOR = f'''<main>
               <button class="btn ghost sm" id="fReset" type="button"><span>Start again</span></button>
             </div>
             <p class="t-status" id="fStatus" role="status"></p>
-            <p class="t-fine">We use your details only to reply about this build. A demo shows the structure; the real site is designed and written for your business alone. Imagery in the preview is illustrative.</p>
+            <p class="t-fine">We use your details only to reply about this build (<a href="privacy.html">privacy</a>). A demo shows the structure; the real site is designed and written for your business alone. Imagery in the preview is illustrative.</p>
           </div>
         </div>
         </div>
@@ -448,6 +448,7 @@ CONTACT = f'''<main>
         <input class="hp" id="cWeb" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div><button class="btn sig" type="submit"><span>Send it over</span>{ARROW}</button></div>
         <p class="c-ok" id="cOk" role="status"></p>
+        <p class="c-fine">We use your details only to reply to you. See our <a href="privacy.html">privacy notice</a>.</p>
       </form>
     </div>
   </section>
@@ -605,6 +606,47 @@ with open(os.path.join(ROOT, 'websites-for.html'), 'w', encoding='utf-8') as f:
     f.write(head('Websites by trade · Coveworks', 'Sample websites for barbers, restaurants, plumbers, dentists, photographers and twenty more trades, each built for what that business needs.', '', 'websites-for.html') + chrome('') + '\n' + INDEX_TRADES + footer())
 extra_pages.insert(0, 'websites-for.html')
 print('wrote', len(extra_pages), 'trade pages')
+
+# ---------- privacy.html ----------
+KEEP = 'twelve months'      # must match CW_KEEP_DAYS in api/lib.php
+PRIVACY = f"""<main>
+{page_head('06', 'Privacy', 'What we do with <em>your details.</em>', 'The short version: we collect only what you choose to send us, we use it to reply to you, and we do not track you around the site.')}
+  <section class="block" style="padding-top:clamp(20px,2.6vw,32px)">
+    <div class="wrap">
+      <div class="legal">
+        <article>
+          <h2>Who we are</h2>
+          <p>This site is run by Coveworks Ltd, an independent web studio. We are the controller of the personal information described here. For anything about your information, write to <a href="mailto:sales@coveworks.tech">sales@coveworks.tech</a>.</p>
+        </article>
+        <article>
+          <h2>What we collect, and when</h2>
+          <p><strong>When you send us a build or a message.</strong> Your name, your email address, your phone number if you give one, what you wrote, and the build you made in the configurator: the kind of site, the look, the sections, the headline and the words you typed to describe it. If you pasted the address of your current website, we keep that address too.</p>
+          <p><strong>When you paste a web address into the configurator.</strong> Our server opens that public page once and reads a few details from it: the business name, the main headline, the description, the main colour and the logo. A temporary copy of those details is kept so a repeat lookup is quick, and is cleared automatically. Nothing else is kept unless you then send us the build.</p>
+          <p><strong>To stop misuse.</strong> When you send a form or look up a site, we keep a scrambled record of your internet address for a short time, so that nobody can flood the forms. It is cleared automatically, normally within hours.</p>
+          <p><strong>What we do not do.</strong> This site sets no cookies and uses no analytics, advertising or tracking tools. Describing a site in words is read in your own browser and sends us nothing until you press send. Like any website, the company that hosts ours keeps standard server logs.</p>
+        </article>
+        <article>
+          <h2>Why we use it</h2>
+          <p>To reply to you, talk through your project and prepare a quote, which are steps you have asked us to take. We do not add you to a mailing list, and we never sell or share your details for marketing.</p>
+        </article>
+        <article>
+          <h2>Where it is kept, and for how long</h2>
+          <p>Enquiries are held on our web hosting and in our email, both provided by IONOS. We keep an enquiry for up to {KEEP} after we last spoke, then delete it. If you become a client, we keep what we need for the work and for our business records.</p>
+        </article>
+        <article>
+          <h2>Your rights</h2>
+          <p>You can ask us for a copy of the information we hold about you, ask us to correct it or delete it, or object to how we use it. Email <a href="mailto:sales@coveworks.tech">sales@coveworks.tech</a> and we will reply within a month. If you are unhappy with our answer, you can complain to the Information Commissioner's Office at <a href="https://ico.org.uk" rel="noopener">ico.org.uk</a>.</p>
+        </article>
+        <p class="legal-date">Last updated 12 November 2026.</p>
+      </div>
+    </div>
+  </section>
+</main>
+"""
+with open(os.path.join(ROOT, 'privacy.html'), 'w', encoding='utf-8') as f:
+    f.write(head('Privacy · Coveworks', 'What Coveworks Ltd collects when you send a build or a message, why, how long it is kept and your rights.', '', 'privacy.html') + chrome('') + '\n' + PRIVACY + footer())
+extra_pages.append('privacy.html')
+print('wrote privacy.html')
 
 # ---------- sitemap.xml and robots.txt ----------
 urls = [SITE] + [SITE + href for href, _l in PAGES if href != 'index.html'] + [SITE + href for href in extra_pages]

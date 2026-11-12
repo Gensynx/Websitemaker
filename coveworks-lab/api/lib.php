@@ -4,6 +4,7 @@
 
 const CW_TO = 'sales@coveworks.tech';      // where leads are emailed, and the sender address
 const CW_SITE = 'https://www.coveworks.tech';
+const CW_KEEP_DAYS = 365;                  // how long a saved lead is kept; the privacy page says the same
 
 function cw_json(int $status, array $body): void {
     http_response_code($status);
@@ -39,9 +40,7 @@ function cw_rate_ok(string $bucket, int $max, int $window): bool {
     $n = (int) @file_get_contents($file);
     if ($n >= $max) return false;
     @file_put_contents($file, (string) ($n + 1), LOCK_EX);
-    if (mt_rand(1, 50) === 1) {                       // now and then, clear out old slots
-        foreach (glob($dir . '/*.txt') ?: [] as $f) if (@filemtime($f) < time() - 2 * $window) @unlink($f);
-    }
+    foreach (glob($dir . '/*.txt') ?: [] as $f) if (@filemtime($f) < time() - 7200) @unlink($f);   // nothing here outlives two hours of activity
     return true;
 }
 

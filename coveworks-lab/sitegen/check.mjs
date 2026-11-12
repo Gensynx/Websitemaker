@@ -87,7 +87,7 @@ async function open(url, viewport = { width: 1440, height: 900 }) {
 
 console.log('Pages');
 for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
-  for (const p of ['index.html', 'work.html', 'configurator.html', 'studio.html', 'contact.html', 'websites-for.html', 'websites-for-barbers.html', 'websites-for-online-shops.html']) {
+  for (const p of ['index.html', 'work.html', 'configurator.html', 'studio.html', 'contact.html', 'websites-for.html', 'websites-for-barbers.html', 'websites-for-online-shops.html', 'privacy.html']) {
     const page = await open(p, viewport);
     await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 700) { scrollTo(0, y); await new Promise(r => setTimeout(r, 40)); } });
     await page.waitForLoadState('networkidle');
@@ -211,6 +211,10 @@ else {
   if (after[0] === 'Sharp cuts, no fuss.' || after[1]) fail('a new brief should clear what was read from the site');
 
   console.log('Leads');
+  /* a lead from two years ago is already on file: the next one in must clear it out */
+  fs.writeFileSync(path.join(DATA, 'leads.php'), '<?php http_response_code(404); exit; ?>\n' +
+    JSON.stringify({ id: 'CW-OLD000', at: new Date(Date.now() - 730 * 864e5).toISOString(), kind: 'contact', email: 'old@example.com' }) + '\n' +
+    JSON.stringify({ id: 'CW-NEW000', at: new Date(Date.now() - 30 * 864e5).toISOString(), kind: 'contact', email: 'recent@example.com' }) + '\n');
   await page.fill('#lName', 'Sam Kingsley'); await page.fill('#lEmail', 'not an email'); await page.click('#fSend');
   await page.waitForTimeout(200);
   if (await page.locator('.lead-done').count()) fail('lead form accepted a bad email');
@@ -235,6 +239,8 @@ else {
   const all = fs.readFileSync(path.join(DATA, 'leads.php'), 'utf8');
   if (!all.includes('"kind":"contact"') || !all.includes('ada@example.com')) fail('the contact message was not saved');
   if (!all.startsWith('<?php http_response_code(404); exit; ?>')) fail('the leads file is not guarded');
+  if (all.includes('old@example.com')) fail('a lead older than twelve months was not deleted');
+  if (!all.includes('recent@example.com')) fail('a recent lead was deleted');
   await contact.close();
 }
 
