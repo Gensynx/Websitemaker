@@ -100,10 +100,22 @@ jobs:
         run: |
           sleep 5
           fail=0
-          for path in / /configurator.html /assets/site.css /assets/fitting.js /assets/fonts/doto.woff2 /assets/gen/lab-hero.webp /work/aesthetics-clinic/ /work/accountants/ /work/streetwear/ /work/car-hire/ /work/mobile-mechanic/ /work/vassallo/ /work/dar-ul-amir/ /work/flagship/; do
+          for path in / /configurator.html /preview.html /websites-for.html /websites-for-barbers.html /sitemap.xml /robots.txt \
+                      /assets/site.css /assets/fitting.js /assets/fitting-data.js /assets/fonts/doto.woff2 /assets/gen/lab-hero.webp \
+                      /work/aesthetics-clinic/ /work/accountants/ /work/streetwear/ /work/car-hire/ /work/mobile-mechanic/ \
+                      /work/vassallo/ /work/dar-ul-amir/ /work/flagship/; do
             code=$(curl -s -o /dev/null -w '%{http_code}' "$SITE$path")
             echo "$code $path"
             [ "$code" = "200" ] || fail=1
+          done
+          # the lead endpoint must run as PHP (a GET is refused with JSON), and its data must not be readable
+          lead=$(curl -s "$SITE/api/lead.php")
+          echo "api/lead.php -> $lead"
+          case "$lead" in '{"ok":false'*) ;; *) echo "::error::api/lead.php is not running as PHP, so leads cannot be captured."; fail=1 ;; esac
+          for path in /api/data/leads.php /api/data/.htaccess /api/data/; do
+            code=$(curl -s -o /tmp/body -w '%{http_code}' "$SITE$path")
+            echo "$code $path (must not be 200 with content)"
+            if [ "$code" = "200" ] && [ -s /tmp/body ]; then echo "::error::$path is readable from the web."; fail=1; fi
           done
           if [ "$fail" = "1" ]; then
             echo "::error::Uploaded, but some files are not being served. Check IONOS_REMOTE_DIR points at the folder with index.html."

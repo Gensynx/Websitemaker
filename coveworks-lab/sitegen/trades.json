@@ -1,0 +1,149 @@
+{
+  "_note": "One landing page per trade: websites-for-<slug>.html. 'type' is a site type from assets/fitting-data.js, 'brief' is what the configurator is opened with, 'demo' names the sample business in the live preview. Copy rules: no hyphens inside words, no italics.",
+  "trades": [
+    {
+      "slug": "barbers", "name": "barbers", "one": "barber shop", "type": "salon", "brief": "a barber shop", "demo": "Kingsley & Sons",
+      "intro": "A barber's site has one job: get the chair booked. We build sites that show the shop, list every cut with its price, and let a customer book in under a minute from their phone.",
+      "needs": [["A price list people can read", "Every service with its time and price, so nobody has to ring to ask what a skin fade costs."], ["Booking from the first screen", "One clear button, on every page, that works with one thumb."], ["The shop and the barbers", "Real photos of the chairs and the people behind them. That is what a new customer is choosing."]],
+      "faq": [["Can customers book online?", "Yes. We connect the site to the booking system you already use, or set one up for you."], ["Can I change prices myself?", "Yes. Prices and opening hours are the first things we make easy to edit."]]
+    },
+    {
+      "slug": "hair-salons", "name": "hair salons", "one": "hair salon", "type": "salon", "brief": "a hair salon", "demo": "Studio Fern",
+      "intro": "People choose a salon with their eyes. We build salon sites around the work: colour, cuts and the room itself, with services, prices and booking never more than a tap away.",
+      "needs": [["Your work, front and centre", "A gallery of real colour and cuts does more than any paragraph of text."], ["Services with times and prices", "Clear, grouped and honest, with patch test notes where they apply."], ["Stylists with faces", "Clients book a person. Show who does what, and let them choose."]],
+      "faq": [["Can it link to our booking app?", "Yes. Whichever system you use, the site sends people straight to the right service."], ["Do you take the photos?", "We can art direct a shoot, or build around photos you already have."]]
+    },
+    {
+      "slug": "beauty-salons", "name": "beauty salons", "one": "beauty salon", "type": "salon", "brief": "a beauty salon for nails, lashes and brows", "demo": "Petal Room",
+      "intro": "Nails, lashes, brows, waxing: a beauty salon sells a long list of short appointments. We build sites that make that list easy to scan and each treatment easy to book.",
+      "needs": [["A menu that scans in seconds", "Treatments grouped the way clients think, with times and prices beside each one."], ["Proof that it is clean and calm", "Photos of the room, the products you use and your qualifications."], ["Offers and gift vouchers", "Simple ways to bring a first visit in and a second visit back."]],
+      "faq": [["Can clients buy vouchers online?", "Yes. We can add gift vouchers that are paid for and emailed in one step."], ["Can I add new treatments myself?", "Yes. The treatment list is built to be edited without calling us."]]
+    },
+    {
+      "slug": "restaurants", "name": "restaurants", "one": "restaurant", "type": "restaurant", "brief": "a restaurant", "demo": "Orto",
+      "intro": "A restaurant site is read hungry, on a phone, minutes before a decision. We build sites that put the menu, the table and the address in front of people straight away.",
+      "needs": [["The menu as a page, not a PDF", "Fast to open, easy to read on a phone and simple to change when the kitchen does."], ["A table in three taps", "Guests, date and time from the first screen, linked to your booking system."], ["Hours and the way in", "Opening times, address and a map link where nobody has to hunt for them."]],
+      "faq": [["Can we update the menu ourselves?", "Yes. The menu is the part of the site you will edit most, so we make it the easiest."], ["Does it work with our booking system?", "Yes. We connect to the one you use, or help you choose one."]]
+    },
+    {
+      "slug": "cafes", "name": "cafés", "one": "café", "type": "cafe", "brief": "a café and bakery", "demo": "Sunday Bakehouse",
+      "intro": "A café lives on regulars and passers by. We build warm, quick sites that show what is on the counter today, when you are open and why the queue is worth it.",
+      "needs": [["Today's counter", "Coffee, bakes and brunch with prices, kept current in a couple of minutes a week."], ["Opening hours that are right", "The first thing people check, so it sits at the top and matches your door."], ["A feel for the room", "A few good photos tell people whether to bring a laptop or a pram."]],
+      "faq": [["Can people order ahead?", "Yes. We can add click and collect, or link to the ordering app you already use."], ["We have two sites. Can it show both?", "Yes. Each location gets its own hours, address and map."]]
+    },
+    {
+      "slug": "plumbers", "name": "plumbers", "one": "plumber", "type": "trades", "brief": "a plumber", "demo": "Harbour Plumbing",
+      "intro": "When a pipe bursts, nobody reads a homepage. We build plumbers' sites that say what you fix, where you cover and how to reach you, with the phone number always in view.",
+      "needs": [["A number that is always on screen", "Tap to call from any page, plus a quick form for jobs that can wait."], ["The areas you cover", "A plain list of towns, so customers and search engines both know you come to them."], ["Proof you can be trusted", "Reviews, your Gas Safe details and a clear note on guarantees."]],
+      "faq": [["Will it help me show up locally?", "Yes. Each service and area is written so search engines can match you to nearby searches."], ["Can customers send photos of the job?", "Yes. The quote form can take photos, which saves you a visit."]]
+    },
+    {
+      "slug": "electricians", "name": "electricians", "one": "electrician", "type": "trades", "brief": "an electrician", "demo": "Brightwire Electrical",
+      "intro": "Customers want a qualified electrician who turns up and charges what was quoted. We build sites that make those three things obvious before they have picked up the phone.",
+      "needs": [["Your registrations, up front", "NICEIC or NAPIT details and insurance, where a careful customer looks first."], ["Jobs in plain words", "Rewires, fuse boards, EV chargers and testing, each explained without jargon."], ["A fast way to ask for a quote", "A short form and a tap to call number on every page."]],
+      "faq": [["Can I list commercial and home work separately?", "Yes. Each gets its own section, so the right customer finds the right page."], ["Can it show my certificates?", "Yes. Logos, registration numbers and links to check them."]]
+    },
+    {
+      "slug": "builders", "name": "builders", "one": "building firm", "type": "trades", "brief": "a builder for extensions and renovations", "demo": "Oakframe Builders",
+      "intro": "An extension is the biggest cheque most people ever write. We build builders' sites that show finished work properly and explain how a job runs, so the first call is a serious one.",
+      "needs": [["Finished projects, shown well", "Before and after photos with a line on what was done and how long it took."], ["How a job runs", "Survey, quote, schedule, handover. Customers trust a builder who explains the plan."], ["A proper enquiry form", "Postcode, type of work and budget, so you can sort real jobs from tyre kickers."]],
+      "faq": [["Can I add new projects myself?", "Yes. Adding a project is a title, a few photos and a paragraph."], ["Do you write the text?", "Yes. We write it from a short call with you, in your voice."]]
+    },
+    {
+      "slug": "cleaners", "name": "cleaning companies", "one": "cleaning company", "type": "trades", "brief": "a cleaning company", "demo": "Fresh Start Cleaning",
+      "intro": "Letting someone into your home or office takes trust. We build cleaning company sites that set out the service, the price and the checks you run, and make booking simple.",
+      "needs": [["Clear services and prices", "Regular, deep and end of tenancy cleans, each with what is included."], ["Who comes through the door", "Vetting, insurance and reviews, stated plainly."], ["Quote or book in a minute", "A short form that asks for rooms and postcode, not a life story."]],
+      "faq": [["Can customers book a regular slot online?", "Yes. We can add online booking with weekly or fortnightly slots."], ["We cover several towns. Can it show that?", "Yes. An areas section lists every town you serve."]]
+    },
+    {
+      "slug": "dentists", "name": "dentists", "one": "dental practice", "type": "clinic", "brief": "a dental practice", "demo": "Mill Street Dental",
+      "intro": "Most people put off the dentist. A calm, clear site makes the first appointment easier to book. We build practice sites that answer the nervous questions before they are asked.",
+      "needs": [["Treatments and fees, clearly", "Check ups, hygiene, whitening and more, with honest prices and plans."], ["The team, by name", "Faces, qualifications and a few friendly words go a long way with anxious patients."], ["Booking and emergencies", "Online booking for routine visits and a clear line for urgent ones."]],
+      "faq": [["Can patients register online?", "Yes. New patient forms can be filled in before the first visit."], ["Does it meet the rules for dental sites?", "We build in the details the GDC expects, such as registration numbers and complaints information."]]
+    },
+    {
+      "slug": "aesthetics-clinics", "name": "aesthetics clinics", "one": "aesthetics clinic", "type": "clinic", "brief": "an aesthetics clinic", "demo": "Calm Skin Clinic",
+      "intro": "Aesthetics is a decision people research for weeks. We build clinic sites that feel as considered as the treatments: honest information, real practitioners and a consultation that is easy to book.",
+      "needs": [["Treatments explained properly", "What it is, how long it lasts, downtime and price, without hard selling."], ["Who holds the needle", "Qualifications, registrations and insurance, shown where patients look."], ["Consultation first", "Every page leads to a consultation, which is where good clinics start."]],
+      "faq": [["Can it link to our booking system?", "Yes. Each treatment can open the right appointment type."], ["Can we show before and after photos?", "Yes, with consent notes and in line with advertising rules."]]
+    },
+    {
+      "slug": "personal-trainers", "name": "personal trainers", "one": "personal trainer", "type": "fitness", "brief": "a personal trainer", "demo": "Strong Hour",
+      "intro": "Clients hire a trainer they believe in. We build personal trainer sites that show who you are, how you coach and what it costs, then make the first session easy to book.",
+      "needs": [["You, clearly", "Your story, qualifications and the kind of client you get results for."], ["Packages and prices", "Single sessions, blocks and online coaching, set out side by side."], ["A free first session", "One low pressure offer, on every page, that starts the conversation."]],
+      "faq": [["Can clients pay online?", "Yes. Blocks and monthly plans can be bought on the site."], ["I coach online too. Can it cover both?", "Yes. In person and online coaching each get their own section."]]
+    },
+    {
+      "slug": "gyms", "name": "gyms", "one": "gym", "type": "fitness", "brief": "a gym with classes", "demo": "Iron Yard",
+      "intro": "A gym site should make someone want to walk in. We build sites with the timetable, the memberships and the coaches up front, and a free first class one tap away.",
+      "needs": [["A live timetable", "This week's classes, readable on a phone at six in the morning."], ["Memberships without the small print", "Three clear options with what each includes."], ["The coaches and the floor", "Photos of the space and the people, so nobody walks in blind."]],
+      "faq": [["Can members book classes on the site?", "Yes. We link to your booking system or set one up."], ["Can we change the timetable ourselves?", "Yes. It is built to be edited in a minute."]]
+    },
+    {
+      "slug": "photographers", "name": "photographers", "one": "photographer", "type": "photography", "brief": "a photography portfolio", "demo": "Ada Lowe",
+      "intro": "A photographer's site should get out of the way. We build quiet, fast portfolios where the pictures fill the screen, the packages are clear and an enquiry takes one minute.",
+      "needs": [["Pictures first", "Large images that load fast, with nothing fighting them for attention."], ["Series and stories", "Group work into projects so a client can see how you think, not only single frames."], ["Packages and availability", "Clear starting prices and how far ahead you are booking."]],
+      "faq": [["Will my images load quickly?", "Yes. Every image is sized and compressed for the screen it is shown on."], ["Can I add new work myself?", "Yes. Adding a series is as simple as uploading the photos."]]
+    },
+    {
+      "slug": "estate-agents", "name": "estate agents", "one": "estate agency", "type": "property", "brief": "an estate agent", "demo": "Marlow & Finch",
+      "intro": "Sellers pick the agent who looks like they will sell. We build estate agency sites with properties shown beautifully, honest numbers and a valuation request that takes a minute.",
+      "needs": [["Listings that sell the home", "Large photos, the key facts and a clear way to book a viewing."], ["Numbers that win instructions", "Homes sold, time to offer and reviews, where a seller will see them."], ["A valuation form", "The most valuable enquiry you get, so it sits on every page."]],
+      "faq": [["Can it show our live listings?", "Yes. We connect to your property software so listings update on their own."], ["Do you cover lettings as well?", "Yes. Sales and lettings each get their own search and pages."]]
+    },
+    {
+      "slug": "accountants", "name": "accountants", "one": "accountancy firm", "type": "professional", "brief": "an accountancy firm", "demo": "Northgate Accounts",
+      "intro": "People change accountant when they feel ignored. We build accountancy sites that sound like a person, show fixed fees and make it simple to book a first call.",
+      "needs": [["Services in plain English", "Bookkeeping, year end, tax and payroll, each explained without the acronyms."], ["Fixed fees, shown", "Clear packages for sole traders and companies win trust before the first call."], ["The people behind it", "Named accountants with photos, because clients want to know who answers."]],
+      "faq": [["Can clients book a call online?", "Yes. A diary link lets them choose a time that suits."], ["Can it include a deadline reminder?", "Yes. We can add key tax dates and a countdown."]]
+    },
+    {
+      "slug": "solicitors", "name": "solicitors", "one": "law firm", "type": "professional", "brief": "a law firm", "demo": "Hale Legal",
+      "intro": "Nobody visits a law firm's site on a good day. We build sites that are calm and clear: what you handle, what it costs and who to speak to, with no legalese.",
+      "needs": [["Practice areas people recognise", "Moving home, family, wills, employment: named the way clients search."], ["Price and service information", "The transparency details the SRA requires, presented so they reassure."], ["A direct line to a person", "Named solicitors with a phone number and a short enquiry form."]],
+      "faq": [["Does it meet the SRA transparency rules?", "We build in the pricing and service information the rules ask for, and the digital badge."], ["Can enquiries go to the right department?", "Yes. Each practice area can send its form to a different inbox."]]
+    },
+    {
+      "slug": "tutors", "name": "tutors", "one": "tutoring business", "type": "education", "brief": "a tutoring business", "demo": "Bright Path Tutors",
+      "intro": "Parents want to know who will be teaching their child and whether it works. We build tutoring sites that answer both, set out subjects and prices, and offer a free first lesson.",
+      "needs": [["Subjects and levels", "From primary to A level, so a parent finds their child's year in seconds."], ["Tutors you can check", "Qualifications, experience and DBS status beside every name."], ["A free first lesson", "The easiest yes there is, offered on every page."]],
+      "faq": [["Can parents book and pay online?", "Yes. Single lessons and termly blocks can both be booked on the site."], ["We teach online and in person. Can it show both?", "Yes. Each has its own section and prices."]]
+    },
+    {
+      "slug": "nurseries", "name": "nurseries", "one": "nursery", "type": "childcare", "brief": "a nursery for children under five", "demo": "Little Orchard",
+      "intro": "Choosing a nursery is choosing who looks after your child. We build nursery sites that show the rooms, the team and a typical day, and make it simple to book a visit.",
+      "needs": [["The rooms and the garden", "Bright photos of where the day actually happens."], ["Hours, fees and funding", "Opening times, session prices and funded hours, without a phone call."], ["Book a visit", "Parents decide in person, so every page leads there."]],
+      "faq": [["Can parents register interest online?", "Yes. A short form collects the child's age and the start date they want."], ["Can we share our Ofsted report?", "Yes. The rating and a link to the report sit where parents look."]]
+    },
+    {
+      "slug": "dog-groomers", "name": "dog groomers", "one": "dog grooming business", "type": "pets", "brief": "a dog groomer", "demo": "Muddy Paws",
+      "intro": "Owners hand over a member of the family. We build grooming sites that show gentle handling, clear prices by breed and size, and an easy way to book a slot.",
+      "needs": [["Prices by size and coat", "A simple table, so owners know the cost before they ask."], ["Before and after", "Happy, fluffy proof that you are good at this."], ["Booking and reminders", "Slots booked online, with a note about first visits for puppies."]],
+      "faq": [["Can owners book online?", "Yes. They choose the groom, the dog's size and a time."], ["I also do walks and day care. Can it show those?", "Yes. Each service gets its own section and prices."]]
+    },
+    {
+      "slug": "hotels", "name": "hotels and B&Bs", "one": "hotel or B&B", "type": "travel", "brief": "a small hotel", "demo": "The Old Mill",
+      "intro": "Every booking through an agent costs you commission. We build hotel and B&B sites that make booking direct the obvious choice: lovely rooms, clear rates and dates on the first screen.",
+      "needs": [["Dates on the first screen", "Check in, check out and guests, linked to your booking engine."], ["Rooms worth choosing between", "Each room with photos, what is in it and its rate."], ["A reason to book direct", "Best rate, breakfast included or free cancellation, stated plainly."]],
+      "faq": [["Does it connect to our booking system?", "Yes. We link to your booking engine so availability is always live."], ["Can we add offers for quiet months?", "Yes. Offers are easy to add and take down."]]
+    },
+    {
+      "slug": "wedding-venues", "name": "wedding venues", "one": "wedding venue", "type": "events", "brief": "a wedding venue", "demo": "Fernhill Barn",
+      "intro": "Couples fall for a venue online before they ever visit. We build venue sites with the place shown at its best, clear packages and an easy way to check a date.",
+      "needs": [["The venue at its best", "A gallery through the seasons, from ceremony to last dance."], ["Packages and capacity", "What is included, for how many, from what price."], ["Check a date", "The question every couple has, answered from every page."]],
+      "faq": [["Can couples check availability online?", "Yes. A date checker or enquiry form sits on every page."], ["Can we list open days?", "Yes. Dates for the diary are easy to add and remove."]]
+    },
+    {
+      "slug": "online-shops", "name": "online shops", "one": "online shop", "type": "boutique", "brief": "an online shop for a small brand", "demo": "Field & Thread",
+      "intro": "A small brand wins on taste, not on range. We build online shops that feel like the product: considered pages, honest photography and a checkout that never gets in the way.",
+      "needs": [["Product pages that sell", "Large photos, the details that matter and a clear price and button."], ["A story worth buying into", "Why you make it and how, told in a few good lines."], ["Delivery and returns, upfront", "The two questions that stop a sale, answered before the basket."]],
+      "faq": [["Which shop system do you build on?", "We build on Shopify or a lighter setup, whichever suits your range and budget."], ["Can I add products myself?", "Yes. Adding a product is photos, a price and a few lines."]]
+    },
+    {
+      "slug": "startups", "name": "startups", "one": "startup", "type": "saas", "brief": "a launch page for a software startup", "demo": "Tallyo",
+      "intro": "A launch page has seconds to explain a new idea. We build startup sites that say what the product does, show it working and make signing up the obvious next step.",
+      "needs": [["One clear line", "What it is and who it is for, before anyone scrolls."], ["The product, shown", "Real screens and short demos, not stock art of people pointing at laptops."], ["Pricing and a way in", "Simple tiers and a sign up that asks for as little as possible."]],
+      "faq": [["Can it connect to our waitlist or app?", "Yes. Sign ups can go to your app, your CRM or a simple list."], ["Can we change it as the product changes?", "Yes. Sections are built to be reordered and rewritten quickly."]]
+    }
+  ]
+}

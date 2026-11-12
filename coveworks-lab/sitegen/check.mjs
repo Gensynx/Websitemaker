@@ -3,18 +3,45 @@
 
        node coveworks-lab/sitegen/check.mjs
 
-   Needs Playwright (npm i -g playwright, or any install Node can resolve). */
+   Needs Playwright (npm i -g playwright, or any install Node can resolve). With PHP installed
+   it also runs the two endpoints in api/ for real: leads are written to a temporary folder,
+   nothing is emailed, and the site reader is pointed at a small fixture site served from here. */
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
+import { spawn, spawnSync } from 'node:child_process';
+import os from 'node:os';
 
 const ROOT = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const { chromium } = createRequire(import.meta.url)('playwright');
 
 const MIME = { '.html': 'text/html', '.css': 'text/css', '.js': 'text/javascript', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
+/* a small business site for the site reader to rebuild */
+const FIXTURE = `<!doctype html><html><head><meta charset="utf-8"><title>Home | Kingsley's Barbers – Traditional cuts in Leeds</title>
+<meta name="description" content="Traditional barbering in the heart of Leeds. Skin fades, hot towel shaves and beard trims.">
+<style>.btn{background:#0B6E4F}a{color:#0b6e4f}</style></head><body><h1>Sharp cuts, no fuss.</h1><h2>Our services</h2>
+<p>Kingsley's has been cutting hair on Call Lane since 2009. Good barbers, fair prices and a proper hot towel shave.</p></body></html>`;
+
+const HAS_PHP = spawnSync('php', ['-v']).status === 0;
+const DATA = fs.mkdtempSync(path.join(os.tmpdir(), 'cw-check-'));
+let php = null, phpPort = 0;
+if (HAS_PHP) {
+  phpPort = 20000 + Math.floor(Math.random() * 20000);
+  php = spawn('php', ['-S', `127.0.0.1:${phpPort}`, '-t', ROOT], { stdio: 'ignore', env: { ...process.env, CW_ALLOW_LOCAL: '1', CW_NO_MAIL: '1', CW_DATA_DIR: DATA } });
+  await new Promise(r => setTimeout(r, 900));
+}
+
 const server = http.createServer((req, res) => {
+  if (req.url.startsWith('/__fixture/')) { res.writeHead(200, { 'content-type': 'text/html; charset=utf-8' }); res.end(FIXTURE); return; }
+  if (req.url.startsWith('/api/')) {                       // the endpoints run in PHP's own server
+    if (!php) { res.writeHead(503, { 'content-type': 'application/json' }); res.end('{"ok":false,"error":"PHP is not installed"}'); return; }
+    const up = http.request({ host: '127.0.0.1', port: phpPort, path: req.url, method: req.method, headers: req.headers }, r => { res.writeHead(r.statusCode, r.headers); r.pipe(res); });
+    up.on('error', () => { res.writeHead(502); res.end(); });
+    req.pipe(up);
+    return;
+  }
   let p = decodeURIComponent(req.url.split('?')[0]);
   if (p.endsWith('/')) p += 'index.html';
   const file = path.join(ROOT, p);
@@ -60,7 +87,7 @@ async function open(url, viewport = { width: 1440, height: 900 }) {
 
 console.log('Pages');
 for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
-  for (const p of ['index.html', 'work.html', 'configurator.html', 'studio.html', 'contact.html']) {
+  for (const p of ['index.html', 'work.html', 'configurator.html', 'studio.html', 'contact.html', 'websites-for.html', 'websites-for-barbers.html', 'websites-for-online-shops.html']) {
     const page = await open(p, viewport);
     await page.evaluate(async () => { for (let y = 0; y < document.body.scrollHeight; y += 700) { scrollTo(0, y); await new Promise(r => setTimeout(r, 40)); } });
     await page.waitForLoadState('networkidle');
@@ -132,12 +159,88 @@ console.log('Configurator');
   await again.waitForTimeout(600);
   const second = await again.evaluate(() => [document.querySelector('#pvSite h1').innerText, document.querySelector('#pvSite .x-logo').innerText]);
   if (second.join() !== first.join()) fail(`share link reopened as "${second.join('" / "')}"`);
-  const mail = decodeURIComponent(await again.getAttribute('#fSend', 'href'));
-  if (!mail.startsWith('mailto:sales@coveworks.tech') || !mail.includes('Something else · beekeeping supplies')) fail('email brief is wrong');
   await again.close();
+
+  /* the same build, full page, with a way back into the configurator */
+  const full = await open('preview.html' + share);
+  await full.waitForTimeout(500);
+  const shown = await full.evaluate(() => [document.querySelector('#pvSite h1').innerText, document.getElementById('pvBar').getAttribute('href'), document.documentElement.scrollWidth > innerWidth]);
+  if (shown[0] !== first[0]) fail(`preview page shows "${shown[0]}"`);
+  if (!shown[1].includes('configurator.html?fit=')) fail('preview page does not link back to the configurator');
+  if (shown[2]) fail('preview page scrolls sideways');
+  await full.close();
+}
+
+console.log('Trade pages');
+{
+  const made = fs.readdirSync(ROOT).filter(f => /^websites-for-.+\.html$/.test(f));
+  const listed = JSON.parse(fs.readFileSync(path.join(ROOT, 'sitegen', 'trades.json'), 'utf8')).trades;
+  if (made.length !== listed.length) fail(`${listed.length} trades listed but ${made.length} pages built: run build.py`);
+  const map = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');
+  for (const t of listed) if (!map.includes(`websites-for-${t.slug}.html`)) fail(`sitemap is missing ${t.slug}`);
+  const page = await open('websites-for-dentists.html');
+  const frame = page.frameLocator('.live-frame iframe');
+  await page.locator('.live-frame').scrollIntoViewIfNeeded();
+  const h1 = await frame.locator('#pvSite h1').innerText({ timeout: 8000 }).catch(() => '');
+  const name = await frame.locator('#pvSite .x-logo').first().innerText().catch(() => '');
+  if (!h1 || name !== 'Mill Street Dental') fail(`dentists sample shows "${name}" / "${h1}"`);
+  if (await frame.locator('#pvBar').count()) fail('embedded preview still shows its bar');
+  const cta = await page.getAttribute('.live-cta a', 'href');
+  if (cta !== 'configurator.html?brief=a%20dental%20practice') fail(`dentists page opens the configurator with ${cta}`);
+  await page.close();
+}
+
+if (!HAS_PHP) console.log('Endpoints: skipped, PHP is not installed');
+else {
+  console.log('Rebuild from an existing site');
+  const page = await open('configurator.html');
+  await page.fill('#fBrief', BASE + '__fixture/'); await page.press('#fBrief', 'Enter');
+  await page.waitForFunction(() => /Rebuilt from|could not/i.test(document.getElementById('fBriefRead').innerText), null, { timeout: 15000 }).catch(() => {});
+  await page.waitForTimeout(500);
+  const r = await page.evaluate(() => ({
+    read: document.getElementById('fBriefRead').innerText, type: document.querySelector('#fType input:checked')?.value,
+    h1: document.querySelector('#pvSite h1').innerText, name: document.querySelector('#pvSite .x-logo').innerText,
+    sub: document.querySelector('#pvSite .x-hero-copy > p:not(.x-kick)').innerText,
+    colour: document.getElementById('pvSite').style.getPropertyValue('--a'), accent: document.querySelector('#fAccent input:checked')?.value }));
+  if (r.type !== 'salon') fail(`site rebuild chose ${r.type}, expected salon (${r.read})`);
+  if (r.h1 !== 'Sharp cuts, no fuss.' || r.name !== "Kingsley's Barbers") fail(`site rebuild shows "${r.name}" / "${r.h1}"`);
+  if (!r.sub.startsWith('Traditional barbering')) fail(`site rebuild did not keep their words: "${r.sub}"`);
+  if (r.colour !== '#0B6E4F' || r.accent !== 'own') fail(`site rebuild colour is ${r.colour} (${r.accent})`);
+  await page.fill('#fBrief', 'a plumber'); await page.press('#fBrief', 'Enter'); await page.waitForTimeout(300);
+  const after = await page.evaluate(() => [document.querySelector('#pvSite h1').innerText, !!document.querySelector('#fAccent input[value=own]')]);
+  if (after[0] === 'Sharp cuts, no fuss.' || after[1]) fail('a new brief should clear what was read from the site');
+
+  console.log('Leads');
+  await page.fill('#lName', 'Sam Kingsley'); await page.fill('#lEmail', 'not an email'); await page.click('#fSend');
+  await page.waitForTimeout(200);
+  if (await page.locator('.lead-done').count()) fail('lead form accepted a bad email');
+  await page.fill('#lEmail', 'sam@example.com');
+  await page.waitForTimeout(2600);                      // the endpoint ignores forms sent faster than a person could
+  await page.click('#fSend');
+  await page.waitForSelector('.lead-done', { timeout: 8000 }).catch(() => fail('lead form did not confirm'));
+  const saved = fs.existsSync(path.join(DATA, 'leads.php')) ? fs.readFileSync(path.join(DATA, 'leads.php'), 'utf8').trim().split('\n').slice(1).map(l => JSON.parse(l)) : [];
+  const lead = saved.find(l => l.email === 'sam@example.com');
+  if (!lead) fail('the lead was not saved');
+  else {
+    if (lead.kind !== 'build' || !lead.summary.includes('Type of site: Trades') || !lead.link.includes('configurator.html?fit=')) fail('the saved lead is missing the build');
+    if (!/^CW-[0-9A-F]{6}$/.test(lead.id)) fail('the saved lead has no reference');
+  }
+  await page.close();
+
+  const contact = await open('contact.html');
+  await contact.fill('#cName', 'Ada'); await contact.fill('#cEmail', 'ada@example.com'); await contact.fill('#cMsg', 'A site for my studio, please.');
+  await contact.waitForTimeout(2600);
+  await contact.click('#cForm button[type=submit]');
+  await contact.waitForSelector('.lead-done', { timeout: 8000 }).catch(() => fail('contact form did not confirm'));
+  const all = fs.readFileSync(path.join(DATA, 'leads.php'), 'utf8');
+  if (!all.includes('"kind":"contact"') || !all.includes('ada@example.com')) fail('the contact message was not saved');
+  if (!all.startsWith('<?php http_response_code(404); exit; ?>')) fail('the leads file is not guarded');
+  await contact.close();
 }
 
 await browser.close();
 server.close();
+if (php) php.kill();
+fs.rmSync(DATA, { recursive: true, force: true });
 console.log(fails.length ? `\n${fails.length} problem(s)` : '\nAll checks passed');
 process.exit(fails.length ? 1 : 0);

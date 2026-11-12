@@ -385,3 +385,11 @@
 .brief-pick{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .brief-pick button{background:#fff;color:var(--ink);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600}
 .brief-pick button:hover{background:var(--sig);color:#fff}
+
+/* a build read from the visitor's own site: their logo beside the name, their colour in the palette */
+.pvs .x-logo-img{height:1.25em;width:auto;max-width:2.4em;object-fit:contain;margin-right:.45em;vertical-align:-.26em;border-radius:5px;display:inline-block}
+.swatch.own span{box-shadow:inset 0 0 0 1px rgba(0,0,0,.12),0 0 0 2px var(--panel),0 0 0 3px var(--sig)}
+.swatch.own input:checked + span{box-shadow:0 0 0 2px var(--panel),0 0 0 3.5px var(--ink)}
+.stage.reading .browser{opacity:.45;transition:opacity .3s;animation:reading 1.1s ease-in-out infinite alternate}
+@keyframes reading{to{opacity:.7}}
+@media (prefers-reduced-motion:reduce){.stage.reading .browser{animation:none}}

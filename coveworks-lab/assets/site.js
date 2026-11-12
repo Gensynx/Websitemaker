@@ -185,6 +185,17 @@ if (wList){
 
 /* the fitting room lives in fitting.js */
 
+/* ============ leads ============ */
+/* Posts an enquiry to api/lead.php, which saves it and emails the studio. Resolves with { id },
+   rejects with { error, field } so the caller can fall back to the visitor's own email app. */
+var opened = Date.now();
+window.cwLead = function(lead){
+  lead.t = Date.now() - opened;
+  return fetch('api/lead.php', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(lead) })
+    .then(function(r){ return r.json(); })
+    .then(function(d){ if (!d || !d.ok) throw d || {}; return d; });
+};
+
 /* ============ contact form ============ */
 var cForm = $('cForm');
 if (cForm) cForm.addEventListener('submit', function(e){
@@ -198,9 +209,33 @@ if (cForm) cForm.addEventListener('submit', function(e){
   });
   if (!ok){ $('cOk').textContent = 'A field needs another look'; return; }
   var n = $('cName').value.trim(), em = $('cEmail').value.trim(), msg = $('cMsg').value.trim();
-  window.location.href = 'mailto:sales@coveworks.tech?subject=' + encodeURIComponent('Project enquiry · ' + n) + '&body=' + encodeURIComponent(msg + '\n\n· ' + n + '\n· ' + em);
-  $('cOk').textContent = 'Your email app has opened · hit send to finish';
+  var btn = cForm.querySelector('button[type=submit]');
+  btn.disabled = true;
+  $('cOk').textContent = 'Sending';
+  window.cwLead({ kind: 'contact', name: n, email: em, message: msg, website: $('cWeb').value }).then(function(d){
+    cForm.innerHTML = '<p class="lead-done"><span class="led ok"></span><b>Sent.</b> Thank you, ' + esc(n) + '. Your message is with us as ' + esc(d.id) + ' and we will reply to ' + esc(em) + ' within a day.</p>';
+  }, function(){
+    /* the server could not take it: open the visitor's own email app with the message written */
+    btn.disabled = false;
+    window.location.href = 'mailto:sales@coveworks.tech?subject=' + encodeURIComponent('Project enquiry · ' + n) + '&body=' + encodeURIComponent(msg + '\n\n· ' + n + '\n· ' + em);
+    $('cOk').textContent = 'Your email app has opened · hit send to finish';
+  });
 });
+
+/* ============ live previews ============ */
+/* Each .live-frame holds a full page preview in an iframe, drawn at desktop or phone width and scaled to fit. */
+var lives = document.querySelectorAll('.live-frame');
+function fitLives(){
+  lives.forEach(function(box){
+    var f = box.querySelector('iframe'), w = box.clientWidth, phone = w < 560;
+    var fw = phone ? 390 : 1280, fh = phone ? 760 : 800, k = Math.min(1, w / fw);
+    f.style.width = fw + 'px'; f.style.height = fh + 'px';
+    f.style.transform = 'scale(' + k + ')';
+    f.style.left = Math.max(0, (w - fw * k) / 2) + 'px';
+    box.style.height = Math.round(fh * k) + 'px';
+  });
+}
+if (lives.length){ fitLives(); window.addEventListener('resize', fitLives, { passive: true }); }
 
 /* ============ scroll loop ============ */
 var ticking = false;
